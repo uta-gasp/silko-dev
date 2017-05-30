@@ -252,6 +252,16 @@ class DB {
         });
     }
 
+    deleteItems( cls, ids ) {
+        const promises = [];
+        ids.forEach( id => {
+            const ref = this.fb.child( `${cls.db}/${id}` );
+            promises.push( ref.remove() );
+        });
+
+        return Promise.all( promises );
+    }
+
     delete( obj, cb ) {
         const ref = this.fb.child( `${obj.__proto__.constructor.db}/${obj.id}` );
         return ref.remove().then( () => cb() ).catch( err => cb( err ) );

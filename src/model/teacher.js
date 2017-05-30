@@ -3,6 +3,7 @@ import School from './school.js';
 import Student from './student.js';
 import Intro from './intro.js';
 import Class from './class.js';
+import Task from './task.js';
 import db from './db.js';
 
 export default class Teacher {
@@ -95,6 +96,31 @@ export default class Teacher {
 
         db.updateField( this, 'intros', this.intros, cb );
 
+        db.getFromIDs( Class, this.classes, (err, classes) => {
+            if (err) {
+                return console.log( err );
+            }
+
+            classes.forEach( cls => {
+                db.getFromIDs( Task, cls.tasks, (err, tasks) => {
+                    if (err) {
+                        return console.log( err );
+                    }
+
+                    tasks.forEach( task => {
+                        if (task.intro === intro.id ) {
+                            task.intro = '';
+                            db.updateField( task, 'intro', task.intro, err => {
+                                if (err) {
+                                    return console.log( err );
+                                }
+                            });
+                        }
+                    })
+                })
+            })
+        });
+
         db.delete( intro, err => {
             // ignore the error
         });
@@ -130,6 +156,8 @@ export default class Teacher {
         this.classes = this.classes.filter( item => item !== cls.id );
 
         db.updateField( this, 'classes', this.classes, cb );
+
+        db.deleteItems( Task, cls.tasks );
 
         db.getFromIDs( Student, cls.students, (err, students) => {
             if (err) {

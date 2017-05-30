@@ -22,28 +22,17 @@
               i.fa.fa-remove
 
     modal-editor-container(v-if="isEditing" title="Available students" @close="closeEditor()")
-      div.tabs.is-centered.is-boxed
-        ul.ul
-          li(:class="{ 'is-active': isGradeSelected( grade ) }" v-for="grade in schoolGrades" :key="grade")
-            a(@click="setCurrentGrade( grade )") {{grade.name}}
-      .students
-        .has-text-centered(v-if="!isGradeSelected()")
-          i Select a class
-        .container(v-for="grade in schoolGrades" v-if="isGradeSelected( grade )")
-          .card.is-fullwidth.student(:class="{ 'is-selected' : student.selected }" v-for="student in grade.students")
-            .card-content.title.is-5(@click="selectStudent( student, $event)") {{student.ref.name}}
-      .field
-        p.control
-          a.button.is-primary(@click="addNewStudents") Save
+      student-select-box(:grades="schoolGrades" @accept="addNewStudents( $event )")
 </template>
 
 <script>
   import gui from '@/utils/gui.js';
 
   import ModalEditorContainer from '@/components/widgets/ModalEditorContainer';
+  import StudentSelectBox from '@/components/widgets/StudentSelectBox';
 
   export default {
-    name: 'introductions',
+    name: 'student-list',
 
     data() {
       return {
@@ -75,7 +64,8 @@
     },
 
     components: {
-      'modal-editor-container': ModalEditorContainer
+      'modal-editor-container': ModalEditorContainer,
+      'student-select-box': StudentSelectBox,
     },
 
     watch: {
@@ -172,19 +162,9 @@
         this.isEditing = true;
       },
 
-      addNewStudents() {
-        const newStudents = [];
-
-        this.schoolGrades.forEach( grade => {
-          grade.students.forEach( student => {
-            if (student.selected) {
-              newStudents.push( student.ref.id );
-            }
-          });
-        });
-
-        if (newStudents.length) {
-          this.parent.addStudents( newStudents, err => {
+      addNewStudents( e ) {
+        if (e.students.length) {
+          this.parent.addStudents( e.students, err => {
             if (err) {
               return console.log( 'TODO display the error', err );
             }
@@ -217,22 +197,6 @@
           this.loadStudents();
         });
       },
-
-      // selection
-      setCurrentGrade( grade ) {
-        this.currentGrade = grade;
-      },
-
-      isGradeSelected( grade ) {
-        if (!this.currentGrade) {
-          return false;
-        }
-        return grade ? this.currentGrade.name === grade.name : !!this.currentGrade;
-      },
-
-      selectStudent( student ) {
-        student.selected = !student.selected;
-      },
     },
 
     mounted() {
@@ -244,23 +208,4 @@
 
 
 <style lang="less" scoped>
-  .students {
-    min-height: 50vh;
-    max-height: 90vh;
-    margin-bottom: 1em;
-    overflow-y: auto;
-  }
-
-  .tabs {
-    margin-bottom: 0 !important;
-  }
-
-  .student {
-    cursor: cell;
-  }
-
-  .is-selected {
-    background-color: #cfc;
-  }
-
 </style>
