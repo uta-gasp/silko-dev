@@ -126,6 +126,28 @@ class DB {
         return this.fb.update( updates, cb );
     }
 
+    // Update a record
+    // @param obj - instance of a class to update
+    // @param upd - an object with field-value pairs
+    // @param cb - callback( err )
+    // @return - Promose
+    updateFields( obj, upd, cb ) {
+        const updates = {};
+
+        if (upd instanceof Array) {
+            upd.forEach( item => {
+                updates[ `/${obj.__proto__.constructor.db}/${obj.id}/${item.field}` ] = item.value;
+            });
+        }
+        else {
+            for (let field in upd) {
+                updates[ `/${obj.__proto__.constructor.db}/${obj.id}/${field}` ] = upd[ field ];
+            }
+        }
+
+        return this.fb.update( updates, cb );
+    }
+
     // Sets a new value for a field
     // @param obj - instance of a class to update
     // @param field - field to update
@@ -232,6 +254,11 @@ class DB {
 
     delete( obj, cb ) {
         const ref = this.fb.child( `${obj.__proto__.constructor.db}/${obj.id}` );
+        return ref.remove().then( () => cb() ).catch( err => cb( err ) );
+    }
+
+    deleteField( obj, field, cb ) {
+        const ref = this.fb.child( `${obj.__proto__.constructor.db}/${obj.id}/${field}` );
         return ref.remove().then( () => cb() ).catch( err => cb( err ) );
     }
 

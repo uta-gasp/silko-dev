@@ -3,7 +3,7 @@
     p.panel-heading
       nav.level
         .level-left
-          .level-item {{tasks.length}} texts
+          .level-item {{gui.displayCount( tasks, 'task' )}}
         .level-right
           .level-item
             button.button.is-primary(@click="openNewTextBox()") Add
@@ -22,7 +22,6 @@
 
     modal-editor-container(v-if="isEditing" title="Text editor" @close="closeEditor()")
       text-editor(
-        :is-intro="false"
         :action="action"
         :show-labels="true"
         :name-editable="!toEdit"
@@ -30,9 +29,8 @@
         :src-text="toEditText"
         :intros="intros"
         :src-intro="toEditIntro"
-        :is-multipages="true"
-        :src-lang="toEditLang"
-        :src-syllabs="toEditSyllabs"
+        :src-syllab="toEditSyllab"
+        :src-syllab-exceps="toEditSyllabExceps"
         :src-speech="toEditSpeech"
         @save="save")
 
@@ -40,11 +38,12 @@
 </template>
 
 <script>
-  import Task from '../model/task.js';
+  import Task from '@/model/task.js';
+  import gui from '@/utils/gui.js';
 
-  import ModalEditorContainer from './ModalEditorContainer';
-  import TextEditor from './TextEditor';
-  import RemoveWarning from './RemoveWarning';
+  import ModalEditorContainer from '@/components/widgets/ModalEditorContainer';
+  import TextEditor from '@/components/widgets/TextEditor';
+  import RemoveWarning from '@/components/widgets/RemoveWarning';
 
   export default {
     name: 'introductions',
@@ -57,6 +56,8 @@
         toEdit: null,
         isCreating: false,
         toDelete: null,
+
+        gui
       };
     },
 
@@ -94,16 +95,16 @@
         return this.toEdit ? this.toEdit.intro : '';
       },
 
-      toEditLang() {
-        return this.toEdit ? this.toEdit.lang : '';
+      toEditSyllab() {
+        return this.toEdit ? this.toEdit.syllab : '';
       },
 
-      toEditSyllabs() {
+      toEditSyllabExceps() {
         return this.toEdit ? Task.syllabsToText( this.toEdit.syllabExceptions ) : '';
       },
 
       toEditSpeech() {
-        return this.toEdit ? this.toEdit.speech : false;
+        return this.toEdit ? this.toEdit.speech : '';
       },
 
       toDeleteName() {
@@ -184,7 +185,9 @@
 
       removeWarningClosed( confirm ) {
         if (confirm) {
+          const id = this.toDelete.id;
           this.parent.deleteTask( this.toDelete, err => {
+            this.$emit( 'deleted', { task: id } );
             this.loadTasks();
           });
         }

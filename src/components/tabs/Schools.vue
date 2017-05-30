@@ -15,7 +15,7 @@
 
     nav.panel
       p.panel-heading Schools
-      .center(v-if="!schools.length")
+      .container(v-if="!schools.length")
         i No school exists yet
       table.table(v-else)
         thead
@@ -31,12 +31,12 @@
 </template>
 
 <script>
-  import { EventBus }  from '../model/event-bus.js';
-  import Admin from '../model/users/admin.js';
-  import School from '../model/school.js';
+  import { EventBus }  from '@/model/event-bus.js';
+  import Admin from '@/model/users/admin.js';
+  import School from '@/model/school.js';
 
-  import CreationSuccess from './CreationSuccess';
-  import CreationError from './CreationError';
+  import CreationSuccess from '@/components/widgets/CreationSuccess';
+  import CreationError from '@/components/widgets/CreationError';
 
   export default {
     name: 'schools',
@@ -157,10 +157,4 @@
 </script>
 
 <style lang="less" scoped>
-  .center {
-    margin-top: 2em;
-    width: 100%;
-    text-align: center;
-    vertical-align: middle;
-  }
 </style>

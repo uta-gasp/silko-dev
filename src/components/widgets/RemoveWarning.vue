@@ -11,10 +11,11 @@
               .level-right
                 .level-item
                   button.delete(@click="reject()")
-          .message-body
+          .message-body.container
             p The {{object}} "{{name}}" will be deleted permanently. Continue?
-            .control
-            button.button.is-danger(@click="confirm()") OK
+            p.panel-tabs
+              button.button.is-danger(@click="confirm()") OK
+              button.button(@click="reject()") Cancel
 </template>
 
 <script>
@@ -43,7 +44,8 @@ export default {
 </script>
 
 <style lang="less" scoped>
-  .message-body {
-    text-align: center;
+  .button {
+    margin-left: 0.5em;
+    min-width: 5em;
   }
 </style>

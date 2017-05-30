@@ -11,10 +11,10 @@
 </template>
 
 <script>
-  import { EventBus } from '../model/event-bus.js';
-  import db from '../model/db.js';
+  import { EventBus } from '@/model/event-bus.js';
+  import db from '@/model/db.js';
 
-  import login from './login'
+  import login from '@/components/widgets/Login'
 
   export default {
     name: 'home',

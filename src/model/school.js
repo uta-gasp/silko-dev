@@ -1,6 +1,7 @@
 import Recordable from './commons/recordable.js';
 import Teacher from './teacher.js';
 import Student from './student.js';
+import Class from './class.js';
 import db from './db.js';
 
 export default class School {
@@ -21,7 +22,7 @@ export default class School {
     }
 
     static get instance() {
-        return db.user ? db.user.ref : null;
+        return (db.user && db.user.isSchool) ? db.user.ref : null;
     }
 
     static list( cb ) {
@@ -52,13 +53,38 @@ export default class School {
         });
     }
 
-    getStudents( cb ) {
-        return db.getAll( Student, (err, students) => {
+    getTeachers( cb ) {
+        return db.getFromIDs( Teacher, this.teachers, (err, teachers) => {
             if (err) {
                 return cb( err );
             }
 
-            cb( undefined, students.filter( item => item.school === this.id ) );
+            cb( undefined, teachers );
+        });
+    }
+
+    getStudents( cb ) {
+        return db.getFromIDs( Student, this.students, (err, students) => {
+            if (err) {
+                return cb( err );
+            }
+
+            cb( undefined, students );
+        });
+    }
+
+    getClasses( cb ) {
+        const classes = [];
+        return this.getTeachers( (err, teachers) => {
+            if (err) {
+                return cb( err );
+            }
+
+            teachers.forEach( teacher => {
+                classes.push( ...teacher.classes );
+            });
+        }).then( values => {
+            return db.getFromIDs( Class, classes, cb);
         });
     }
 
@@ -83,36 +109,36 @@ export default class School {
         });
     }
 
-    passTeachersTo( teachers, school, cb ) {
-        this.teachers = this.teachers.filter( teacher => {
-            return teachers.indexOf( teacher ) < 0;
-        });
+    // passTeachersTo( teachers, school, cb ) {
+    //     this.teachers = this.teachers.filter( teacher => {
+    //         return teachers.indexOf( teacher ) < 0;
+    //     });
 
-        let _err;
+    //     let _err;
 
-        db.updateField( this, 'teachers', this.teachers, err => {
-            if (err) {
-                return _err = err;
-            }
+    //     db.updateField( this, 'teachers', this.teachers, err => {
+    //         if (err) {
+    //             return _err = err;
+    //         }
 
-            db.get( School, school, (err, anotherSchool) => {
-                if (err) {
-                    return _err = err;
-                }
+    //         db.get( School, school, (err, anotherSchool) => {
+    //             if (err) {
+    //                 return _err = err;
+    //             }
 
-                const anotherSchoolTeachers = anotherSchool.teachers.concat( teachers );
-                db.updateField( anotherSchool, 'teachers', anotherSchoolTeachers, err => {
-                    _err = err;
+    //             const anotherSchoolTeachers = anotherSchool.teachers.concat( teachers );
+    //             db.updateField( anotherSchool, 'teachers', anotherSchoolTeachers, err => {
+    //                 _err = err;
 
-                    teachers.forEach( teacher => {
-                        db.update( `/${Teacher.db}/${teacher}/school`, school );
-                    });
-                });
-            });
-        });
+    //                 teachers.forEach( teacher => {
+    //                     db.update( `/${Teacher.db}/${teacher}/school`, school );
+    //                 });
+    //             });
+    //         });
+    //     });
 
-        cb( _err );
-    }
+    //     cb( _err );
+    // }
 }
 
 Recordable.apply( School );

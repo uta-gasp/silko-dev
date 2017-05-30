@@ -24,7 +24,7 @@ export default class Teacher {
     }
 
     static get instance() {
-        return db.user ? db.user.ref : null;
+        return (db.user && db.user.isTeacher) ? db.user.ref : null;
     }
 
     static list( cb ) {
@@ -43,7 +43,7 @@ export default class Teacher {
             school: this.school,
             classes: [],
             sessions: [],
-            assignments: []
+            assignments: {}
         }, (err, id) => {
             if (err) {
                 return cb( err );
@@ -123,7 +123,7 @@ export default class Teacher {
     }
 
     getClasses( cb ) {
-        db.getFromIDs( Class, this.classes, cb);
+        return db.getFromIDs( Class, this.classes, cb);
     }
 
     deleteClass( cls, cb ) {
@@ -131,9 +131,27 @@ export default class Teacher {
 
         db.updateField( this, 'classes', this.classes, cb );
 
+        db.getFromIDs( Student, cls.students, (err, students) => {
+            if (err) {
+                return console.log( err );
+            }
+
+            students.forEach( student => {
+                student.removeClass( cls.id, err => {
+                    if (err) {
+                        return console.log( err );
+                    }
+                });
+            });
+        });
+
         db.delete( cls, err => {
             // ignore the error
         });
+    }
+
+    getListOfClasses( classes ) {
+        return classes.filter( cls => this.classes.includes( cls.id ) );
     }
 }
 

@@ -18,6 +18,9 @@
       router-link.nav-item.is-tab(to="/classes" v-if="isTeacher")
         i.fa.fa-database
         span Classes
+      router-link.nav-item.is-tab(to="/assignments" v-if="isStudent")
+        i.fa.fa-tasks
+        span Assignments
     .nav-right(v-if="user")
       .user-block
         span.user {{user.name}}
@@ -66,7 +69,11 @@
 
       isTeacher() {
         return this.user ? this.user.isTeacher : false;
-      }
+      },
+
+      isStudent() {
+        return this.user ? this.user.isStudent : false;
+      },
     },
 
     created() {

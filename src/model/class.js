@@ -20,10 +20,11 @@ export default class Class {
         db.add( Task, {
             name: task.name,
             owner: this.owner,
+            cls: this.id,
             type: 'text',
             intro: task.intro,
             pages: Task.textToPages( task.text ),
-            lang: task.lang,
+            syllab: task.syllab,
             syllabExceptions: Task.textToSyllabs( task.syllabExceptions ),
             speech: task.speech
         }, (err, id) => {
@@ -46,12 +47,34 @@ export default class Class {
         db.getFromIDs( Task, this.tasks, cb );
     }
 
-    deleteTask( text, cb ) {
-        this.tasks = this.tasks.filter( item => item !== text.id );
+    deleteTask( task, cb ) {
+        this.tasks = this.tasks.filter( item => item !== task.id );
 
         db.updateField( this, 'tasks', this.tasks, cb );
 
-        db.delete( text, err => {
+        db.getFromIDs( Student, this.students, (err, students) => {
+            if (err) {
+                return console.log( err );
+            }
+
+            students.forEach( student => {
+                // student.removeClass( this.id, err => {
+                //     if (err) {
+                //         return console.log( err );
+                //     }
+                // });
+
+                if (student.assignments[ this.id ] === task.id) {
+                    student.setAssignment( this.id, null, err => {
+                        if (err) {
+                            return console.log( err );
+                        }
+                    });
+                }
+            });
+        });
+
+        db.delete( task, err => {
             // ignore the error
         });
     }
@@ -65,6 +88,20 @@ export default class Class {
         db.updateField( this, 'students', newStudents, err => {
             if (!err) {
                 this.students = newStudents;
+
+                db.getFromIDs( Student, ids, (err, students) => {
+                    if (err) {
+                        return console.log( err );
+                    }
+
+                    students.forEach( student => {
+                        student.addClass( this.id, err => {
+                            if (err) {
+                                return console.log( err );
+                            }
+                        });
+                    });
+                })
             }
 
             cb( err );
@@ -75,6 +112,24 @@ export default class Class {
         this.students = this.students.filter( item => item !== student.id );
 
         db.updateField( this, 'students', this.students, cb );
+
+        db.get( Student, student.id, (err, _student) => {
+            if (err) {
+                return console.log( err );
+            }
+
+            student.removeClass( this.id, err => {
+                if (err) {
+                    return console.log( err );
+                }
+            });
+
+            student.setAssignment( this.id, null, err => {
+                if (err) {
+                    return console.log( err );
+                }
+            });
+        })
     }
 }
 

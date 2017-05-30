@@ -6,12 +6,13 @@ export default class Task {
         this.id = id;
         this.name = '';
         this.owner = '';
+        this.cls = '';
         this.type = '';
         this.intro = '';
         this.pages = [];    // array of arrays of strings
-        this.lang = '';
+        this.syllab = '';
         this.syllabExceptions = {};
-        this.speech = false;
+        this.speech = '';
     }
 
     static get db() {
@@ -97,17 +98,14 @@ export default class Task {
         return result.join( '\n' );
     }
 
-    update( task ) {
-        db.update( `${Task.db}/${this.id}`, {
-            name: task.name,
-            owner: this.owner,
-            type: this.type,
+    update( task, cb ) {
+        db.updateFields( this, {
             intro: task.intro,
             pages: Task.textToPages( task.text ),
-            lang: task.lang,
+            syllab: task.syllab,
             syllabExceptions: Task.textToSyllabs( task.syllabExceptions ),
             speech: task.speech
-        });
+        }, cb);
     }
 }
 

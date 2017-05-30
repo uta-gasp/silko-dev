@@ -4,56 +4,55 @@
       creation-error(object="introduction" :show="showCreationError" :error="creationError")
       creation-success(object="introduction" :show="showCreationSuccess")
       p.panel-heading Add introduction
-      text-editor(
-        :is-intro="true"
+      intro-editor(
         :name-editable="true"
         :reload="resetNew"
         @save="tryToCreate")
 
     nav.panel
       p.panel-heading Introductions
-      .center(v-if="!intros.length")
+      .container(v-if="!intros.length")
         i No introductions exists yet
       table.table(v-else)
         thead
           tr
             th Name
             th Text
-            th Actions
+            th
+              .is-pulled-right Actions
         tbody
           tr(v-for="item in intros")
             td {{item.name}}
             td.pre {{getTextFromLines( item.lines )}}
             td
-              button.button.is-light(@click="edit( item )")
-                i.fa.fa-edit
-              button.button.is-danger(@click="remove( item )")
-                i.fa.fa-remove
+              .is-pulled-right
+                button.button.is-light(@click="edit( item )")
+                  i.fa.fa-edit
+                button.button.is-danger(@click="remove( item )")
+                  i.fa.fa-remove
 
     modal-editor-container(v-if="toEdit" title="Introduction editor" @close="closeEditor()")
-      text-editor(
-        :is-intro="true"
+      intro-editor(
         action="Save"
         :name-editable="false"
         :show-labels="true"
         :src-name="toEditName"
         :src-text="toEditText"
-        :is-multipages="false"
         @save="saveEdited")
 
     remove-warning(v-if="toDelete" object="introduction" :name="toDeleteName" @close="removeWarningClosed")
 </template>
 
 <script>
-  import { EventBus }  from '../model/event-bus.js';
-  import Teacher from '../model/teacher.js';
-  import Intro from '../model/intro.js';
+  import { EventBus }  from '@/model/event-bus.js';
+  import Teacher from '@/model/teacher.js';
+  import Intro from '@/model/intro.js';
 
-  import CreationSuccess from './CreationSuccess';
-  import CreationError from './CreationError';
-  import ModalEditorContainer from './ModalEditorContainer';
-  import TextEditor from './TextEditor';
-  import RemoveWarning from './RemoveWarning';
+  import CreationSuccess from '@/components/widgets/CreationSuccess';
+  import CreationError from '@/components/widgets/CreationError';
+  import ModalEditorContainer from '@/components/widgets/ModalEditorContainer';
+  import IntroEditor from '@/components/widgets/IntroEditor';
+  import RemoveWarning from '@/components/widgets/RemoveWarning';
 
   export default {
     name: 'introductions',
@@ -80,7 +79,7 @@
       'creation-success': CreationSuccess,
       'creation-error': CreationError,
       'modal-editor-container': ModalEditorContainer,
-      'text-editor': TextEditor,
+      'intro-editor': IntroEditor,
       'remove-warning': RemoveWarning
     },
 
@@ -215,13 +214,6 @@
 </script>
 
 <style lang="less" scoped>
-  .center {
-    margin-top: 2em;
-    width: 100%;
-    text-align: center;
-    vertical-align: middle;
-  }
-
   .pre {
     white-space: pre;
   }

@@ -3,28 +3,29 @@
     .field
       p.control.has-icons-left.has-icons-right
         input.input(type="email" placeholder="Email" v-model="email")
-        //span.icon.is-small.is-left
-          a-i.fa.fa-envelope
-        //a-span.icon.is-small.is-right(v-if="!isEmailValid")
-          a-i.fa.fa-warning
+        //- span.icon.is-small.is-left
+        //-   i.fa.fa-envelope
+        //- span.icon.is-small.is-right(v-if="!isEmailValid")
+        //-   i.fa.fa-warning
 
       p.control.has-icons-left.has-icons-right
         input.input(type="password" placeholder="Password" v-model="password")
-        //span.icon.is-small.is-left
-          i.fa.fa-user-secret
-        //span.icon.is-small.is-right(v-if="!isPasswordValid")
-          i.fa.fa-warning
+        //- span.icon.is-small.is-left
+        //-   i.fa.fa-user-secret
+        //- span.icon.is-small.is-right(v-if="!isPasswordValid")
+        //-   i.fa.fa-warning
 
-      a.button.is-primary(:disabled="inProgress" @click="login()") Log in
+      p.control.has-text-centered
+        a.button.is-primary(:disabled="inProgress" @click="login()") Log in
 
       .error
         error(:show="showError" :error="errorText")
 </template>
 
 <script>
-  import db from '../model/db.js'
+  import db from '@/model/db.js'
 
-  import error from './Error';
+  import error from '@/components/widgets/Error';
 
   export default {
     name: 'Login',

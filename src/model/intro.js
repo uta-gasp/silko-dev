@@ -13,9 +13,9 @@ export default class Intro {
         return 'intros';
     }
 
-    updateText( text ) {
+    updateText( text, cb ) {
         const lines = text.split( '\n' ).map( line => line.trim() );
-        db.update( `${Intro.db}/${this.id}/lines`, lines, cb );
+        db.updateField( this, 'lines', lines, cb );
     }
 }
 

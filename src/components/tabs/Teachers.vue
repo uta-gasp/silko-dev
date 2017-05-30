@@ -1,68 +1,61 @@
 <template lang="pug">
-  #students
+  #teachers
     nav.panel
-      creation-error(object="student" :show="showCreationError" :error="creationError")
-      creation-success(object="student" :show="showCreationSuccess")
-      p.panel-heading Add student
+      creation-error(object="teacher" :show="showCreationError" :error="creationError")
+      creation-success(object="teacher" :show="showCreationSuccess")
+      p.panel-heading Add teacher
       .panel-block
         .field
           p.control
             input.input(type="text" placeholder="Name" v-model="newName")
           p.control
             input.input(type="email" placeholder="Email" v-model="newEmail")
-          p.control
-            input.input(type="text" placeholder="Grade" v-model="newGrade")
           p.control(v-if="isAdmin")
             span.select
               select(v-model="newSchool" required)
                 option(value="" disabled selected hidden ) School
                 option(v-for="item in schoolItems" v-bind:value="item.value") {{item.text}}
           p.control
-            button.button.is-primary(:disabled="!canCreateStudent" @click="tryToCreateStudent()") Create
+            button.button.is-primary(:disabled="!canCreate" @click="tryToCreate()") Create
     nav.panel
-      p.panel-heading Students
-      .center(v-if="!students.length")
-        i No students exists yet
+      p.panel-heading Teachers
+      .container(v-if="!teachers.length")
+        i No teachers exists yet
       table.table(v-else)
         thead
           tr
             th Name
             th(v-if="isAdmin") School
-            th Grade
-            th Classes
+            th(v-if="!isAdmin") Classes
         tbody
-          tr(v-for="student in students")
-            td {{student.name}}
+          tr(v-for="teacher in teachers")
+            td {{teacher.name}}
             td(v-if="isAdmin")
-              p.control
-                span.select
-                  select(:value="student.school" @input="moveStudent( student, $event )")
-                    option(v-for="school in schools" :value="school.id") {{school.name}}
-            td {{student.grade}}
-            td {{student.classes.length}}
+              span.select
+                select(:value="teacher.school" @input="moveTeacher( teacher, $event )")
+                  option(v-for="school in schools" :value="school.id") {{school.name}}
+            td(v-if="!isAdmin")
+              span.ellipsis {{getListOfTeacherClasses( teacher )}}
 </template>
 
 <script>
-  import { EventBus }  from '../model/event-bus.js';
-  import Admin from '../model/users/admin.js';
-  import School from '../model/school.js';
-  import Student from '../model/student.js';
-  import Teacher from '../model/teacher.js';
+  import { EventBus }  from '@/model/event-bus.js';
+  import Admin from '@/model/users/admin.js';
+  import School from '@/model/school.js';
+  import Teacher from '@/model/teacher.js';
 
-  import CreationSuccess from './CreationSuccess';
-  import CreationError from './CreationError';
+  import CreationSuccess from '@/components/widgets/CreationSuccess';
+  import CreationError from '@/components/widgets/CreationError';
 
   export default {
-    name: 'students',
+    name: 'teachers',
 
     data() {
       return {
-        teacher: null,
         school: null,
 
         newName: '',
         newEmail: '',
-        newGrade: '',
         newSchool: '',
 
         isCreating: false,
@@ -71,7 +64,8 @@
         showCreationSuccess: 0, // random value to trigger the notification
 
         schools: [],
-        students: []
+        teachers: [],
+        classes: [],
       };
     },
 
@@ -82,10 +76,6 @@
 
     computed: {
 
-      isAdmin() {
-        return Admin.isLogged;
-      },
-
       isNewNameValid() {
         return this.newName.trim().length > 2;
       },
@@ -94,20 +84,19 @@
         return /(.{2,})@(\w{2,}\.\w{2,})/.test( this.newEmail.trim() );
       },
 
-      isNewGradeValid() {
-        return this.newGrade.trim().length;
-      },
-
       isSchoolValid() {
-        return !Admin.isLogged || this.newSchool;
+        return !this.isAdmin || this.newSchool;
       },
 
-      canCreateStudent() {
+      canCreate() {
         return !this.isCreating
           && this.isNewNameValid
           && this.isNewEmailValid
-          && this.isNewGradeValid
           && this.isSchoolValid;
+      },
+
+      isAdmin() {
+        return Admin.isLogged;
       },
 
       schoolItems() {
@@ -137,28 +126,36 @@
         });
       },
 
-      loadStudents() {
-        Student.list( (err, students) => {
+      loadSchoolClasses() {
+        return this.school.getClasses( (err, classes) => {
           if (err) {
-            return `Cannot retrieve students.\n\n${err}`;
+            return `Cannot retrieve classes.\n\n${err}`;
           }
 
-          this.students = students.filter( student => {
-            if (this.school) {
-              return this.school.id === student.school;
-            }
-            else if (this.teacher) {
-              return this.teacher.school === student.school;
-            }
-            return true;
-          }).sort( (a, b) => {
-            return a.name.toLowerCase() < b.name.toLowerCase();
-          });
+          this.classes = classes;
         });
       },
 
+      loadTeachers() {
+        const onDone = (err, teachers) => {
+          if (err) {
+            return `Cannot retrieve teachers.\n\n${err}`;
+          }
+
+          this.teachers = teachers.sort( (a, b) => {
+            return a.name.toLowerCase() < b.name.toLowerCase();
+          });
+        };
+
+        if (!this.school) {
+          return Teacher.list( onDone );
+        }
+
+        return this.school.getTeachers( onDone );
+      },
+
       checkAccess() {
-        if (!Admin.isLogged && !Teacher.isLogged && !School.isLogged) {
+        if (!Admin.isLogged && !School.isLogged) {
           this.$router.replace( '/' );
         }
       },
@@ -168,24 +165,24 @@
         this.showCreationError = Math.random();
       },
 
-      tryToCreateStudent() {
-        if (!this.canCreateStudent) {
+      tryToCreate() {
+        if (!this.canCreate) {
           return;
         }
 
-        const exists = this.students.some( student => {
-          return student.email.toLowerCase() === this.newEmail.toLowerCase().trim();
+        const exists = this.teachers.some( teacher => {
+          return teacher.email.toLowerCase() === this.newEmail.toLowerCase().trim();
         });
 
         if (exists) {
-          this.setCreationError( 'A student with this email exists already' );
+          this.setCreationError( 'A teacher with this email exists already' );
         }
         else {
-          this.createStudent();
+          this.createTeacher();
         }
       },
 
-      createStudent() {
+      createTeacher() {
         this.isCreating = true;
 
         const onFinished = (err, id) => {
@@ -197,17 +194,15 @@
           else {
             this.newName = '';
             this.newEmail = '';
-            this.loadStudents();
+            this.loadTeachers();
 
             this.showCreationSuccess = Math.random();
           }
         };
 
         if (this.school) {
-          this.school.createStudent( this.newName.trim(), this.newEmail.trim(), this.newGrade.trim(), onFinished );
-        }
-        else if (this.teacher) {
-          this.teacher.createStudent( this.newName.trim(), this.newEmail.trim(), this.newGrade.trim(), onFinished );
+          // return console.log( 'school', this.school.name, 'creates teacher:',  this.newName.trim(), this.newEmail.trim() );
+          this.school.createTeacher( this.newName.trim(), this.newEmail.trim(), onFinished );
         }
         else {  // admin
           School.get( this.newSchool, (err, school) => {
@@ -215,18 +210,26 @@
               return onFinished( err );
             }
 
-            school.createStudent( this.newName.trim(), this.newEmail.trim(), this.newGrade.trim(), onFinished );
+            //return console.log( 'admind creates teacher:',  this.newName.trim(), this.newEmail.trim(), 'for school', school.name );
+            school.createTeacher( this.newName.trim(), this.newEmail.trim(), onFinished );
           });
         }
       },
 
-      moveStudent( student, e ) {
-        Admin.moveStudent( student, e.target.value, this.schools );
+      moveTeacher( teacher, e ) {
+        Admin.moveTeacher( teacher, e.target.value, this.schools );
+      },
+
+      getListOfTeacherClasses( teacher ) {
+        return teacher
+          .getListOfClasses( this.classes )
+          .map( cls => cls.name )
+          .join( ', ' );
       }
     },
 
     created() {
-      console.log('Students component created');
+      console.log('Teachers component created');
       EventBus.$on( 'logout', () => {
         this.checkAccess();
       });
@@ -237,27 +240,22 @@
     mounted() {
       if (Admin.isLogged) {
         this.loadSchools().then( () => {
-          this.loadStudents();
+          return this.loadTeachers();
         });
       }
-      else if (School.isLogged) {
+      else {
         this.school = School.instance;
-        this.loadStudents();
-      }
-      else if (Teacher.isLogged) {
-        this.teacher = Teacher.instance;
-        this.loadStudents();
+        this.loadSchoolClasses().then( () => {
+          return this.loadTeachers();
+        });
       }
     }
   }
 </script>
 
 <style lang="less" scoped>
-  .center {
-    margin-top: 2em;
-    width: 100%;
-    text-align: center;
-    vertical-align: middle;
+  .ellipsis {
+    text-overflow: ellipsis;
   }
 
   select:invalid {

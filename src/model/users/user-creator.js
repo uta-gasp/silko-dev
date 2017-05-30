@@ -34,7 +34,7 @@ export default class UserCreator {
                     cb( err );
                 });
             }
-            else {
+            else if (ref.path === Student.db){
                 console.log( 'logged as student' );
                 return db.get( Student, ref.id, (err, student) => {
                     if (!err) {
@@ -45,6 +45,6 @@ export default class UserCreator {
             }
         }
 
-        cb( 'Invalid reference' );
+        cb( 'UserCreator: Invalid reference' );
     }
 }

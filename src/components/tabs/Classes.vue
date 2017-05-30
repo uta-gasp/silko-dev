@@ -14,7 +14,7 @@
 
     nav.panel
       p.panel-heading Classes
-      .center(v-if="!classes.length")
+      .container(v-if="!classes.length")
         i No classes exists yet
       table.table(v-else)
         thead
@@ -22,30 +22,32 @@
             th Name
             th Texts
             th Students
-            th Actions
+            th
+              .is-pulled-right Actions
         tbody
-          tr(v-for="item in classes")
+          tr(v-for="item in classes" :key="item.id")
             td {{item.name}}
             td
-              task-list(:cls="item" :intros="intros" @saved="onTextSaved" @created="onTextCreated")
+              task-list(:cls="item" :intros="intros" @saved="onTaskSaved" @created="onTaskCreated" @deleted="onTaskDeleted")
             td
-              student-list(:cls="item" :teacher="teacher" @added="onStudentAdded" @removed="onStudentRemoved")
-            td.is-pulled-right
-              button.button.is-danger(@click="removeClass( item )")
-                i.fa.fa-remove
+              student-list(:cls="item" :teacher="teacher" :refresh="refreshStudents" @added="onStudentAdded" @removed="onStudentRemoved")
+            td
+              .is-pulled-right
+                button.button.is-danger(@click="removeClass( item )")
+                  i.fa.fa-remove
 
     remove-warning(v-if="toDelete" object="class" :name="toDeleteName" @close="removeWarningClosed")
 </template>
 
 <script>
-  import { EventBus }  from '../model/event-bus.js';
-  import Teacher from '../model/teacher.js';
+  import { EventBus }  from '@/model/event-bus.js';
+  import Teacher from '@/model/teacher.js';
 
-  import CreationSuccess from './CreationSuccess';
-  import CreationError from './CreationError';
-  import TaskList from './TaskList';
-  import StudentList from './StudentList';
-  import RemoveWarning from './RemoveWarning';
+  import CreationSuccess from '@/components/widgets/CreationSuccess';
+  import CreationError from '@/components/widgets/CreationError';
+  import TaskList from '@/components/widgets/TaskList';
+  import StudentList from '@/components/widgets/StudentList';
+  import RemoveWarning from '@/components/widgets/RemoveWarning';
 
   export default {
     name: 'introductions',
@@ -60,6 +62,7 @@
         creationError: '',
         showCreationError: 0,   // random value to trigger the notification
         showCreationSuccess: 0, // random value to trigger the notification
+        refreshStudents: 0,
 
         createdObject: 'class',
         action: 'create new',
@@ -185,7 +188,7 @@
         this.toDelete = null;
       },
 
-      onTextSaved( e ) {
+      onTaskSaved( e ) {
         this.action = 'save';
         this.createdObject = 'text';
         if (e.err) {
@@ -196,7 +199,7 @@
         }
       },
 
-      onTextCreated( e ) {
+      onTaskCreated( e ) {
         this.action = 'create new';
         this.createdObject = 'text';
         if (e.err) {
@@ -204,7 +207,12 @@
         }
         else {
           this.showCreationSuccess = Math.random();
+          this.refreshStudents = Math.random();
         }
+      },
+
+      onTaskDeleted( e ) {
+        this.refreshStudents = Math.random();
       },
 
       onStudentAdded( e ) {
@@ -235,11 +243,4 @@
 </script>
 
 <style lang="less" scoped>
-  .center {
-    margin-top: 2em;
-    width: 100%;
-    text-align: center;
-    vertical-align: middle;
-  }
-
 </style>
