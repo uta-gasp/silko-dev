@@ -66,11 +66,15 @@ export default class Teacher {
         });
     }
 
-    createIntro( name, text, cb ) {
+    createIntro( name, texts, cb ) {
+        const introTexts = Intro.validateTexts( texts );
+
         db.add( Intro, {
             name: name,
             owner: this.id,
-            lines: text.split( '\n' ).map( line => line.trim() )
+            calibInstruction: introTexts.calibInstruction,
+            startInstruction: introTexts.startInstruction,
+            firstPage: introTexts.firstPage
         }, (err, id) => {
             if (err) {
                 return cb( err );

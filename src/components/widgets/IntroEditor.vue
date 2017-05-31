@@ -4,20 +4,26 @@
       label.label(v-show="showLabels") Name
       p.control
         input.input(type="text" placeholder="Name" :disabled="!nameEditable" v-model="name")
-      label.label(v-show="showLabels") Text
+      label.label(v-show="showLabels") Texts
       p.control
-        textarea.textarea(placeholder="Text" v-model="text")
+        textarea.textarea.low(placeholder="Calibration instruction" v-model="calib")
+      p.control
+        textarea.textarea.low(placeholder="Start instruction" v-model="start")
+      p.control
+        textarea.textarea(placeholder="First page" v-model="firstPage")
       a.button.is-primary(:disabled="!canSave" @click="save()") {{action}}
 </template>
 
 <script>
   export default {
-    name: 'text-editor',
+    name: 'intro-editor',
 
     data() {
       return {
-        name: this.srcName || '',
-        text: this.srcText || '',
+        name: this.intro ? this.intro.name : '',
+        calib: this.intro ? this.intro.calibInstruction : '',
+        start: this.intro ? this.intro.startInstruction : '',
+        firstPage: this.intro ? this.intro.firstPageAsText() : '',
       };
     },
 
@@ -34,21 +40,19 @@
         type: Boolean,
         default: true
       },
-      srcName: {
-        type: String,
-        default: ''
-      },
-      srcText: {
-        type: String,
-        default: ''
+      intro: {
+        type: Object,
+        default: null
       },
       reload: Number
     },
 
     watch: {
       reload() {
-        this.name = this.srcName || '';
-        this.text = this.srcText || '';
+        this.name = this.intro ? this.intro.name : '';
+        this.calib = this.intro ? this.intro.calibInstruction : '';
+        this.start = this.intro ? this.intro.startInstruction : '';
+        this.firstPage = this.intro ? this.intro.firstPageAsText() : '';
       }
     },
 
@@ -58,13 +62,23 @@
         return this.name.length > 1;
       },
 
-      isTextValid() {
-        return this.text.length > 14;
+      isFirstPageValid() {
+        return this.firstPage.length > 14;
+      },
+
+      isCalibInstructionValid() {
+        return this.calib.length > 4;
+      },
+
+      isStartInstructionValid() {
+        return this.start.length > 4;
       },
 
       canSave() {
-        return this.isNameValid &&
-          this.isTextValid;
+        return this.isNameValid && (
+          this.isCalibInstructionValid ||
+          this.isStartInstructionValid ||
+          this.isFirstPageValid);
       },
     },
 
@@ -73,7 +87,11 @@
       save() {
         this.$emit( 'save', {
           name: this.name.trim(),
-          text: this.text,
+          texts: {
+            calibInstruction: this.calib.trim(),
+            startInstruction: this.start.trim(),
+            firstPage: this.firstPage.trim(),
+          }
         });
       }
     }
@@ -84,5 +102,9 @@
   #intro-editor {
     padding: 1em;
     text-align: left;
+  }
+
+  .low {
+    min-height: 60px;
   }
 </style>

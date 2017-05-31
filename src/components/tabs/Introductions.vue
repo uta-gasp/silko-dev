@@ -22,8 +22,8 @@
               .is-pulled-right Actions
         tbody
           tr(v-for="item in intros")
-            td {{item.name}}
-            td.pre {{getTextFromLines( item.lines )}}
+            td {{ item.name }}
+            td.pre {{ item.firstPageAsText() }}
             td
               .is-pulled-right
                 button.button.is-light(@click="edit( item )")
@@ -36,8 +36,7 @@
         action="Save"
         :name-editable="false"
         :show-labels="true"
-        :src-name="toEditName"
-        :src-text="toEditText"
+        :intro="toEdit"
         @save="saveEdited")
 
     remove-warning(v-if="toDelete" object="introduction" :name="toDeleteName" @close="removeWarningClosed")
@@ -87,14 +86,6 @@
 
       toDeleteName() {
         return this.toDelete ? this.toDelete.name : '' ;
-      },
-
-      toEditName() {
-        return this.toEdit ? this.toEdit.name : '' ;
-      },
-
-      toEditText() {
-        return this.toEdit ? this.toEdit.lines.join( '\n' ) : '' ;
       }
     },
 
@@ -130,23 +121,23 @@
         this.showCreationError = Math.random();
       },
 
-      tryToCreate( newIntro ) {
+      tryToCreate( e ) {
         const exists = this.intros.some( intro => {
-          return intro.name.toLowerCase() === newIntro.name.toLowerCase();
+          return intro.name.toLowerCase() === e.name.toLowerCase();
         });
 
         if (exists) {
           this.setCreationError( 'An introduction of this name exists already' );
         }
         else {
-          this.createIntro( newIntro );
+          this.createIntro( e );
         }
       },
 
       createIntro( newIntro ) {
         this.isCreating = true;
 
-        this.teacher.createIntro( newIntro.name, newIntro.text, (err, id) => {
+        this.teacher.createIntro( newIntro.name, newIntro.texts, (err, id) => {
           this.isCreating = false;
 
           if (err) {
@@ -161,16 +152,12 @@
         });
       },
 
-      getTextFromLines( lines ) {
-        return lines ? lines.join( '\n' ) : '';
-      },
-
       edit( item ) {
         this.toEdit = item;
       },
 
       saveEdited( e ) {
-        this.toEdit.updateText( e.text, err => {
+        this.toEdit.updateTexts( e.texts, err => {
           this.loadIntros();
         });
 

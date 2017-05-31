@@ -128,7 +128,7 @@ class DB {
 
     // Update a record
     // @param obj - instance of a class to update
-    // @param upd - an object with field-value pairs
+    // @param upd - [ { field, value } ]
     // @param cb - callback( err )
     // @return - Promose
     updateFields( obj, upd, cb ) {
