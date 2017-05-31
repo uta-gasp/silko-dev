@@ -2,14 +2,14 @@
   #login
     .field
       p.control.has-icons-left.has-icons-right
-        input.input(type="email" placeholder="Email" v-model="email")
+        input.input(type="email" placeholder="Email" v-model="email" @keyup.enter="login()")
         //- span.icon.is-small.is-left
         //-   i.fa.fa-envelope
         //- span.icon.is-small.is-right(v-if="!isEmailValid")
         //-   i.fa.fa-warning
 
       p.control.has-icons-left.has-icons-right
-        input.input(type="password" placeholder="Password" v-model="password")
+        input.input(type="password" placeholder="Password" v-model="password" @keyup.enter="login()")
         //- span.icon.is-small.is-left
         //-   i.fa.fa-user-secret
         //- span.icon.is-small.is-right(v-if="!isPasswordValid")
