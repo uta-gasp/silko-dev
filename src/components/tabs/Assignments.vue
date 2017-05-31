@@ -6,14 +6,15 @@
         .container(v-if="!hasAssignment")
           i No assignments at this moment
         .tile.is-ancestor(v-else)
-          .tile.is-child(v-for="assignment in assignments")
-            .card
-              header.card-header
-                p.card-header-title.notification.is-info {{assignment.cls.name}}
-              .card-content
-                .content {{assignment.task.name}}
-              .card-footer
-                a.card-footer-item(@click="start( assignment )") Start;
+          .tile.is-parent(v-for="assignment in assignments")
+            .tile.is-child
+              .card
+                header.card-header
+                  p.card-header-title.notification.is-info {{assignment.cls.name}}
+                .card-content
+                  .content {{assignment.task.name}}
+                .card-footer
+                  a.card-footer-item(@click="start( assignment )") Start;
 </template>
 
 <script>

@@ -1,21 +1,14 @@
 import UserCreator from './users/user-creator.js';
 import { EventBus }  from './event-bus.js';
 
+const config = require( `@/config/db.${process.env.NODE_ENV}.js` ).config;
+
 class DB {
     // Constructor
     // @param debug - if true, the the test databse is used
     constructor( debug ) {
         if (!window['firebase']) {
             return window.alert( 'Cannot access Firebase' );
-        };
-
-        const config = {
-          apiKey: "AIzaSyBeKdNAX1_JHeGnPouQTYH0d3APAYzRZVY",
-          authDomain: "eye-school-test.firebaseapp.com",
-          databaseURL: "https://eye-school-test.firebaseio.com",
-          projectId: "eye-school-test",
-          storageBucket: "eye-school-test.appspot.com",
-          messagingSenderId: "1082968904935"
         };
 
         firebase.initializeApp( config );
