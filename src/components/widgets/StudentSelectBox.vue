@@ -3,16 +3,28 @@
     div.tabs.is-centered.is-boxed
       ul.ul
         li(:class="{ 'is-active': isGradeSelected( grade ) }" v-for="grade in grades" :key="grade")
-          a(@click="setCurrentGrade( grade )") {{grade.name}}
+          a(@click="selectGrade( grade )") {{grade.name}}
     .students
       .has-text-centered(v-if="!isGradeSelected()")
-        i Select a class
-      .container(v-for="grade in grades" v-if="isGradeSelected( grade )")
-        .card.is-fullwidth.student(:class="{ 'is-selected' : student.selected }" v-for="student in grade.students")
-          .card-content.title.is-5(@click="selectStudent( student, $event)") {{student.ref.name}}
+        i Select a grade
+      div(v-for="grade in grades" v-if="isGradeSelected( grade )")
+        .card.student(:class="{ 'is-selected' : student.selected }"
+          v-if="hasStudents( grade )"
+          v-for="student in grade.students")
+          .card-content.title.is-6(@click="selectStudent( student, $event)") {{student.ref.name}}
+        .has-text-centered(v-if="!hasStudents( grade )")
+          i No available students
     .field
       p.control
-        a.button.is-primary(@click="accept()") Save
+        .level
+          .level-left
+            .level-item
+              a.button.is-primary(@click="accept()") Save
+          .level-right
+            .level-item
+              a.button(:disabled="!hasStudents()" @click="selectAllStudents()") Select all
+            .level-item
+              a.button(:disabled="!hasStudents()" @click="removeAllStudents()") Remove all selections
 </template>
 
 <script>
@@ -33,7 +45,7 @@
     },
 
     methods: {
-      setCurrentGrade( grade ) {
+      selectGrade( grade ) {
         this.currentGrade = grade;
       },
 
@@ -45,8 +57,27 @@
         return grade ? this.currentGrade.name === grade.name : !!this.currentGrade;
       },
 
+      hasStudents( grade ) {
+        grade = grade || this.currentGrade;
+        return grade && grade.students ? !!grade.students.length : false;
+      },
+
       selectStudent( student ) {
         student.selected = !student.selected;
+      },
+
+      selectAllStudents( grade ) {
+        grade = grade || this.currentGrade;
+        grade.students.forEach( student => {
+          student.selected = true;
+        });
+      },
+
+      removeAllStudents( grade ) {
+        grade = grade || this.currentGrade;
+        grade.students.forEach( student => {
+          student.selected = false;
+        });
       },
 
       accept() {
@@ -84,6 +115,22 @@
 
   .is-selected {
     background-color: #cfc;
+  }
+
+  .card-content {
+    padding: 1rem;
+  }
+
+  .columns {
+    margin-bottom: 0;
+  }
+
+  .column {
+    padding-bottom: 0;
+  }
+
+  .level:not(:last-child) {
+    margin-bottom: 0;
   }
 
 </style>

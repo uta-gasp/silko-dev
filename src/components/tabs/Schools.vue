@@ -5,7 +5,7 @@
       creation-success(object="school" :show="showCreationSuccess")
       p.panel-heading Add school
       .panel-block
-        .field
+        .field.control
           p.control
             input.input(type="text" placeholder="Name" v-model="newName")
           p.control
@@ -15,19 +15,20 @@
 
     nav.panel
       p.panel-heading Schools
-      .container(v-if="!schools.length")
-        i No school exists yet
-      table.table(v-else)
-        thead
-          tr
-            th Name
-            th Teachers
-            th Students
-        tbody
-          tr(v-for="item in schools")
-            td {{item.name}}
-            td {{item.teachers.length}}
-            td {{item.students.length}}
+      .panel-block.is-paddingless
+        .container(v-if="!schools.length")
+          i No school exists yet
+        table.table(v-else)
+          thead
+            tr
+              th Name
+              th Teachers
+              th Students
+          tbody
+            tr(v-for="item in schools")
+              td {{item.name}}
+              td {{item.teachers.length}}
+              td {{item.students.length}}
 </template>
 
 <script>

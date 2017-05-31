@@ -7,18 +7,18 @@
         .level-right
           .level-item
             button.button.is-primary(@click="openNewTextBox()") Add
-    .panel-block(v-for="task in tasks")
-      nav.level
-        .level-left
-          .level-item {{task.name}}
-            span(v-if="!!task.pages") &nbsp;({{task.pages.length}} pages)
-        .level-right
-          .level-item
-            button.button.is-light(@click="edit( task )")
-              i.fa.fa-edit
-          .level-item
-            button.button.is-danger(@click="remove( task )")
-              i.fa.fa-remove
+    .panel-block.is-paddingless
+      table.table
+        tbody
+          tr(v-for="task in tasks" :key="parent.id+task.id")
+            td
+              span.is-inline-block {{task.name}}
+              span.is-inline-block(v-if="!!task.pages") &nbsp;({{task.pages.length}} pages)
+            td.is-narrow
+              button.button.is-light(@click="edit( task )")
+                i.fa.fa-edit
+              button.button.is-danger(@click="remove( task )")
+                i.fa.fa-remove
 
     modal-editor-container(v-if="isEditing" title="Text editor" @close="closeEditor()")
       text-editor(
@@ -205,3 +205,9 @@
     }
   };
 </script>
+
+<style lang="less" scoped>
+  .table {
+    margin-bottom: 0;
+  }
+</style>

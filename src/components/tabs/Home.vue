@@ -5,7 +5,7 @@
         .container
           //img(src="../assets/icon-32.png")
           h1.title Welcome to Eye-School
-          h2.subtitle Reading Aid for teachers
+          h2.subtitle A reading aid for students and teachers
     section.section(v-if="loginVisible")
       login
 </template>

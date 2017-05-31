@@ -6,7 +6,7 @@
       creation-success(:object="createdObject" :show="showCreationSuccess")
       p.panel-heading Add class
       .panel-block
-        .field
+        .field.control
           p.control
             input.input(type="text" placeholder="Name" v-model="newName")
           p.control
@@ -14,27 +14,27 @@
 
     nav.panel
       p.panel-heading Classes
-      .container(v-if="!classes.length")
-        i No classes exists yet
-      table.table(v-else)
-        thead
-          tr
-            th Name
-            th Texts
-            th Students
-            th
-              .is-pulled-right Actions
-        tbody
-          tr(v-for="item in classes" :key="item.id")
-            td {{item.name}}
-            td
-              task-list(:cls="item" :intros="intros" @saved="onTaskSaved" @created="onTaskCreated" @deleted="onTaskDeleted")
-            td
-              student-list(:cls="item" :teacher="teacher" :refresh="refreshStudents" @added="onStudentAdded" @removed="onStudentRemoved")
-            td
-              .is-pulled-right
-                button.button.is-danger(@click="removeClass( item )")
-                  i.fa.fa-remove
+      .panel-block.is-paddingless
+        .container(v-if="!classes.length")
+          i No classes exists yet
+        table.table(v-else)
+          thead
+            tr
+              th Name
+              th Texts
+              th Students
+              th.is-narrow
+          tbody
+            tr(v-for="item in classes" :key="item.id")
+              td.title.is-4 {{item.name}}
+              td
+                task-list(:cls="item" :intros="intros" @saved="onTaskSaved" @created="onTaskCreated" @deleted="onTaskDeleted")
+              td
+                student-list(:cls="item" :teacher="teacher" :refresh="refreshStudents" @added="onStudentAdded" @removed="onStudentRemoved")
+              td.is-narrow
+                .is-pulled-right
+                  button.button.is-danger(@click="removeClass( item )")
+                    i.fa.fa-remove
 
     remove-warning(v-if="toDelete" object="class" :name="toDeleteName" @close="removeWarningClosed")
 </template>

@@ -2,16 +2,18 @@
   #assignments
     nav.panel
       p.panel-heading Assignments
-      .container(v-if="!hasAssignment")
-        i No assignments at this moment
-      p.control(v-else)
-        .card(v-for="assignment in assignments")
-          header.card-header
-            p.card-header-title {{assignment.cls.name}}
-          .card-content
-            .content {{assignment.task.name}}
-          .card-footer
-            a.card-footer-item Start;
+      .panel-block
+        .container(v-if="!hasAssignment")
+          i No assignments at this moment
+        .tile.is-ancestor(v-else)
+          .tile.is-child(v-for="assignment in assignments")
+            .card
+              header.card-header
+                p.card-header-title.notification.is-info {{assignment.cls.name}}
+              .card-content
+                .content {{assignment.task.name}}
+              .card-footer
+                a.card-footer-item(@click="start( assignment )") Start;
 </template>
 
 <script>
@@ -63,6 +65,10 @@
           this.$router.replace( '/' );
         }
       },
+
+      start( assignment ) {
+
+      }
     },
 
     created() {

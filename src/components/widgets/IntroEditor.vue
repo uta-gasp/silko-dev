@@ -11,7 +11,8 @@
         textarea.textarea.low(placeholder="Start instruction" v-model="start")
       p.control
         textarea.textarea(placeholder="First page" v-model="firstPage")
-      a.button.is-primary(:disabled="!canSave" @click="save()") {{action}}
+      p.control
+        a.button.is-primary(:disabled="!canSave" @click="save()") {{action}}
 </template>
 
 <script>

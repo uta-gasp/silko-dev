@@ -22,7 +22,7 @@
         i.fa.fa-tasks
         span Assignments
     .nav-right(v-if="user")
-      .user-block
+      .user-block.is-small
         span.user {{user.name}}
         span.user {{user.ref.name}}
       span.nav-item
@@ -93,7 +93,6 @@
   }
 
   .user-block {
-    padding: 10px;
     display: flex;
     flex-direction: column;
   }

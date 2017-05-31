@@ -4,32 +4,34 @@
       creation-error(object="introduction" :show="showCreationError" :error="creationError")
       creation-success(object="introduction" :show="showCreationSuccess")
       p.panel-heading Add introduction
-      intro-editor(
-        :name-editable="true"
-        :reload="resetNew"
-        @save="tryToCreate")
+      .panel-block.is-paddingless
+        intro-editor.control(
+          :name-editable="true"
+          :reload="resetNew"
+          @save="tryToCreate")
 
     nav.panel
       p.panel-heading Introductions
-      .container(v-if="!intros.length")
-        i No introductions exists yet
-      table.table(v-else)
-        thead
-          tr
-            th Name
-            th Text
-            th
-              .is-pulled-right Actions
-        tbody
-          tr(v-for="item in intros")
-            td {{ item.name }}
-            td.pre {{ item.firstPageAsText() }}
-            td
-              .is-pulled-right
-                button.button.is-light(@click="edit( item )")
-                  i.fa.fa-edit
-                button.button.is-danger(@click="remove( item )")
-                  i.fa.fa-remove
+      .panel-block.is-paddingless
+        .container(v-if="!intros.length")
+          i No introductions exists yet
+        table.table(v-else)
+          thead
+            tr
+              th Name
+              th Text
+              th
+                .is-pulled-right Actions
+          tbody
+            tr(v-for="item in intros")
+              td {{ item.name }}
+              td.pre {{ item.firstPageAsText() }}
+              td
+                .is-pulled-right
+                  button.button.is-light(@click="edit( item )")
+                    i.fa.fa-edit
+                  button.button.is-danger(@click="remove( item )")
+                    i.fa.fa-remove
 
     modal-editor-container(v-if="toEdit" title="Introduction editor" @close="closeEditor()")
       intro-editor(

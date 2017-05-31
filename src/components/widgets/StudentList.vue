@@ -7,19 +7,25 @@
         .level-right
           .level-item
             button.button.is-primary(@click="openEditor()") Add
-    .panel-block(v-for="student in students" :key="parent.id+student.id")
-      nav.level
-        .level-left
-          .level-item {{student.name}}
-        .level-right
-          .level-item
-            span.select
-              select(:value="getAssignment( student )" @input="setAssignment( student, $event )")
-                option(value="") none
-                option(v-for="task in tasks" :value="task.id" :key="parent.id+student.id+task.id") {{task.name}}
-          .level-item
-            button.button.is-danger(@click="remove( student )")
-              i.fa.fa-remove
+    .panel-block.is-paddingless
+      table.table
+        thead
+          tr.is-subheader
+            th Name
+            th.is-narrow
+              .has-text-centered Assignment
+            th.is-narrow
+        tbody
+          tr(v-for="student in students" :key="parent.id+student.id")
+            td {{student.name}}
+            td.is-narrow
+              span.select
+                select(:value="getAssignment( student )" @input="setAssignment( student, $event )")
+                  option(value="") none
+                  option(v-for="task in tasks" :value="task.id" :key="parent.id+student.id+task.id") {{task.name}}
+            td.is-narrow
+              button.button.is-danger(@click="remove( student )")
+                i.fa.fa-remove
 
     modal-editor-container(v-if="isEditing" title="Available students" @close="closeEditor()")
       student-select-box(:grades="schoolGrades" @accept="addNewStudents( $event )")
@@ -208,4 +214,13 @@
 
 
 <style lang="less" scoped>
+  .table {
+    margin-bottom: 0;
+  }
+
+  .is-subheader {
+    font-size: 12px;
+    background-color: hsl(0, 0%, 98%);
+    border-bottom: 1px solid #dbdbdb;
+  }
 </style>

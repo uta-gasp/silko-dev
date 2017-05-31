@@ -3,37 +3,38 @@
     .field
       .columns
         .column
-          label.label(v-show="showLabels") Name
           p.control
+            label.label(v-show="showLabels") Name
             input.input(type="text" placeholder="Name" :disabled="!nameEditable" v-model="name")
         .column
-          label.label(v-show="showLabels") Introduction
           p.control
+            label.label(v-show="showLabels") Introduction
             span.select
               select(v-model="intro")
                 option(value="") none
                 option(v-for="item in intros" :value="item.id") {{item.name}}
-      label.label(v-show="showLabels") Text
       p.control
+        label.label(v-show="showLabels") Text
         textarea.textarea(placeholder="Text" v-model="text")
-      .columns
-        .column
-          label.label Syllabification
-          p.control
-            span.select
-              select(v-model="syllab")
-                option(value="" selected) none
-                option(value="Finnish") Finnish
-        .column
-          label.label Speech
-          p.control
-            span.select
-              select(v-model="speech")
-                option(value="" selected) none
-                option(value="Finnish") Finnish
-      label.label Syllabification exceptions
-      i Example: kaupunki=kau pun ki
       p.control
+        .columns
+          .column
+            p.control
+              label.label Syllabification
+              span.select
+                select(v-model="syllab")
+                  option(value="" selected) none
+                  option(value="Finnish") Finnish
+          .column
+            p.control
+              label.label Speech
+              span.select
+                select(v-model="speech")
+                  option(value="" selected) none
+                  option(value="Finnish") Finnish
+      p.control
+        label.label Syllabification exceptions
+          i Example: kaupunki=kau pun ki
         textarea.textarea(:disabled="!syllab" placeholder="Syllabifications" v-model="syllabExceps")
       p.control
         a.button.is-primary(:disabled="!canSave" @click="save()") {{action}}
@@ -146,11 +147,6 @@
 </script>
 
 <style lang="less" scoped>
-  #text-editor {
-    padding: 1em;
-    text-align: left;
-  }
-
   select:invalid {
     color: #999;
   }
@@ -161,5 +157,15 @@
 
   option {
     color: #222;
+  }
+
+  .label > i {
+    display: block;
+    font-size: 12px;
+    font-weight: 400;
+  }
+
+  .label:not(:last-child) {
+    margin-bottom: 0;
   }
 </style>

@@ -2,11 +2,10 @@
   .modal.is-active
     .modal-background
     .modal-content
-      .container
-        .notification
-          .heading.has-text-centered
-            h1 {{title}}
-          slot
+      .notification
+        .heading.has-text-centered
+          h1 {{title}}
+        slot
     button.modal-close(@click="onClose()")
 </template>
 
@@ -33,3 +32,9 @@
     }
   };
 </script>
+
+<style lang="less" scoped>
+  .heading {
+    margin-bottom: 1em;
+  }
+</style>

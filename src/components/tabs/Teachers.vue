@@ -5,7 +5,7 @@
       creation-success(object="teacher" :show="showCreationSuccess")
       p.panel-heading Add teacher
       .panel-block
-        .field
+        .field.control
           p.control
             input.input(type="text" placeholder="Name" v-model="newName")
           p.control
@@ -19,23 +19,24 @@
             button.button.is-primary(:disabled="!canCreate" @click="tryToCreate()") Create
     nav.panel
       p.panel-heading Teachers
-      .container(v-if="!teachers.length")
-        i No teachers exists yet
-      table.table(v-else)
-        thead
-          tr
-            th Name
-            th(v-if="isAdmin") School
-            th(v-if="!isAdmin") Classes
-        tbody
-          tr(v-for="teacher in teachers")
-            td {{teacher.name}}
-            td(v-if="isAdmin")
-              span.select
-                select(:value="teacher.school" @input="moveTeacher( teacher, $event )")
-                  option(v-for="school in schools" :value="school.id") {{school.name}}
-            td(v-if="!isAdmin")
-              span.ellipsis {{getListOfTeacherClasses( teacher )}}
+      .panel-block.is-paddingless
+        .container(v-if="!teachers.length")
+          i No teachers exists yet
+        table.table(v-else)
+          thead
+            tr
+              th Name
+              th(v-if="isAdmin") School
+              th(v-if="!isAdmin") Classes
+          tbody
+            tr(v-for="teacher in teachers")
+              td {{teacher.name}}
+              td(v-if="isAdmin")
+                span.select
+                  select(:value="teacher.school" @input="moveTeacher( teacher, $event )")
+                    option(v-for="school in schools" :value="school.id") {{school.name}}
+              td(v-if="!isAdmin")
+                span.ellipsis {{getListOfTeacherClasses( teacher )}}
 </template>
 
 <script>

@@ -5,7 +5,7 @@
       creation-success(object="student" :show="showCreationSuccess")
       p.panel-heading Add student
       .panel-block
-        .field
+        .field.control
           p.control
             input.input(type="text" placeholder="Name" v-model="newName")
           p.control
@@ -19,27 +19,29 @@
                 option(v-for="item in schoolItems" v-bind:value="item.value") {{item.text}}
           p.control
             button.button.is-primary(:disabled="!canCreateStudent" @click="tryToCreateStudent()") Create
+
     nav.panel
       p.panel-heading Students
-      .container(v-if="!students.length")
-        i No students exists yet
-      table.table(v-else)
-        thead
-          tr
-            th Name
-            th(v-if="isAdmin") School
-            th Grade
-            th(v-if="!isAdmin") Classes
-        tbody
-          tr(v-for="student in students")
-            td {{student.name}}
-            td(v-if="isAdmin")
-              span.select
-                select(:value="student.school" @input="moveStudent( student, $event )")
-                  option(v-for="school in schools" :value="school.id") {{school.name}}
-            td {{student.grade}}
-            td(v-if="!isAdmin")
-              span.ellipsis {{getListOfStudentClasses( student )}}
+      .panel-block.is-paddingless
+        .container(v-if="!students.length")
+          i No students exists yet
+        table.table(v-else)
+          thead
+            tr
+              th Name
+              th(v-if="isAdmin") School
+              th Grade
+              th(v-if="!isAdmin") Classes
+          tbody
+            tr(v-for="student in students")
+              td {{student.name}}
+              td(v-if="isAdmin")
+                span.select
+                  select(:value="student.school" @input="moveStudent( student, $event )")
+                    option(v-for="school in schools" :value="school.id") {{school.name}}
+              td {{student.grade}}
+              td(v-if="!isAdmin")
+                span.ellipsis {{getListOfStudentClasses( student )}}
 </template>
 
 <script>
