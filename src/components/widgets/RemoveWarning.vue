@@ -17,28 +17,31 @@
 </template>
 
 <script>
-export default {
-  name: 'remove-warning',
-  data() {
-    return {
-    };
-  },
-  props: {
-    object: String,
-    name: String,
-    data: Object
-  },
-  methods: {
+  export default {
+    name: 'remove-warning',
 
-    reject() {
-      this.$emit( 'close', false, this.data );
+    data() {
+      return {
+      };
     },
 
-    confirm() {
-      this.$emit( 'close', true, this.data );
+    props: {
+      object: String,
+      name: String,
+      data: Object
     },
-  }
-};
+
+    methods: {
+
+      reject() {
+        this.$emit( 'close', false, this.data );
+      },
+
+      confirm() {
+        this.$emit( 'close', true, this.data );
+      },
+    }
+  };
 </script>
 
 <style lang="less" scoped>

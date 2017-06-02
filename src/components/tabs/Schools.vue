@@ -147,6 +147,9 @@
       EventBus.$on( 'logout', () => {
         this.checkAccess();
       });
+      EventBus.$on( 'login', () => {
+        this.loadSchools();
+      });
 
       this.checkAccess();
     },

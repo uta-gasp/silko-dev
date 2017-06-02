@@ -50,7 +50,7 @@
   import RemoveWarning from '@/components/widgets/RemoveWarning';
 
   export default {
-    name: 'introductions',
+    name: 'classes',
 
     data() {
       return {

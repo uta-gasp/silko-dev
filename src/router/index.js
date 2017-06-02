@@ -8,6 +8,7 @@ import Students from '@/components/tabs/Students';
 import Intros from '@/components/tabs/Introductions';
 import Classes from '@/components/tabs/Classes';
 import Assignments from '@/components/tabs/Assignments';
+import Assignment from '@/components/tabs/Assignment';
 
 Vue.use( Router );
 
@@ -20,6 +21,7 @@ export default new Router({
     { path: '/intros', component: Intros },
     { path: '/classes', component: Classes },
     { path: '/assignments', component: Assignments },
+    { path: '/assignment/:id', component: Assignment },
   ],
   linkActiveClass: 'is-active',
   mode: 'history',

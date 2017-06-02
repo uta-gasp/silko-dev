@@ -9,12 +9,17 @@
           .tile.is-parent(v-for="assignment in assignments")
             .tile.is-child
               .card
-                header.card-header
-                  p.card-header-title.notification.is-info {{assignment.cls.name}}
+                header.card-header.notification.is-info.is-paddingless
+                  .card-header-title {{ assignment.cls.name }}
+                  .card-header-icon
+                    span.icon(v-if="assignment.task.syllab")
+                      i.fa.fa-ellipsis-h
+                    span.icon(v-if="assignment.task.speech")
+                      i.fa.fa-headphones
                 .card-content
-                  .content {{assignment.task.name}}
+                  .content {{ assignment.task.name }}
                 .card-footer
-                  a.card-footer-item(@click="start( assignment )") Start;
+                  a.card-footer-item(@click="start( assignment )") Start
 </template>
 
 <script>
@@ -68,7 +73,7 @@
       },
 
       start( assignment ) {
-
+        this.$router.replace( `assignment/${assignment.cls.id}` );
       }
     },
 
@@ -91,4 +96,11 @@
 </script>
 
 <style lang="less" scoped>
+  header {
+    margin-bottom: 0 !important;
+  }
+
+  .card-header-title {
+    color: #fff;
+  }
 </style>

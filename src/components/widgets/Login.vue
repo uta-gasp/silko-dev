@@ -20,16 +20,16 @@
           a.button.is-primary(:disabled="inProgress" @click="login()") Log in
 
       .error
-        error(:show="showError" :error="errorText")
+        temporal-error(:show="showError" :error="errorText")
 </template>
 
 <script>
   import db from '@/model/db.js'
 
-  import error from '@/components/widgets/Error';
+  import TemporalError from '@/components/widgets/TemporalError';
 
   export default {
-    name: 'Login',
+    name: 'login',
 
     data() {
       return {
@@ -43,7 +43,7 @@
     },
 
     components: {
-      error
+      'temporal-error': TemporalError
     },
 
     methods: {
@@ -80,13 +80,13 @@
 </script>
 
 <style lang="less" scoped>
-#login {
-  max-width: 20em;
-  min-width: 10em;
-  margin: 0 auto;
-}
+  #login {
+    max-width: 20em;
+    min-width: 10em;
+    margin: 0 auto;
+  }
 
-.error {
-  margin-top: 1em;
-}
+  .error {
+    margin-top: 1em;
+  }
 </style>

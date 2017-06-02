@@ -46,7 +46,7 @@
   import RemoveWarning from '@/components/widgets/RemoveWarning';
 
   export default {
-    name: 'introductions',
+    name: 'task-list',
 
     data() {
       return {

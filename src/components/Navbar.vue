@@ -1,5 +1,5 @@
 <template lang="pug">
-  .nav.has-shadow
+  .nav.has-shadow(v-show="!isAssignment")
     .nav-left
       router-link.nav-item.is-brand(to="/")
         img(src="../assets/icon-32.png")
@@ -14,7 +14,7 @@
         span Students
       router-link.nav-item.is-tab(to="/intros" v-if="isTeacher")
         i.fa.fa-info
-        span Introductions
+        span Instructions
       router-link.nav-item.is-tab(to="/classes" v-if="isTeacher")
         i.fa.fa-database
         span Classes
@@ -74,6 +74,10 @@
       isStudent() {
         return this.user ? this.user.isStudent : false;
       },
+
+      isAssignment() {
+        return this.$route.path.startsWith( '/assignment/' );
+      }
     },
 
     created() {

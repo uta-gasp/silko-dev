@@ -96,6 +96,10 @@ export default class Student {
         });
     }
 
+    loadTask( task, cb ) {
+        return db.get( Task, task, cb );
+    }
+
     getListOfClasses( classes ) {
         return classes.filter( cls => this.classes.includes( cls.id ) );
     }

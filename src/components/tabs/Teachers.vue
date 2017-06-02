@@ -115,6 +115,20 @@
 
     methods: {
 
+      init() {
+        if (Admin.isLogged) {
+          this.loadSchools().then( () => {
+            return this.loadTeachers();
+          });
+        }
+        else {
+          this.school = School.instance;
+          this.loadSchoolClasses().then( () => {
+            return this.loadTeachers();
+          });
+        }
+      },
+
       loadSchools() {
         return School.list( (err, schools) => {
           if (err) {
@@ -234,22 +248,15 @@
       EventBus.$on( 'logout', () => {
         this.checkAccess();
       });
+      EventBus.$on( 'login', () => {
+        this.init();
+      });
 
       this.checkAccess();
     },
 
     mounted() {
-      if (Admin.isLogged) {
-        this.loadSchools().then( () => {
-          return this.loadTeachers();
-        });
-      }
-      else {
-        this.school = School.instance;
-        this.loadSchoolClasses().then( () => {
-          return this.loadTeachers();
-        });
-      }
+      this.init();
     }
   }
 </script>

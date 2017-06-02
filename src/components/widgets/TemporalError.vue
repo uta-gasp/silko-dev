@@ -1,18 +1,16 @@
 <template lang="pug">
-  #creation-error
+  #temporal-error
     .zero-height
       transition(name="fade")
         .notification.is-danger(v-if="showState")
-          span Failed to &nbsp;
-          slot create new
-          span &nbsp; {{object}}: {{error}}
+          span {{error}}
 </template>
 
 <script>
   const MSG_SHOW_DURATION = 5000;
 
   export default {
-    name: 'creation-error',
+    name: 'temporal-error',
 
     data() {
       return {
@@ -22,7 +20,6 @@
     },
 
     props: {
-      object: String,
       error: String,
       show: Number
     },
@@ -30,12 +27,15 @@
     watch: {
       show() {
         this.showState = true;
+
         if (this.timer) {
           clearTimeout( this.timer );
         }
+
         this.timer = setTimeout( () => {
           this.showState = false;
           this.timer = null;
+          this.$emit( 'closed' );
         }, MSG_SHOW_DURATION);
       }
     }
@@ -59,7 +59,7 @@
     transition: opacity .5s
   }
 
-  .fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
+  .fade-enter, .fade-leave-to {
     opacity: 0
   }
 </style>

@@ -1,4 +1,5 @@
 import Recordable from './commons/recordable.js';
+import Intro from './intro.js';
 import db from './db.js';
 
 export default class Task {
@@ -106,6 +107,10 @@ export default class Task {
             syllabExceptions: Task.textToSyllabs( task.syllabExceptions ),
             speech: task.speech
         }, cb);
+    }
+
+    getIntro( cb ) {
+        return db.get( Intro, this.intro, cb );
     }
 }
 

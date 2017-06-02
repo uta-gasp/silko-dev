@@ -128,6 +128,26 @@
 
     methods: {
 
+      init() {
+        if (Admin.isLogged) {
+          this.loadSchools().then( () => {
+            this.loadStudents();
+          });
+        }
+        else if (School.isLogged) {
+          this.school = School.instance;
+          this.loadSchoolClasses().then( () => {
+            this.loadStudents();
+          });
+        }
+        else if (Teacher.isLogged) {
+          this.teacher = Teacher.instance;
+          this.loadTeacherClasses().then( () => {
+            this.loadStudents();
+          });
+        }
+      },
+
       loadSchools() {
         return School.list( (err, schools) => {
           if (err) {
@@ -267,28 +287,15 @@
       EventBus.$on( 'logout', () => {
         this.checkAccess();
       });
+      EventBus.$on( 'login', () => {
+        this.init();
+      });
 
       this.checkAccess();
     },
 
     mounted() {
-      if (Admin.isLogged) {
-        this.loadSchools().then( () => {
-          this.loadStudents();
-        });
-      }
-      else if (School.isLogged) {
-        this.school = School.instance;
-        this.loadSchoolClasses().then( () => {
-          this.loadStudents();
-        });
-      }
-      else if (Teacher.isLogged) {
-        this.teacher = Teacher.instance;
-        this.loadTeacherClasses().then( () => {
-          this.loadStudents();
-        });
-      }
+      this.init();
     }
   }
 </script>

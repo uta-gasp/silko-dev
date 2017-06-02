@@ -1,9 +1,9 @@
 <template lang="pug">
   #intros
     nav.panel
-      creation-error(object="introduction" :show="showCreationError" :error="creationError")
-      creation-success(object="introduction" :show="showCreationSuccess")
-      p.panel-heading Add introduction
+      creation-error(object="instruction" :show="showCreationError" :error="creationError")
+      creation-success(object="instruction" :show="showCreationSuccess")
+      p.panel-heading Add instruction
       .panel-block.is-paddingless
         intro-editor.control(
           :name-editable="true"
@@ -11,10 +11,10 @@
           @save="tryToCreate")
 
     nav.panel
-      p.panel-heading Introductions
+      p.panel-heading Instructions
       .panel-block.is-paddingless
         .container(v-if="!intros.length")
-          i No introductions exists yet
+          i No instructions exists yet
         table.table(v-else)
           thead
             tr
@@ -33,7 +33,7 @@
                   button.button.is-danger(@click="remove( item )")
                     i.fa.fa-remove
 
-    modal-editor-container(v-if="toEdit" title="Introduction editor" @close="closeEditor()")
+    modal-editor-container(v-if="toEdit" title="Instruction editor" @close="closeEditor()")
       intro-editor(
         action="Save"
         :name-editable="false"
@@ -41,7 +41,7 @@
         :intro="toEdit"
         @save="saveEdited")
 
-    remove-warning(v-if="toDelete" object="introduction" :name="toDeleteName" @close="removeWarningClosed")
+    remove-warning(v-if="toDelete" object="instruction" :name="toDeleteName" @close="removeWarningClosed")
 </template>
 
 <script>
