@@ -1,9 +1,13 @@
+import Rect from '../commons/rect.js';
+import WordFocusing from './wordFocusing.js';
+import WordFeedback from './wordFeedback.js';
+
 export default class DataWord {
-    constructor( text, rect, page, focusing, interaction ) {
-        this.text = text;           // string
-        this.rect = rect;           // Rect
-        this.page = page;           // id
-        this.focusing = focusing;   // WordFocusing
-        this.feedback = feedback;   // WordFeedback
+    constructor( el, page ) {
+        this.text = el ? el.textContent : '';   // string
+        this.rect = Rect.from( el );            // Rect
+        this.page = page;                       // id
+        this.focusing = new WordFocusing();     // WordFocusing
+        this.feedback = new WordFeedback();     // WordFeedback
     }
-}
+};

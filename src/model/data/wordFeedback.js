@@ -1,6 +1,6 @@
 export default class WordFeedback {
-    constructor( pronounced, syllabified ) {
-        this.pronounced = pronounced;       // bool
-        this.syllabified = syllabified;     // bool
+    constructor() {
+        this.pronounced = false;      // bool
+        this.syllabified = false;     // bool
     }
 }

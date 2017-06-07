@@ -49,7 +49,12 @@ export default class Student {
 
     setAssignment( cls, task, cb ) {
         const prevAssignment = this.assignments[ cls ];
-        this.assignments[ cls ] = task;
+        if (!task) {
+            delete this.assignments[ cls ];
+        }
+        else {
+            this.assignments[ cls ] = task;
+        }
 
         const onDone = err => {
             if (err) {
@@ -84,7 +89,7 @@ export default class Student {
             tasks.forEach( task => {
                 promises.push( db.get( Class, task.cls, (err, cls) => {
                     if (err) {
-                        return console.log( 'db.get Class', err );
+                        return console.log( 'TODO db.get Class', err );
                     }
                     result.push( { cls, task } );
                 }));
@@ -102,6 +107,17 @@ export default class Student {
 
     getListOfClasses( classes ) {
         return classes.filter( cls => this.classes.includes( cls.id ) );
+    }
+
+    taskDone( task, session, cb ) {
+        this.sessions.push( session );
+        db.updateField( this, 'sessions', this.sessions, err => {
+            if (err) {
+                return cb( err );
+            }
+
+            this.setAssignment( task, null, cb );
+        });
     }
 }
 

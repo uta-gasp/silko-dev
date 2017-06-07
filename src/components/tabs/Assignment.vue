@@ -4,7 +4,7 @@
       p.panel-heading {{task ? task.name : ''}}
 
     calib-page(:texts="introTexts" v-if="state === 'calibrate'" @close="calibrate( $event )")
-    start-page(:texts="introTexts" :task="task" :intro="intro.firstPage" v-if="intro" v-show="state === 'start'" @close="start( $event )" @saved="dataSaved( $event )")
+    start-page(:texts="introTexts" :task="task" :intro="intro.firstPage" :student="student" v-if="intro" v-show="state === 'start'" @close="start( $event )" @saved="dataSaved( $event )")
     finished-page(:texts="introTexts" :saving="!isDataSaved" v-if="state === 'finished'" )
 
     modal-error(:text="errorText" @close="exit()")
@@ -122,6 +122,17 @@
       },
 
       dataSaved( e ) {
+        if (!e.err) {
+          this.student.taskDone( this.task.cls, e.session, err => {
+            if (err) {
+              console.log( 'TODO task done', e.err );
+            }
+          });
+        }
+        else {
+          console.log( 'TODO data saved', e.err );
+        }
+
         this.isDataSaved = true;
       }
     },

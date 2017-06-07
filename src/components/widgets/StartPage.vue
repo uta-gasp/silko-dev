@@ -9,7 +9,7 @@
         button.button.is-large(@click="cancel()") {{ texts.startCancel }}
 
     div.fullscreen(ref="fullscreen")
-      task-page(v-show="isRunning" :texts="texts" :task="task" @finished="finished()" @saved="dataSaved( $event )")
+      task-page(v-show="isRunning" :texts="texts" :task="task" :student="student" @finished="finished()" @saved="dataSaved( $event )")
 
     p
       .container(v-show="!isCalibrated")
@@ -39,7 +39,8 @@
 
     props: {
       texts: Object,
-      task: Object
+      task: Object,
+      student: Object,
     },
 
     computed: {

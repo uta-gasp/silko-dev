@@ -1,3 +1,7 @@
+  import Feedbacks from '@/model/session/feedbacks.js';
+  import SpeechFeedback from '@/model/session/speechFeedback.js';
+  import SyllabificationFeedback from '@/model/session/syllabificationFeedback.js';
+
 // Word-in-focus highlighting, syllabification and pronounciation
 //  external dependencies:
 //      responsiveVoice
@@ -52,6 +56,20 @@ export default class Syllabifier {
         }
     }
 
+    get setup() {
+        return new Feedbacks(
+            new SpeechFeedback(
+                !!this.voice,
+                this.speech.threshold
+            ),
+            new SyllabificationFeedback(
+                !!this.rule,
+                this.syllabification.threshold,
+                this.hyphen
+            )
+        );
+    }
+
     // Resets the highlighting
     cleanup() {
 
@@ -64,20 +82,6 @@ export default class Syllabifier {
         this.timer = null;
         this.words = null;
     }
-
-    // getSetup() {
-    //     return {
-    //         syllabification: {
-    //             enabled: !!this.rule,
-    //             threshold: this.syllabification.threshold,
-    //             hyphen: this.hyphen
-    //         },
-    //         speech: {
-    //             enabled: !!this.voice,
-    //             threshold: this.speech.threshold
-    //         }
-    //     };
-    // }
 
     init() {
         this.words = new Map();
@@ -150,26 +154,26 @@ export default class Syllabifier {
     // Propagates / removed the highlighing
     // Arguments:
     //   wordEl: - the focused word DOM element
-    setFocusedWord( wordEl ) {
+    setFocusedWord( el ) {
 
-        if (this.currentWord != wordEl) {
+        if (this.currentWord != el) {
             if (this.highlightingEnabled) {
                 if (this.currentWord) {
                     this.currentWord.classList.remove( this.className );
                 }
-                if (wordEl) {
-                    wordEl.classList.add( this.className );
+                if (el) {
+                    el.classList.add( this.className );
                 }
             }
 
-            this.currentWord = wordEl;
+            this.currentWord = el;
 
-            if (wordEl && !this.words.has( wordEl )) {
-                this.words.set( wordEl, {
+            if (el && !this.words.has( el )) {
+                this.words.set( el, {
                     accumulatedTime: 0,
                     notSyllabified: true,
                     notPronounced: true,
-                    word: this._getWordFromElement( wordEl )
+                    word: this._getWordFromElement( el )
                 });
             }
         }

@@ -1,170 +1,194 @@
-let _startTime = 0;
+import Data from '../model/data.js';
+import Session from '../model/session.js';
+import Fixation from '../model/data/fixation.js';
+import DataPage from '../model/data/dataPage.js';
+import DataWord from '../model/data/dataWord.js';
+import FeedbackEvent from '../model/data/feedbackEvent.js';
+import db from '../model/db.js';
 
-function timestamp() {
-    return Math.round( window.performance.now() - _startTime );
-}
+const MIN_FIXATION_DURATION = 80;
 
-function Page( wordList ) {
-    this.wordList = wordList;
-    this.words = new Map();
-    this.fixations = [];
-    this.syllabifications = [];
-    this.speech = [];
-}
-
-function Record( elem, pageID ) {
-    let rect = null;
-    if (elem) {
-        const box = elem.getBoundingClientRect()
-        rect = {
-            x: box.left,
-            y: box.top,
-            width: box.width,
-            height: box.height
-        };
-    }
-    this.rect = rect;
-    this.text = elem ? elem.textContent : '';
-    this.duration = 0;
-    this.focusCount = 0;
-    this.firstEntry = 0;
-    this.lastEntry = 0;
-    this.pageID = pageID;
-    this.syllabified = false;
-    this.pronounced = false;
-}
-
-Record.prototype.start = function () {
-    this.lastEntry = timestamp();
-    if (!this.focusCount) {
-        this.firstEntry = this.lastEntry;
-    }
-    this.focusCount++;
-};
-
-Record.prototype.stop = function () {
-    this.duration += timestamp() - this.lastEntry;
-};
-
-function Fixation (fixation) {
-    this.ts = fixation.ts;
-    this.tsSync = timestamp();
-    this.x = Math.round( fixation.x );
-    this.y = Math.round( fixation.y );
-    this.duration = fixation.duration;
-}
-
-function FeedbackEvent( record ) {
-    this.ts = timestamp();
-    this.rect = record.rect;
-    this.text = record.text;
-}
-
-
-
-
-
-
-export default class DataCollector {
-    constructor( options ) {
-        options = options || {};
-        this.wordSelector = ('.' + options.wordClass) || '.word';
-        this.minFixationDuration = options.minFixationDuration || 80;
-
-        this.currentWord = null;
-        this.currentPage = null;
-        this.currentRecord = null;
-        this.pages = [];
-
-        this.startDate = null;
+class Timer {
+    constructor() {
+        this._date = null;
+        this._start = 0;
     }
 
     start() {
-        this.startDate = (new Date()).toJSON();
-        _startTime = window.performance.now();
+        this._date = (new Date()).toJSON();
+        this._start = window.performance.now();
     }
+
+    get value() {
+        return Math.round( window.performance.now() - this._start );
+    }
+
+    get date() {
+        return this._date;
+    }
+}
+
+class Page {
+    constructor() {
+        this.words = new Map();
+        this.data = new DataPage();
+    }
+}
+
+class Pages {
+    constructor() {
+        this.items = [];
+        this.pageIndex = -1;
+    }
+
+    page( index ) {
+        return this.items[ index ];
+    }
+
+    get current() {
+        return this.items[ this.pageIndex ];
+    }
+
+    get ready() {
+        return this.pageIndex >= 0;
+    }
+
+    add() {
+        const page = new Page();
+        this.items.push( page );
+        this.pageIndex++;
+        return page;
+    }
+
+    done() {
+        this.pageIndex = -1;
+    }
+};
+
+export default class DataCollector {
+    constructor( task, student, font, feedbacks ) {
+        this.session = {
+            date: (new Date()).toJSON(),
+            student: student.id,
+            task: task.id,
+            cls: task.cls,
+            font: font,
+            feedbacks: feedbacks,
+            data: null
+        };
+
+        this.pages = new Pages();
+        this.timer = new Timer();
+
+        this.focusedElem = null;
+        this.currentWord = null;
+    }
+
+    start() {
+        if (!this.pages.ready) {
+            this.pages.add();
+        }
+        this.timer.start();
+    }
+
+    stop( cb ) {
+        this.setFocusedWord( null );
+        this.pages.done();
+        this._save( cb );
+    }
+
+    nextPage() {
+        this.pages.add();
+    }
+
+    // Loggers
 
     // Propagates the highlighing if the focused word is the next after the current
     // Arguments:
     //        word:         - the focused word  (DOM element)
-    setFocusedWord( word, pageID ) {
+    setFocusedWord( el ) {
 
-        if (this.currentWord != word) {
-            if (this.currentRecord) {
-                this.currentRecord.stop();
-                this.currentRecord = null;
+        if (this.focusedElem === el || !this.pages.ready) {
+            return;
+        }
+
+        if (this.currentWord) {
+            this.currentWord.focusing.stop( this.timer.value );
+            this.currentWord = null;
+        }
+
+        if (el) {
+            const page = this.pages.current;
+            this.currentWord = page.words.get( el );
+            if (!this.currentWord) {
+                this.currentWord = new DataWord( el, this.pages.pageIndex );
+                page.words.set( el, this.currentWord );
             }
 
-            if (word) {
-                const page = this._getPage( pageID );
-                this.currentRecord = page.words.get( word );
-                if (!this.currentRecord) {
-                    this.currentRecord = new Record( word, pageID );
-                    page.words.set( word, this.currentRecord );
-                }
-
-                this.currentRecord.start();
-            }
-
-            this.currentWord = word;
-            this.currentPage = pageID;
+            this.currentWord.focusing.start( this.timer.value );
         }
+
+        this.focusedElem = el;
     };
 
-    // Logs fixation
-    logFixation( fixation, pageID ) {
-        const page = this._getPage( pageID );
-        page.fixations.push( new Fixation( fixation ) );
-    };
-
-    save( cb ) {
-        const fixations = this._filterFixations( this.minFixationDuration );
-        this._saveRemote( fixations, cb );
-    };
-
-    syllabified( word ) {
-        if (!word || this.currentPage === null) {
+    addGazePoint( gazePoint ) {
+        if (!this.pages.ready) {
             return;
         }
 
-        const page = this._getPage( this.currentPage );
-        if (!page) {
+        this.pages.current.data.fixations.push( Fixation.from( gazePoint, this.timer.value ) );
+    };
+
+    syllabified( el ) {
+        if (!el || !this.pages.ready) {
             return;
         }
 
-        const record = page.words.get( word );
-        if (record) {
-            record.syllabified = true;
-            page.syllabifications.push( new FeedbackEvent( record ) );
+        const page = this.pages.current;
+        const word = page.words.get( el );
+
+        if (word) {
+            word.feedback.syllabified = true;
+            page.data.syllabifications.push( new FeedbackEvent(
+                this.timer.value,
+                word.text,
+                word.rect
+            ));
         }
     };
 
-    pronounced( word ) {
-        if (!word || this.currentPage === null) {
+    pronounced( el ) {
+        if (!el || !this.pages.ready) {
             return;
         }
-        const page = this._getPage( this.currentPage );
-        if (!page) {
-            return;
-        }
-        const record = page.words.get( word );
-        if (record) {
-            record.pronounced = true;
-            page.speech.push( new FeedbackEvent( record ) );
+
+        const page = this.pages.current;
+        const word = page.words.get( el );
+
+        if (word) {
+            word.feedback.pronounced = true;
+            page.data.speech.push( new FeedbackEvent(
+                this.timer.value,
+                word.text,
+                word.rect
+            ));
         }
     };
+
+
+    // Other methods
 
     getAvgWordReadingDuration() {
-        const page = this._getPage( 0 );
+        const page = this.pages.page( 0 );
         if (!page) {
             return 500;
         }
 
         let sum = 0;
         let count = 0;
-        page.words.forEach( record => {
-            if (record.duration > 200 && record.duration < 2000) {
-                sum += record.duration;
+        page.words.forEach( word => {
+            if (word.focusing.duration > 200 && word.focusing.duration < 2000) {
+                sum += word.focusing.duration;
                 count++;
             }
         });
@@ -177,15 +201,6 @@ export default class DataCollector {
     };
 
     // private
-    _getPage( pageID ) {
-        var page = this.pages[ pageID ];
-        if (!page) {
-            page = new Page( this._getWordsList() );
-            this.pages.push( page );
-        }
-
-        return page;
-    }
 
     /*
     Statistics.prototype._saveLocal = function () {
@@ -207,34 +222,41 @@ export default class DataCollector {
         downloadLink.click();
     };*/
 
-    _saveRemote( fixations, cb ) {
-        if (this.currentRecord) {
-            this.currentRecord.stop();
-            this.currentRecord = null;
-        }
+    _save( cb ) {
 
         // const textSetup = _services.getTextSetup();
         // const textHash = murmurhash3_32_gc( textSetup.text, 1837832);
 
-        const session = this.pages.map( (page, pi) => {
-            const records = [];
-            for (let record of page.words.values()) {
-                records.push( record );
+        const data = {
+            task: this.session.task,
+            student: this.session.student,
+            pages: this.pages.items.map( page => {
+                page.data.filterFixations( MIN_FIXATION_DURATION );
+                page.data.setWords( page.words );
+                return page.data;
+            })
+        };
+
+        db.add( Data, data, (err, key) => {
+            if (err) {
+                return cb( err );
             }
 
-            return {
-                records: records,
-                fixations: fixations[ pi ],
-                syllabifications: page.syllabifications,
-                speech: page.speech,
-            };
+            this.session.data = key;
+            db.add( Session, this.session, (err, key) => {
+                if (err) {
+                    return cb( err );
+                }
+
+                cb( undefined, key );
+            });
         });
 
-        const text = this.pages.map( page => {
-            return page.wordList;
-        });
+        // const textPages = this.pages.items.map( page => page.text );
 
-        setTimeout( cb, 2000 );
+
+
+        //setTimeout( () => cb( data ), 2000 );
 
         /*
         const userSessions = app.firebase.child( 'users/' + name + '/sessions' );
@@ -254,69 +276,4 @@ export default class DataCollector {
         app.firebase.update( updates, () => {
         });*/
     };
-
-    _getWordsList() {
-        const list = [];
-        const words = document.querySelectorAll( this.wordSelector );
-
-        for (let i = 0; i < words.length; i += 1) {
-
-            const word = words.item(i);
-            const rect = word.getBoundingClientRect();
-
-            list.push({
-                text: word.textContent,
-                x: rect.left,
-                y: rect.top,
-                width: rect.width,
-                height: rect.height,
-                id: i
-            });
-        }
-        return list;
-    };
-
-    _filterFixations( durationThreshold ) {
-        const result = [];
-
-        let lastFix = null;
-        let lastFixContainer = null;
-
-        this.pages.forEach( page => {
-            const pageFixations = [];
-            let fixTimestamp = 0;
-            let fixTimestampSync = 0;
-
-            page.fixations.forEach( fixation => {
-                if (fixation.duration < durationThreshold) {
-                    return;
-                }
-
-                if (!lastFix) {
-                    lastFixContainer = pageFixations;
-                }
-                else if (lastFix.ts !== fixation.ts) {
-                    lastFix.tsSync = fixTimestampSync;
-                    lastFixContainer.push( lastFix );
-                    lastFixContainer = pageFixations;
-                }
-
-                if (fixTimestamp !== fixation.ts) {
-                    fixTimestamp = fixation.ts;
-                    fixTimestampSync = fixation.tsSync;
-                }
-
-                lastFix = fixation;
-            });
-
-            result.push( pageFixations );
-        });
-
-        if (lastFix && lastFixContainer) {
-            lastFixContainer.push( lastFix );
-        }
-
-        return result;
-    }
-
 }

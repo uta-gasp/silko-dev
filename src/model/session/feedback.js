@@ -1,6 +1,6 @@
 export default class Feedback {
-    constructor( enabled = false, threshold = 3000 ) {
-        this.enabled = enabled;     // bool
-        this.threshold = threshold; // int
+    constructor( enabled, threshold ) {
+        this.enabled = enabled || false;     // bool
+        this.threshold = threshold || 3000;  // int
     }
 }

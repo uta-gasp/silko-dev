@@ -1,5 +1,5 @@
 export default class Font {
-    constructor( family = "Arial", size = "22pt", style = "normal", weight = 700 ) {
+    constructor( family, size, style, weight ) {
         this.family = family;   // string
         this.size = size;       // string
         this.style = style;     // string

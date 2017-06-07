@@ -4,7 +4,7 @@ const callbackLists = {
     stateUpdated: {},
     wordFocused: {},
     wordLeft: {},
-    fixation: {},
+    gazePoint: {},
 };
 
 const callbacks = {
@@ -13,7 +13,7 @@ const callbacks = {
     stateUpdated: null,
     wordFocused: null,
     wordLeft: null,
-    fixation: null
+    gazePoint: null
 };
 
 for (let name in callbacks) {
@@ -96,9 +96,9 @@ class GazeTracking {
                 }
             },
 
-            fixation: (fix) => {
-                if (callbacks.fixation) {
-                    callbacks.fixation( fix );
+            fixation: fix => {
+                if (callbacks.gazePoint) {
+                    callbacks.gazePoint( fix );
                 }
             }
         });

@@ -4,7 +4,7 @@
       .hero-body
         .container
           //img(src="../assets/icon-32.png")
-          h1.title Welcome to Eye-School
+          h1.title.logo Silko
           h2.subtitle A reading aid for students and teachers
     section.section(v-if="loginVisible")
       login
@@ -45,4 +45,8 @@
 </script>
 
 <style lang="less" scoped>
+  .logo {
+    font-family: 'Gloria Hallelujah', 'Avenir', Helvetica, Arial, sans-serif;
+    padding-bottom: 0.5em;
+  }
 </style>

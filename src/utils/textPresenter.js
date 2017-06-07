@@ -34,6 +34,8 @@ export default class TextPresenter {
         this._createLines( this.container );
     }
 
+    // Private
+
     _createLines( el ) {
         el.innerHTML = '';
 

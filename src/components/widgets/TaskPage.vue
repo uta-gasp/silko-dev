@@ -14,6 +14,8 @@
   import DataCollector from '@/utils/dataCollector.js';
   import gazeTracking from '@/utils/gazeTracking.js';
 
+  import Font from '@/model/session/font.js';
+
   export default {
     name: 'task-page',
 
@@ -22,12 +24,14 @@
         textPresenter: null,
         syllabifier: null,
         collector: null,
+        font: new Font( 'Calibri', '20pt', 'normal', 'bold' ) // should match the style defined below
       };
     },
 
     props: {
       texts: Object,
-      task: Object
+      task: Object,
+      student: Object,
     },
 
     computed: {
@@ -40,14 +44,15 @@
 
       next() {
         this.textPresenter.nextPage();
+        this.collector.nextPage();
         this.syllabifier.reset( this.textPresenter.page === 1 && this.texts.firstPage );
         gazeTracking.updateTargets();
       },
 
       finish() {
         this.$emit( 'finished' );
-        this.collector.save( err => {
-          this.$emit( 'saved', { err } );
+        this.collector.stop( (err, session) => {
+          this.$emit( 'saved', { err, session } );
         });
       },
     },
@@ -58,12 +63,11 @@
           syllabificationSmart: true,
           speech: this.task.speech
       });
-
       this.syllabifier.init();
 
       this.textPresenter = new TextPresenter( this.task, this.texts.firstPage, this.$refs.text, this.syllabifier );
 
-      this.collector = new DataCollector();
+      this.collector = new DataCollector( this.task, this.student, this.font, this.syllabifier.setup );
       this.syllabifier.events.addListener( 'syllabified', data => this.collector.syllabified( data ) );
       this.syllabifier.events.addListener( 'pronounced', data => this.collector.pronounced( data ) );
 
@@ -80,8 +84,8 @@
           this.syllabifier.setFocusedWord( null );
           this.collector.setFocusedWord( null );
       });
-      gazeTracking.setCallback( 'fixation', 'task-page', fix => {
-          this.collector.logFixation( fix, this.textPresenter.page );
+      gazeTracking.setCallback( 'gazePoint', 'task-page', gazePoint => {
+          this.collector.addGazePoint( gazePoint, this.textPresenter.page );
       });
 
       this.next();
@@ -93,7 +97,7 @@
       gazeTracking.clearCallback( 'stateUpdated', 'task-page');
       gazeTracking.clearCallback( 'wordFocused', 'task-page' );
       gazeTracking.clearCallback( 'wordLeft', 'task-page' );
-      gazeTracking.clearCallback( 'fixation', 'task-page' );
+      gazeTracking.clearCallback( 'gazePoint', 'task-page' );
     }
   };
 </script>

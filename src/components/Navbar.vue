@@ -2,7 +2,8 @@
   .nav.has-shadow(v-show="!isAssignment")
     .nav-left
       router-link.nav-item.is-brand(to="/")
-        img(src="../assets/icon-32.png")
+        h2.logo Silko
+        //- img(src="../assets/icon-32.png")
       router-link.nav-item.is-tab(to="/schools" v-if="isAdmin")
         i.fa.fa-university
         span Schools
@@ -102,5 +103,9 @@
   }
 
   .user {
+  }
+
+  .logo {
+    font-family: 'Gloria Hallelujah', 'Avenir', Helvetica, Arial, sans-serif;
   }
 </style>

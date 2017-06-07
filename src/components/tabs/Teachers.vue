@@ -121,7 +121,7 @@
             return this.loadTeachers();
           });
         }
-        else {
+        else if (School.isLogged) {
           this.school = School.instance;
           this.loadSchoolClasses().then( () => {
             return this.loadTeachers();

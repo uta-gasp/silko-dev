@@ -59,7 +59,7 @@
       loadAssignments() {
         this.student.loadAssignments( (err, assignments) => {
           if (err) {
-            return console.log( 'TODO Handle err' );
+            return console.log( 'TODO loadAssignments', err );
           }
 
           this.assignments = assignments;
