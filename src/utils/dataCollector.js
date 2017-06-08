@@ -103,6 +103,28 @@ export default class DataCollector {
         this.pages.add();
     }
 
+    get wordReadingDuration() {
+        const page = this.pages.current;
+        if (!page) {
+            return null;
+        }
+
+        let sum = 0;
+        let count = 0;
+        page.words.forEach( word => {
+            if (word.focusing.duration > 200 && word.focusing.duration < 2000) {
+                sum += word.focusing.duration;
+                count++;
+            }
+        });
+
+        if (!count) {
+            return null;
+        }
+
+        return sum / count;
+    };
+
     // Loggers
 
     // Propagates the highlighing if the focused word is the next after the current
@@ -178,56 +200,9 @@ export default class DataCollector {
     };
 
 
-    // Other methods
-
-    getAvgWordReadingDuration() {
-        const page = this.pages.page( 0 );
-        if (!page) {
-            return 500;
-        }
-
-        let sum = 0;
-        let count = 0;
-        page.words.forEach( word => {
-            if (word.focusing.duration > 200 && word.focusing.duration < 2000) {
-                sum += word.focusing.duration;
-                count++;
-            }
-        });
-
-        if (!count) {
-            return 500;
-        }
-
-        return sum / count;
-    };
-
     // private
 
-    /*
-    Statistics.prototype._saveLocal = function () {
-        var data = document.querySelector( this.root + ' textarea' ).value;
-        var blob = new Blob([data], {type: 'text/plain'});
-
-        var downloadLink = document.createElement("a");
-        downloadLink.download = 'results.txt';
-        downloadLink.innerHTML = 'Download File';
-
-        var URL = window.URL || window.webkitURL;
-        downloadLink.href = URL.createObjectURL( blob );
-        downloadLink.onclick = function(event) { // self-destrly
-            document.body.removeChild(event.target);
-        };
-        downloadLink.style.display = 'none';
-        document.body.appendChild( downloadLink );
-
-        downloadLink.click();
-    };*/
-
     _save( cb ) {
-
-        // const textSetup = _services.getTextSetup();
-        // const textHash = murmurhash3_32_gc( textSetup.text, 1837832);
 
         const data = {
             task: this.session.task,
@@ -253,29 +228,5 @@ export default class DataCollector {
                 cb( undefined, key );
             });
         });
-
-        // const textPages = this.pages.items.map( page => page.text );
-
-
-
-        //setTimeout( () => cb( data ), 2000 );
-
-        /*
-        const userSessions = app.firebase.child( 'users/' + name + '/sessions' );
-        const sessionKey = userSessions.push({
-            date: this.startDate,
-            text: textHash,
-            textTitle: textSetup.title,
-            lineSize: textSetup.lineSize,
-            font: textSetup.font,
-            interaction: _services.getInteractionSetup()
-        }).key;
-
-        const updates = {};
-        updates[ '/sessions/' + sessionKey ] = session;
-        updates[ '/texts/' + textHash ] = text;
-
-        app.firebase.update( updates, () => {
-        });*/
-    };
+   };
 }

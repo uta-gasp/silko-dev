@@ -12,7 +12,7 @@
                 header.card-header.notification.is-info.is-paddingless
                   .card-header-title {{ assignment.cls.name }}
                   .card-header-icon
-                    span.icon(v-if="assignment.task.syllab")
+                    span.icon(v-if="assignment.task.syllab.language")
                       i.fa.fa-ellipsis-h
                     span.icon(v-if="assignment.task.speech")
                       i.fa.fa-headphones

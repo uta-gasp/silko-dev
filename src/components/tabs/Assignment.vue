@@ -4,7 +4,16 @@
       p.panel-heading {{task ? task.name : ''}}
 
     calib-page(:texts="introTexts" v-if="state === 'calibrate'" @close="calibrate( $event )")
-    start-page(:texts="introTexts" :task="task" :intro="intro.firstPage" :student="student" v-if="intro" v-show="state === 'start'" @close="start( $event )" @saved="dataSaved( $event )")
+    start-page(
+      :texts="introTexts"
+      :task="task"
+      :intro="intro.firstPage"
+      :student="student"
+      v-if="intro"
+      v-show="state === 'start'"
+      @close="start( $event )"
+      @saved="dataSaved( $event )"
+    )
     finished-page(:texts="introTexts" :saving="!isDataSaved" v-if="state === 'finished'" )
 
     modal-error(:text="errorText" @close="exit()")

@@ -4,6 +4,15 @@ import Intro from './intro.js';
 
 import db from '@/db/db.js';
 
+class Threshold {
+    constructor( value, smart, min, max ) {
+        this.value = value;
+        this.smart = smart;
+        this.min = min;
+        this.max = max;
+    }
+};
+
 export default class Task {
     constructor( id ) {
         this.id = id;
@@ -13,21 +22,24 @@ export default class Task {
         this.type = '';
         this.intro = '';
         this.pages = [];    // array of arrays of strings
-        this.syllab = '';
-        this.syllabExceptions = {};
-        this.speech = '';
+        this.syllab = Task.defaultSyllab;
+        this.speech = Task.defaultSpeech;
     }
 
     static get db() {
         return 'tasks';
     }
 
-    static get hyphen() {
-        return String.fromCharCode( 0x00B7 );
-    }
-
     static get syllabSep() {
         return '=';
+    }
+
+    static get defaultSyllab() {
+        return  { language: '', exceptions: {}, threshold: new Threshold( 3000, false, 1500, 3000 ) };
+    }
+
+    static get defaultSpeech() {
+        return { language: '', threshold: new Threshold( 4000, false, 3000, 4000 ) };
     }
 
     static textToPages( text ) {
@@ -85,9 +97,7 @@ export default class Task {
                 return;
             }
 
-            const syllabs = syllabText.split( ' ' ).filter( item => item.length );
-
-            result[ word ] = syllabs.join( Task.hyphen );
+            result[ word ] = syllabText.split( ' ' ).filter( item => item.length ).join( ' ' );
         });
 
         return result;
@@ -96,20 +106,22 @@ export default class Task {
     static syllabsToText( syllabs ) {
         const result = [];
         for (let word in syllabs) {
-            const parts = syllabs[ word ].split( Task.hyphen );
-            result.push( `${word}${Task.syllabSep}${parts.join( ' ' )}` );
+            result.push( `${word}${Task.syllabSep}${syllabs[ word ]}` );
         }
         return result.join( '\n' );
     }
 
     update( task, cb ) {
-        db.updateFields( this, {
+        const _task = {
             intro: task.intro,
             pages: Task.textToPages( task.text ),
             syllab: task.syllab,
-            syllabExceptions: Task.textToSyllabs( task.syllabExceptions ),
             speech: task.speech
-        }, cb);
+        };
+
+        _task.syllab.exceptions = Task.textToSyllabs( task.syllab.exceptions );
+
+        db.updateFields( this, _task, cb);
     }
 
     getIntro( cb ) {

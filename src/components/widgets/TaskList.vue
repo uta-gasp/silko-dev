@@ -21,26 +21,13 @@
                 i.fa.fa-remove
 
     modal-editor-container(v-if="isEditing" title="Task editor" @close="closeEditor()")
-      task-editor(
-        :action="action"
-        :show-labels="true"
-        :name-editable="!toEdit"
-        :src-name="toEditName"
-        :src-text="toEditText"
-        :intros="intros"
-        :src-intro="toEditIntro"
-        :src-syllab="toEditSyllab"
-        :src-syllab-exceps="toEditSyllabExceps"
-        :src-speech="toEditSpeech"
-        @save="save")
+      task-editor(:action="action" :show-labels="true" :task="toEdit" :intros="intros" @save="save")
 
     remove-warning(v-if="toDelete" object="task" :name="toDeleteName" @close="removeWarningClosed")
 </template>
 
 <script>
   import gui from '@/utils/gui.js';
-
-  import Task from '@/model/task.js';
 
   import ModalEditorContainer from '@/components/widgets/ModalEditorContainer';
   import TaskEditor from '@/components/widgets/TaskEditor';
@@ -82,30 +69,6 @@
     computed: {
       isEditing() {
         return this.toEdit || this.isCreating;
-      },
-
-      toEditName() {
-        return this.toEdit ? this.toEdit.name : '';
-      },
-
-      toEditText() {
-        return this.toEdit ? Task.pagesToText( this.toEdit.pages ) : '';
-      },
-
-      toEditIntro() {
-        return this.toEdit ? this.toEdit.intro : '';
-      },
-
-      toEditSyllab() {
-        return this.toEdit ? this.toEdit.syllab : '';
-      },
-
-      toEditSyllabExceps() {
-        return this.toEdit ? Task.syllabsToText( this.toEdit.syllabExceptions ) : '';
-      },
-
-      toEditSpeech() {
-        return this.toEdit ? this.toEdit.speech : '';
       },
 
       toDeleteName() {

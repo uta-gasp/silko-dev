@@ -10,7 +10,7 @@
 
 <script>
   import TextPresenter from '@/utils/textPresenter.js';
-  import Syllabifier from '@/utils/syllabifier.js'
+  import FeedbackProvider from '@/utils/feedbackProvider.js'
   import DataCollector from '@/utils/dataCollector.js';
   import gazeTracking from '@/utils/gazeTracking.js';
 
@@ -22,7 +22,7 @@
     data() {
       return {
         textPresenter: null,
-        syllabifier: null,
+        feedbackProvider: null,
         collector: null,
         font: new Font( 'Calibri', '20pt', 'normal', 'bold' ) // should match the style defined below
       };
@@ -43,9 +43,16 @@
     methods: {
 
       next() {
+        let wordReadingDuration;
+        if (this.textPresenter.page === 0 && this.texts.firstPage) {
+          wordReadingDuration = this.collector.wordReadingDuration;
+          console.log( wordReadingDuration );
+        }
+
         this.textPresenter.nextPage();
         this.collector.nextPage();
-        this.syllabifier.reset( this.textPresenter.page === 1 && this.texts.firstPage );
+        this.feedbackProvider.reset( wordReadingDuration );
+
         gazeTracking.updateTargets();
       },
 
@@ -58,18 +65,14 @@
     },
 
     mounted() {
-      this.syllabifier = new Syllabifier( this.task.syllabExceptions, {
-          syllabification: this.task.syllab,
-          syllabificationSmart: true,
-          speech: this.task.speech
-      });
-      this.syllabifier.init();
+      this.feedbackProvider = new FeedbackProvider( this.task.syllab, this.task.speech );
+      this.feedbackProvider.init();
 
-      this.textPresenter = new TextPresenter( this.task, this.texts.firstPage, this.$refs.text, this.syllabifier );
+      this.textPresenter = new TextPresenter( this.task, this.texts.firstPage, this.$refs.text, this.feedbackProvider.syllabifier );
 
-      this.collector = new DataCollector( this.task, this.student, this.font, this.syllabifier.setup );
-      this.syllabifier.events.addListener( 'syllabified', data => this.collector.syllabified( data ) );
-      this.syllabifier.events.addListener( 'pronounced', data => this.collector.pronounced( data ) );
+      this.collector = new DataCollector( this.task, this.student, this.font, this.feedbackProvider.setup );
+      this.feedbackProvider.events.addListener( 'syllabified', data => this.collector.syllabified( data ) );
+      this.feedbackProvider.events.addListener( 'pronounced', data => this.collector.pronounced( data ) );
 
       gazeTracking.setCallback( 'stateUpdated', 'task-page', state => {
         if (state.isConnected && state.isTracking && !state.isBusy) {
@@ -77,22 +80,22 @@
         }
       });
       gazeTracking.setCallback( 'wordFocused', 'task-page', word => {
-          this.syllabifier.setFocusedWord( word );
-          this.collector.setFocusedWord( word, this.textPresenter.page );
+        this.feedbackProvider.setFocusedWord( word );
+        this.collector.setFocusedWord( word, this.textPresenter.page );
       });
       gazeTracking.setCallback( 'wordLeft', 'task-page', word => {
-          this.syllabifier.setFocusedWord( null );
-          this.collector.setFocusedWord( null );
+        this.feedbackProvider.setFocusedWord( null );
+        this.collector.setFocusedWord( null );
       });
       gazeTracking.setCallback( 'gazePoint', 'task-page', gazePoint => {
-          this.collector.addGazePoint( gazePoint, this.textPresenter.page );
+        this.collector.addGazePoint( gazePoint, this.textPresenter.page );
       });
 
       this.next();
     },
 
     beforeDestroy() {
-      this.syllabifier.cleanup();
+      this.feedbackProvider.cleanup();
 
       gazeTracking.clearCallback( 'stateUpdated', 'task-page');
       gazeTracking.clearCallback( 'wordFocused', 'task-page' );

@@ -37,4 +37,8 @@
   .heading {
     margin-bottom: 1em;
   }
+
+  .modal-content {
+    width: 70%;
+  }
 </style>

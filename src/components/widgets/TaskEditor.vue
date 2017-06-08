@@ -5,57 +5,50 @@
         .column
           p.control
             label.label(v-show="showLabels") Name
-            input.input(type="text" placeholder="Name" :disabled="!nameEditable" v-model="name")
-        .column
+            input.input(type="text" placeholder="Name" :disabled="!isNameEditable" v-model="name")
           p.control
-            label.label(v-show="showLabels") Introduction
-            span.select
-              select(v-model="intro")
-                option(value="") none
-                option(v-for="item in intros" :value="item.id") {{item.name}}
-      p.control
-        label.label(v-show="showLabels").is-pulled-left Text
-        .is-pulled-right.has-text-right
-          .text-format-instruction Empty line to separate pages
-          .text-format-instruction "\" after a word and "|" after a line to apply a style to them
-          .text-format-instruction Styles: "b" - black, "n" - navy, "g" - light-grey
-        textarea.textarea(placeholder="Text" v-model="text")
-      p.control
-        .columns
-          .column
+            label.label(v-show="showLabels").is-pulled-left Text
+            .is-pulled-right.has-text-right
+              .text-format-instruction Empty line to separate pages
+              .text-format-instruction "\" after a word and "|" after a line to apply a style to them
+              .text-format-instruction Styles: "b" - black, "n" - navy, "g" - light-grey
+          p.control
+            textarea.textarea.text(placeholder="Text" v-model="text")
+        .column
+          .field
             p.control
-              label.label Syllabification
+              label.label(v-show="showLabels") Introduction
               span.select
-                select(v-model="syllab")
-                  option(value="" selected) none
-                  option(value="Finnish") Finnish
-          .column
+                select(v-model="intro")
+                  option(value="") none
+                  option(v-for="item in intros" :value="item.id") {{item.name}}
+          feedback-editor(header="Speech" :value="speech")
+          feedback-editor(header="Syllabification" :value="syllab")
+          .field
             p.control
-              label.label Speech
-              span.select
-                select(v-model="speech")
-                  option(value="" selected) none
-                  option(value="Finnish") Finnish
-      p.control
-        label.label Syllabification exceptions
-          i Example: kaupunki=kau pun ki
-        textarea.textarea(:disabled="!syllab" placeholder="Syllabifications" v-model="syllabExceps")
+              label.label Syllabification exceptions
+                i Example: kaupunki=kau pun ki
+              textarea.textarea(:disabled="!syllab.language" placeholder="Syllabifications" v-model="syllabExceptions")
       p.control
         a.button.is-primary(:disabled="!canSave" @click="save()") {{action}}
 </template>
 
 <script>
+  import Task from '@/model/task.js';
+
+  import FeedbackEditor from '@/components/widgets/feedbackEditor';
+
   export default {
     name: 'task-editor',
 
     data() {
       return {
-        name: this.srcName || '',
-        text: this.srcText || '',
-        intro: this.srcIntro || '',
-        syllab: this.srcSyllab || '',
-        syllabExceps: this.srcSyllabExceps || '',
-        speech: this.srcSpeech || '',
+        name: this.task ? this.task.name : '',
+        text: this.task ? Task.pagesToText( this.task.pages ) : '',
+        intro: this.task ? this.task.intro : '',
+        syllab: this.task ? this.task.syllab : Task.defaultSyllab,
+        speech: this.task ? this.task.speech : Task.defaultSpeech,
+        syllabExceptions: this.task ? Task.syllabsToText( this.task.syllab.exceptions ) : ''
       };
     },
 
@@ -68,53 +61,25 @@
         type: Boolean,
         default: false
       },
-      nameEditable: {
-        type: Boolean,
-        default: true
-      },
-      srcName: {
-        type: String,
-        default: ''
-      },
-      srcText: {
-        type: String,
-        default: ''
+      task: {
+        type: Object,
+        default: () => { return {}; }
       },
       intros: {
         type: Array,
         default: () => []
-      },
-      srcIntro: {
-        type: String,
-        default: ''
-      },
-      srcSyllab: {
-        type: String,
-        default: ''
-      },
-      srcSyllabExceps: {
-        type: String,
-        default: ''
-      },
-      srcSpeech: {
-        type: String,
-        default: ''
-      },
-      reload: Number
-    },
-
-    watch: {
-      reload() {
-        this.name = this.srcName || '';
-        this.text = this.srcText || '';
-        this.intro = this.srcIntro || '';
-        this.syllabs = this.srcSyllab || '';
-        this.syllabExceps = this.srcSyllabExceps || '';
-        this.speech = this.srcSpeech || '';
       }
     },
 
+    components: {
+      'feedback-editor': FeedbackEditor,
+    },
+
     computed: {
+
+      isNameEditable() {
+        return !this.task;
+      },
 
       isNameValid() {
         return this.name.length > 1;
@@ -133,12 +98,14 @@
     methods: {
 
       save() {
+        this.syllab.exceptions = this.syllabExceptions;
+        console.dir(this.syllab);
+
         this.$emit( 'save', {
           name: this.name.trim(),
           text: this.text,
           intro: this.intro,
           syllab: this.syllab,
-          syllabExceptions: this.syllabExceps,
           speech: this.speech,
         });
       }
@@ -173,5 +140,9 @@
 
   .label:not(:last-child) {
     margin-bottom: 0;
+  }
+
+  .text {
+    min-height: 350px;
   }
 </style>

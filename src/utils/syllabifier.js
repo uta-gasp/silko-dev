@@ -1,120 +1,33 @@
-  import Feedbacks from '@/model/session/feedbacks.js';
-  import SpeechFeedback from '@/model/session/speechFeedback.js';
-  import SyllabificationFeedback from '@/model/session/syllabificationFeedback.js';
+import SyllabificationFeedback from '@/model/session/syllabificationFeedback.js';
 
-// Word-in-focus highlighting, syllabification and pronounciation
-//  external dependencies:
-//      responsiveVoice
-//      EventEmitter
-//
-// Constructor arguments:
-//      options: {
-//          highlightingEnabled
-//          syllabification          - language, or empty
-//          syllabificationThreshold - minimum fixation duration in ms to consider the word should be split
-//          syllabificationSmart     - if enabled, computeds the threshold after the first page is read
-//              syllabificationSmartThresholdMin
-//              syllabificationSmartThresholdMax
-//              syllabificationSmartThresholdFactor
-//          speech          - language, or empty
-//          speechThreshold - minimum fixation duration in ms to consider the word should be pronounced
-//          focusedWordClass
-//          hyphen
-//      }
 export default class Syllabifier {
-    constructor( exceptions, options ) {
-        options = options || {};
+    constructor( options ) {
+        this.options = Object.assign( { factor: 3 }, options );
 
-        this.highlightingEnabled = options.highlightingEnabled || false;
-        this.syllabification = {};
-        this.syllabification.language = options.syllabification || '';
-        this.syllabification.threshold = options.syllabificationThreshold || 2500;
-        this.syllabification.smart = {}
-        this.syllabification.smart.enabled = options.syllabificationSmart || true;
-        this.syllabification.smart.threshold = {}
-        this.syllabification.smart.threshold.min = options.syllabificationSmartThresholdMin || 1500;
-        this.syllabification.smart.threshold.max = options.syllabificationSmartThresholdMax || 3000;
-        this.syllabification.smart.threshold.factor = options.syllabificationSmartThresholdFactor || 4;
-        this.speech = {};
-        this.speech.language = options.speech || '';
-        this.speech.threshold = options.speechThreshold || 4000;
-        this.className = options.focusedWordClass || 'currentWord';
-        this.hyphen = options.hyphen || String.fromCharCode( 0x00B7 );//DOTS: 00B7 2010 2022 2043 LINES: 2758 22EE 205E 237F
+        this.className = 'currentWord';
+        this.hyphen = String.fromCharCode( 0x00B7 );//DOTS: 00B7 2010 2022 2043 LINES: 2758 22EE 205E 237F
 
-        this.events = new EventEmitter();
         this.hyphenHtml = `<span class="hyphen">${this.hyphen}</span>`;
-        this.timer = null;
-        this.currentWord = null;
-        this.words = null;
 
-        this.rule = rules[ this.syllabification.language ];
-        this.voice = voices[ this.speech.language ];
+        this.rule = rules[ this.options.language ];
 
         this.exceptions = {};
-        for (let word in exceptions) {
-            this.exceptions[ word.toLowerCase() ] = exceptions[ word ].replace( ' ', this.hyphen ).toLowerCase();
+        for (let word in this.options.exceptions) {
+            this.exceptions[ word.toLowerCase() ] = this.options.exceptions[ word ].replace( ' ', this.hyphen ).toLowerCase();
         }
+    }
+
+    get enabled() {
+        return !!this.rule;
     }
 
     get setup() {
-        return new Feedbacks(
-            new SpeechFeedback(
-                !!this.voice,
-                this.speech.threshold
-            ),
-            new SyllabificationFeedback(
-                !!this.rule,
-                this.syllabification.threshold,
-                this.hyphen
-            )
+        return new SyllabificationFeedback(
+            !!this.rule,
+            this.options.threshold.value,
+            this.hyphen
         );
     }
-
-    // Resets the highlighting
-    cleanup() {
-
-        if (this.currentWord) {
-            this.currentWord.classList.remove( this.className );
-            this.currentWord = null;
-        }
-
-        clearTimeout( this.timer );
-        this.timer = null;
-        this.words = null;
-    }
-
-    init() {
-        this.words = new Map();
-
-        if (this.rule || this.voice) {
-            this.timer = setInterval( () => {
-                this._tick();
-            }, 30);
-        }
-    }
-
-    reset( updateThresholds ) {
-        if (updateThresholds) {
-        //     const avgWordReadingDuration = statistics.getAvgWordReadingDuration();
-        //     syllabifier.setAvgWordReadingDuration( avgWordReadingDuration );
-        }
-
-        this.words = new Map();
-        this.currentWord = null;
-    }
-
-    // @param text - [""]
-    // syllabify( text ) {
-
-    //     if (!this.rule) {
-    //         return text;
-    //     }
-
-    //     return text.map( line => {
-    //         const words = line.split( ' ' ).map( word => word.toLowerCase() );
-    //         return words.map( word => this._syllabifyWord( word, this.hyphenHtml ) ).join( ' ' );
-    //     });
-    // }
 
     prepare( text ) {
 
@@ -151,75 +64,31 @@ export default class Syllabifier {
         }
     };
 
-    // Propagates / removed the highlighing
-    // Arguments:
-    //   wordEl: - the focused word DOM element
-    setFocusedWord( el ) {
+    inspect( el, params ) {
+        if (this.rule && params.notSyllabified &&
+            params.accumulatedTime > this.options.threshold.value) {
 
-        if (this.currentWord != el) {
-            if (this.highlightingEnabled) {
-                if (this.currentWord) {
-                    this.currentWord.classList.remove( this.className );
-                }
-                if (el) {
-                    el.classList.add( this.className );
-                }
-            }
+            params.notSyllabified = false;
 
-            this.currentWord = el;
+            el.innerHTML = this._syllabifyWord( params.word, this.hyphenHtml );
 
-            if (el && !this.words.has( el )) {
-                this.words.set( el, {
-                    accumulatedTime: 0,
-                    notSyllabified: true,
-                    notPronounced: true,
-                    word: this._getWordFromElement( el )
-                });
-            }
+            return true;
         }
+
+        return false;
     }
 
-    _setAvgWordReadingDuration( avgWordReadingDuration ) {
-        if (!this.syllabification.smart.enabled) {
+    setAvgWordReadingDuration( avgWordReadingDuration ) {
+        if (!this.options.threshold.smart) {
             return;
         }
 
-        this.syllabification.threshold =
-            Math.max( this.syllabification.smart.threshold.min,
-            Math.min( this.syllabification.smart.threshold.max,
-            avgWordReadingDuration * this.syllabification.smart.threshold.factor
+        this.options.threshold.value =
+            Math.max( this.options.threshold.min,
+            Math.min( this.options.threshold.max,
+            avgWordReadingDuration * this.options.threshold.factor
         ));
     }
-
-    _tick() {
-        for (let key of this.words.keys()) {
-
-            const wordSyllabParams = this.words.get( key );
-            wordSyllabParams.accumulatedTime = Math.max( 0,
-                wordSyllabParams.accumulatedTime + (key === this.currentWord ? 30 : -30)
-            );
-
-            if (this.rule && wordSyllabParams.notSyllabified &&
-                wordSyllabParams.accumulatedTime > this.syllabification.threshold) {
-
-                wordSyllabParams.notSyllabified = false;
-
-                const word = this._getWordFromElement( key );
-                key.innerHTML = this._syllabifyWord( word, this.hyphenHtml );
-
-                this.events.emitEvent( 'syllabified', [ key ] );
-            }
-
-            if (this.voice && wordSyllabParams.notPronounced &&
-                wordSyllabParams.accumulatedTime > this.speech.threshold) {
-
-                wordSyllabParams.notPronounced = false;
-                this.voice( wordSyllabParams.word );
-
-                this.events.emitEvent( 'pronounced', [ key ] );
-            }
-        }
-    };
 
     _syllabifyWord( word, hyphen ) {
         const exception = Object.keys( this.exceptions ).find( exception => this._isException( word, exception ));
@@ -258,21 +127,6 @@ export default class Syllabifier {
 
         return prefix + result + postfix;
     }
-
-    _getWordFromElement( element ) {
-        const textNodes = Array.from( element.childNodes ).filter( node =>
-            node.nodeType === Node.TEXT_NODE ||
-            !node.classList.contains( 'hyphens' )
-        );
-
-        return textNodes[0].textContent.trim();
-    }
-
-    // test
-    // syllabified.forEach( line => line.forEach( word => { console.log(word); } ));
-    //console.log( new Syllabifier({})._syllabifyWord( 'WeeGee:ssä.', '-' ) );
-    //console.log( new Syllabifier({})._syllabifyWord( '"Unien', '-' ) );
-
 };
 
 const rules = {
@@ -289,35 +143,56 @@ const rules = {
         const result = [];
 
         let hasVowel = false;
+        let vowelsInRow = 0;
+
         for (let i = word.length - 1; i >= 0; i--) {
             let separate = false;
             const char = word[i];
             const type = getType( char );
+            const charNext = i > 0 ? word[i - 1] : null;
+            const typeNext = charNext ? getType( charNext ) : '_';
+
             if (type === 'V') {
+                hasVowel = true;
+                vowelsInRow++;
+
                 if (i < word.length - 1) {
                     const charPrevious = word[ i + 1 ];
                     const typePrevious = getType( charPrevious );
                     if (charPrevious !== char && typePrevious === type
-                        && !diftongs.includes( char + charPrevious)) {
+                        && !diftongs.includes( char + charPrevious )) {
                         result.unshift( hyphen );
+                        vowelsInRow = 0;
+                    }
+                    else if ( char === 'i' && result[0] === 'e' && result[1] === 'n') { // handle '-ien' ending
+                        result.unshift( hyphen );
+                        vowelsInRow = 0;
+                    }
+                    else if (vowelsInRow === 3) { // this is a comound word... make a guess
+                        result.unshift( hyphen );
+                        vowelsInRow = 0;
                     }
                 }
-                hasVowel = true;
             }
             else if (type === 'C' && hasVowel) {
+                vowelsInRow = 0;
+
                 separate = i > 0;
-                if (i === 1) {
-                    const charNext = word[i - 1];
-                    const typeNext = getType( charNext );
+                if (i === 1) {  // prevent the two leading consonants to separate (eg. 'kreikka' )
+                    // const charNext = word[i - 1];
+                    // const typeNext = getType( charNext );
                     if (typeNext === type) {
                         separate = false;
                     }
                 }
             }
+
             result.unshift( char );
 
             if (separate) {
-                result.unshift( hyphen );
+                if (type !== '_' && typeNext !== '_') {
+                    result.unshift( hyphen );
+                }
                 hasVowel = false;
             }
         }
@@ -325,9 +200,3 @@ const rules = {
         return result.join('');
     }
 };
-
-const voices = {
-    Finnish( word ) {
-        responsiveVoice.speak( word, 'Finnish Female' );
-    }
-}

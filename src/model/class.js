@@ -19,6 +19,8 @@ export default class Class {
     }
 
     createTask( task, type, cb ) {
+        task.syllab.exceptions = Task.textToSyllabs( task.syllabExceptions );
+
         db.add( Task, {
             name: task.name,
             owner: this.owner,
@@ -27,7 +29,6 @@ export default class Class {
             intro: task.intro,
             pages: Task.textToPages( task.text ),
             syllab: task.syllab,
-            syllabExceptions: Task.textToSyllabs( task.syllabExceptions ),
             speech: task.speech
         }, (err, id) => {
             if (err) {
