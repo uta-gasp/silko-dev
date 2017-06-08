@@ -14,7 +14,11 @@
                 option(value="") none
                 option(v-for="item in intros" :value="item.id") {{item.name}}
       p.control
-        label.label(v-show="showLabels") Text
+        label.label(v-show="showLabels").is-pulled-left Text
+        .is-pulled-right.has-text-right
+          .text-format-instruction Empty line to separate pages
+          .text-format-instruction "\" after a word and "|" after a line to apply a style to them
+          .text-format-instruction Styles: "b" - black, "n" - navy, "g" - light-grey
         textarea.textarea(placeholder="Text" v-model="text")
       p.control
         .columns
@@ -156,6 +160,12 @@
   }
 
   .label > i {
+    display: block;
+    font-size: 12px;
+    font-weight: 400;
+  }
+
+  .text-format-instruction {
     display: block;
     font-size: 12px;
     font-weight: 400;

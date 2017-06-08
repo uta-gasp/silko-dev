@@ -49,22 +49,19 @@ export default class TextPresenter {
     }
 
     // Creates a text line from a string. Features:
-    //   1. Classes can be listed after "|"
-    //      For example, "This is a text|header|bold" will expand
-    //      to HTML "<soan class="header bold"> This is a text </span>"
-    //   2. "\b" placed right after a word adds "bold" class
+    //      Classes can be listed after "|" (lines) or "\" (words)
+    //      For example, "This is\b a text|n" will expand
+    //      to HTML "<span class="n">This <span class="b">is</span> a text</span>"
     _lineToElement( line ) {
-        const reBold = /(\S+)(\\b)/g;
-        const parts = line.split( '|' );
-        let lineText = parts[0].replace( reBold, '<span class="bold"> $1</span>' );
+        const reWord = /(\S+)(\\)(\w{1})\s/g;
+        const reLine = /^(.+)(\|)(\w{1})$/gm;
+
+        line = line.replace( reWord, '<span class="$3"> $1</span> ' ).
+                    replace( reLine, '<span class="$3">$1</span>' );
 
         const el = document.createElement( 'div' );
-        el.innerHTML = lineText;
+        el.innerHTML = line;
         el.classList.add( 'line' );
-
-        for (let i = 1; i < parts.length; i++) {
-            el.classList.add( parts[i] );
-        }
 
         return el;
     }

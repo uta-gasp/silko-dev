@@ -177,6 +177,20 @@
     &.authors {
         color: lighten(@fontColor, 25%);
     }
+
+    // custom styles
+
+    .b {
+      color: #000;
+    }
+
+    .n {
+      color: #008;
+    }
+
+    .g {
+      color: #ccc;
+    }
   }
 
   .currentWord {

@@ -41,6 +41,7 @@ export default class Task {
 
         lines.forEach( line => {
             line = line.trim();
+
             if (!line) {
                 if (page.length > 0) {
                     page = [];

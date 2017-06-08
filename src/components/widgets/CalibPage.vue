@@ -7,6 +7,7 @@
 
         button.button.is-large.is-primary(:disabled="!isConnected" @click="calibrate()") {{ texts.calibStart }}
         button.button.is-large(:disabled="!isConnected" @click="skip()") {{ texts.calibSkip }}
+        button.button.is-large(@click="cancel()") {{ texts.startCancel }}
 
       .container(v-show="!isETUDConnected")
         .message.is-danger.is-centered
@@ -64,6 +65,10 @@
       skip() {
         this.$emit( 'close', { skip: true } );
       },
+
+      cancel() {
+        this.$router.replace( '/assignments' );
+      }
     },
 
     created() {
