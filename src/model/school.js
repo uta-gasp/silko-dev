@@ -1,8 +1,10 @@
 import Recordable from './commons/recordable.js';
+
 import Teacher from './teacher.js';
 import Student from './student.js';
 import Class from './class.js';
-import db from './db.js';
+
+import db from '@/db/db.js';
 
 export default class School {
     constructor( id, email, name ) {

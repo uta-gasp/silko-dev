@@ -20,8 +20,8 @@
               button.button.is-danger(@click="remove( task )")
                 i.fa.fa-remove
 
-    modal-editor-container(v-if="isEditing" title="Text editor" @close="closeEditor()")
-      text-editor(
+    modal-editor-container(v-if="isEditing" title="Task editor" @close="closeEditor()")
+      task-editor(
         :action="action"
         :show-labels="true"
         :name-editable="!toEdit"
@@ -38,11 +38,12 @@
 </template>
 
 <script>
-  import Task from '@/model/task.js';
   import gui from '@/utils/gui.js';
 
+  import Task from '@/model/task.js';
+
   import ModalEditorContainer from '@/components/widgets/ModalEditorContainer';
-  import TextEditor from '@/components/widgets/TextEditor';
+  import TaskEditor from '@/components/widgets/TaskEditor';
   import RemoveWarning from '@/components/widgets/RemoveWarning';
 
   export default {
@@ -63,7 +64,7 @@
 
     components: {
       'modal-editor-container': ModalEditorContainer,
-      'text-editor': TextEditor,
+      'task-editor': TaskEditor,
       'remove-warning': RemoveWarning
     },
 
@@ -157,7 +158,7 @@
           });
         }
         else if (!this.canCreate( task )) {
-          this.$emit( 'created', { err: 'A text with the same name exists already' } );
+          this.$emit( 'created', { err: 'A task with the same name exists already' } );
         }
         else {
           this.parent.createTask( task, 'text', (err, newTask) => {

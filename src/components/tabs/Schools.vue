@@ -32,8 +32,9 @@
 </template>
 
 <script>
-  import { EventBus }  from '@/model/event-bus.js';
-  import Admin from '@/model/users/admin.js';
+  import eventBus  from '@/utils/event-bus.js';
+
+  import Admin from '@/model/admin.js';
   import School from '@/model/school.js';
 
   import CreationSuccess from '@/components/widgets/CreationSuccess';
@@ -144,10 +145,10 @@
     created() {
       // BUG - every logging in creates additional Schools.vue instance, even after logging out
       console.log('Schools component created');
-      EventBus.$on( 'logout', () => {
+      eventBus.$on( 'logout', () => {
         this.checkAccess();
       });
-      EventBus.$on( 'login', () => {
+      eventBus.$on( 'login', () => {
         this.loadSchools();
       });
 

@@ -1,5 +1,6 @@
 import Recordable from './commons/recordable.js';
-import db from './db.js';
+
+import db from '@/db/db.js';
 
 export default class Intro {
     constructor( id, name, owner ) {

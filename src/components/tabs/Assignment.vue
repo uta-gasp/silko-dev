@@ -11,9 +11,10 @@
 </template>
 
 <script>
-  import { EventBus }  from '@/model/event-bus.js';
   import Student from '@/model/student.js';
+
   import gazeTracking from '@/utils/gazeTracking.js';
+  import eventBus  from '@/utils/event-bus.js';
 
   import ModalError from '@/components/widgets/ModalError';
   import CalibPage from '@/components/widgets/CalibPage';
@@ -139,10 +140,10 @@
 
     created() {
       console.log('Assignment component created');
-      EventBus.$on( 'logout', () => {
+      eventBus.$on( 'logout', () => {
         this.checkAccess();
       });
-      EventBus.$on( 'login', () => {
+      eventBus.$on( 'login', () => {
         this.init();
       });
 

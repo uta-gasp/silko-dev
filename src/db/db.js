@@ -1,5 +1,6 @@
-import UserCreator from './users/user-creator.js';
-import { EventBus }  from './event-bus.js';
+import UserCreator from './user-creator.js';
+
+import eventBus  from '@/utils/event-bus.js';
 
 const config = require( `@/config/db.${process.env.NODE_ENV}.js` ).config;
 
@@ -290,12 +291,12 @@ class DB {
                     }
 
                     this._user = result;
-                    EventBus.$emit( 'login' );
+                    eventBus.$emit( 'login' );
                 });
             });
         } else {
             this._user = null;
-            EventBus.$emit( 'logout' );
+            eventBus.$emit( 'logout' );
         }
     }
 }

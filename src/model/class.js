@@ -1,7 +1,9 @@
 import Recordable from './commons/recordable.js';
+
 import Task from './task.js';
 import Student from './student.js';
-import db from './db.js';
+
+import db from '@/db/db.js';
 
 export default class Class {
     constructor( id, name, owner ) {

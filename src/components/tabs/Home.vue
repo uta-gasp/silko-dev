@@ -6,40 +6,40 @@
           //img(src="../assets/icon-32.png")
           h1.title.logo Silko
           h2.subtitle A reading aid for students and teachers
-    section.section(v-if="loginVisible")
+    section.section(v-if="isLoginVisible")
       login
 </template>
 
 <script>
-  import { EventBus } from '@/model/event-bus.js';
-  import db from '@/model/db.js';
+  import eventBus from '@/utils/event-bus.js';
+  import login from '@/utils/login.js';
 
-  import login from '@/components/widgets/Login'
+  import Login from '@/components/widgets/Login'
 
   export default {
     name: 'home',
 
     data() {
       return {
-        loginVisible: true
+        isLoginVisible: true
       }
     },
 
     components: {
-      login
+      'login': Login
     },
 
     created() {
-      EventBus.$on( 'login', id => {
-        this.loginVisible = false;
+      eventBus.$on( 'login', id => {
+        this.isLoginVisible = false;
       });
-      EventBus.$on( 'logout', id => {
-        this.loginVisible = true;
+      eventBus.$on( 'logout', id => {
+        this.isLoginVisible = true;
       });
     },
 
     mounted() {
-      this.loginVisible = !db.user;
+      this.isLoginVisible = !login.user;
     }
   }
 </script>

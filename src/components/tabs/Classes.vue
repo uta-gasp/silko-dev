@@ -40,7 +40,8 @@
 </template>
 
 <script>
-  import { EventBus }  from '@/model/event-bus.js';
+  import eventBus  from '@/utils/event-bus.js';
+
   import Teacher from '@/model/teacher.js';
 
   import CreationSuccess from '@/components/widgets/CreationSuccess';
@@ -226,10 +227,10 @@
 
     created() {
       console.log('Classes component created');
-      EventBus.$on( 'logout', () => {
+      eventBus.$on( 'logout', () => {
         this.checkAccess();
       });
-      EventBus.$on( 'login', () => {
+      eventBus.$on( 'login', () => {
         this.init();
       });
 

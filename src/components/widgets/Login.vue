@@ -24,7 +24,7 @@
 </template>
 
 <script>
-  import db from '@/model/db.js'
+  import login from '@/utils/login.js'
 
   import TemporalError from '@/components/widgets/TemporalError';
 
@@ -56,7 +56,7 @@
       login() {
         this.inProgress = true;
 
-        db.logIn( this.email, this.password, (err, user) => {
+        login.logIn( this.email, this.password, (err, user) => {
           this.inProgress = false;
 
           if (err) {

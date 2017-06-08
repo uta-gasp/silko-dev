@@ -1,16 +1,10 @@
-import User from './user.js';
-import School from '../school.js';
-import db from '../db.js';
+import School from '@/model/school.js';
 
-class Admin extends User {
-    constructor( user ) {
-        super( user );
+import db from '@/db/db.js';
 
-        this._ref = { name: 'Admin' };
-    }
-
-    get isAdmin() {
-        return true;
+export default class Admin {
+    constructor() {
+        this.name = 'Admin';
     }
 
     static get isLogged() {
@@ -64,6 +58,4 @@ class Admin extends User {
             });
         });
     }
-}
-
-export default Admin;
+};

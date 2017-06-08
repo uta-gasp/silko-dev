@@ -1,10 +1,12 @@
 import Data from '../model/data.js';
 import Session from '../model/session.js';
+
 import Fixation from '../model/data/fixation.js';
 import DataPage from '../model/data/dataPage.js';
 import DataWord from '../model/data/dataWord.js';
 import FeedbackEvent from '../model/data/feedbackEvent.js';
-import db from '../model/db.js';
+
+import db from '../db/db.js';
 
 const MIN_FIXATION_DURATION = 80;
 

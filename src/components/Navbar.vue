@@ -31,8 +31,8 @@
 </template>
 
 <script>
-  import { EventBus }  from '../model/event-bus.js';
-  import db from '../model/db.js';
+  import eventBus  from '@/utils/event-bus.js';
+  import login from '@/utils/login.js';
 
   export default {
     name: 'navbar',
@@ -46,7 +46,7 @@
     methods: {
 
       logOut() {
-        db.logOut();
+        login.logOut();
       }
     },
 
@@ -82,10 +82,10 @@
     },
 
     created() {
-      EventBus.$on( 'login', () => {
-        this.user = db.user;
+      eventBus.$on( 'login', () => {
+        this.user = login.user;
       });
-      EventBus.$on( 'logout', () => {
+      eventBus.$on( 'logout', () => {
         this.user = null;
       });
     }

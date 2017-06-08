@@ -45,8 +45,9 @@
 </template>
 
 <script>
-  import { EventBus }  from '@/model/event-bus.js';
-  import Admin from '@/model/users/admin.js';
+  import eventBus  from '@/utils/event-bus.js';
+
+  import Admin from '@/model/admin.js';
   import School from '@/model/school.js';
   import Student from '@/model/student.js';
   import Teacher from '@/model/teacher.js';
@@ -284,10 +285,10 @@
 
     created() {
       console.log('Students component created');
-      EventBus.$on( 'logout', () => {
+      eventBus.$on( 'logout', () => {
         this.checkAccess();
       });
-      EventBus.$on( 'login', () => {
+      eventBus.$on( 'login', () => {
         this.init();
       });
 

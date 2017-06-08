@@ -23,11 +23,9 @@
 </template>
 
 <script>
-  import { EventBus }  from '@/model/event-bus.js';
-  import Admin from '@/model/users/admin.js';
-  import School from '@/model/school.js';
+  import eventBus  from '@/utils/event-bus.js';
+
   import Student from '@/model/student.js';
-  import Teacher from '@/model/teacher.js';
 
   export default {
     name: 'assignments',
@@ -79,10 +77,10 @@
 
     created() {
       console.log('Assignments component created');
-      EventBus.$on( 'logout', () => {
+      eventBus.$on( 'logout', () => {
         this.checkAccess();
       });
-      EventBus.$on( 'login', () => {
+      eventBus.$on( 'login', () => {
         this.init();
       });
 

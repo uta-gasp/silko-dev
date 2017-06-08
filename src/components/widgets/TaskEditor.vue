@@ -1,5 +1,5 @@
 <template lang="pug">
-  #text-editor
+  #task-editor
     .field
       .columns
         .column
@@ -42,7 +42,7 @@
 
 <script>
   export default {
-    name: 'text-editor',
+    name: 'task-editor',
 
     data() {
       return {
@@ -119,10 +119,6 @@
       isTextValid() {
         return this.text.length > 14;
       },
-
-      // areToolsEnabled() {
-      //   return this.textLang.length > 0;
-      // },
 
       canSave() {
         return this.isNameValid &&

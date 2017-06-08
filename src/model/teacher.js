@@ -1,10 +1,12 @@
 import Recordable from './commons/recordable.js';
+
 import School from './school.js';
 import Student from './student.js';
 import Intro from './intro.js';
 import Class from './class.js';
 import Task from './task.js';
-import db from './db.js';
+
+import db from '@/db/db.js';
 
 export default class Teacher {
     constructor( id, name, email, school ) {
