@@ -2,7 +2,8 @@ import SyllabificationFeedback from '@/model/session/syllabificationFeedback.js'
 
 export default class Syllabifier {
     constructor( options ) {
-        this.options = Object.assign( { factor: 3 }, options );
+        this.options = Object.assign( {}, options );
+        this.options.threshold.factor = 4;
 
         this.className = 'currentWord';
         this.hyphen = String.fromCharCode( 0x00B7 );//DOTS: 00B7 2010 2022 2043 LINES: 2758 22EE 205E 237F
@@ -78,7 +79,7 @@ export default class Syllabifier {
         return false;
     }
 
-    setAvgWordReadingDuration( avgWordReadingDuration ) {
+    setAvgWordReadingDuration( wordReadingDuration ) {
         if (!this.options.threshold.smart) {
             return;
         }
@@ -86,7 +87,7 @@ export default class Syllabifier {
         this.options.threshold.value =
             Math.max( this.options.threshold.min,
             Math.min( this.options.threshold.max,
-            avgWordReadingDuration * this.options.threshold.factor
+            wordReadingDuration * this.options.threshold.factor
         ));
     }
 

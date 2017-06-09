@@ -3,7 +3,7 @@
     nav.panel
       p.panel-heading {{task ? task.name : ''}}
 
-    calib-page(:texts="introTexts" v-if="state === 'calibrate'" @close="calibrate( $event )")
+    calib-page(:texts="introTexts" v-if="state === 'calibrate'" @close="calibrate")
     start-page(
       :texts="introTexts"
       :task="task"
@@ -11,12 +11,12 @@
       :student="student"
       v-if="intro"
       v-show="state === 'start'"
-      @close="start( $event )"
-      @saved="dataSaved( $event )"
+      @close="start"
+      @saved="done"
     )
     finished-page(:texts="introTexts" :saving="!isDataSaved" v-if="state === 'finished'" )
 
-    modal-error(:text="errorText" @close="exit()")
+    modal-error(:text="errorText" @close="exit")
 </template>
 
 <script>
@@ -123,6 +123,7 @@
       },
 
       start( e ) {
+        console.dir( e );
         if (e.finished) {
           this.state = 'finished';
         }
@@ -131,7 +132,7 @@
         }
       },
 
-      dataSaved( e ) {
+      done( e ) {
         if (!e.err) {
           this.student.taskDone( this.task.cls, e.session, err => {
             if (err) {

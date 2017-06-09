@@ -5,9 +5,9 @@
         .content.is-large
           p(v-for="line in calibInstruction") {{ line }}
 
-        button.button.is-large.is-primary(:disabled="!isConnected" @click="calibrate()") {{ texts.calibStart }}
-        button.button.is-large(:disabled="!isConnected" @click="skip()") {{ texts.calibSkip }}
-        button.button.is-large(@click="cancel()") {{ texts.startCancel }}
+        button.button.is-large.is-primary(:disabled="!isConnected" @click="calibrate") {{ texts.calibStart }}
+        button.button.is-large(:disabled="!isConnected" @click="skip") {{ texts.calibSkip }}
+        button.button.is-large(@click="cancel") {{ texts.startCancel }}
 
       .container(v-show="!isETUDConnected")
         .message.is-danger.is-centered
@@ -18,10 +18,10 @@
               ul
                 li ETU-Driver service is not running
                 li ETU-Driver service is running, but its WebSocket server is not enabled
-            button.button.is-large.is-primary(@click="reload()") Reload
+            button.button.is-large.is-primary(@click="reload") Reload
 
       .is-bottom-right
-        a.button(:disabled="!isETUDConnected" @click="showETUDOptions()")
+        a.button(:disabled="!isETUDConnected" @click="showETUDOptions")
           span.icon
             i.fa.fa-eye
 </template>
@@ -55,7 +55,8 @@
       },
 
       reload() {
-        window.location.assign( window.location.origin );
+        this.$router.replace( '/assignments' );
+        //window.location.assign( window.location.origin );
       },
 
       calibrate() {

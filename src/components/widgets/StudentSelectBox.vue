@@ -19,12 +19,13 @@
         .level
           .level-left
             .level-item
-              a.button.is-primary(@click="accept()") Save
+              a.button.is-primary(@click="accept") Save
+            .level-item
           .level-right
             .level-item
-              a.button(:disabled="!hasStudents()" @click="selectAllStudents()") Select all
+              a.button(:disabled="!hasStudents()" @click="selectAllStudents") Select all
             .level-item
-              a.button(:disabled="!hasStudents()" @click="removeAllStudents()") Remove all selections
+              a.button(:disabled="!hasStudents()" @click="removeAllStudents") Remove all selections
 </template>
 
 <script>
@@ -66,16 +67,14 @@
         student.selected = !student.selected;
       },
 
-      selectAllStudents( grade ) {
-        grade = grade || this.currentGrade;
-        grade.students.forEach( student => {
+      selectAllStudents() {
+        this.currentGrade.students.forEach( student => {
           student.selected = true;
         });
       },
 
-      removeAllStudents( grade ) {
-        grade = grade || this.currentGrade;
-        grade.students.forEach( student => {
+      removeAllStudents() {
+        this.currentGrade.students.forEach( student => {
           student.selected = false;
         });
       },

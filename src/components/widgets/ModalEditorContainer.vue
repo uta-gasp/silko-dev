@@ -6,7 +6,7 @@
         .heading.has-text-centered
           h1 {{title}}
         slot
-    button.modal-close(@click="onClose()")
+    button.modal-close(@click="close")
 </template>
 
 <script>
@@ -26,7 +26,7 @@
     },
 
     methods: {
-      onClose() {
+      close() {
         this.$emit( 'close' );
       }
     }
@@ -39,6 +39,6 @@
   }
 
   .modal-content {
-    width: 70%;
+    width: auto;
   }
 </style>

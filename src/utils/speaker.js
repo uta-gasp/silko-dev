@@ -5,7 +5,9 @@ import SpeechFeedback from '@/model/session/speechFeedback.js';
 
 export default class Speaker {
     constructor( options ) {
-        this.options = Object.assign( { factor: 4 }, options );
+        this.options = Object.assign( {}, options );
+        this.options.threshold.factor = 4;
+
         this.voice = voices[ this.options.language ];
     }
 
@@ -34,7 +36,7 @@ export default class Speaker {
         return false;
     }
 
-    setAvgWordReadingDuration( avgWordReadingDuration ) {
+    setAvgWordReadingDuration( wordReadingDuration ) {
         if (!this.options.threshold.smart) {
             return;
         }
@@ -42,8 +44,9 @@ export default class Speaker {
         this.options.threshold.value =
             Math.max( this.options.threshold.min,
             Math.min( this.options.threshold.max,
-            avgWordReadingDuration * this.options.threshold.factor
+            wordReadingDuration * this.options.threshold.factor
         ));
+        console.log( 'wordReadingDuration', wordReadingDuration, '   >>   new value', this.options.threshold.value );
     }
 };
 

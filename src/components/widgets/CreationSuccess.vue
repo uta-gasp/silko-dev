@@ -1,9 +1,10 @@
 <template lang="pug">
   #creation-success
-    .zero-height
-      transition(name="fade")
-        .notification.is-success(v-if="showState")
-          span The {{object}} was created
+    transition(name="slide-fade")
+      .modal.on-top.is-active(v-if="showState")
+        .modal-content
+          .notification.is-success
+            span The {{object}} was created
 </template>
 
 <script>
@@ -35,28 +36,45 @@
           this.timer = null;
         }, MSG_SHOW_DURATION);
       }
+    },
+
+    mounted() {
+      this.showState = false;
     }
   };
 </script>
 
 <style lang="less" scoped>
-  .zero-height {
-    position: relative;
-    overflow-y: visible;
-    height: 0;
+  // .zero-height {
+  //   position: relative;
+  //   overflow-y: visible;
+  //   height: 0;
+  // }
+
+  #creation-success {
+    z-index: 30;
   }
 
-  .notification {
-    position: absolute;
-    top: 0;
-    width: 100%;
+  .modal.on-top {
+    top: 50px;
+    bottom: inherit;
   }
 
-  .fade-enter-active, .fade-leave-active {
-    transition: opacity .5s
-  }
+  // .notification {
+  //   position: absolute;
+  //   top: 0;
+  //   width: 100%;
+  // }
 
-  .fade-enter, .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
-    opacity: 0
+  .slide-fade-enter-active {
+    transition: all .3s ease;
+  }
+  .slide-fade-leave-active {
+    transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+  }
+  .slide-fade-enter, .slide-fade-leave-to
+  /* .slide-fade-leave-active for <2.1.8 */ {
+    transform: translateY(-200px);
+    opacity: 0;
   }
 </style>

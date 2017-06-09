@@ -18,7 +18,7 @@
                 option(value="" disabled selected hidden ) School
                 option(v-for="item in schoolItems" v-bind:value="item.value") {{item.text}}
           p.control
-            button.button.is-primary(:disabled="!canCreateStudent" @click="tryToCreateStudent()") Create
+            button.button.is-primary(:disabled="!canCreateStudent" @click="tryToCreateStudent") Create
 
     nav.panel
       p.panel-heading Students

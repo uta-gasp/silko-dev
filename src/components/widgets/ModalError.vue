@@ -5,7 +5,7 @@
         .notification.is-danger
           .heading.has-text-centered Assignment error
           .has-text-centered {{text}}
-      button.modal-close(@click="close()")
+      button.modal-close(@click="close")
 </template>
 
 <script>

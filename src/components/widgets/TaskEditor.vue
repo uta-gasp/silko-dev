@@ -14,7 +14,7 @@
               .text-format-instruction Styles: "b" - black, "n" - navy, "g" - light-grey
           p.control
             textarea.textarea.text(placeholder="Text" v-model="text")
-        .column
+        .column.is-narrow
           .field
             p.control
               label.label(v-show="showLabels") Introduction
@@ -24,13 +24,12 @@
                   option(v-for="item in intros" :value="item.id") {{item.name}}
           feedback-editor(header="Speech" :value="speech")
           feedback-editor(header="Syllabification" :value="syllab")
-          .field
-            p.control
-              label.label Syllabification exceptions
-                i Example: kaupunki=kau pun ki
-              textarea.textarea(:disabled="!syllab.language" placeholder="Syllabifications" v-model="syllabExceptions")
+          p.control
+            div Exceptions
+            i.text-format-instruction Example: kaupunki=kau pun ki
+            textarea.textarea(:disabled="!syllab.language" placeholder="Syllabifications" v-model="syllabExceptions")
       p.control
-        a.button.is-primary(:disabled="!canSave" @click="save()") {{action}}
+        a.button.is-primary(:disabled="!canSave" @click="save") {{action}}
 </template>
 
 <script>
@@ -98,8 +97,11 @@
     methods: {
 
       save() {
+        if (!this.canSave) {
+          return;
+        }
+
         this.syllab.exceptions = this.syllabExceptions;
-        console.dir(this.syllab);
 
         this.$emit( 'save', {
           name: this.name.trim(),
@@ -114,6 +116,11 @@
 </script>
 
 <style lang="less" scoped>
+
+  #task-editor {
+    width: 840px;
+  }
+
   select:invalid {
     color: #999;
   }
@@ -144,5 +151,7 @@
 
   .text {
     min-height: 350px;
+    font-size: 15px;
+    line-height: 1.25em;
   }
 </style>

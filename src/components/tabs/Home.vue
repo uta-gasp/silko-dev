@@ -3,7 +3,7 @@
     section.hero
       .hero-body
         .container
-          //img(src="../assets/icon-32.png")
+          //-img(src="../assets/icon-32.png")
           h1.title.logo Silko
           h2.subtitle A reading aid for students and teachers
     section.section(v-if="isLoginVisible")

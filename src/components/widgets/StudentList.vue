@@ -6,7 +6,7 @@
           .level-item {{gui.displayCount( students, 'student' )}}
         .level-right
           .level-item
-            button.button.is-primary(@click="openEditor()") Add
+            button.button.is-primary(@click="openEditor") Add
     .panel-block.is-paddingless
       table.table
         thead
@@ -27,8 +27,8 @@
               button.button.is-danger(@click="remove( student )")
                 i.fa.fa-remove
 
-    modal-editor-container(v-if="isEditing" title="Available students" @close="closeEditor()")
-      student-select-box(:grades="schoolGrades" @accept="addNewStudents( $event )")
+    modal-editor-container(v-if="isEditing" title="Available students" @close="closeEditor")
+      student-select-box(:grades="schoolGrades" @accept="addNewStudents")
 </template>
 
 <script>

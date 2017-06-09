@@ -25,15 +25,15 @@
           tbody
             tr(v-for="item in intros")
               td {{ item.name }}
-              td.pre {{ item.firstPageAsText() }}
+              td.keep-lines {{ item.firstPageAsText() }}
               td
-                .is-pulled-right
+                .is-pulled-right.is-flex
                   button.button.is-light(@click="edit( item )")
                     i.fa.fa-edit
                   button.button.is-danger(@click="remove( item )")
                     i.fa.fa-remove
 
-    modal-editor-container(v-if="toEdit" title="Instruction editor" @close="closeEditor()")
+    modal-editor-container(v-if="toEdit" title="Instruction editor" @close="closeEditor")
       intro-editor(
         action="Save"
         :name-editable="false"
@@ -181,7 +181,7 @@
           });
         }
         this.toDelete = null;
-      }
+      },
     },
 
     created() {
@@ -203,8 +203,7 @@
 </script>
 
 <style lang="less" scoped>
-  .pre {
-    white-space: pre;
+  .keep-lines {
+    white-space: pre-line;
   }
-
 </style>

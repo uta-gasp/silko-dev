@@ -6,7 +6,7 @@
           .level-item {{gui.displayCount( tasks, 'task' )}}
         .level-right
           .level-item
-            button.button.is-primary(@click="openNewTextBox()") Add
+            button.button.is-primary(@click="openNewTextBox") Add
     .panel-block.is-paddingless
       table.table
         tbody
@@ -20,7 +20,7 @@
               button.button.is-danger(@click="remove( task )")
                 i.fa.fa-remove
 
-    modal-editor-container(v-if="isEditing" title="Task editor" @close="closeEditor()")
+    modal-editor-container(v-if="isEditing" title="Task editor" @close="closeEditor")
       task-editor(:action="action" :show-labels="true" :task="toEdit" :intros="intros" @save="save")
 
     remove-warning(v-if="toDelete" object="task" :name="toDeleteName" @close="removeWarningClosed")

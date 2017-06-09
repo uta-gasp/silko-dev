@@ -12,9 +12,9 @@
                 header.card-header.notification.is-info.is-paddingless
                   .card-header-title {{ assignment.cls.name }}
                   .card-header-icon
-                    span.icon(v-if="assignment.task.syllab.language")
+                    span.icon(v-if="assignment.task.syllab.language" title="Syllabification")
                       i.fa.fa-ellipsis-h
-                    span.icon(v-if="assignment.task.speech")
+                    span.icon(v-if="assignment.task.speech" title="Voice")
                       i.fa.fa-headphones
                 .card-content
                   .content {{ assignment.task.name }}
@@ -100,5 +100,9 @@
 
   .card-header-title {
     color: #fff;
+  }
+
+  .card-header-icon {
+    cursor: default;
   }
 </style>

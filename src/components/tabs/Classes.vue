@@ -10,7 +10,7 @@
           p.control
             input.input(type="text" placeholder="Name" v-model="newName")
           p.control
-            button.button.is-primary(:disabled="!canCreate" @click="tryToCreate()") Create
+            button.button.is-primary(:disabled="!canCreate" @click="tryToCreate") Create
 
     nav.panel
       p.panel-heading Classes
@@ -142,6 +142,10 @@
       // Class
 
       tryToCreate() {
+        if (!this.canCreate) {
+          return;
+        }
+
         this.action = 'create new';
         this.createdObject = 'class';
 

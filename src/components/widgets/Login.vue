@@ -2,14 +2,14 @@
   #login
     .field
       p.control.has-icons-left.has-icons-right
-        input.input(type="email" placeholder="Email" v-model="email" @keyup.enter="login()")
+        input.input(type="email" placeholder="Email" v-model="email" @keyup.enter="login")
         span.icon.is-small.is-left
           i.fa.fa-envelope
         span.icon.is-small.is-right(v-if="!isEmailValid")
           i.fa.fa-warning
 
       p.control.has-icons-left.has-icons-right
-        input.input(type="password" placeholder="Password" v-model="password" @keyup.enter="login()")
+        input.input(type="password" placeholder="Password" v-model="password" @keyup.enter="login")
         span.icon.is-small.is-left
           i.fa.fa-user-secret
         span.icon.is-small.is-right(v-if="!isPasswordValid")
@@ -17,7 +17,7 @@
 
       p.control
         .has-text-centered
-          a.button.is-primary(:disabled="inProgress" @click="login()") Log in
+          a.button.is-primary(:disabled="inProgress" @click="login") Log in
 
       .error
         temporal-error(:show="showError" :error="errorText")

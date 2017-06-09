@@ -6,14 +6,14 @@
         article.message.is-danger
           .message-header
             p Deleting the {{object}}.
-            button.delete(@click="reject()")
+            button.delete(@click="reject")
           .message-body
             .level
               .level-item The {{object}} "{{name}}" will be deleted permanently. Continue?
             .level
               .level-item
-                button.button.is-danger(@click="confirm()") OK
-                button.button(@click="reject()") Cancel
+                button.button.is-danger(@click="confirm") OK
+                button.button(@click="reject") Cancel
 </template>
 
 <script>

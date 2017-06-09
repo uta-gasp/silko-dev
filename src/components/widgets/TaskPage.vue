@@ -2,9 +2,9 @@
   #task-page
     .text.median(ref="text")
     .is-bottom-right
-      a.button.is-primary.is-large(v-show="hasNextPage" @click="next()")
+      a.button.is-primary.is-large(v-show="hasNextPage" @click="next")
         span {{ texts.next }}
-      a.button.is-primary.is-large(v-show="!hasNextPage" @click="finish()")
+      a.button.is-primary.is-large(v-show="!hasNextPage" @click="finish")
         span {{ texts.finish }}
 </template>
 
@@ -46,7 +46,6 @@
         let wordReadingDuration;
         if (this.textPresenter.page === 0 && this.texts.firstPage) {
           wordReadingDuration = this.collector.wordReadingDuration;
-          console.log( wordReadingDuration );
         }
 
         this.textPresenter.nextPage();
@@ -106,25 +105,24 @@
 </script>
 
 <style lang="less" scoped>
+
   .is-bottom-right {
     position: fixed;
     bottom: 1em;
     right: 1em;
   }
 
-  @fontColor: #775;
-  @backColor: #fff;
   @margin: 15;
 
   #task-page {
     position: relative;
     height: unit(100 - 2 * @margin, vh);
     margin: unit(@margin, vh) unit(@margin, vw);
-    background-color: @backColor;
+    background-color: #fff;
   }
 
   .text {
-    color: @fontColor;
+    color: #775;
     font-size: 20pt;
     font-family: Calibri, Arial, sans-serif;
     font-weight: bold;
@@ -163,23 +161,9 @@
 </style>
 
 <style lang="less">
-  @fontColor: #775;
-  @backColor: #fff;
 
   .line {
     display: block;
-
-    &.h1 {
-        color: #5e2095;
-    }
-
-    &.h2 {
-        color: #0e6095;
-    }
-
-    &.authors {
-        color: lighten(@fontColor, 25%);
-    }
 
     // custom styles
 
@@ -188,11 +172,15 @@
     }
 
     .n {
-      color: #008;
+      color: #5e2095;
+    }
+
+    .h {
+      color: #0e6095;
     }
 
     .g {
-      color: #ccc;
+      color: lighten(#775, 25%);
     }
   }
 
@@ -205,7 +193,7 @@
   }
 
   .hyphens {
-    color: @backColor;
+    color: #fff;
   }
 
   .hyphen {

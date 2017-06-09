@@ -5,11 +5,11 @@
         .content.is-large
           p(v-for="line in startInstruction") {{ line }}
 
-        button.button.is-large.is-primary(:disabled="!isCalibrated" @click="start()") {{ texts.startRun }}
-        button.button.is-large(@click="cancel()") {{ texts.startCancel }}
+        button.button.is-large.is-primary(:disabled="!isCalibrated" @click="start") {{ texts.startRun }}
+        button.button.is-large(@click="cancel") {{ texts.startCancel }}
 
     div.fullscreen(ref="fullscreen")
-      task-page(v-show="isRunning" :texts="texts" :task="task" :student="student" @finished="finished()" @saved="dataSaved( $event )")
+      task-page(v-show="isRunning" :texts="texts" :task="task" :student="student" @finished="finished" @saved="done")
 
     p
       .container(v-show="!isCalibrated")
@@ -89,7 +89,7 @@
         this.closeFullscreen();
       },
 
-      dataSaved( e ) {
+      done( e ) {
         this.$emit( 'saved', e );
       },
     },

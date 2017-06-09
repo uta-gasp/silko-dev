@@ -11,7 +11,7 @@
           p.control
             input.input(type="email" placeholder="Email" v-model="newEmail")
           p.control
-            button.button.is-primary(:disabled="!canCreate" @click="tryToCreate()") Create
+            button.button.is-primary(:disabled="!canCreate" @click="tryToCreate") Create
 
     nav.panel
       p.panel-heading Schools
