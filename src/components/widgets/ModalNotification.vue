@@ -3,8 +3,8 @@
     transition(name="slide-fade")
       .modal.on-top.is-active(v-if="showState")
         .modal-content
-          .notification.is-success
-            span The {{object}} was created
+          .notification(:class="notificationClass")
+            slot
 </template>
 
 <script>
@@ -21,7 +21,7 @@
     },
 
     props: {
-      object: String,
+      type: String,
       show: Number
     },
 
@@ -35,6 +35,12 @@
           this.showState = false;
           this.timer = null;
         }, MSG_SHOW_DURATION);
+      }
+    },
+
+    computed: {
+      notificationClass() {
+        return 'is-' + this.type;
       }
     },
 

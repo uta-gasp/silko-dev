@@ -1,8 +1,11 @@
 <template lang="pug">
   #students
+    modal-notification(type="danger" :show="showCreationError")
+      span Failed to add a student: {{ creationError }}
+    modal-notification(type="success" :show="showCreationSuccess")
+      span The student was added.
+
     nav.panel
-      creation-error(object="student" :show="showCreationError" :error="creationError")
-      creation-success(object="student" :show="showCreationSuccess")
       p.panel-heading Add student
       .panel-block
         .field.control
@@ -52,8 +55,7 @@
   import Student from '@/model/student.js';
   import Teacher from '@/model/teacher.js';
 
-  import CreationSuccess from '@/components/widgets/CreationSuccess';
-  import CreationError from '@/components/widgets/CreationError';
+  import ModalNotification from '@/components/widgets/ModalNotification';
 
   export default {
     name: 'students',
@@ -80,8 +82,7 @@
     },
 
     components: {
-      'creation-success': CreationSuccess,
-      'creation-error': CreationError
+      'modal-notification': ModalNotification,
     },
 
     computed: {

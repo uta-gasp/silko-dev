@@ -1,9 +1,11 @@
 <template lang="pug">
   #classes
+    modal-notification(type="danger" :show="showCreationError")
+      span Failed to {{ action }} {{ createdObject }}: {{ creationError }}
+    modal-notification(type="success" :show="showCreationSuccess")
+      span The {{ createdObject }} was created.
+
     nav.panel
-      creation-error(:object="createdObject" :show="showCreationError" :error="creationError")
-        span {{action}}
-      creation-success(:object="createdObject" :show="showCreationSuccess")
       p.panel-heading Add class
       .panel-block
         .field.control
@@ -26,7 +28,7 @@
               th.is-narrow
           tbody
             tr(v-for="item in classes" :key="item.id")
-              td.title.is-4 {{item.name}}
+              td.title.is-4 {{ item.name }}
               td
                 task-list(:cls="item" :intros="intros" @saved="onTaskSaved" @created="onTaskCreated" @deleted="onTaskDeleted")
               td
@@ -44,8 +46,7 @@
 
   import Teacher from '@/model/teacher.js';
 
-  import CreationSuccess from '@/components/widgets/CreationSuccess';
-  import CreationError from '@/components/widgets/CreationError';
+  import ModalNotification from '@/components/widgets/ModalNotification';
   import TaskList from '@/components/widgets/TaskList';
   import StudentList from '@/components/widgets/StudentList';
   import RemoveWarning from '@/components/widgets/RemoveWarning';
@@ -76,8 +77,7 @@
     },
 
     components: {
-      'creation-success': CreationSuccess,
-      'creation-error': CreationError,
+      'modal-notification': ModalNotification,
       'task-list': TaskList,
       'student-list': StudentList,
       'remove-warning': RemoveWarning

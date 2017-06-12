@@ -1,8 +1,11 @@
 <template lang="pug">
   #intros
+    modal-notification(type="danger" :show="showCreationError")
+      span Failed to create an instruction: {{ creationError }}.
+    modal-notification(type="success" :show="showCreationSuccess")
+      span The instruction was created.
+
     nav.panel
-      creation-error(object="instruction" :show="showCreationError" :error="creationError")
-      creation-success(object="instruction" :show="showCreationSuccess")
       p.panel-heading Add instruction
       .panel-block.is-paddingless
         intro-editor.control(
@@ -49,8 +52,7 @@
 
   import Teacher from '@/model/teacher.js';
 
-  import CreationSuccess from '@/components/widgets/CreationSuccess';
-  import CreationError from '@/components/widgets/CreationError';
+  import ModalNotification from '@/components/widgets/ModalNotification';
   import ModalEditorContainer from '@/components/widgets/ModalEditorContainer';
   import IntroEditor from '@/components/widgets/IntroEditor';
   import RemoveWarning from '@/components/widgets/RemoveWarning';
@@ -77,8 +79,7 @@
     },
 
     components: {
-      'creation-success': CreationSuccess,
-      'creation-error': CreationError,
+      'modal-notification': ModalNotification,
       'modal-editor-container': ModalEditorContainer,
       'intro-editor': IntroEditor,
       'remove-warning': RemoveWarning
