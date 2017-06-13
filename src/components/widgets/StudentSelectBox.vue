@@ -3,7 +3,7 @@
     div.tabs.is-centered.is-boxed
       ul.ul
         li(:class="{ 'is-active': isGradeSelected( grade ) }" v-for="grade in grades" :key="grade")
-          a(@click="selectGrade( grade )") {{grade.name}}
+          a(@click="selectGrade( grade )") {{ grade.name }}
     .students
       .has-text-centered(v-if="!isGradeSelected()")
         i Select a grade
@@ -11,7 +11,7 @@
         .card.student(:class="{ 'is-selected' : student.selected }"
           v-if="hasStudents( grade )"
           v-for="student in grade.students")
-          .card-content.title.is-6(@click="selectStudent( student, $event)") {{student.ref.name}}
+          .card-content.title.is-6(@click="selectStudent( student, $event)") {{ student.ref.name }}
         .has-text-centered(v-if="!hasStudents( grade )")
           i No available students
     .field
@@ -19,13 +19,13 @@
         .level
           .level-left
             .level-item
-              a.button.is-primary(@click="accept") Save
+              button.button.is-primary(@click="accept") Save
             .level-item
           .level-right
             .level-item
-              a.button(:disabled="!hasStudents()" @click="selectAllStudents") Select all
+              button.button(:disabled="!hasStudents()" @click="selectAllStudents") Select all
             .level-item
-              a.button(:disabled="!hasStudents()" @click="removeAllStudents") Remove all selections
+              button.button(:disabled="!hasStudents()" @click="removeAllStudents") Remove all selections
 </template>
 
 <script>

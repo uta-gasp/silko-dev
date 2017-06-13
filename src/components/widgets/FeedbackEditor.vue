@@ -15,9 +15,9 @@
       .field.is-horizontal
         template(v-if="feedback.threshold.smart")
           .control-line from
-          input.input(type="number" step="100" v-model="feedback.threshold.min" :disabled="!canEditCalibThresholdParams")
+          input.input(type="number" step="100" v-model="feedback.threshold.min" :disabled="!canEditCalibThresholdParams" min="1000" :max="feedback.threshold.max")
           .control-line to
-          input.input(type="number" step="100" v-model="feedback.threshold.max" :disabled="!canEditCalibThresholdParams")
+          input.input(type="number" step="100" v-model="feedback.threshold.max" :disabled="!canEditCalibThresholdParams" max="5000" :min="feedback.threshold.min")
           .control-line ms
         template(v-else)
           .is-right

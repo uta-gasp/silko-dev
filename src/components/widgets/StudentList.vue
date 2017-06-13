@@ -3,7 +3,7 @@
     p.panel-heading
       nav.level
         .level-left
-          .level-item {{gui.displayCount( students, 'student' )}}
+          .level-item {{ gui.displayCount( students, 'student' ) }}
         .level-right
           .level-item
             button.button.is-primary(@click="openEditor") Add
@@ -17,12 +17,12 @@
             th.is-narrow
         tbody
           tr(v-for="student in students" :key="parent.id+student.id")
-            td {{student.name}}
+            td {{ student.name }}
             td.is-narrow
               span.select
                 select(:value="getAssignment( student )" @input="setAssignment( student, $event )")
                   option(value="") none
-                  option(v-for="task in tasks" :value="task.id" :key="parent.id+student.id+task.id") {{task.name}}
+                  option(v-for="task in tasks" :value="task.id" :key="parent.id+student.id+task.id") {{ task.name }}
             td.is-narrow
               button.button.is-danger(@click="remove( student )")
                 i.fa.fa-remove

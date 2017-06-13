@@ -3,7 +3,7 @@
     p.panel-heading
       nav.level
         .level-left
-          .level-item {{gui.displayCount( tasks, 'task' )}}
+          .level-item {{ gui.displayCount( tasks, 'task' ) }}
         .level-right
           .level-item
             button.button.is-primary(@click="openNewTextBox") Add
@@ -12,8 +12,8 @@
         tbody
           tr(v-for="task in tasks" :key="parent.id+task.id")
             td
-              span.is-inline-block {{task.name}}
-              span.is-inline-block(v-if="!!task.pages") &nbsp;({{task.pages.length}} pages)
+              span.is-inline-block {{ task.name }}
+              span.is-inline-block(v-if="!!task.pages") &nbsp;({{ task.pages.length }} pages)
             td.is-narrow
               button.button.is-light(@click="edit( task )")
                 i.fa.fa-edit

@@ -4,7 +4,7 @@
     .modal-content
       .notification
         .heading.has-text-centered
-          h1 {{title}}
+          h1 {{ title }}
         slot
     button.modal-close(@click="close")
 </template>

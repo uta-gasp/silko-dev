@@ -1,7 +1,7 @@
 <template lang="pug">
   #assignment
     nav.panel
-      p.panel-heading {{task ? task.name : ''}}
+      p.panel-heading {{ task ? task.name : '' }}
 
     calib-page(:texts="introTexts" v-if="state === 'calibrate'" @close="calibrate")
     start-page(

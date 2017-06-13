@@ -43,7 +43,7 @@
           p.control
             input.input(type="text" placeholder="Thank you" v-model="finished")
       p.control
-        a.button.is-primary(:disabled="!canSave" @click="save") {{action}}
+        button.button.is-primary(:disabled="!canSave" @click="save") {{ action }}
 </template>
 
 <script>
@@ -131,10 +131,6 @@
     methods: {
 
       save( e ) {
-        if (!this.canSave) {
-          return;
-        }
-
         this.$emit( 'save', {
           name: this.name.trim(),
           texts: {

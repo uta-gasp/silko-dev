@@ -36,8 +36,16 @@ export default class Speaker {
         return false;
     }
 
+    say( word ) {
+        if (!this.voice) {
+            return;
+        }
+
+        this.voice( word );
+    }
+
     setAvgWordReadingDuration( wordReadingDuration ) {
-        if (!this.options.threshold.smart) {
+        if (!this.options.threshold.smart || !wordReadingDuration) {
             return;
         }
 

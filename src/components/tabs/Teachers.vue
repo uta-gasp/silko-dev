@@ -17,7 +17,7 @@
             span.select
               select(v-model="newSchool" required)
                 option(value="" disabled selected hidden ) School
-                option(v-for="item in schoolItems" v-bind:value="item.value") {{item.text}}
+                option(v-for="item in schoolItems" v-bind:value="item.value") {{ item.text }}
           p.control
             button.button.is-primary(:disabled="!canCreate" @click="tryToCreate") Create
     nav.panel
@@ -33,13 +33,13 @@
               th(v-if="!isAdmin") Classes
           tbody
             tr(v-for="teacher in teachers")
-              td {{teacher.name}}
+              td {{ teacher.name }}
               td(v-if="isAdmin")
                 span.select
                   select(:value="teacher.school" @input="moveTeacher( teacher, $event )")
-                    option(v-for="school in schools" :value="school.id") {{school.name}}
+                    option(v-for="school in schools" :value="school.id") {{ school.name }}
               td(v-if="!isAdmin")
-                span.ellipsis {{getListOfTeacherClasses( teacher )}}
+                span.ellipsis {{ getListOfTeacherClasses( teacher ) }}
 </template>
 
 <script>

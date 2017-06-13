@@ -2,6 +2,7 @@
   #task-editor
     .field
       .columns
+
         .column
           p.control
             label.label(v-show="showLabels") Name
@@ -14,6 +15,7 @@
               .text-format-instruction Styles: "b" - black, "n" - navy, "g" - light-grey
           p.control
             textarea.textarea.text(placeholder="Text" v-model="text")
+
         .column.is-narrow
           .field
             p.control
@@ -21,21 +23,27 @@
               span.select
                 select(v-model="intro")
                   option(value="") none
-                  option(v-for="item in intros" :value="item.id") {{item.name}}
+                  option(v-for="item in intros" :value="item.id") {{ item.name }}
           feedback-editor(header="Speech" :value="speech")
           feedback-editor(header="Syllabification" :value="syllab")
           p.control
             div Exceptions
             i.text-format-instruction Example: kaupunki=kau pun ki
             textarea.textarea(:disabled="!syllab.language" placeholder="Syllabifications" v-model="syllabExceptions")
+
       p.control
-        a.button.is-primary(:disabled="!canSave" @click="save") {{action}}
+        button.button.is-primary(:disabled="!canSave" @click="save") {{ action }}
+        button.button.is-primary.is-pulled-right(@click="preview") Preview
+
+    .fullscreen(ref="fullscreen")
+      task-preview(v-if="inPreview" :task="currentTask" @close="closePreview")
 </template>
 
 <script>
   import Task from '@/model/task.js';
 
   import FeedbackEditor from '@/components/widgets/feedbackEditor';
+  import TaskPreview from '@/components/widgets/taskPreview';
 
   export default {
     name: 'task-editor',
@@ -47,7 +55,9 @@
         intro: this.task ? this.task.intro : '',
         syllab: this.task ? this.task.syllab : Task.defaultSyllab,
         speech: this.task ? this.task.speech : Task.defaultSpeech,
-        syllabExceptions: this.task ? Task.syllabsToText( this.task.syllab.exceptions ) : ''
+        syllabExceptions: this.task ? Task.syllabsToText( this.task.syllab.exceptions ) : '',
+
+        inPreview: false,
       };
     },
 
@@ -72,6 +82,7 @@
 
     components: {
       'feedback-editor': FeedbackEditor,
+      'task-preview': TaskPreview,
     },
 
     computed: {
@@ -92,15 +103,35 @@
         return this.isNameValid &&
           this.isTextValid;
       },
+
+      currentTask() {
+        let result = new Task();
+        result = Object.assign( result, {
+          name: this.name.trim(),
+          type: 'text',
+          pages: Task.textToPages( this.text ),
+          syllab: Object.assign( {}, this.syllab ),
+          speech: Object.assign( {}, this.speech ),
+        });
+
+        result.syllab.exceptions = Task.textToSyllabs( this.syllabExceptions );
+        return result;
+      }
     },
 
     methods: {
 
-      save() {
-        if (!this.canSave) {
-          return;
-        }
+      preview( e ) {
+        this.inPreview = true;
+        this.makeFullscreen( this.$refs.fullscreen );
+      },
 
+      closePreview( e ) {
+        this.inPreview = false;
+        this.closeFullscreen();
+      },
+
+      save() {
         this.syllab.exceptions = this.syllabExceptions;
 
         this.$emit( 'save', {
@@ -110,7 +141,31 @@
           syllab: this.syllab,
           speech: this.speech,
         });
-      }
+      },
+
+      makeFullscreen( element ) {
+        if(element.requestFullscreen) {
+          element.requestFullscreen();
+        } else if(element.mozRequestFullScreen) {
+          element.mozRequestFullScreen();
+        } else if(element.webkitRequestFullscreen) {
+          element.webkitRequestFullscreen();
+        } else if(element.msRequestFullscreen) {
+          element.msRequestFullscreen();
+        }
+      },
+
+      closeFullscreen() {
+        if(document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if(document.mozCancelFullScreen) {
+          document.mozCancelFullScreen();
+        } else if(document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        } else if(document.msExitFullscreen) {
+          document.msExitFullscreen();
+        }
+      },
     }
   }
 </script>
@@ -153,5 +208,9 @@
     min-height: 350px;
     font-size: 15px;
     line-height: 1.25em;
+  }
+
+  .fullscreen {
+    background-color: #fff;
   }
 </style>

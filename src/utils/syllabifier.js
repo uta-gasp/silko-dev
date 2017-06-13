@@ -4,8 +4,8 @@ export default class Syllabifier {
     constructor( options ) {
         this.options = Object.assign( {}, options );
         this.options.threshold.factor = 4;
+        this.options.mode = this.options.mode || 'hyphen';
 
-        this.className = 'currentWord';
         this.hyphen = String.fromCharCode( 0x00B7 );//DOTS: 00B7 2010 2022 2043 LINES: 2758 22EE 205E 237F
 
         this.hyphenHtml = `<span class="hyphen">${this.hyphen}</span>`;
@@ -16,6 +16,11 @@ export default class Syllabifier {
         for (let word in this.options.exceptions) {
             this.exceptions[ word.toLowerCase() ] = this.options.exceptions[ word ].replace( ' ', this.hyphen ).toLowerCase();
         }
+
+        this.MODES = {
+            hyphen: this.hyphen,
+            colors: [ 'black', 'red' ]
+        };
     }
 
     get enabled() {
@@ -63,7 +68,11 @@ export default class Syllabifier {
         else {
             return prepareWord( text );
         }
-    };
+    }
+
+    unprepare( text ) {
+        return text.replace( new RegExp( this.hyphen, 'g' ), '' );
+    }
 
     inspect( el, params ) {
         if (this.rule && params.notSyllabified &&
@@ -79,8 +88,18 @@ export default class Syllabifier {
         return false;
     }
 
+    syllabifyWord( el, word ) {
+        if (!this.rule) {
+            return false;
+        }
+
+        el.innerHTML = this._syllabifyWord( word, this.hyphenHtml );
+
+        return true;
+    }
+
     setAvgWordReadingDuration( wordReadingDuration ) {
-        if (!this.options.threshold.smart) {
+        if (!this.options.threshold.smart || !wordReadingDuration) {
             return;
         }
 
@@ -169,7 +188,7 @@ const rules = {
                         result.unshift( hyphen );
                         vowelsInRow = 0;
                     }
-                    else if (vowelsInRow === 3) { // this is a comound word... make a guess
+                    else if (vowelsInRow === 3) { // this is a compound word... split as "V-VV" (incorrect for eg maailma)
                         result.unshift( hyphen );
                         vowelsInRow = 0;
                     }

@@ -19,7 +19,7 @@
             span.select
               select(v-model="newSchool" required)
                 option(value="" disabled selected hidden ) School
-                option(v-for="item in schoolItems" v-bind:value="item.value") {{item.text}}
+                option(v-for="item in schoolItems" v-bind:value="item.value") {{ item.text }}
           p.control
             button.button.is-primary(:disabled="!canCreateStudent" @click="tryToCreateStudent") Create
 
@@ -37,14 +37,14 @@
               th(v-if="!isAdmin") Classes
           tbody
             tr(v-for="student in students")
-              td {{student.name}}
+              td {{ student.name }}
               td(v-if="isAdmin")
                 span.select
                   select(:value="student.school" @input="moveStudent( student, $event )")
-                    option(v-for="school in schools" :value="school.id") {{school.name}}
-              td {{student.grade}}
+                    option(v-for="school in schools" :value="school.id") {{ school.name }}
+              td {{ student.grade }}
               td(v-if="!isAdmin")
-                span.ellipsis {{getListOfStudentClasses( student )}}
+                span.ellipsis {{ getListOfStudentClasses( student ) }}
 </template>
 
 <script>

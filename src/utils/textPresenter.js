@@ -1,7 +1,7 @@
 export default class TextPresenter {
     constructor( task, firstPage, container, syllabifier ) {
-        this.task = task;
-        this.firstPage = firstPage;
+        // this.task = task;
+        // this.firstPage = firstPage;
         this.container = container;
         this.syllabifier = syllabifier;
 
@@ -23,6 +23,10 @@ export default class TextPresenter {
         return (this.pageIndex + 1) < this.pages.length;
     }
 
+    get hasPrevPage() {
+        return (this.pageIndex - 1) >= 0;
+    }
+
     nextPage() {
         const newPageIndex = this.pageIndex + 1;
         if (newPageIndex >= this.pages.length) {
@@ -32,6 +36,28 @@ export default class TextPresenter {
         this.pageIndex = newPageIndex;
 
         this._createLines( this.container );
+    }
+
+    prevPage() {
+        const newPageIndex = this.pageIndex - 1;
+        if (newPageIndex < 0) {
+            return;
+        }
+
+        this.pageIndex = newPageIndex;
+
+        this._createLines( this.container );
+    }
+
+    get words() {
+        const result = new Map();
+
+        const els = document.querySelectorAll( '.' + this.WORD_CLASS );
+        Array.from( els).forEach( el => {
+            result.set( el, this.syllabifier.unprepare( el.textContent ) );
+        });
+
+        return result;
     }
 
     // Private
@@ -53,7 +79,7 @@ export default class TextPresenter {
     //      For example, "This is\b a text|n" will expand
     //      to HTML "<span class="n">This <span class="b">is</span> a text</span>"
     _lineToElement( line ) {
-        const reWord = /(\S+)(\\)(\w{1})\s/g;
+        const reWord = /(\S+)(\|)(\w{1})\s/g;
         const reLine = /^(.+)(\|)(\w{1})$/gm;
 
         line = line.replace( reWord, '<span class="$3"> $1</span> ' ).

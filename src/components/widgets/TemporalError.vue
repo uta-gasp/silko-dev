@@ -3,7 +3,7 @@
     .zero-height
       transition(name="fade")
         .notification.is-danger(v-if="showState")
-          span {{error}}
+          span {{ error }}
 </template>
 
 <script>

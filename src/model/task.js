@@ -35,11 +35,18 @@ export default class Task {
     }
 
     static get defaultSyllab() {
-        return  { language: '', exceptions: {}, threshold: new Threshold( 3000, false, 1500, 3000 ) };
+        return  {
+            language: '',
+            exceptions: {},
+            threshold: new Threshold( 3000, false, 1500, 3000 )
+        };
     }
 
     static get defaultSpeech() {
-        return { language: '', threshold: new Threshold( 4000, false, 3000, 4000 ) };
+        return {
+            language: '',
+            threshold: new Threshold( 4000, false, 3000, 4000 )
+        };
     }
 
     static textToPages( text ) {

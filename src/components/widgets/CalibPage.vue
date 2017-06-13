@@ -6,7 +6,7 @@
           p(v-for="line in calibInstruction") {{ line }}
 
         button.button.is-large.is-primary(:disabled="!isConnected" @click="calibrate") {{ texts.calibStart }}
-        button.button.is-large(:disabled="!isConnected" @click="skip") {{ texts.calibSkip }}
+        button.button.is-large(:disabled="!isCalibrated" @click="skip") {{ texts.calibSkip }}
         button.button.is-large(@click="cancel") {{ texts.startCancel }}
 
       .container(v-show="!isETUDConnected")
@@ -35,7 +35,8 @@
     data() {
       return {
         isConnected: (gazeTracking.state.isConnected && !gazeTracking.state.isTracking && !gazeTracking.state.isBusy) || false,
-        isETUDConnected: gazeTracking.state.isServiceRunning || false
+        isETUDConnected: gazeTracking.state.isServiceRunning || false,
+        isCalibrated: gazeTracking.state.isCalibrated || false,
       };
     },
 
@@ -50,24 +51,25 @@
     },
 
     methods: {
-      showETUDOptions() {
+      showETUDOptions( e ) {
         gazeTracking.showOptions();
       },
 
-      reload() {
+      reload( e ) {
         this.$router.replace( '/assignments' );
         //window.location.assign( window.location.origin );
       },
 
-      calibrate() {
+      calibrate( e ) {
         this.$emit( 'close', { skip: false } );
       },
 
-      skip() {
-        this.$emit( 'close', { skip: true } );
+      skip( e ) {
+        console.dir( e.target );
+        // this.$emit( 'close', { skip: true } );
       },
 
-      cancel() {
+      cancel( e ) {
         this.$router.replace( '/assignments' );
       }
     },

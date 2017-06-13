@@ -5,11 +5,11 @@
       .modal-content
         article.message.is-danger
           .message-header
-            p Deleting the {{object}}.
+            p Deleting the {{ object }}.
             button.delete(@click="reject")
           .message-body
             .level
-              .level-item The {{object}} "{{name}}" will be deleted permanently. Continue?
+              .level-item The {{ object }} "{{ name }}" will be deleted permanently. Continue?
             .level
               .level-item
                 button.button.is-danger(@click="confirm") OK
