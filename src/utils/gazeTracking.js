@@ -32,6 +32,8 @@ class GazeTracking {
 
     constructor() {
 
+        this.serviceCheckTimer = null;
+
         window.GazeTargets.init({
             etudPanel: {
                show: false
@@ -82,6 +84,10 @@ class GazeTracking {
 
                 if (callbacks.stateUpdated) {
                     callbacks.stateUpdated( state );
+                }
+
+                if (!state.isServiceRunning || !serviceCheckTimer) {
+                    this.scheduleReconnection();
                 }
             },
 
@@ -143,7 +149,19 @@ class GazeTracking {
     updateTargets() {
         window.GazeTargets.updateTargets();
     }
+
+    scheduleReconnection() {
+        this.serviceCheckTimer = setTimeout( () => {
+            this.serviceCheckTimer = null;
+            if (!lastState.isServiceRunning) {
+                window.GazeTargets.reconnect();
+                this.scheduleReconnection();
+            }
+        }, 3000);
+    }
 }
 
 const gazeTracking = new GazeTracking();
+gazeTracking.scheduleReconnection();
+
 export default gazeTracking;

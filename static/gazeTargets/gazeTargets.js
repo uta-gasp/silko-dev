@@ -2307,6 +2307,10 @@
 
             panel.setLabel(stateLabel.connecting);
 
+            this.connect();
+        },
+
+        connect: function () {
             var protocol = 'ws'; //location.protocol.indexOf("https" >= 0) ? 'wss' : 'ws';
             var wsURI = protocol + '://localhost:' + settings.port + '/';
             websocket = new WebSocket(wsURI);
@@ -4584,6 +4588,9 @@
         //calibVerifier.run(customSettings, customCallbacks);
     };
 
+    GazeTargets.reconnect = function () {
+        root.GazeTargets.ETUDriver.connect();
+    };
 
     // Internal
 
