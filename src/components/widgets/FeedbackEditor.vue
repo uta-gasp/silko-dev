@@ -7,22 +7,20 @@
           select(v-model="feedback.language")
             option(value="" selected) none
             option(value="Finnish") Finnish
-        .control-line after
+        slot(name="first")
+      .field.is-horizontal
         .select
           select(v-model="feedback.threshold.smart" :disabled="!isLanguageSelected")
             option(:value="false") fixed
             option(:value="true") calibrated
-      .field.is-horizontal
         template(v-if="feedback.threshold.smart")
-          .control-line from
-          input.input(type="number" step="100" v-model="feedback.threshold.min" :disabled="!canEditCalibThresholdParams" min="1000" :max="feedback.threshold.max")
-          .control-line to
-          input.input(type="number" step="100" v-model="feedback.threshold.max" :disabled="!canEditCalibThresholdParams" max="5000" :min="feedback.threshold.min")
+          input.input(type="number" step="100" v-model.number="feedback.threshold.min" :disabled="!canEditCalibThresholdParams" min="1000" :max="feedback.threshold.max")
+          .control-line -
+          input.input(type="number" step="100" v-model.number="feedback.threshold.max" :disabled="!canEditCalibThresholdParams" max="5000" :min="feedback.threshold.min")
           .control-line ms
         template(v-else)
-          .is-right
-            input.input(type="number" step="100" v-model="feedback.threshold.value" :disabled="!feedback.language")
-            .control-line ms
+          input.input(type="number" step="100" v-model.number="feedback.threshold.value" :disabled="!feedback.language")
+          .control-line ms
 </template>
 
 <script>
@@ -51,10 +49,6 @@
 </script>
 
 <style lang="less" scoped>
-  .checkbox {
-    white-space: nowrap;
-  }
-
   .control-line {
     display: inline-block;
     margin: 0.2em 0.5em 0;
@@ -65,9 +59,5 @@
 
   input[type="number"] {
     width: 5em;
-  }
-
-  .is-right {
-    margin-left: auto;
   }
 </style>

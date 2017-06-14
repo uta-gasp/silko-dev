@@ -1,25 +1,27 @@
 <template lang="pug">
   #task-preview
-    .instruction.notification.is-info.has-text-centered
+    .notification.is-info.has-text-centered.on-top
       .columns
-        .column(v-if="task.syllab.language") Alt + click on a word to syllabify it.
+        .column(v-if="task.syllab.language") Ctrl + click on a word to syllabify it.
         .column(v-if="task.syllab.language")
           button.button.is-primary.is-small(@click="syllabifyAll") Syllabify all
-        .column(v-if="task.speech.language") Ctrl + click on a word to pronounce it.
-    .text.median(ref="text" @click.alt="syllabify" @click.ctrl="pronounce" @contextmenu.prevent="")
+        .column(v-if="task.speech.language") Alt + click on a word to pronounce it.
+    task-text(ref="container" @click.native.ctrl="syllabify" @click.native.alt="pronounce")
     .columns.at-bottom
       .column.has-text-right
-        button.button.is-primary.is-large(:disabled="!hasPrevPage" @click="prev")
+        button.button.is-primary(:disabled="!hasPrevPage" @click="prev")
           span &lt;
       .column.has-text-centered.is-narrow
-        button.button.is-primary.is-large(@click="close")
+        button.button.is-primary(@click="close")
           span Close
       .column.has-text-left
-        button.button.is-primary.is-large(:disabled="!hasNextPage" @click="next")
+        button.button.is-primary(:disabled="!hasNextPage" @click="next")
           span &gt;
 </template>
 
 <script>
+  import TaskText from '@/components/widgets/TaskText';
+
   import TextPresenter from '@/utils/textPresenter.js';
   import FeedbackProvider from '@/utils/feedbackProvider.js'
 
@@ -42,6 +44,10 @@
       task: {
         type: Object,
       },
+    },
+
+    components: {
+      'task-text': TaskText,
     },
 
     computed: {
@@ -86,7 +92,6 @@
       },
 
       pronounce( e ) {
-        console.log(e);
         if (e.target.classList.contains( 'word' )) {
           const text = this.feedbackProvider.syllabifier.unprepare( e.target.textContent )
           if (text) {
@@ -100,7 +105,8 @@
       this.feedbackProvider = new FeedbackProvider( this.task.syllab, this.task.speech );
       this.feedbackProvider.init();
 
-      this.textPresenter = new TextPresenter( this.task, this.firstPage, this.$refs.text, this.feedbackProvider.syllabifier );
+      const textEl = this.$refs.container.$refs.text;
+      this.textPresenter = new TextPresenter( this.task, this.firstPage, textEl, this.feedbackProvider.syllabifier );
 
       this.next();
     },
@@ -112,58 +118,11 @@
 </script>
 
 <style lang="less" scoped>
-
-  .is-bottom-right {
+  .on-top {
     position: fixed;
-    bottom: 1em;
-    right: 1em;
-  }
-
-  @margin: 15;
-
-  #task-preview {
-    position: relative;
-    height: unit(100 - 2 * @margin, vh);
-    margin: unit(@margin, vh) unit(@margin, vw);
-    background-color: #fff;
-  }
-
-  .text {
-    color: #775;
-    font-size: 20pt;
-    font-family: Calibri, Arial, sans-serif;
-    font-weight: bold;
-
-    width: 100%;
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-
-    text-align: center;
-
-    &.alignLeft {
-      text-align: left;
-    }
-
-    &.x-large {
-      line-height: (100vh - 2 * unit(@margin, vh)) / 4;
-    }
-    &.large {
-      line-height: (100vh - 2 * unit(@margin, vh)) / 5;
-    }
-    &.median {
-      line-height: (100vh - 2 * unit(@margin, vh)) / 6;
-    }
-    &.small {
-      line-height: (100vh - 2 * unit(@margin, vh)) / 7;
-    }
-    &.x-small {
-      line-height: (100vh - 2 * unit(@margin, vh)) / 8;
-    }
-
-    // &:hover .word {
-    //   outline: 2px solid #ccf;
-    // }
+    top: 0;
+    left: 0;
+    right: 0;
   }
 
   .at-bottom {
@@ -172,57 +131,4 @@
     left: 0;
     right: 0;
   }
-
-  .instruction {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-  }
-</style>
-
-<style lang="less">
-
-  .line {
-    display: block;
-
-    // custom styles
-
-    .b {
-      color: #000;
-    }
-
-    .n {
-      color: #5e2095;
-    }
-
-    .h {
-      color: #0e6095;
-    }
-
-    .g {
-      color: lighten(#775, 25%);
-    }
-  }
-
-  .currentWord {
-    color: #c00;
-  }
-
-  .word {
-    /* nothing is needed, just the class declaration */
-  }
-
-  .hyphens {
-    color: #fff;
-  }
-
-  .hyphen {
-    color: #ffa0a0;
-  }
-
-  .bold {
-    color: black;
-  }
-
 </style>

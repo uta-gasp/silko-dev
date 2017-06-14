@@ -1,6 +1,6 @@
 <template lang="pug">
   #task-page
-    .text.median(ref="text")
+    task-text(ref="container")
     .is-bottom-right
       a.button.is-primary.is-large(v-show="hasNextPage" @click="next")
         span {{ texts.next }}
@@ -9,6 +9,8 @@
 </template>
 
 <script>
+  import TaskText from '@/components/widgets/TaskText';
+
   import TextPresenter from '@/utils/textPresenter.js';
   import FeedbackProvider from '@/utils/feedbackProvider.js'
   import DataCollector from '@/utils/dataCollector.js';
@@ -32,6 +34,10 @@
       texts: Object,
       task: Object,
       student: Object,
+    },
+
+    components: {
+      'task-text': TaskText,
     },
 
     computed: {
@@ -67,7 +73,8 @@
       this.feedbackProvider = new FeedbackProvider( this.task.syllab, this.task.speech );
       this.feedbackProvider.init();
 
-      this.textPresenter = new TextPresenter( this.task, this.texts.firstPage, this.$refs.text, this.feedbackProvider.syllabifier );
+      const textEl = this.$refs.container.$refs.text;
+      this.textPresenter = new TextPresenter( this.task, this.texts.firstPage, textEl, this.feedbackProvider.syllabifier );
 
       this.collector = new DataCollector( this.task, this.student, this.font, this.feedbackProvider.setup );
       this.feedbackProvider.events.addListener( 'syllabified', data => this.collector.syllabified( data ) );
@@ -110,98 +117,6 @@
     position: fixed;
     bottom: 1em;
     right: 1em;
-  }
-
-  @margin: 15;
-
-  #task-page {
-    position: relative;
-    height: unit(100 - 2 * @margin, vh);
-    margin: unit(@margin, vh) unit(@margin, vw);
-    background-color: #fff;
-  }
-
-  .text {
-    color: #775;
-    font-size: 20pt;
-    font-family: Calibri, Arial, sans-serif;
-    font-weight: bold;
-
-    width: 100%;
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-
-    text-align: center;
-
-    &.alignLeft {
-      text-align: left;
-    }
-
-    &.x-large {
-      line-height: (100vh - 2 * unit(@margin, vh)) / 4;
-    }
-    &.large {
-      line-height: (100vh - 2 * unit(@margin, vh)) / 5;
-    }
-    &.median {
-      line-height: (100vh - 2 * unit(@margin, vh)) / 6;
-    }
-    &.small {
-      line-height: (100vh - 2 * unit(@margin, vh)) / 7;
-    }
-    &.x-small {
-      line-height: (100vh - 2 * unit(@margin, vh)) / 8;
-    }
-
-    // &:hover .word {
-    //   outline: 2px solid #ccf;
-    // }
-  }
-</style>
-
-<style lang="less">
-
-  .line {
-    display: block;
-
-    // custom styles
-
-    .b {
-      color: #000;
-    }
-
-    .n {
-      color: #5e2095;
-    }
-
-    .h {
-      color: #0e6095;
-    }
-
-    .g {
-      color: lighten(#775, 25%);
-    }
-  }
-
-  .currentWord {
-    color: #c00;
-  }
-
-  .word {
-    /* nothing is needed, just the class declaration */
-  }
-
-  .hyphens {
-    color: #fff;
-  }
-
-  .hyphen {
-    color: #ffa0a0;
-  }
-
-  .bold {
-    color: black;
   }
 
 </style>

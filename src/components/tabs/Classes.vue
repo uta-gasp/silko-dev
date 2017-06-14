@@ -1,9 +1,9 @@
 <template lang="pug">
   #classes
-    modal-notification(type="danger" :show="showCreationError")
-      span Failed to {{ action }} {{ createdObject }}: {{ creationError }}
-    modal-notification(type="success" :show="showCreationSuccess")
-      span The {{ createdObject }} was created.
+    modal-notification(type="danger" :show="showError")
+      span The {{ notification.obj }} was not {{ notification.action }}: {{ errorMessage }}
+    modal-notification(type="success" :show="showSuccess")
+      span The {{ notification.obj }} was {{ notification.action }}.
 
     nav.panel
       p.panel-heading Add class
@@ -61,13 +61,15 @@
         newName: '',
 
         isCreating: false,
-        creationError: '',
-        showCreationError: 0,   // random value to trigger the notification
-        showCreationSuccess: 0, // random value to trigger the notification
+        errorMessage: '',
+        showError: 0,   // random value to trigger the notification
+        showSuccess: 0, // random value to trigger the notification
         refreshStudents: 0,
 
-        createdObject: 'class',
-        action: 'create new',
+        notification: {
+          action: '',
+          obj: ''
+        },
 
         classes: [],
         intros: [],
@@ -134,9 +136,9 @@
         }
       },
 
-      setCreationError( msg ) {
-        this.creationError = msg;
-        this.showCreationError = Math.random();
+      setError( msg ) {
+        this.errorMessage = msg;
+        this.showError = Math.random();
       },
 
       // Class
@@ -146,15 +148,15 @@
           return;
         }
 
-        this.action = 'create new';
-        this.createdObject = 'class';
+        this.notification.action = 'created';
+        this.notification.obj = 'class';
 
         const exists = this.classes.some( cls => {
           return cls.name.toLowerCase() === this.newName.toLowerCase();
         });
 
         if (exists) {
-          this.setCreationError( 'A class of this name exists already' );
+          this.setError( 'A class of this name exists already' );
         }
         else {
           this.createClass( this.newName );
@@ -168,12 +170,12 @@
           this.isCreating = false;
 
           if (err) {
-            this.setCreationError( err );
+            this.setError( err );
           }
           else {
             this.loadClasses();
 
-            this.showCreationSuccess = Math.random();
+            this.showSuccess = Math.random();
             this.newName = '';
           }
         });
@@ -194,24 +196,24 @@
       },
 
       onTaskSaved( e ) {
-        this.action = 'save';
-        this.createdObject = 'text';
+        this.notification.action = 'updated';
+        this.notification.obj = 'task';
         if (e.err) {
-          this.setCreationError( e.err );
+          this.setError( e.err );
         }
         else {
-          this.showCreationSuccess = Math.random();
+          this.showSuccess = Math.random();
         }
       },
 
       onTaskCreated( e ) {
-        this.action = 'create new';
-        this.createdObject = 'text';
+        this.notification.action = 'created';
+        this.notification.obj = 'task';
         if (e.err) {
-          this.setCreationError( e.err );
+          this.setError( e.err );
         }
         else {
-          this.showCreationSuccess = Math.random();
+          this.showSuccess = Math.random();
           this.refreshStudents = Math.random();
         }
       },

@@ -4,9 +4,9 @@ export default class Syllabifier {
     constructor( options ) {
         this.options = Object.assign( {}, options );
         this.options.threshold.factor = 4;
-        this.options.mode = this.options.mode || 'hyphen';
+        this.options.mode = this.options.mode || 'colors';
 
-        this.hyphen = String.fromCharCode( 0x00B7 );//DOTS: 00B7 2010 2022 2043 LINES: 2758 22EE 205E 237F
+        this.hyphen = Syllabifier.MODES[ 'hyphen' ];
 
         this.hyphenHtml = `<span class="hyphen">${this.hyphen}</span>`;
 
@@ -16,10 +16,12 @@ export default class Syllabifier {
         for (let word in this.options.exceptions) {
             this.exceptions[ word.toLowerCase() ] = this.options.exceptions[ word ].replace( ' ', this.hyphen ).toLowerCase();
         }
+    }
 
-        this.MODES = {
-            hyphen: this.hyphen,
-            colors: [ 'black', 'red' ]
+    static get MODES() {
+        return {
+            hyphen: String.fromCharCode( 0x00B7 ), //DOTS: 00B7 2010 2022 2043 LINES: 2758 22EE 205E 237F
+            colors: [ 'black', 'red', '#0af' ]
         };
     }
 
@@ -37,7 +39,7 @@ export default class Syllabifier {
 
     prepare( text ) {
 
-        if (!this.rule) {
+        if (!this.rule || this.options.mode !== 'hyphen') {
             return text;
         }
 
@@ -111,12 +113,25 @@ export default class Syllabifier {
     }
 
     _syllabifyWord( word, hyphen ) {
-        const exception = Object.keys( this.exceptions ).find( exception => this._isException( word, exception ));
-        if (exception) {
-            return this._formatException( word, exception, this.exceptions[ exception ], hyphen );
+        if (this.options.mode === 'colors') {
+            hyphen = this.hyphen;
         }
 
-        return this.rule( word, hyphen );
+        let result;
+        const exception = Object.keys( this.exceptions ).find( exception => this._isException( word, exception ));
+        if (exception) {
+            result = this._formatException( word, exception, this.exceptions[ exception ], hyphen );
+        }
+        else {
+            result = this.rule( word, hyphen );
+        }
+
+        if (this.options.mode === 'colors') {
+            const syllabs = result.split( this.hyphen );
+            result = this._colorize( syllabs );
+        }
+
+        return result;
     }
 
     _isException( word, exception ) {
@@ -132,11 +147,11 @@ export default class Syllabifier {
 
         for (let i = start, j = 0; i < start + length; i++) {
             let c = word.charAt( i );
-            if (c === c.toUpperCase()) {
+            if (c === c.toUpperCase()) {    // this is not a letter
                 chars[j] = c;
             }
 
-            while (chars[ ++j ]=== this.hyphen) { }
+            while (chars[ ++j ] === this.hyphen) { }    // just copy hyphens
         }
 
         let result = chars.join('');
@@ -146,6 +161,21 @@ export default class Syllabifier {
         }
 
         return prefix + result + postfix;
+    }
+
+    _colorize( syllabs ) {
+        const colors = Syllabifier.MODES[ 'colors' ];
+        let colorIndex = 0;
+
+        const colorizedSyllabs = syllabs.map( syllab => {
+            const result = `<span style="color: ${colors[ colorIndex ]}">${syllab}</span>`;
+            if (++colorIndex === colors.length) {
+                colorIndex = 0;
+            }
+            return result;
+        });
+
+        return colorizedSyllabs.join('');
     }
 };
 

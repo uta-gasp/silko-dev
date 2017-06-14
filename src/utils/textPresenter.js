@@ -1,3 +1,10 @@
+const RE_WORD = /(\S+)(\|)([\w,#]+)\b/g;
+const RE_LINE = /^(.+)(\s\|)([\w,#]+)$/gm;
+const CLASS_NAMES = [   // must correspond to the styles in TaskText.vue
+    'lighter',
+    'darker'
+];
+
 export default class TextPresenter {
     constructor( task, firstPage, container, syllabifier ) {
         // this.task = task;
@@ -79,17 +86,43 @@ export default class TextPresenter {
     //      For example, "This is\b a text|n" will expand
     //      to HTML "<span class="n">This <span class="b">is</span> a text</span>"
     _lineToElement( line ) {
-        const reWord = /(\S+)(\|)(\w{1})\s/g;
-        const reLine = /^(.+)(\|)(\w{1})$/gm;
 
-        line = line.replace( reWord, '<span class="$3"> $1</span> ' ).
-                    replace( reLine, '<span class="$3">$1</span>' );
+        const styledLine = this._parseStyles( line );
 
         const el = document.createElement( 'div' );
-        el.innerHTML = line;
+        el.innerHTML = styledLine;
         el.classList.add( 'line' );
 
         return el;
+    }
+
+    _parseStyles( line ) {
+        function applyStyleAndSpace() {
+            return applyStyle( ...arguments, true );
+        }
+
+        function applyStyle( match, p1, p2, p3, offset, string, space ) {
+            const text = p1;
+            const styles = p3;
+
+            const css = [];
+            const classes = [];
+            styles.split( ',' ).forEach( style => {
+                if (CLASS_NAMES.includes( style )) {
+                    classes.push( style );
+                }
+                else {
+                    const isNumber = !Number.isNaN( Number.parseInt( style ) );
+                    css.push( (isNumber ? 'font-size:' : 'color:') + style );
+                }
+            });
+
+            const s = space ? ' ' : '';
+            return `<span class="${classes.join(' ')}" style="${css.join(';')}">${s}${text}</span>${s}`;
+        }
+
+        return line.replace( RE_WORD, applyStyleAndSpace ).
+                    replace( RE_LINE, applyStyle );
     }
 
     // Splits the text nodes into words, each in its own span.word element

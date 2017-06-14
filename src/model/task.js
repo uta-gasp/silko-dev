@@ -30,14 +30,19 @@ export default class Task {
         return 'tasks';
     }
 
-    static get syllabSep() {
+    static get wordSyllabSeparator() {
         return '=';
+    }
+
+    static get syllabSeparator() {
+        return ' ';
     }
 
     static get defaultSyllab() {
         return  {
             language: '',
             exceptions: {},
+            mode: 'colors',
             threshold: new Threshold( 3000, false, 1500, 3000 )
         };
     }
@@ -93,18 +98,20 @@ export default class Task {
 
         lines.forEach( line => {
             line = line.trim();
-            const parts = line.split( Task.syllabSep );
+            const parts = line.split( Task.wordSyllabSeparator );
             if (parts.length != 2) {
                 return;
             }
 
             const word = parts[0].trim();
             const syllabText = parts[1].trim();
-            if (!word || !syllabText || word.split( ' ' ).length > 1) {
+            if (!word || !syllabText || word.split( Task.syllabSeparator ).length > 1) {
                 return;
             }
 
-            result[ word ] = syllabText.split( ' ' ).filter( item => item.length ).join( ' ' );
+            result[ word ] = syllabText.split( Task.syllabSeparator ).
+                filter( item => item.length ).
+                join( Task.syllabSeparator );
         });
 
         return result;
@@ -113,7 +120,7 @@ export default class Task {
     static syllabsToText( syllabs ) {
         const result = [];
         for (let word in syllabs) {
-            result.push( `${word}${Task.syllabSep}${syllabs[ word ]}` );
+            result.push( `${word}${Task.wordSyllabSeparator}${syllabs[ word ]}` );
         }
         return result.join( '\n' );
     }

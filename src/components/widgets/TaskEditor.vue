@@ -8,13 +8,23 @@
             label.label(v-show="showLabels") Name
             input.input(type="text" placeholder="Name" :disabled="!isNameEditable" v-model="name")
           p.control
-            label.label(v-show="showLabels").is-pulled-left Text
-            .is-pulled-right.has-text-right
-              .text-format-instruction Empty line to separate pages
-              .text-format-instruction "\" after a word and "|" after a line to apply a style to them
-              .text-format-instruction Styles: "b" - black, "n" - navy, "g" - light-grey
-          p.control
-            textarea.textarea.text(placeholder="Text" v-model="text")
+            .columns.is-paddingless.is-marginless
+              .column.is-paddingless.is-marginless.is-narrow
+                label.label(v-show="showLabels").is-pulled-left Text
+              //- .is-pulled-right.has-text-right
+              .column.has-text-right.is-paddingless.is-marginless
+                .text-format-instruction Empty line to separate pages
+                .text-format-instruction "|" after a word or line to apply styles separated by ","
+                .text-format-instruction Styles: 1) text colors, eg&nbsp;
+                  a(href="https://www.w3schools.com/cssref/css_colors.asp" target="_blank") "red"
+                  span ,&nbsp;
+                  a(href="https://www.w3schools.com/colors/colors_rgb.asp") "#22aaff"
+                  span ,&nbsp;
+                  abbr(title="25% lighter than the normal text") 'lighter',
+                  abbr(title="25% darker than the normal text") "darker"
+                  span 2) font size, eg "22pt"
+                .text-format-instruction Example: This is a big black string with a blue|#22aaff word |black,28pt
+          textarea.textarea.text(placeholder="Text" v-model="text")
 
         .column.is-narrow
           .field
@@ -26,9 +36,12 @@
                   option(v-for="item in intros" :value="item.id") {{ item.name }}
           feedback-editor(header="Speech" :value="speech")
           feedback-editor(header="Syllabification" :value="syllab")
+            span.select(slot="first")
+              select(v-model="syllab.mode")
+                option(v-for="mode in syllabModes" :value="mode") {{ mode }}
           p.control
             div Exceptions
-            i.text-format-instruction Example: kaupunki=kau pun ki
+            i.text-format-instruction Example: maailma=maa il ma
             textarea.textarea(:disabled="!syllab.language" placeholder="Syllabifications" v-model="syllabExceptions")
 
       p.control
@@ -41,6 +54,8 @@
 
 <script>
   import Task from '@/model/task.js';
+
+  import Syllabifier from '@/utils/syllabifier.js';
 
   import FeedbackEditor from '@/components/widgets/feedbackEditor';
   import TaskPreview from '@/components/widgets/taskPreview';
@@ -58,6 +73,7 @@
         syllabExceptions: this.task ? Task.syllabsToText( this.task.syllab.exceptions ) : '',
 
         inPreview: false,
+        syllabModes: Object.keys( Syllabifier.MODES ),
       };
     },
 
@@ -205,7 +221,7 @@
   }
 
   .text {
-    min-height: 350px;
+    min-height: 334px;
     font-size: 15px;
     line-height: 1.25em;
   }

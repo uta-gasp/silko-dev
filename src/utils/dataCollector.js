@@ -1,6 +1,8 @@
 import Data from '../model/data.js';
 import Session from '../model/session.js';
 
+import ScreenSize from '../model/session/screenSize.js';
+
 import Fixation from '../model/data/fixation.js';
 import DataPage from '../model/data/dataPage.js';
 import DataWord from '../model/data/dataWord.js';
@@ -76,6 +78,7 @@ export default class DataCollector {
             cls: task.cls,
             font: font,
             feedbacks: feedbacks,
+            screen: ScreenSize.full,
             data: null
         };
 
