@@ -11,7 +11,6 @@
             .columns.is-paddingless.is-marginless
               .column.is-paddingless.is-marginless.is-narrow
                 label.label(v-show="showLabels").is-pulled-left Text
-              //- .is-pulled-right.has-text-right
               .column.has-text-right.is-paddingless.is-marginless
                 .text-format-instruction Empty line to separate pages
                 .text-format-instruction "|" after a word or line to apply styles separated by ","
@@ -36,13 +35,19 @@
                   option(v-for="item in intros" :value="item.id") {{ item.name }}
           feedback-editor(header="Speech" :value="speech")
           feedback-editor(header="Syllabification" :value="syllab")
-            span.select(slot="first")
-              select(v-model="syllab.mode")
-                option(v-for="mode in syllabModes" :value="mode") {{ mode }}
-          p.control
-            div Exceptions
-            i.text-format-instruction Example: maailma=maa il ma
-            textarea.textarea(:disabled="!syllab.language" placeholder="Syllabifications" v-model="syllabExceptions")
+            span(slot="first")
+              span.select()
+                select(v-model="syllab.mode" :disabled="!syllab.language")
+                  option(v-for="mode in syllabModes" :value="mode") {{ mode }}
+            .field(slot="last")
+              bulma-checkbox.is-inline(v-model="syllab.temporary" label="temporary" :disabled="!syllab.language")
+          .field
+            .columns.is-paddingless.is-marginless
+              .column.is-paddingless.is-marginless.is-narrow
+                label Exceptions
+              .column.has-text-right.is-paddingless.is-marginless
+                i.text-format-instruction Eg: maailma=maa il ma
+            textarea.textarea.exceptions(:disabled="!syllab.language" placeholder="Syllabifications" v-model="syllabExceptions")
 
       p.control
         button.button.is-primary(:disabled="!canSave" @click="save") {{ action }}
@@ -59,6 +64,7 @@
 
   import FeedbackEditor from '@/components/widgets/feedbackEditor';
   import TaskPreview from '@/components/widgets/taskPreview';
+  import BulmaCheckbox from '@/components/widgets/bulmaCheckbox';
 
   export default {
     name: 'task-editor',
@@ -99,6 +105,7 @@
     components: {
       'feedback-editor': FeedbackEditor,
       'task-preview': TaskPreview,
+      'bulma-checkbox': BulmaCheckbox,
     },
 
     computed: {
@@ -192,18 +199,6 @@
     width: 840px;
   }
 
-  select:invalid {
-    color: #999;
-  }
-
-  select {
-    padding-left: 5px;
-  }
-
-  option {
-    color: #222;
-  }
-
   .label > i {
     display: block;
     font-size: 12px;
@@ -226,7 +221,16 @@
     line-height: 1.25em;
   }
 
+  .exceptions {
+    min-height: 100px;
+  }
+
   .fullscreen {
     background-color: #fff;
   }
+
+  .is-inline {
+    display: inline-block;
+  }
+
 </style>

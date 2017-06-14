@@ -21,6 +21,9 @@
         template(v-else)
           input.input(type="number" step="100" v-model.number="feedback.threshold.value" :disabled="!feedback.language")
           .control-line ms
+        slot(name="second")
+      .field.is-horizontal
+        slot(name="last")
 </template>
 
 <script>
@@ -51,13 +54,22 @@
 <style lang="less" scoped>
   .control-line {
     display: inline-block;
-    margin: 0.2em 0.5em 0;
-    line-height: 2em;
+    margin: 0 0.2em;
+    line-height: 2.25em;
     vertical-align: middle;
     white-space: nowrap;
   }
 
   input[type="number"] {
     width: 5em;
+  }
+
+  .field {
+    margin-bottom: 3px;
+  }
+
+  input,
+  select {
+    margin-right: 4px;
   }
 </style>

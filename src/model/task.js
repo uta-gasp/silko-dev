@@ -43,6 +43,7 @@ export default class Task {
             language: '',
             exceptions: {},
             mode: 'colors',
+            temporary: false,
             threshold: new Threshold( 3000, false, 1500, 3000 )
         };
     }

@@ -1,5 +1,7 @@
 import SyllabificationFeedback from '@/model/session/syllabificationFeedback.js';
 
+const RESTORE_INTERVAL = 3000;
+
 export default class Syllabifier {
     constructor( options ) {
         this.options = Object.assign( {}, options );
@@ -21,7 +23,7 @@ export default class Syllabifier {
     static get MODES() {
         return {
             hyphen: String.fromCharCode( 0x00B7 ), //DOTS: 00B7 2010 2022 2043 LINES: 2758 22EE 205E 237F
-            colors: [ 'black', 'red', '#0af' ]
+            colors: [ 'black', 'red'] //, '#0af'
         };
     }
 
@@ -84,6 +86,13 @@ export default class Syllabifier {
 
             el.innerHTML = this._syllabifyWord( params.word, this.hyphenHtml );
 
+            if (this.options.temporary) {
+                console.log('i;ll be back');
+                setTimeout( () => {
+                    this._restore( el );
+                }, RESTORE_INTERVAL );
+            }
+
             return true;
         }
 
@@ -132,6 +141,21 @@ export default class Syllabifier {
         }
 
         return result;
+    }
+
+    _restore( el ) {
+        let text = null;
+        console.log('i`m back');
+        try {
+            text = el.textContent;
+        }
+        catch (e) { }
+
+        if (text) {
+            console.log('ok');
+            const syllabs = text.split( this.hyphen );
+            el.innerHTML = syllabs.join('');
+        }
     }
 
     _isException( word, exception ) {
