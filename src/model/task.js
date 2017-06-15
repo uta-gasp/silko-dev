@@ -44,6 +44,7 @@ export default class Task {
             exceptions: {},
             mode: 'colors',
             temporary: false,
+            adjustForWordLength: false,
             threshold: new Threshold( 3000, false, 1500, 3000 )
         };
     }

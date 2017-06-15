@@ -41,6 +41,7 @@
                   option(v-for="mode in syllabModes" :value="mode") {{ mode }}
             .field(slot="last")
               bulma-checkbox.is-inline(v-model="syllab.temporary" label="temporary" :disabled="!syllab.language")
+              bulma-checkbox.is-inline(v-model="syllab.adjustForWordLength" label="word-dependent" :disabled="!syllab.language")
           .field
             .columns.is-paddingless.is-marginless
               .column.is-paddingless.is-marginless.is-narrow

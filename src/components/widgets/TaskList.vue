@@ -27,7 +27,7 @@
 </template>
 
 <script>
-  import countString from '@/components/mixins/count-string.js';
+  import stringification from '@/components/mixins/stringification.js';
 
   import ModalEditorContainer from '@/components/widgets/ModalEditorContainer';
   import TaskEditor from '@/components/widgets/TaskEditor';
@@ -36,7 +36,7 @@
   export default {
     name: 'task-list',
 
-    mixins: [ countString ],
+    mixins: [ stringification ],
 
     components: {
       'modal-editor-container': ModalEditorContainer,

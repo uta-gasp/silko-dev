@@ -72,12 +72,10 @@
 
     label {
       display: inline-block;
-      position: absolute;
-      left: 2.25em;
-      top: 0;
 
       line-height: 1.75em;
       padding: 0.25em;
+      padding-left: 2.5em;
       cursor: pointer;
 
       &[disabled] {

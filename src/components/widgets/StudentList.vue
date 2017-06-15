@@ -32,7 +32,7 @@
 </template>
 
 <script>
-  import countString from '@/components/mixins/count-string.js';
+  import stringification from '@/components/mixins/stringification.js';
 
   import ModalEditorContainer from '@/components/widgets/ModalEditorContainer';
   import StudentSelectBox from '@/components/widgets/StudentSelectBox';
@@ -40,7 +40,7 @@
   export default {
     name: 'student-list',
 
-    mixins: [ countString ],
+    mixins: [ stringification ],
 
     components: {
       'modal-editor-container': ModalEditorContainer,

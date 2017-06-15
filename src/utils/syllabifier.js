@@ -1,6 +1,8 @@
 import SyllabificationFeedback from '@/model/session/syllabificationFeedback.js';
 
 const RESTORE_INTERVAL = 3000;
+const LONG_WORD_MIN_LENGTH = 7;
+const EXTRA_THRESHOLD_FOR_CHAR = 0.05;
 
 export default class Syllabifier {
     constructor( options ) {
@@ -79,23 +81,37 @@ export default class Syllabifier {
 
     // @wordFocus - WordFocus
     inspect( el, wordFocus ) {
-        if (this.rule && !wordFocus.syllabified && wordFocus.focusCount === 1 &&
-            wordFocus.accumulatedTime > this.options.threshold.value) {
-
-            wordFocus.syllabified = true;
-
-            el.innerHTML = this._syllabifyWord( wordFocus.word, this.hyphenHtml );
-
-            if (this.options.temporary) {
-                setTimeout( () => {
-                    this._restore( el );
-                }, RESTORE_INTERVAL );
-            }
-
-            return true;
+        if (!this.rule) {
+            return false;
         }
 
-        return false;
+        // We consider the common threshold as the threshold for relatively short words
+        // For long words, each addition character increases the threhold
+        let threshold = this.options.threshold.value;
+        if (this.options.threshold.adjustForWordLength) {
+            threshold *= Math.max( 1, 1 + (wordFocus.word.length - LONG_WORD_MIN_LENGTH) * EXTRA_THRESHOLD_FOR_CHAR );
+        }
+
+        const mustSyllabify =
+            !wordFocus.syllabified &&
+            wordFocus.focusCount === 1 &&
+            wordFocus.accumulatedTime > threshold;
+
+        if (!mustSyllabify) {
+            return false;
+        }
+
+        wordFocus.syllabified = true;
+
+        el.innerHTML = this._syllabifyWord( wordFocus.word, this.hyphenHtml );
+
+        if (this.options.temporary) {
+            setTimeout( () => {
+                this._restore( el );
+            }, RESTORE_INTERVAL );
+        }
+
+        return true;
     }
 
     syllabifyWord( el, word ) {

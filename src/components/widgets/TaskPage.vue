@@ -30,7 +30,7 @@
         textPresenter: null,
         feedbackProvider: null,
         collector: null,
-        font: new Font( 'Calibri', '20pt', 'normal', 'bold' ) // should match the style defined below
+        font: Font.from( TaskText.data().textStyle )
       };
     },
 

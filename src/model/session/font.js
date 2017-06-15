@@ -5,4 +5,13 @@ export default class Font {
         this.style = style;     // string
         this.weight = weight;   // number | string
     }
+
+    static from( style ) {
+        return new Font(
+            style['font-family'],
+            style['font-size'],
+            style['font-style'],
+            style['font-weight']
+        );
+    }
 }

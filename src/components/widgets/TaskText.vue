@@ -1,11 +1,23 @@
 <template lang="pug">
   #task-text
-    .text.median(ref="text")
+    .text.median(ref="text" :style="textStyle")
 </template>
 
 <script>
   export default {
     name: 'task-text',
+
+    data() {
+      return {
+        textStyle: {
+          'color': '#775',
+          'font-family': 'Calibri, Arial, sans-serif',
+          'font-size': '20pt',
+          'font-style': 'normal',
+          'font-weight': 'bold',
+        },
+      }
+    },
   };
 </script>
 
@@ -21,11 +33,6 @@
   }
 
   .text {
-    color: #775;
-    font-size: 20pt;
-    font-family: Calibri, Arial, sans-serif;
-    font-weight: bold;
-
     width: 100%;
     position: absolute;
     top: 50%;
