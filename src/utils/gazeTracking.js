@@ -1,3 +1,5 @@
+const RECONNECT_INTERVAL = 3000;
+
 const callbackLists = {
     started: {},
     stopped: {},
@@ -19,7 +21,6 @@ const callbacks = {
 for (let name in callbacks) {
     callbacks[ name ] = arg => {
         for (let cb in callbackLists[ name ]) {
-            // console.log( name, cb, callbackLists[ name ][ cb ]);
             callbackLists[ name ][ cb ]( arg );
         }
     };
@@ -55,13 +56,7 @@ class GazeTracking {
             mapping: {
                 type: GazeTargets.mapping.types.expanded,
                 source: GazeTargets.mapping.sources.samples,
-                //readingModel: GazeTargets.mapping.readingModel.campbell,
                 expansion: 30,
-                // reading: {
-                //     maxSaccadeLength: 250,
-                //     maxSaccadeAngleRatio: 0.7,
-                //     fixedText: true
-                // }
             }
         }, {
             state: state => {
@@ -86,7 +81,7 @@ class GazeTracking {
                     callbacks.stateUpdated( state );
                 }
 
-                if (!state.isServiceRunning || !serviceCheckTimer) {
+                if (state.isDisconnected) {
                     this.scheduleReconnection();
                 }
             },
@@ -151,17 +146,19 @@ class GazeTracking {
     }
 
     scheduleReconnection() {
+        if (this.serviceCheckTimer) {
+            return;
+        }
+
         this.serviceCheckTimer = setTimeout( () => {
             this.serviceCheckTimer = null;
             if (!lastState.isServiceRunning) {
                 window.GazeTargets.reconnect();
-                this.scheduleReconnection();
             }
-        }, 3000);
+        }, RECONNECT_INTERVAL);
     }
 }
 
 const gazeTracking = new GazeTracking();
-gazeTracking.scheduleReconnection();
 
 export default gazeTracking;

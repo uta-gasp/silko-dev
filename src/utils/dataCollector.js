@@ -202,10 +202,7 @@ export default class DataCollector {
         }
     };
 
-
-    // private
-
-    _save( cb ) {
+   _save( cb ) {
 
         const data = {
             task: this.session.task,

@@ -2311,6 +2311,8 @@
         },
 
         connect: function () {
+            utils.debug('ETUDriver', 'WebSocket created');
+
             var protocol = 'ws'; //location.protocol.indexOf("https" >= 0) ? 'wss' : 'ws';
             var wsURI = protocol + '://localhost:' + settings.port + '/';
             websocket = new WebSocket(wsURI);
@@ -2420,12 +2422,12 @@
     var samplingStart = 0;
 
     var send = function (message) {
-        utils.debug('ETUDriver.send', 'WebSocket sent: ' + message);
+        utils.debug('ETUDriver', 'WebSocket sent: ' + message);
         websocket.send(message);
     };
 
     var onWebSocketOpen = function (evt) {
-        //debug('onWebSocketOpen', evt);
+        utils.debug('ETUDriver', 'WebSocket opened');
         var state = getState(stateFlags.none);
 
         panel.setLabel(stateLabel.connected);
@@ -2440,11 +2442,13 @@
     };
 
     var onWebSocketClose = function (evt) {
-        //debug('onWebSocketClose', evt);
+        utils.debug('ETUDriver', 'WebSocket closed');
+
         websocket = null;
         currentDevice = '';
 
         var state = getState(stateFlags.none);
+        state.isDisconnected = true;
         if (callbacks.state) {
             callbacks.state(state);
         }
@@ -2467,11 +2471,11 @@
                 }
                 panel.printData(ge);
             } else if (ge.type === respondType.state) {
-                utils.debug('onWebSocketMessage', 'WebSocket got state: ' + evt.data);
+                utils.debug('ETUDriver', 'WebSocket got state: ' + evt.data);
                 state = getState(ge.value);
                 respondToStateChange(state);
             } else if (ge.type === respondType.device) {
-                utils.debug('onWebSocketMessage', 'WebSocket got device: ' + evt.data);
+                utils.debug('ETUDriver', 'WebSocket got device: ' + evt.data);
                 if (storage.device) {
                     utils.store(storage.device, ge.name);
                 }
@@ -2485,7 +2489,7 @@
     };
 
     var onWebSocketError = function (evt) {
-        utils.debug('onWebSocketError', evt);
+        utils.debug('ETUDriver', 'WebSocket error: ' + JSON.stringify( evt ));
         panel.showMessage('Problems in the connection to WebSocket server', 5000);
     };
 
@@ -2511,6 +2515,7 @@
             isTracking:   (currentStateFlags & stateFlags.tracking) > 0,
             isBusy:       (currentStateFlags & stateFlags.busy) > 0,
             isStopped:    isStopped,
+            isDisconnected: false,
             device:       currentDevice
         };
     };

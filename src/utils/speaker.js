@@ -22,13 +22,14 @@ export default class Speaker {
         );
     }
 
-    inspect( el, params ) {
-        if (this.voice && params.notPronounced &&
-            params.accumulatedTime > this.options.threshold.value) {
+    // @wordFocus - WordFocus
+    inspect( el, wordFocus ) {
+        if (this.voice && !wordFocus.pronounced && wordFocus.focusCount === 1 &&
+            wordFocus.accumulatedTime > this.options.threshold.value) {
 
-            params.notPronounced = false;
+            wordFocus.pronounced = true;
 
-            this.voice( params.word );
+            this.voice( wordFocus.word );
 
             return true;
         }

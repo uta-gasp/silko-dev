@@ -77,16 +77,16 @@ export default class Syllabifier {
         return text.replace( new RegExp( this.hyphen, 'g' ), '' );
     }
 
-    inspect( el, params ) {
-        if (this.rule && params.notSyllabified &&
-            params.accumulatedTime > this.options.threshold.value) {
+    // @wordFocus - WordFocus
+    inspect( el, wordFocus ) {
+        if (this.rule && !wordFocus.syllabified && wordFocus.focusCount === 1 &&
+            wordFocus.accumulatedTime > this.options.threshold.value) {
 
-            params.notSyllabified = false;
+            wordFocus.syllabified = true;
 
-            el.innerHTML = this._syllabifyWord( params.word, this.hyphenHtml );
+            el.innerHTML = this._syllabifyWord( wordFocus.word, this.hyphenHtml );
 
             if (this.options.temporary) {
-                console.log('i;ll be back');
                 setTimeout( () => {
                     this._restore( el );
                 }, RESTORE_INTERVAL );

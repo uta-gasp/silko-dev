@@ -2,6 +2,7 @@ import Feedbacks from '@/model/session/feedbacks.js';
 
 import Syllabifier from './syllabifier.js';
 import Speaker from './speaker.js';
+import WordFocus from './wordFocus.js';
 
 export default class FeedbackProvider {
     constructor( syllab, speech ) {
@@ -14,7 +15,8 @@ export default class FeedbackProvider {
         this.events = new EventEmitter();
         this.timer = null;
         this.currentWord = null;
-        this.words = null;
+
+        this.words = null;  // map of el: WordFocus
     }
 
     get setup() {
@@ -59,7 +61,7 @@ export default class FeedbackProvider {
 
     // Propagates / removed the highlighing
     // Arguments:
-    //   wordEl: - the focused word DOM element
+    //   el: - the focused word DOM element
     setFocusedWord( el ) {
 
         if (this.currentWord != el) {
@@ -74,13 +76,13 @@ export default class FeedbackProvider {
 
             this.currentWord = el;
 
-            if (el && !this.words.has( el )) {
-                this.words.set( el, {
-                    accumulatedTime: 0,
-                    notSyllabified: true,
-                    notPronounced: true,
-                    word: this._getWordFromElement( el )
-                });
+            if (el) {
+                if (!this.words.has( el )) {
+                    this.words.set( el, new WordFocus( el ) );
+                }
+                else {
+                    this.words.get( el ).focusCount++;
+                }
             }
         }
     }
@@ -88,27 +90,18 @@ export default class FeedbackProvider {
     _tick() {
         for (let key of this.words.keys()) {
 
-            const wordParams = this.words.get( key );
-            wordParams.accumulatedTime = Math.max( 0,
-                wordParams.accumulatedTime + (key === this.currentWord ? 30 : -30)
+            const wordFocus = this.words.get( key );
+            wordFocus.accumulatedTime = Math.max( 0,
+                wordFocus.accumulatedTime + (key === this.currentWord ? 30 : -30)
             );
 
-            if (this.syllabifier.inspect( key, wordParams )) {
+            if (this.syllabifier.inspect( key, wordFocus )) {
                 this.events.emitEvent( 'syllabified', [ key ] );
             }
 
-            if (this.speaker.inspect( key, wordParams )) {
+            if (this.speaker.inspect( key, wordFocus )) {
                 this.events.emitEvent( 'pronounced', [ key ] );
             }
         }
     };
-
-    _getWordFromElement( element ) {
-        const textNodes = Array.from( element.childNodes ).filter( node =>
-            node.nodeType === Node.TEXT_NODE ||
-            !node.classList.contains( 'hyphens' )
-        );
-
-        return textNodes[0].textContent.trim();
-    }
 };
