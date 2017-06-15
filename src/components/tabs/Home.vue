@@ -19,14 +19,14 @@
   export default {
     name: 'home',
 
+    components: {
+      'login': Login
+    },
+
     data() {
       return {
         isLoginVisible: true
       }
-    },
-
-    components: {
-      'login': Login
     },
 
     created() {

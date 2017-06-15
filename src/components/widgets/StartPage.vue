@@ -22,8 +22,16 @@
 
   import TaskPage from '@/components/widgets/TaskPage';
 
+  import fullscreen from '@/components/mixins/fullscreen.js';
+
   export default {
     name: 'start-page',
+
+    mixins: [ fullscreen ],
+
+    components: {
+      'task-page': TaskPage,
+    },
 
     data() {
       return {
@@ -31,10 +39,6 @@
         isCalibrated: (gazeTracking.state.isCalibrated && !gazeTracking.state.isTracking && !gazeTracking.state.isBusy) || false,
         isRunning: (gazeTracking.state.isConnected && gazeTracking.state.isTracking && !gazeTracking.state.isBusy) || false,
       };
-    },
-
-    components: {
-      'task-page': TaskPage,
     },
 
     props: {
@@ -50,40 +54,17 @@
     },
 
     methods: {
-      makeFullscreen( element ) {
-        if(element.requestFullscreen) {
-          element.requestFullscreen();
-        } else if(element.mozRequestFullScreen) {
-          element.mozRequestFullScreen();
-        } else if(element.webkitRequestFullscreen) {
-          element.webkitRequestFullscreen();
-        } else if(element.msRequestFullscreen) {
-          element.msRequestFullscreen();
-        }
-      },
 
-      closeFullscreen() {
-        if(document.exitFullscreen) {
-          document.exitFullscreen();
-        } else if(document.mozCancelFullScreen) {
-          document.mozCancelFullScreen();
-        } else if(document.webkitExitFullscreen) {
-          document.webkitExitFullscreen();
-        } else if(document.msExitFullscreen) {
-          document.msExitFullscreen();
-        }
-      },
-
-      start() {
+      start( e ) {
         this.makeFullscreen( this.$refs.fullscreen );
         gazeTracking.start();
       },
 
-      cancel() {
+      cancel( e ) {
         this.$emit( 'close', { cancelled: true } );
       },
 
-      finished() {
+      finished( e ) {
         this.$emit( 'close', { finished: true } );
         gazeTracking.stop();
         this.closeFullscreen();

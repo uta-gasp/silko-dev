@@ -62,12 +62,22 @@
 
   import Syllabifier from '@/utils/syllabifier.js';
 
+  import fullscreen from '@/components/mixins/fullscreen.js';
+
   import FeedbackEditor from '@/components/widgets/feedbackEditor';
   import TaskPreview from '@/components/widgets/taskPreview';
   import BulmaCheckbox from '@/components/widgets/bulmaCheckbox';
 
   export default {
     name: 'task-editor',
+
+    mixins: [ fullscreen ],
+
+    components: {
+      'feedback-editor': FeedbackEditor,
+      'task-preview': TaskPreview,
+      'bulma-checkbox': BulmaCheckbox,
+    },
 
     data() {
       return {
@@ -102,12 +112,6 @@
       }
     },
 
-    components: {
-      'feedback-editor': FeedbackEditor,
-      'task-preview': TaskPreview,
-      'bulma-checkbox': BulmaCheckbox,
-    },
-
     computed: {
 
       isNameEditable() {
@@ -133,8 +137,8 @@
           name: this.name.trim(),
           type: 'text',
           pages: Task.textToPages( this.text ),
-          syllab: Object.assign( {}, this.syllab ),
-          speech: Object.assign( {}, this.speech ),
+          syllab: { ...this.syllab },
+          speech: { ...this.speech },
         });
 
         result.syllab.exceptions = Task.textToSyllabs( this.syllabExceptions );
@@ -154,7 +158,7 @@
         this.closeFullscreen();
       },
 
-      save() {
+      save( e ) {
         this.syllab.exceptions = this.syllabExceptions;
 
         this.$emit( 'save', {
@@ -164,31 +168,7 @@
           syllab: this.syllab,
           speech: this.speech,
         });
-      },
-
-      makeFullscreen( element ) {
-        if(element.requestFullscreen) {
-          element.requestFullscreen();
-        } else if(element.mozRequestFullScreen) {
-          element.mozRequestFullScreen();
-        } else if(element.webkitRequestFullscreen) {
-          element.webkitRequestFullscreen();
-        } else if(element.msRequestFullscreen) {
-          element.msRequestFullscreen();
-        }
-      },
-
-      closeFullscreen() {
-        if(document.exitFullscreen) {
-          document.exitFullscreen();
-        } else if(document.mozCancelFullScreen) {
-          document.mozCancelFullScreen();
-        } else if(document.webkitExitFullscreen) {
-          document.webkitExitFullscreen();
-        } else if(document.msExitFullscreen) {
-          document.msExitFullscreen();
-        }
-      },
+      }
     }
   }
 </script>

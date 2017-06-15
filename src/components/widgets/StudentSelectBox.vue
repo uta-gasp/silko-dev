@@ -11,7 +11,7 @@
         .card.student(:class="{ 'is-selected' : student.selected }"
           v-if="hasStudents( grade )"
           v-for="student in grade.students")
-          .card-content.title.is-6(@click="selectStudent( student, $event)") {{ student.ref.name }}
+          .card-content.title.is-6(@click="selectStudent( student )") {{ student.ref.name }}
         .has-text-centered(v-if="!hasStudents( grade )")
           i No available students
     .field
@@ -46,7 +46,8 @@
     },
 
     methods: {
-      selectGrade( grade ) {
+
+      selectGrade( grade, e ) {
         this.currentGrade = grade;
       },
 
@@ -63,23 +64,23 @@
         return grade && grade.students ? !!grade.students.length : false;
       },
 
-      selectStudent( student ) {
+      selectStudent( student, e ) {
         student.selected = !student.selected;
       },
 
-      selectAllStudents() {
+      selectAllStudents( e ) {
         this.currentGrade.students.forEach( student => {
           student.selected = true;
         });
       },
 
-      removeAllStudents() {
+      removeAllStudents( e ) {
         this.currentGrade.students.forEach( student => {
           student.selected = false;
         });
       },
 
-      accept() {
+      accept( e ) {
         const selected = [];
 
         this.grades.forEach( grade => {

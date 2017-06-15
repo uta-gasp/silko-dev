@@ -64,7 +64,7 @@
   .line {
     display: block;
 
-    // custom styles
+    // custom styles to support by TextPresenter
 
     .lighter {
       color: lighten(#775, 25%);

@@ -3,7 +3,7 @@
     p.panel-heading
       nav.level
         .level-left
-          .level-item {{ gui.displayCount( students, 'student' ) }}
+          .level-item {{ displayCount( students, 'student' ) }}
         .level-right
           .level-item
             button.button.is-primary(@click="openEditor") Add
@@ -32,13 +32,20 @@
 </template>
 
 <script>
-  import gui from '@/utils/gui.js';
+  import countString from '@/components/mixins/count-string.js';
 
   import ModalEditorContainer from '@/components/widgets/ModalEditorContainer';
   import StudentSelectBox from '@/components/widgets/StudentSelectBox';
 
   export default {
     name: 'student-list',
+
+    mixins: [ countString ],
+
+    components: {
+      'modal-editor-container': ModalEditorContainer,
+      'student-select-box': StudentSelectBox,
+    },
 
     data() {
       return {
@@ -49,8 +56,6 @@
 
         isEditing: false,
         currentGrade: null,
-
-        gui
       };
     },
 
@@ -67,11 +72,6 @@
         type: Number,
         default: 0
       }
-    },
-
-    components: {
-      'modal-editor-container': ModalEditorContainer,
-      'student-select-box': StudentSelectBox,
     },
 
     watch: {
@@ -124,7 +124,7 @@
         });
       },
 
-      makeGrades( students) {
+      makeGrades( students ) {
         const grades = [];
         students.forEach( student => {
           let grade = grades.find( item => {
@@ -163,7 +163,7 @@
         });
       },
 
-      openEditor() {
+      openEditor( e ) {
         this.loadAvailableStudents();
         this.isEditing = true;
       },
@@ -182,7 +182,7 @@
         this.closeEditor();
       },
 
-      closeEditor() {
+      closeEditor( e ) {
         this.isEditing = false;
       },
 
@@ -198,7 +198,7 @@
         });
       },
 
-      remove( student ) {
+      remove( student, e ) {
         this.parent.removeStudent( student, err => {
           this.loadStudents();
         });

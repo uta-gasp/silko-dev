@@ -5,7 +5,7 @@ import SpeechFeedback from '@/model/session/speechFeedback.js';
 
 export default class Speaker {
     constructor( options ) {
-        this.options = Object.assign( {}, options );
+        this.options = { ...options };
         this.options.threshold.factor = 4;
 
         this.voice = voices[ this.options.language ];

@@ -51,11 +51,6 @@
 </script>
 
 <style lang="less" scoped>
-  // .zero-height {
-  //   position: relative;
-  //   overflow-y: visible;
-  //   height: 0;
-  // }
 
   #creation-success {
     z-index: 30;
@@ -66,20 +61,13 @@
     bottom: inherit;
   }
 
-  // .notification {
-  //   position: absolute;
-  //   top: 0;
-  //   width: 100%;
-  // }
-
   .slide-fade-enter-active {
     transition: all .3s ease;
   }
   .slide-fade-leave-active {
     transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
   }
-  .slide-fade-enter, .slide-fade-leave-to
-  /* .slide-fade-leave-active for <2.1.8 */ {
+  .slide-fade-enter, .slide-fade-leave-to {
     transform: translateY(-200px);
     opacity: 0;
   }

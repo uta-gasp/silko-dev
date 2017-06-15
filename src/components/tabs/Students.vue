@@ -220,7 +220,7 @@
         this.showCreationError = Math.random();
       },
 
-      tryToCreateStudent() {
+      tryToCreateStudent( e ) {
         if (!this.canCreateStudent) {
           return;
         }

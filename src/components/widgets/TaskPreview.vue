@@ -28,6 +28,10 @@
   export default {
     name: 'task-preview',
 
+    components: {
+      'task-text': TaskText,
+    },
+
     data() {
       return {
         textPresenter: null,
@@ -40,17 +44,13 @@
         type: String,
         default: ''
       },
-
       task: {
         type: Object,
       },
     },
 
-    components: {
-      'task-text': TaskText,
-    },
-
     computed: {
+
       hasNextPage() {
         return this.textPresenter ? this.textPresenter.hasNextPage : false;
       },

@@ -33,13 +33,14 @@
 
     methods: {
 
-      reject() {
-        this.$emit( 'close', false, this.data );
+      reject( e ) {
+        this.$emit( 'close', { confirm: false, data: this.data } );
       },
 
-      confirm() {
-        this.$emit( 'close', true, this.data );
+      confirm( e ) {
+        this.$emit( 'close', { confirm: true, data: this.data } );
       },
+
     }
   };
 </script>

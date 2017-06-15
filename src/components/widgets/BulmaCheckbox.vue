@@ -9,11 +9,13 @@
 <script>
   export default {
     name: 'bulma-checkbox',
+
     data() {
       return {
         checked: !!this.value || false
       };
     },
+
     props: {
       value: {
         type: Boolean,
@@ -27,8 +29,10 @@
         default: false
       }
     },
+
     methods: {
-      toggle() {
+
+      toggle( e ) {
         if (this.disabled) {
           return;
         }
@@ -36,6 +40,7 @@
         this.checked = !this.checked;
         this.$emit( 'input', this.checked );
       }
+
     }
   }
 </script>

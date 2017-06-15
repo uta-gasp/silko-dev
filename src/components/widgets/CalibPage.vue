@@ -65,8 +65,7 @@
       },
 
       skip( e ) {
-        console.dir( e.target );
-        // this.$emit( 'close', { skip: true } );
+        this.$emit( 'close', { skip: true } );
       },
 
       cancel( e ) {
@@ -75,8 +74,6 @@
     },
 
     created() {
-      console.log( this.isConnected );
-      console.log( this.isETUDConnected );
       gazeTracking.setCallback( 'stateUpdated', 'calib', state => {
         this.isConnected = state.isConnected && !state.isTracking && !state.isBusy;
         this.isETUDConnected = state.isServiceRunning;

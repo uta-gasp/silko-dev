@@ -4,9 +4,8 @@ const RESTORE_INTERVAL = 3000;
 
 export default class Syllabifier {
     constructor( options ) {
-        this.options = Object.assign( {}, options );
+        this.options = { ...options };
         this.options.threshold.factor = 4;
-        this.options.mode = this.options.mode || 'colors';
 
         this.hyphen = Syllabifier.MODES[ 'hyphen' ];
 
@@ -145,14 +144,12 @@ export default class Syllabifier {
 
     _restore( el ) {
         let text = null;
-        console.log('i`m back');
         try {
             text = el.textContent;
         }
         catch (e) { }
 
         if (text) {
-            console.log('ok');
             const syllabs = text.split( this.hyphen );
             el.innerHTML = syllabs.join('');
         }

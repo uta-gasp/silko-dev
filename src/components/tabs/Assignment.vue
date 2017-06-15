@@ -33,6 +33,13 @@
   export default {
     name: 'assignments',
 
+    components: {
+      'modal-error': ModalError,
+      'calib-page': CalibPage,
+      'start-page': StartPage,
+      'finished-page': FinishedPage,
+    },
+
     data() {
       return {
         student: null,
@@ -44,13 +51,6 @@
 
         errorText: null,
       };
-    },
-
-    components: {
-      'modal-error': ModalError,
-      'calib-page': CalibPage,
-      'start-page': StartPage,
-      'finished-page': FinishedPage,
     },
 
     computed: {
@@ -91,27 +91,15 @@
         }
       },
 
-      makeFullscreen( element ) {
-        if(element.requestFullscreen) {
-          element.requestFullscreen();
-        } else if(element.mozRequestFullScreen) {
-          element.mozRequestFullScreen();
-        } else if(element.webkitRequestFullscreen) {
-          element.webkitRequestFullscreen();
-        } else if(element.msRequestFullscreen) {
-          element.msRequestFullscreen();
-        }
-      },
-
-      exit() {
-        this.errorText = null;
-        this.$router.replace( '/assignments' );
-      },
-
       checkAccess() {
         if (!Student.isLogged) {
           this.$router.replace( '/' );
         }
+      },
+
+      exit( e ) {
+        this.errorText = null;
+        this.$router.replace( '/assignments' );
       },
 
       calibrate( e ) {
@@ -123,7 +111,6 @@
       },
 
       start( e ) {
-        console.dir( e );
         if (e.finished) {
           this.state = 'finished';
         }

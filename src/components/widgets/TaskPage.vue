@@ -21,6 +21,10 @@
   export default {
     name: 'task-page',
 
+    components: {
+      'task-text': TaskText,
+    },
+
     data() {
       return {
         textPresenter: null,
@@ -36,10 +40,6 @@
       student: Object,
     },
 
-    components: {
-      'task-text': TaskText,
-    },
-
     computed: {
       hasNextPage() {
         return this.textPresenter ? this.textPresenter.hasNextPage : false;
@@ -48,7 +48,7 @@
 
     methods: {
 
-      next() {
+      next( e ) {
         let wordReadingDuration;
         if (this.textPresenter.page === 0 && this.texts.firstPage) {
           wordReadingDuration = this.collector.wordReadingDuration;
@@ -61,7 +61,7 @@
         gazeTracking.updateTargets();
       },
 
-      finish() {
+      finish( e ) {
         this.$emit( 'finished' );
         this.collector.stop( (err, session) => {
           this.$emit( 'saved', { err, session } );

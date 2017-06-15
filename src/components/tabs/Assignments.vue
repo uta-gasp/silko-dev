@@ -70,7 +70,7 @@
         }
       },
 
-      start( assignment ) {
+      start( assignment, e ) {
         this.$router.replace( `assignment/${assignment.cls.id}` );
       }
     },

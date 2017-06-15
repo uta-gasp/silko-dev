@@ -30,9 +30,9 @@
             tr(v-for="item in classes" :key="item.id")
               td.title.is-4 {{ item.name }}
               td
-                task-list(:cls="item" :intros="intros" @saved="onTaskSaved" @created="onTaskCreated" @deleted="onTaskDeleted")
+                task-list(:cls="item" :intros="intros" @saved="taskSaved" @created="taskCreated" @deleted="taskDeleted")
               td
-                student-list(:cls="item" :teacher="teacher" :refresh="refreshStudents" @added="onStudentAdded" @removed="onStudentRemoved")
+                student-list(:cls="item" :teacher="teacher" :refresh="refreshStudents" @added="studentAdded" @removed="studentRemoved")
               td.is-narrow
                 .is-pulled-right
                   button.button.is-danger(@click="removeClass( item )")
@@ -53,6 +53,13 @@
 
   export default {
     name: 'classes',
+
+    components: {
+      'modal-notification': ModalNotification,
+      'task-list': TaskList,
+      'student-list': StudentList,
+      'remove-warning': RemoveWarning
+    },
 
     data() {
       return {
@@ -76,13 +83,6 @@
 
         toDelete: null,
       };
-    },
-
-    components: {
-      'modal-notification': ModalNotification,
-      'task-list': TaskList,
-      'student-list': StudentList,
-      'remove-warning': RemoveWarning
     },
 
     computed: {
@@ -141,9 +141,7 @@
         this.showError = Math.random();
       },
 
-      // Class
-
-      tryToCreate() {
+      tryToCreate( e ) {
         if (!this.canCreate) {
           return;
         }
@@ -181,12 +179,12 @@
         });
       },
 
-      removeClass( item ) {
+      removeClass( item, e ) {
         this.toDelete = item;
       },
 
-      removeWarningClosed( confirm ) {
-        if (confirm) {
+      removeWarningClosed( e ) {
+        if (e.confirm) {
           this.teacher.deleteClass( this.toDelete, err => {
             this.loadClasses();
           });
@@ -195,7 +193,7 @@
         this.toDelete = null;
       },
 
-      onTaskSaved( e ) {
+      taskSaved( e ) {
         this.notification.action = 'updated';
         this.notification.obj = 'task';
         if (e.err) {
@@ -206,7 +204,7 @@
         }
       },
 
-      onTaskCreated( e ) {
+      taskCreated( e ) {
         this.notification.action = 'created';
         this.notification.obj = 'task';
         if (e.err) {
@@ -218,15 +216,15 @@
         }
       },
 
-      onTaskDeleted( e ) {
+      taskDeleted( e ) {
         this.refreshStudents = Math.random();
       },
 
-      onStudentAdded( e ) {
+      studentAdded( e ) {
 
       },
 
-      onStudentRemoved( e ) {
+      studentRemoved( e ) {
 
       }
     },

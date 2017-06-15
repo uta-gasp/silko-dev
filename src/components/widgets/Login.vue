@@ -31,6 +31,10 @@
   export default {
     name: 'login',
 
+    components: {
+      'temporal-error': TemporalError
+    },
+
     data() {
       return {
         email: 'oleque.szpakow@gmail.com',
@@ -42,30 +46,6 @@
       };
     },
 
-    components: {
-      'temporal-error': TemporalError
-    },
-
-    methods: {
-
-      setError( msg ) {
-        this.errorText = msg;
-        this.showError = Math.random();
-      },
-
-      login() {
-        this.inProgress = true;
-
-        login.logIn( this.email, this.password, (err, user) => {
-          this.inProgress = false;
-
-          if (err) {
-            return this.setError( err.message );
-          }
-        });
-      }
-    },
-
     computed: {
 
       isEmailValid() {
@@ -75,6 +55,27 @@
       isPasswordValid() {
         return !this.password || this.password.length > 5;
       }
+    },
+
+    methods: {
+
+      setError( msg ) {
+        this.errorText = msg;
+        this.showError = Math.random();
+      },
+
+      login( e ) {
+        this.inProgress = true;
+
+        login.logIn( this.email, this.password, (err, user) => {
+          this.inProgress = false;
+
+          if (err) {
+            return this.setError( err.message );
+          }
+        });
+      },
+
     }
   }
 </script>

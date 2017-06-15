@@ -26,9 +26,11 @@
     },
 
     methods: {
-      close() {
+
+      close( e ) {
         this.$emit( 'close' );
       }
+
     }
   };
 </script>

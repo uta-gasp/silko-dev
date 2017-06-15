@@ -15,9 +15,11 @@
     },
 
     methods: {
-      back() {
+
+      back( e ) {
         this.$router.replace( `../assignments` );
       }
+
     }
   };
 </script>

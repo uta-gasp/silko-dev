@@ -60,6 +60,13 @@
   export default {
     name: 'introductions',
 
+    components: {
+      'modal-notification': ModalNotification,
+      'modal-editor-container': ModalEditorContainer,
+      'intro-editor': IntroEditor,
+      'remove-warning': RemoveWarning
+    },
+
     data() {
       return {
         teacher: null,
@@ -76,13 +83,6 @@
         toDelete: null,
         toEdit: null
       };
-    },
-
-    components: {
-      'modal-notification': ModalNotification,
-      'modal-editor-container': ModalEditorContainer,
-      'intro-editor': IntroEditor,
-      'remove-warning': RemoveWarning
     },
 
     computed: {
@@ -104,7 +104,7 @@
       loadIntros() {
         this.teacher.getIntros( (err, intros) => {
           if (err) {
-            return `Cannot retrieve intros.\n\n${err}`;
+            return `TODO Cannot retrieve intros.\n\n${err}`;
           }
 
           this.intros = intros.sort( (a, b) => {
@@ -155,7 +155,11 @@
         });
       },
 
-      edit( item ) {
+      remove( item, e ) {
+        this.toDelete = item;
+      },
+
+      edit( item, e ) {
         this.toEdit = item;
       },
 
@@ -167,16 +171,12 @@
         this.closeEditor();
       },
 
-      closeEditor() {
+      closeEditor( e ) {
         this.toEdit = null;
       },
 
-      remove( item ) {
-        this.toDelete = item;
-      },
-
-      removeWarningClosed( confirm ) {
-        if (confirm) {
+      removeWarningClosed( e ) {
+        if (e.confirm) {
           this.teacher.deleteIntro( this.toDelete, err => {
             this.loadIntros();
           });

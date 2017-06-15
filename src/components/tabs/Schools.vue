@@ -45,6 +45,10 @@
   export default {
     name: 'schools',
 
+    components: {
+      'modal-notification': ModalNotification,
+    },
+
     data() {
       return {
         newName: '',
@@ -57,10 +61,6 @@
 
         schools: []
       }
-    },
-
-    components: {
-      'modal-notification': ModalNotification,
     },
 
     computed: {
@@ -105,7 +105,7 @@
         this.showCreationError = Math.random();
       },
 
-      tryToCreate() {
+      tryToCreate( e ) {
         if (!this.canCreate) {
           return;
         }

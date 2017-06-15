@@ -3,7 +3,7 @@
     p.panel-heading
       nav.level
         .level-left
-          .level-item {{ gui.displayCount( tasks, 'task' ) }}
+          .level-item {{ displayCount( tasks, 'task' ) }}
         .level-right
           .level-item
             button.button.is-primary(@click="openNewTextBox") Add
@@ -27,7 +27,7 @@
 </template>
 
 <script>
-  import gui from '@/utils/gui.js';
+  import countString from '@/components/mixins/count-string.js';
 
   import ModalEditorContainer from '@/components/widgets/ModalEditorContainer';
   import TaskEditor from '@/components/widgets/TaskEditor';
@@ -35,6 +35,14 @@
 
   export default {
     name: 'task-list',
+
+    mixins: [ countString ],
+
+    components: {
+      'modal-editor-container': ModalEditorContainer,
+      'task-editor': TaskEditor,
+      'remove-warning': RemoveWarning
+    },
 
     data() {
       return {
@@ -44,15 +52,7 @@
         toEdit: null,
         isCreating: false,
         toDelete: null,
-
-        gui
       };
-    },
-
-    components: {
-      'modal-editor-container': ModalEditorContainer,
-      'task-editor': TaskEditor,
-      'remove-warning': RemoveWarning
     },
 
     props: {
@@ -67,6 +67,7 @@
     },
 
     computed: {
+
       isEditing() {
         return this.toEdit || this.isCreating;
       },
@@ -109,11 +110,11 @@
         return this.tasks.every( task => task.name.toLowerCase() !== newTask.name.toLowerCase() );
       },
 
-      edit( task ) {
+      edit( task, e ) {
         this.toEdit = task;
       },
 
-      save( task ) {
+      save( task, e ) {
         if (this.toEdit) {
           this.toEdit.update( task, err => {
             this.$emit( 'saved', { err } );
@@ -138,17 +139,17 @@
         this.closeEditor();
       },
 
-      closeEditor() {
+      closeEditor( e ) {
         this.toEdit = null;
         this.isCreating = false;
       },
 
-      remove( task ) {
+      remove( task, e ) {
         this.toDelete = task;
       },
 
-      removeWarningClosed( confirm ) {
-        if (confirm) {
+      removeWarningClosed( e ) {
+        if (e.confirm) {
           const id = this.toDelete.id;
           this.parent.deleteTask( this.toDelete, err => {
             this.$emit( 'deleted', { task: id } );
@@ -159,7 +160,7 @@
         this.toDelete = null;
       },
 
-      openNewTextBox() {
+      openNewTextBox( e ) {
         this.isCreating = true;
       },
     },

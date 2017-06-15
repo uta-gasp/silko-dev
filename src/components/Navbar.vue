@@ -7,7 +7,7 @@
       router-link.nav-item.is-tab(to="/schools" v-if="isAdmin")
         i.fa.fa-university
         span Schools
-      router-link.nav-item.is-tab(to="/Teachers" v-if="isSchoolOrAdmin")
+      router-link.nav-item.is-tab(to="/teachers" v-if="isAdmin || isSchool")
         i.fa.fa-users
         span Teachers
       router-link.nav-item.is-tab(to="/students" v-if="isAdmin || isSchool || isTeacher")
@@ -58,14 +58,6 @@
 
       isSchool() {
         return this.user ? this.user.isSchool : false;
-      },
-
-      isSchoolOrAdmin() {
-        return this.user ? this.user.isAdmin || this.user.isSchool : false;
-      },
-
-      isTeacherOrAdmin() {
-        return this.user ? this.user.isAdmin || this.user.isTeacher : false;
       },
 
       isTeacher() {
