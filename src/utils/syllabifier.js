@@ -1,5 +1,8 @@
 import SyllabificationFeedback from '@/model/session/syllabificationFeedback.js';
 
+import loggerFactory from '@/utils/logger.js';
+const logger = loggerFactory( 'syllabifier' );
+
 const RESTORE_INTERVAL = 3000;
 const LONG_WORD_MIN_LENGTH = 7;
 const EXTRA_THRESHOLD_FOR_CHAR = 0.05;
@@ -19,6 +22,8 @@ export default class Syllabifier {
         for (let word in this.options.exceptions) {
             this.exceptions[ word.toLowerCase() ] = this.options.exceptions[ word ].replace( ' ', this.hyphen ).toLowerCase();
         }
+
+        logger.info( 'created', options );
     }
 
     static get MODES() {
@@ -45,6 +50,8 @@ export default class Syllabifier {
         if (!this.rule || this.options.mode !== 'hyphen') {
             return text;
         }
+
+        logger.info( 'preparing' );
 
         const prepareWord = word => {
             if (!word) {
@@ -137,6 +144,8 @@ export default class Syllabifier {
     }
 
     _syllabifyWord( word, hyphen ) {
+        logger.info( 'syllabifying', word );
+
         if (this.options.mode === 'colors') {
             hyphen = this.hyphen;
         }
@@ -163,7 +172,11 @@ export default class Syllabifier {
         try {
             text = el.textContent;
         }
-        catch (e) { }
+        catch (e) {
+            logger.error( 'restoring: element do not exist' );
+        }
+
+        logger.info( 'restoring', text );
 
         if (text) {
             const syllabs = text.split( this.hyphen );

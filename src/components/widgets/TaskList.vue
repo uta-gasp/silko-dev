@@ -20,7 +20,7 @@
               button.button.is-danger(@click="remove( task )")
                 i.fa.fa-remove
 
-    modal-editor-container(v-if="isEditing" title="Task editor" @close="closeEditor")
+    modal-editor-container(v-if="isEditing" :title="taskEditorTitle" @close="closeEditor")
       task-editor(:action="action" :show-labels="true" :task="toEdit" :intros="intros" @save="save")
 
     remove-warning(v-if="toDelete" object="task" :name="toDeleteName" @close="removeWarningClosed")
@@ -89,6 +89,10 @@
 
       actionType() {
         return this.toEdit ? 'edit' : 'create new';
+      },
+
+      taskEditorTitle() {
+        return 'Task editor' + (this.toEdit ? ` - ${this.toEdit.name}` : '');
       }
     },
 

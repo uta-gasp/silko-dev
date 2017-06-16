@@ -52,6 +52,10 @@
 </script>
 
 <style lang="less" scoped>
+  #feedback-editor {
+    font-size: 1rem;
+  }
+
   .control-line {
     display: inline-block;
     margin: 0 0.2em;
