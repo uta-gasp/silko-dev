@@ -4,6 +4,21 @@ const CLASS_NAMES = [   // must correspond to the styles in TaskText.vue
     'lighter',
     'darker'
 ];
+const WEIGHT_NAMES = [   // must correspond to the styles in TaskText.vue
+    'bold',
+    'b',
+    'bolder',
+    'normal',
+    'n',
+    'lighter',
+    'l'
+];
+const STYLE_NAMES = [   // must correspond to the styles in TaskText.vue
+    'regular',
+    'r',
+    'italic',
+    'i'
+];
 
 export default class TextPresenter {
     constructor( task, firstPage, container, syllabifier ) {
@@ -108,11 +123,19 @@ export default class TextPresenter {
             const css = [];
             const classes = [];
             styles.split( ',' ).forEach( style => {
+                const styleAsNumber = Number.parseInt( style );
+                const isNumber = !Number.isNaN( styleAsNumber );
+
                 if (CLASS_NAMES.includes( style )) {
                     classes.push( style );
                 }
+                else if (WEIGHT_NAMES.includes( style ) || (isNumber && styleAsNumber % 100) === 0 ) {
+                    css.push( 'font-weight:' + style );
+                }
+                else if (STYLE_NAMES.includes( style )) {
+                    css.push( 'font-style:' + style );
+                }
                 else {
-                    const isNumber = !Number.isNaN( Number.parseInt( style ) );
                     css.push( (isNumber ? 'font-size:' : 'color:') + style );
                 }
             });

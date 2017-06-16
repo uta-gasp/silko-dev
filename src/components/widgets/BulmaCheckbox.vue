@@ -74,8 +74,7 @@
       display: inline-block;
 
       line-height: 1.75em;
-      padding: 0.25em;
-      padding-left: 2.5em;
+      padding: 0.25em 0.5em 0.25em 2.5em;
       cursor: pointer;
 
       &[disabled] {

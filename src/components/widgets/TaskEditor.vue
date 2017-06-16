@@ -8,21 +8,53 @@
             label.label(v-show="showLabels") Name
             input.input(type="text" placeholder="Name" :disabled="!isNameEditable" v-model="name")
           p.control
-            .columns.is-paddingless.is-marginless
-              .column.is-paddingless.is-marginless.is-narrow
-                label.label(v-show="showLabels").is-pulled-left Text
-              .column.has-text-right.is-paddingless.is-marginless
-                .text-format-instruction Empty line to separate pages
-                .text-format-instruction "|" after a word or line to apply styles separated by ","
-                .text-format-instruction Styles: 1) text colors, eg&nbsp;
-                  a(href="https://www.w3schools.com/cssref/css_colors.asp" target="_blank") "red"
-                  span ,&nbsp;
-                  a(href="https://www.w3schools.com/colors/colors_rgb.asp") "#22aaff"
-                  span ,&nbsp;
-                  abbr(title="25% lighter than the normal text") 'lighter',
-                  abbr(title="25% darker than the normal text") "darker"
-                  span 2) font size, eg "22pt"
-                .text-format-instruction Example: This is a big black string with a blue|#22aaff word |black,28pt
+            .columns.is-paddingless.is-marginless.tip-parent
+              .column.is-paddingless.is-marginless
+                label.label(v-show="showLabels") Text
+              .column.is-paddingless.is-marginless.is-narrow.tip-header(v-show="showLabels") Formatting
+              nav.panel.notification.is-tip.is-paddingless
+                p.panel-block
+                  code Empty line
+                  span.explanation page separator
+                p.panel-block
+                  code |
+                  span.explanation applies comma-separated styles listed afterward for
+                    span.explanation.is-inline-block a word:
+                      i Iso koulupiha|bold
+                      span &#61; Iso
+                      b koulupiha
+                    span.explanation.is-inline-block a line:
+                      i Iso koulupiha |bold
+                      span &#61;
+                      b Iso koulupiha
+                p.panel-block
+                  code
+                    a(href="https://www.w3schools.com/cssref/css_colors.asp" target="_blank") red
+                    span
+                    a(href="https://www.w3schools.com/colors/colors_rgb.asp") #22aaff
+                    span
+                    abbr(title="25% lighter than the normal text") lighter
+                    span
+                    abbr(title="25% darker than the normal text") darker
+                  span.explanation font color
+                p.panel-block
+                  code 22pt
+                  span.explanation font size
+                p.panel-block
+                  code italic regular
+                  span.explanation font style
+                p.panel-block
+                  code bold bolder normal lighter light
+                  span.explanation font weight
+                p.panel-block
+                  span
+                    .is-block A big grey line with blue|#22aaff &amp; italic|italic words |grey,18pt
+                    .is-block(style="color: grey; font-size: 18pt")
+                      span A big grey line with
+                      span(style="color: #22aaff") blue
+                      span &amp;
+                      span(style="font-style: italic") italic
+                      span words
           textarea.textarea.text(placeholder="Text" v-model="text")
 
         .column.is-narrow
@@ -40,14 +72,14 @@
                 select(v-model="syllab.mode" :disabled="!syllab.language")
                   option(v-for="mode in syllabModes" :value="mode") {{ mode }}
             .field(slot="last")
-              bulma-checkbox.is-inline(v-model="syllab.temporary" label="temporary" :disabled="!syllab.language")
-              bulma-checkbox.is-inline(v-model="syllab.adjustForWordLength" label="word-dependent" :disabled="!syllab.language")
+              bulma-checkbox.is-inline-block(v-model="syllab.temporary" label="temporary" :disabled="!syllab.language")
+              bulma-checkbox.is-inline-block(v-model="syllab.adjustForWordLength" label="word-dependent" :disabled="!syllab.language")
           .field
             .columns.is-paddingless.is-marginless
               .column.is-paddingless.is-marginless.is-narrow
                 label Exceptions
               .column.has-text-right.is-paddingless.is-marginless
-                i.text-format-instruction Eg: maailma=maa il ma
+                i.instruction Example: maailma=maa il ma
             textarea.textarea.exceptions(:disabled="!syllab.language" placeholder="Syllabifications" v-model="syllabExceptions")
 
       p.control
@@ -186,12 +218,6 @@
     font-weight: 400;
   }
 
-  .text-format-instruction {
-    display: block;
-    font-size: 12px;
-    font-weight: 400;
-  }
-
   .label:not(:last-child) {
     margin-bottom: 0;
   }
@@ -210,8 +236,41 @@
     background-color: #fff;
   }
 
-  .is-inline {
-    display: inline-block;
+  .tip-parent {
+    position: relative;
   }
 
+  .tip-header {
+    border-bottom: 1px dashed #444;
+    font-size: 0.9em;
+  }
+
+  .is-tip {
+    display: none;
+    position: absolute;
+    top: 1.25em;
+    left: 0;
+    z-index: 1;
+  }
+
+  .tip-header:hover ~ .is-tip,
+  .tip-header ~ .is-tip:hover {
+    display: block;
+  }
+
+  .instruction {
+    line-height: 1.75em;
+    font-size: 0.9em;
+  }
+
+  .explanation {
+    padding-left: 1em;
+  }
+
+  .panel-block {
+    span:before,
+    span:after {
+      content: " ";
+    }
+  }
 </style>
