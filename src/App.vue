@@ -1,6 +1,6 @@
 <template lang="pug">
   #app
-    navbar
+    navbar(v-show="isLoggedIn")
     section.section
       .container.is-fluid
         router-view
@@ -9,11 +9,31 @@
 <script>
   import NavBar from '@/components/navbar';
 
+  import eventBus from '@/utils/event-bus.js';
+  import login from '@/utils/login.js';
+
   export default {
     name: 'app',
+
     components: {
       navbar: NavBar
-    }
+    },
+
+    data() {
+      return {
+        isLoggedIn: !!login.user
+      };
+    },
+
+    created() {
+      console.log('App component created');
+      eventBus.$on( 'logout', () => {
+        this.isLoggedIn = false;
+      });
+      eventBus.$on( 'login', () => {
+        this.isLoggedIn = true;
+      });
+    },
   }
 </script>
 
