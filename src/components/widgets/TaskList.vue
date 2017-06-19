@@ -21,7 +21,7 @@
                 i.fa.fa-remove
 
     modal-editor-container(v-if="isEditing" :title="taskEditorTitle" @close="closeEditor")
-      task-editor(:action="action" :show-labels="true" :task="toEdit" :intros="intros" @save="save")
+      task-editor(:action="action" :task="toEdit" :intros="intros" @save="save")
 
     remove-warning(v-if="toDelete" object="task" :name="toDeleteName" @close="removeWarningClosed")
 </template>

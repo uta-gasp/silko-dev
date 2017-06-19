@@ -36,6 +36,7 @@
 </script>
 
 <style lang="less" scoped>
+
   .heading {
     margin-bottom: 1em;
   }
@@ -43,4 +44,9 @@
   .modal-content {
     width: auto;
   }
+
+  .notification {
+    padding-right: 1.5rem;
+  }
+
 </style>

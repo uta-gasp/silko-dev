@@ -24,6 +24,7 @@ export default class Task {
         this.pages = [];    // array of arrays of strings
         this.syllab = Task.defaultSyllab;
         this.speech = Task.defaultSpeech;
+        this.questionnaire = [];
     }
 
     static get db() {
@@ -132,7 +133,8 @@ export default class Task {
             intro: task.intro,
             pages: Task.textToPages( task.text ),
             syllab: task.syllab,
-            speech: task.speech
+            speech: task.speech,
+            questionnaire: task.questionnaire,
         };
 
         _task.syllab.exceptions = Task.textToSyllabs( task.syllab.exceptions );

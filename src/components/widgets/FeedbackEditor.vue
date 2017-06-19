@@ -23,7 +23,7 @@
           .control-line ms
         slot(name="second")
       .field.is-horizontal
-        slot(name="last")
+        slot
 </template>
 
 <script>
