@@ -95,7 +95,7 @@
         });
       },
 
-      currentModel() {
+      model() {
         return {
           questionnaire: this.questions,
         };
@@ -103,8 +103,8 @@
     },
 
     watch: {
-      questions( value ) {
-        this.$emit( 'input', this.currentModel );
+      questions() {
+        this.$emit( 'input', this.model );
       },
     },
 

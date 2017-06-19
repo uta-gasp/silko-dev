@@ -3,17 +3,17 @@
     p.control
       .columns.is-paddingless.is-marginless
         .column.is-paddingless.is-marginless.is-narrow
-          feedback-editor(header="Speech" :value="speech")
-          feedback-editor(header="Syllabification" :value="syllab")
+          feedback-editor(header="Speech" v-model="speech")
+          feedback-editor(header="Syllabification" v-model="syllab")
             .field
               .field.is-horizontal
                 span.select()
-                  select(v-model="syllab.mode" :disabled="!syllab.language")
+                  select(v-model="syllabMode" :disabled="!syllab.language")
                     option(v-for="mode in syllabModes" :value="mode") {{ mode }}
               .field.is-horizontal
-                bulma-checkbox(v-model="syllab.temporary" label="temporary" :disabled="!syllab.language")
+                bulma-checkbox(v-model="syllabTemporary" label="temporary" :disabled="!syllab.language")
               .field.is-horizontal
-                bulma-checkbox(v-model="syllab.adjustForWordLength" label="word-length dependent" :disabled="!syllab.language")
+                bulma-checkbox(v-model="syllabAdjustForWordLength" label="word-length dependent" :disabled="!syllab.language")
         .column.is-paddingless.is-marginless
           .columns.is-paddingless.is-marginless
             .column.is-paddingless.is-marginless.is-narrow
@@ -31,23 +31,6 @@
   import FeedbackEditor from '@/components/widgets/feedbackEditor';
   import BulmaCheckbox from '@/components/widgets/bulmaCheckbox';
 
-  function deepCopy( obj ) {
-    return obj;
-
-    const result = {};
-    for (let key in obj) {
-      const value = obj[ key ];
-      if (typeof value === 'object') {
-        result[ key ] = deepCopy( value );
-      }
-      else {
-        result[ key ] = value;
-      }
-    }
-
-    return result;
-  }
-
   export default {
     name: 'task-editor-feedback',
 
@@ -58,9 +41,13 @@
 
     data() {
       return {
-        syllab: this.task ? deepCopy( this.task.syllab ) : Task.defaultSyllab,
-        speech: this.task ? deepCopy( this.task.speech ) : Task.defaultSpeech,
+        syllab: this.task ? this.task.syllab : Task.defaultSyllab,
+        speech: this.task ? this.task.speech : Task.defaultSpeech,
         syllabExceptions: this.task ? Task.syllabsToText( this.task.syllab.exceptions ) : '',
+
+        syllabMode: this.task ? this.task.syllab.mode : Task.defaultSyllab.mode,
+        syllabTemporary: this.task ? this.task.syllab.temporary : Task.defaultSyllab.temporary,
+        syllabAdjustForWordLength: this.task ? this.task.syllab.adjustForWordLength : Task.defaultSyllab.adjustForWordLength,
 
         syllabModes: Object.keys( Syllabifier.MODES ),
       };
@@ -74,27 +61,28 @@
     },
 
     computed: {
-      currentModel() {
-        return {
+      model() {
+        const result = {
           syllab: this.syllab,
           speech: this.speech,
           syllabExceptions: this.syllabExceptions
-        };
+        }
+
+        result.syllab.mode = this.syllabMode;
+        result.syllab.temporary = this.syllabTemporary;
+        result.syllab.adjustForWordLength = this.syllabAdjustForWordLength;
+
+        return result;
       }
     },
 
     watch: {
-      syllab( value ) {
-        this.$emit( 'input', this.currentModel );
-      },
-
-      speech( value ) {
-        this.$emit( 'input', this.currentModel );
-      },
-
-      syllabExceptions( value ) {
-        this.$emit( 'input', this.currentModel );
-      }
+      syllab() { this.$emit( 'input', this.model ); },
+      speech() { this.$emit( 'input', this.model ); },
+      syllabExceptions() { this.$emit( 'input', this.model ); },
+      syllabMode() { this.$emit( 'input', this.model ); },
+      syllabTemporary() { this.$emit( 'input', this.model ); },
+      syllabAdjustForWordLength() { this.$emit( 'input', this.model ); },
     },
   }
 </script>

@@ -4,22 +4,22 @@
       label.label {{ header }}
       .field.is-horizontal
         .select
-          select(v-model="feedback.language")
+          select(v-model="language")
             option(value="" selected) none
             option(value="Finnish") Finnish
         slot(name="first")
       .field.is-horizontal
         .select
-          select(v-model="feedback.threshold.smart" :disabled="!isLanguageSelected")
+          select(v-model="thresholdIsSmart" :disabled="!isLanguageSelected")
             option(:value="false") fixed
             option(:value="true") calibrated
-        template(v-if="feedback.threshold.smart")
-          input.input(type="number" step="100" v-model.number="feedback.threshold.min" :disabled="!canEditCalibThresholdParams" min="1000" :max="feedback.threshold.max")
+        template(v-if="thresholdIsSmart")
+          input.input(type="number" step="100" v-model.number="thresholdMin" :disabled="!canEditCalibThresholdParams" min="1000" :max="thresholdMax")
           .control-line -
-          input.input(type="number" step="100" v-model.number="feedback.threshold.max" :disabled="!canEditCalibThresholdParams" max="5000" :min="feedback.threshold.min")
+          input.input(type="number" step="100" v-model.number="thresholdMax" :disabled="!canEditCalibThresholdParams" max="5000" :min="thresholdMin")
           .control-line ms
         template(v-else)
-          input.input(type="number" step="100" v-model.number="feedback.threshold.value" :disabled="!feedback.language")
+          input.input(type="number" step="100" v-model.number="thresholdValue" :disabled="!language")
           .control-line ms
         slot(name="second")
       .field.is-horizontal
@@ -32,20 +32,53 @@
 
     data() {
       return {
-        feedback: this.value
+        language: this.value.language,
+        thresholdIsSmart: this.value.threshold.smart,
+        thresholdMin: this.value.threshold.min,
+        thresholdMax: this.value.threshold.max,
+        thresholdValue: this.value.threshold.value,
       };
     },
 
-    props: [ 'value', 'header' ],
+    props: {
+      value: {
+        type: Object,
+        required: true
+      },
+      header: {
+        type: String,
+        required: true
+      },
+    },
 
     computed: {
       canEditCalibThresholdParams() {
-        return this.feedback.language && this.feedback.threshold.smart;
+        return this.language && this.thresholdIsSmart;
       },
 
       isLanguageSelected() {
-        return !!this.feedback.language;
-      }
+        return !!this.language;
+      },
+
+      model() {
+        return {
+          language: this.language,
+          threshold: {
+            smart: this.thresholdIsSmart,
+            min: this.thresholdMin,
+            max: this.thresholdMax,
+            value: this.thresholdValue
+          }
+        };
+      },
+    },
+
+    watch: {
+      language() { this.$emit( 'input', this.model ); },
+      thresholdIsSmart() { this.$emit( 'input', this.model ); },
+      thresholdMin() { this.$emit( 'input', this.model ); },
+      thresholdMax() { this.$emit( 'input', this.model ); },
+      thresholdValue() { this.$emit( 'input', this.model ); },
     }
   };
 

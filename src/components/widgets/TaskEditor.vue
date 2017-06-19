@@ -85,10 +85,12 @@
       },
       task: {
         type: Object,
+        required: true,
         default: () => { return {}; }
       },
       intros: {
         type: Array,
+        required: true,
         default: () => []
       }
     },
@@ -160,7 +162,6 @@
       },
 
       setQuestionnaireInput( e ) {
-        console.log( e.questionnaire.length )
         this.questionnaire = e.questionnaire;
       },
 
