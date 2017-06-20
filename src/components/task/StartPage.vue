@@ -9,12 +9,21 @@
         button.button.is-large(@click="cancel") {{ texts.startCancel }}
 
     div.fullscreen(ref="fullscreen")
-      task-page(v-show="isRunning" :texts="texts" :task="task" :student="student" @finished="finished" @saved="gazeDataSaved")
+      task-page(
+        v-show="isRunning"
+        :texts="texts"
+        :task="task"
+        :student="student"
+        @finished="finishedReading"
+        @saved="gazeDataSaved")
 
-    p
-      .container(v-show="!isCalibrated")
-        .message.is-danger
-          .message-body The tracker is not calibrated yet
+      .container.tracking-lost-error-container(v-show="isFullscreen && !isRunning")
+        .message.is-danger.tracking-lost-error
+          .message-body Gaze tracking is not available
+
+    .container(v-show="!isCalibrated")
+      .message.is-danger
+        .message-body The tracker is not calibrated yet
 </template>
 
 <script>
@@ -38,6 +47,8 @@
         isConnected: (gazeTracking.state.isConnected && !gazeTracking.state.isTracking && !gazeTracking.state.isBusy) || false,
         isCalibrated: (gazeTracking.state.isCalibrated && !gazeTracking.state.isTracking && !gazeTracking.state.isBusy) || false,
         isRunning: (gazeTracking.state.isConnected && gazeTracking.state.isTracking && !gazeTracking.state.isBusy) || false,
+        isReading: false,
+        isFullscreen: false,
       };
     },
 
@@ -56,6 +67,7 @@
     methods: {
 
       start( e ) {
+        this.isReading = true;
         this.makeFullscreen( this.$refs.fullscreen );
         gazeTracking.start();
       },
@@ -64,10 +76,11 @@
         this.$emit( 'close', { cancelled: true } );
       },
 
-      finished( e ) {
+      finishedReading( e ) {
+        this.isReading = false;
         this.$emit( 'close', { finished: true } );
-        gazeTracking.stop();
         this.closeFullscreen();
+        gazeTracking.stop();
       },
 
       gazeDataSaved( e ) {
@@ -75,11 +88,26 @@
       },
     },
 
+    watch: {
+      isRunning( value ) {
+        if (!value && this.isFullscreen && this.isReading) {
+          setTimeout( () => {
+            this.closeFullscreen();
+            this.$router.replace( '/assignments' );
+          }, 4000);
+        }
+      }
+    },
+
     created() {
       gazeTracking.setCallback( 'stateUpdated', 'start', state => {
         this.isConnected = state.isConnected && !state.isTracking && !state.isBusy;
         this.isCalibrated = state.isCalibrated && !state.isTracking && !state.isBusy;
         this.isRunning = state.isConnected && state.isTracking && !state.isBusy;
+      });
+
+      this.onFullscreenChanges( isFullscreen => {
+        this.isFullscreen = isFullscreen;
       });
     },
 
@@ -90,7 +118,19 @@
 </script>
 
 <style lang="less" scoped>
+
   .fullscreen {
     background-color: #fff;
   }
+
+  .tracking-lost-error-container {
+    height: 100%;
+  }
+
+  .tracking-lost-error {
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
 </style>

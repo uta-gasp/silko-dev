@@ -2,7 +2,6 @@
   #questionnaire-page
     section.section
       .container
-        h2.title.is-3 Questionnaire
         .content.is-large
           p {{ question.question }}
 
@@ -60,9 +59,10 @@
   }
 
   .answer {
-    display: block;
+    display: flex;
     width: 100%;
     height: auto;
+    line-height: 1.25em;
     margin: 2px auto;
     white-space: normal;
   }

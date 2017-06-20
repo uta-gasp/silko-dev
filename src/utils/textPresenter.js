@@ -28,6 +28,8 @@ export default class TextPresenter {
         this.syllabifier = syllabifier;
 
         this.pages = task.pages;
+        this.hasInstructionPage = !!firstPage;
+
         if (firstPage) {
             this.pages.unshift( firstPage );
         }
@@ -39,6 +41,10 @@ export default class TextPresenter {
 
     get page() {
         return this.pageIndex;
+    }
+
+    get isInstructionPage() {
+        return this.pageIndex === 0 && this.hasInstructionPage;
     }
 
     get hasNextPage() {

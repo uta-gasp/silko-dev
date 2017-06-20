@@ -90,11 +90,15 @@
         }
       });
       gazeTracking.setCallback( 'wordFocused', 'task-page', word => {
-        this.feedbackProvider.setFocusedWord( word );
+        if (!this.textPresenter.isInstructionPage) {
+          this.feedbackProvider.setFocusedWord( word );
+        }
         this.collector.setFocusedWord( word, this.textPresenter.page );
       });
       gazeTracking.setCallback( 'wordLeft', 'task-page', word => {
-        this.feedbackProvider.setFocusedWord( null );
+        if (!this.textPresenter.isInstructionPage) {
+          this.feedbackProvider.setFocusedWord( null );
+        }
         this.collector.setFocusedWord( null );
       });
       gazeTracking.setCallback( 'gazePoint', 'task-page', gazePoint => {

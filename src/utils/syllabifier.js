@@ -101,7 +101,7 @@ export default class Syllabifier {
 
         const mustSyllabify =
             !wordFocus.syllabified &&
-            wordFocus.focusCount === 1 &&
+            wordFocus.entries === 1 &&
             wordFocus.accumulatedTime > threshold;
 
         if (!mustSyllabify) {

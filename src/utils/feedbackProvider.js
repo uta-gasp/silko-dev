@@ -4,6 +4,10 @@ import Syllabifier from './syllabifier.js';
 import Speaker from './speaker.js';
 import WordFocus from './wordFocus.js';
 
+const FOCUS_THRESHOLD = 150;
+const REENTRY_THRESHOLD = 1000;
+const SAMPLE_DURATION = 30;
+
 export default class FeedbackProvider {
     constructor( syllab, speech ) {
 
@@ -15,6 +19,7 @@ export default class FeedbackProvider {
         this.events = new EventEmitter();
         this.timer = null;
         this.currentWord = null;
+        this.lastFocusedWord = null;
 
         this.words = null;  // map of el: WordFocus
     }
@@ -33,6 +38,8 @@ export default class FeedbackProvider {
             this.currentWord.classList.remove( this.highlighClassName );
             this.currentWord = null;
         }
+
+        this.lastFocusedWord = null;
 
         clearTimeout( this.timer );
         this.timer = null;
@@ -57,6 +64,7 @@ export default class FeedbackProvider {
 
         this.words = new Map();
         this.currentWord = null;
+        this.lastFocusedWord = null;
     }
 
     // Propagates / removed the highlighing
@@ -81,8 +89,21 @@ export default class FeedbackProvider {
                     this.words.set( el, new WordFocus( el ) );
                 }
                 else {
-                    this.words.get( el ).focusCount++;
+                    const wordFocus = this.words.get( el );
+
+                    if (this.currentWord !== this.lastFocusedWord) {
+                        wordFocus.focusRecorded = false;
+                    }
+
+                    const now = performance.now();
+                    if (now - wordFocus.lastSample > REENTRY_THRESHOLD) {
+                        wordFocus.entries++;
+                    }
+
+                    wordFocus.lastSample = now;
                 }
+
+                this.lastFocusedWord = el;
             }
         }
     }
@@ -92,8 +113,13 @@ export default class FeedbackProvider {
 
             const wordFocus = this.words.get( key );
             wordFocus.accumulatedTime = Math.max( 0,
-                wordFocus.accumulatedTime + (key === this.currentWord ? 30 : -30)
+                wordFocus.accumulatedTime + (key === this.currentWord ? SAMPLE_DURATION : -SAMPLE_DURATION)
             );
+
+            if (wordFocus.accumulatedTime > FOCUS_THRESHOLD && !wordFocus.focusRecorded) {
+                wordFocus.focusRecorded = true;
+                wordFocus.focusCount++;
+            }
 
             if (this.syllabifier.inspect( key, wordFocus )) {
                 this.events.emitEvent( 'syllabified', [ key ] );

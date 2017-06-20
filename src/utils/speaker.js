@@ -24,17 +24,23 @@ export default class Speaker {
 
     // @wordFocus - WordFocus
     inspect( el, wordFocus ) {
-        if (this.voice && !wordFocus.pronounced && wordFocus.focusCount === 1 &&
-            wordFocus.accumulatedTime > this.options.threshold.value) {
-
-            wordFocus.pronounced = true;
-
-            this.voice( wordFocus.word );
-
-            return true;
+        if (!this.voice) {
+            return false;
         }
 
-        return false;
+        const mustPronounce =
+            !wordFocus.pronounced &&
+            wordFocus.entries === 1 &&
+            wordFocus.accumulatedTime > this.options.threshold.value;
+
+        if (!mustPronounce) {
+            return false;
+        }
+
+        wordFocus.pronounced = true;
+        this.voice( wordFocus.word );
+
+        return true;
     }
 
     say( word ) {
@@ -55,7 +61,6 @@ export default class Speaker {
             Math.min( this.options.threshold.max,
             wordReadingDuration * this.options.threshold.factor
         ));
-        console.log( 'wordReadingDuration', wordReadingDuration, '   >>   new value', this.options.threshold.value );
     }
 };
 
