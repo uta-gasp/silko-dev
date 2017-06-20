@@ -3,18 +3,22 @@
     nav.panel
       p.panel-heading {{ task ? task.name : '' }}
 
-    calib-page(:texts="introTexts" v-if="state === 'calibrate'" @close="calibrate")
+    calib-page(:texts="introTexts" v-if="state === STATES.calibrate" @close="calibrate")
     start-page(
       :texts="introTexts"
       :task="task"
       :intro="intro.firstPage"
       :student="student"
       v-if="intro"
-      v-show="state === 'start'"
-      @close="start"
-      @saved="done"
+      v-show="state === STATES.start"
+      @close="startPageClosed"
+      @saved="gazeDataSaved"
     )
-    finished-page(:texts="introTexts" :saving="!isDataSaved" v-if="state === 'finished'" )
+    questionnaire-page(
+      :questionnaire="task.questionnaire"
+      v-if="state === STATES.questionnaire"
+      @finished="questionnaireDone")
+    finished-page(:texts="introTexts" :saving="!isDataSaved" v-if="state === STATES.finished" )
 
     modal-error(:text="errorText" @close="exit")
 </template>
@@ -26,9 +30,18 @@
   import eventBus  from '@/utils/event-bus.js';
 
   import ModalError from '@/components/widgets/ModalError';
-  import CalibPage from '@/components/widgets/CalibPage';
-  import StartPage from '@/components/widgets/StartPage';
-  import FinishedPage from '@/components/widgets/FinishedPage';
+
+  import CalibPage from '@/components/task/CalibPage';
+  import StartPage from '@/components/task/StartPage';
+  import QuestionnairePage from '@/components/task/QuestionnairePage';
+  import FinishedPage from '@/components/task/FinishedPage';
+
+  const STATES = {
+    calibrate: { },
+    start: { },
+    questionnaire: { },
+    finished: { }
+  };
 
   export default {
     name: 'assignments',
@@ -37,6 +50,7 @@
       'modal-error': ModalError,
       'calib-page': CalibPage,
       'start-page': StartPage,
+      'questionnaire-page': QuestionnairePage,
       'finished-page': FinishedPage,
     },
 
@@ -46,10 +60,14 @@
         task: null,
         intro: null,
 
-        state: 'calibrate',
+        state: STATES.calibrate,
         isDataSaved: false,
 
         errorText: null,
+        keys: null,
+        answers: null,
+
+        STATES,
       };
     },
 
@@ -107,31 +125,62 @@
           gazeTracking.calibrate();
         }
 
-        this.state = 'start';
+        this.state = STATES.start;
       },
 
-      start( e ) {
+      startPageClosed( e ) {
         if (e.finished) {
-          this.state = 'finished';
+          if (this.task.questionnaire && this.task.questionnaire.length) {
+            this.state = STATES.questionnaire;
+          }
+          else {
+            this.state = STATES.finished;
+          }
         }
         else if (e.cancelled) {
-          this.state = 'calibrate';
+          this.state = STATES.calibrate;
         }
       },
 
-      done( e ) {
+      gazeDataSaved( e ) {
         if (!e.err) {
-          this.student.taskDone( this.task.cls, e.session, err => {
-            if (err) {
-              console.log( 'TODO task done', e.err );
-            }
-          });
+          this.keys = e.keys;
+          if (this.state === STATES.finished) {
+            this.taskDone();
+          }
         }
         else {
           console.log( 'TODO data saved', e.err );
         }
 
         this.isDataSaved = true;
+      },
+
+      questionnaireDone( e ) {
+        this.answers = e.questions.map( question => question.answer );
+        this.state = STATES.finished;
+
+        this.taskDone();
+      },
+
+      taskDone() {
+        if (!this.keys) {
+          return;
+        }
+
+        if (this.answers) {
+          this.student.addAnswers( this.keys.data, this.answers, err => {
+            if (err) {
+              console.log( 'TODO questionnaire done', e.err );
+            }
+          });
+        }
+
+        this.student.taskDone( this.task.cls, this.keys.session, err => {
+          if (err) {
+            console.log( 'TODO task done', e.err );
+          }
+        });
       }
     },
 

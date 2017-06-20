@@ -214,18 +214,18 @@ export default class DataCollector {
             })
         };
 
-        db.add( Data, data, (err, key) => {
+        db.add( Data, data, (err, dataKey) => {
             if (err) {
                 return cb( err );
             }
 
-            this.session.data = key;
-            db.add( Session, this.session, (err, key) => {
+            this.session.data = dataKey;
+            db.add( Session, this.session, (err, sessionKey) => {
                 if (err) {
                     return cb( err );
                 }
 
-                cb( undefined, key );
+                cb( undefined, { data: dataKey, session: sessionKey } );
             });
         });
    };

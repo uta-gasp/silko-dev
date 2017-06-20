@@ -2,6 +2,7 @@ import Recordable from './commons/recordable.js';
 
 import Class from './class.js';
 import Task from './task.js';
+import Data from './data.js';
 
 import db from '@/db/db.js';
 
@@ -119,6 +120,16 @@ export default class Student {
             }
 
             this.setAssignment( task, null, cb );
+        });
+    }
+
+    addAnswers( dataKey, answers, cb ) {
+        db.update( `/${Data.db}/${dataKey}/answers`, answers, err => {
+            if (err) {
+                return cb( err );
+            }
+
+            cb();
         });
     }
 }

@@ -9,7 +9,7 @@
         button.button.is-large(@click="cancel") {{ texts.startCancel }}
 
     div.fullscreen(ref="fullscreen")
-      task-page(v-show="isRunning" :texts="texts" :task="task" :student="student" @finished="finished" @saved="done")
+      task-page(v-show="isRunning" :texts="texts" :task="task" :student="student" @finished="finished" @saved="gazeDataSaved")
 
     p
       .container(v-show="!isCalibrated")
@@ -20,7 +20,7 @@
 <script>
   import gazeTracking from '@/utils/gazeTracking.js';
 
-  import TaskPage from '@/components/widgets/TaskPage';
+  import TaskPage from '@/components/task/TaskPage';
 
   import fullscreen from '@/components/mixins/fullscreen.js';
 
@@ -70,7 +70,7 @@
         this.closeFullscreen();
       },
 
-      done( e ) {
+      gazeDataSaved( e ) {
         this.$emit( 'saved', e );
       },
     },

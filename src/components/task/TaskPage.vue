@@ -63,8 +63,12 @@
 
       finish( e ) {
         this.$emit( 'finished' );
-        this.collector.stop( (err, session) => {
-          this.$emit( 'saved', { err, session } );
+// return setTimeout( () => {
+//   this.$emit( 'saved', { err: null, keys: { data: 'data-key', session: 'session-key' } } );
+// }, 500);
+
+        this.collector.stop( (err, keys) => {
+          this.$emit( 'saved', { err, keys } );
         });
       },
     },
