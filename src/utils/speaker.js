@@ -3,6 +3,9 @@
 
 import SpeechFeedback from '@/model/session/speechFeedback.js';
 
+const LONG_WORD_MIN_LENGTH = 7;
+const EXTRA_THRESHOLD_FOR_CHAR = 0.05;
+
 export default class Speaker {
     constructor( options ) {
         this.options = { ...options };
@@ -25,10 +28,15 @@ export default class Speaker {
             return false;
         }
 
+        let threshold = this.options.threshold.value;
+        if (this.options.threshold.adjustForWordLength) {
+            threshold *= Math.max( 1, 1 + (wordFocus.word.length - LONG_WORD_MIN_LENGTH) * EXTRA_THRESHOLD_FOR_CHAR );
+        }
+
         const mustPronounce =
             !wordFocus.pronounced &&
             wordFocus.entries === 1 &&
-            wordFocus.accumulatedTime > this.options.threshold.value;
+            wordFocus.accumulatedTime > threshold;
 
         if (!mustPronounce) {
             return false;

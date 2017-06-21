@@ -4,6 +4,9 @@
       .columns.is-paddingless.is-marginless
         .column.is-paddingless.is-marginless.is-narrow
           feedback-editor(header="Speech" v-model="speech")
+            .field
+              .field.is-horizontal
+                bulma-checkbox(v-model="speechAdjustForWordLength" label="word-length dependent" :disabled="!speech.language")
           feedback-editor(header="Syllabification" v-model="syllab")
             .field
               .field.is-horizontal
@@ -41,10 +44,11 @@
 
     data() {
       return {
-        syllab: this.task ? this.task.syllab : Task.defaultSyllab,
         speech: this.task ? this.task.speech : Task.defaultSpeech,
-        syllabExceptions: this.task ? Task.syllabsToText( this.task.syllab.exceptions ) : '',
+        speechAdjustForWordLength: this.task ? this.task.speech.threshold.adjustForWordLength : Task.defaultSpeech.threshold.adjustForWordLength,
 
+        syllab: this.task ? this.task.syllab : Task.defaultSyllab,
+        syllabExceptions: this.task ? Task.syllabsToText( this.task.syllab.exceptions ) : '',
         syllabMode: this.task ? this.task.syllab.mode : Task.defaultSyllab.mode,
         syllabTemporary: this.task ? this.task.syllab.temporary : Task.defaultSyllab.temporary,
         syllabAdjustForWordLength: this.task ? this.task.syllab.threshold.adjustForWordLength : Task.defaultSyllab.threshold.adjustForWordLength,
@@ -71,14 +75,16 @@
         result.syllab.mode = this.syllabMode;
         result.syllab.temporary = this.syllabTemporary;
         result.syllab.threshold.adjustForWordLength = this.syllabAdjustForWordLength;
+        result.speech.threshold.adjustForWordLength = this.speechAdjustForWordLength;
 
         return result;
       }
     },
 
     watch: {
-      syllab() { this.$emit( 'input', this.model ); },
       speech() { this.$emit( 'input', this.model ); },
+      speechAdjustForWordLength() { this.$emit( 'input', this.model ); },
+      syllab() { this.$emit( 'input', this.model ); },
       syllabExceptions() { this.$emit( 'input', this.model ); },
       syllabMode() { this.$emit( 'input', this.model ); },
       syllabTemporary() { this.$emit( 'input', this.model ); },
