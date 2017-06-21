@@ -78,7 +78,7 @@
 
       finishedReading( e ) {
         this.isReading = false;
-        this.$emit( 'close', { finished: true } );
+        this.$emit( 'close', { finished: true, ...e } );
         this.closeFullscreen();
         gazeTracking.stop();
       },

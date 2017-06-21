@@ -81,12 +81,12 @@
       },
 
       accept( e ) {
-        const selected = [];
+        const selected = {};
 
         this.grades.forEach( grade => {
           grade.students.forEach( student => {
             if (student.selected) {
-              selected.push( student.ref.id );
+              selected[ student.ref.id ] = student.ref.name;
             }
           });
         });

@@ -138,15 +138,11 @@
         }
         else if (School.isLogged) {
           this.school = School.instance;
-          this.loadSchoolClasses().then( () => {
-            this.loadStudents();
-          });
+          this.loadStudents();
         }
         else if (Teacher.isLogged) {
           this.teacher = Teacher.instance;
-          this.loadTeacherClasses().then( () => {
-            this.loadStudents();
-          });
+          this.loadStudents();
         }
       },
 
@@ -162,26 +158,6 @@
         });
       },
 
-      loadTeacherClasses() {
-        return this.teacher.getClasses( (err, classes) => {
-          if (err) {
-            return `Cannot retrieve classes.\n\n${err}`;
-          }
-
-          this.classes = classes;
-        });
-      },
-
-      loadSchoolClasses() {
-        return this.school.getClasses( (err, classes) => {
-          if (err) {
-            return `Cannot retrieve classes.\n\n${err}`;
-          }
-
-          this.classes = classes;
-        });
-      },
-
       loadStudents() {
         const onDone = (err, students) => {
           if (err) {
@@ -189,7 +165,15 @@
           }
 
           this.students = students.sort( (a, b) => {
-            return a.name.toLowerCase() < b.name.toLowerCase();
+            if (a.school !== b.school) {
+              return a.school > b.school;
+            }
+            else if (a.grade !== b.grade) {
+              return a.grade > b.grade;
+            }
+            else {
+              return a.name.toLowerCase() > b.name.toLowerCase();
+            }
           });
         };
 
@@ -277,10 +261,11 @@
       },
 
       getListOfStudentClasses( student ) {
-        return student
-          .getListOfClasses( this.classes )
-          .map( cls => cls.name )
-          .join( ', ' );
+        const classes = [];
+        for (let id in student.classes) {
+          classes.push( student.classes[ id ] );
+        }
+        return classes.join( ', ' );
       }
     },
 

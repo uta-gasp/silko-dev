@@ -169,7 +169,7 @@
       },
 
       addNewStudents( e ) {
-        if (e.students.length) {
+        if (e.students) {
           this.parent.addStudents( e.students, err => {
             if (err) {
               return console.log( 'TODO display the error', err );

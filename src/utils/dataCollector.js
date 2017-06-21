@@ -106,6 +106,17 @@ export default class DataCollector {
         this.pages.add();
     }
 
+    get longGazedWords() {
+        const result = [];
+        this.pages.items.forEach( page => {
+            page.data.syllabifications.forEach( syllabification => {
+                result.push( syllabification.text );
+            });
+        });
+
+        return result;
+    }
+
     get wordReadingDuration() {
         const page = this.pages.current;
         if (!page) {

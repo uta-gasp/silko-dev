@@ -1,8 +1,10 @@
 import Feedback from './feedback.js';
 
 export default class SyllabificationFeedback extends Feedback {
-    constructor( enabled, threshold, hyphen ) {
-        super( enabled, threshold );
-        this.hyphen = hyphen;       // string
+    constructor( options ) {
+        super( options );
+        this.hyphen = options.hyphen;       // string
+        this.mode = options.mode;           // string, a key from Syllabifier.MODES
+        this.temporary = options.temporary; // boolean
     }
 }

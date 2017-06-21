@@ -1,6 +1,6 @@
 <template lang="pug">
   #assignment
-    nav.panel
+    .panel
       p.panel-heading {{ task ? task.name : '' }}
 
     calib-page(:texts="introTexts" v-if="state === STATES.calibrate" @close="calibrate")
@@ -16,6 +16,7 @@
     )
     questionnaire-page(
       :questionnaire="task.questionnaire"
+      :longGazedWords="longGazedWords"
       v-if="state === STATES.questionnaire"
       @finished="questionnaireDone")
     finished-page(:texts="introTexts" :saving="!isDataSaved" v-if="state === STATES.finished" )
@@ -65,7 +66,8 @@
 
         errorText: null,
         keys: null,
-        answers: null,
+        questionnaire: null,
+        longGazedWords: [],
 
         STATES,
       };
@@ -131,6 +133,7 @@
       startPageClosed( e ) {
         if (e.finished) {
           if (this.task.questionnaire && this.task.questionnaire.length) {
+            this.longGazedWords = e.longGazedWords;
             this.state = STATES.questionnaire;
           }
           else {
@@ -157,7 +160,7 @@
       },
 
       questionnaireDone( e ) {
-        this.answers = e.questions.map( question => question.answer );
+        this.questionnaire = e.questionnaire;
         this.state = STATES.finished;
 
         this.taskDone();
@@ -168,8 +171,8 @@
           return;
         }
 
-        if (this.answers) {
-          this.student.addAnswers( this.keys.data, this.answers, err => {
+        if (this.questionnaire) {
+          this.student.addQuestionnaire( this.keys.data, this.questionnaire, err => {
             if (err) {
               console.log( 'TODO questionnaire done', e.err );
             }

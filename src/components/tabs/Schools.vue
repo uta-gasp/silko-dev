@@ -29,9 +29,9 @@
               th Students
           tbody
             tr(v-for="item in schools")
-              td {{item.name}}
-              td {{item.teachers.length}}
-              td {{item.students.length}}
+              td {{ item.name }}
+              td {{ item.teachers | count }}
+              td {{ item.students | count }}
 </template>
 
 <script>
@@ -140,6 +140,16 @@
             this.showCreationSuccess = Math.random();
           }
         });
+      }
+    },
+
+    filters: {
+      count( obj ) {
+        let result = 0;
+        for (let key in obj) {
+          result++;
+        }
+        return result;
       }
     },
 

@@ -118,7 +118,8 @@
         this.toEdit = task;
       },
 
-      save( task, e ) {
+      save( e ) {
+        const task = e;
         if (this.toEdit) {
           this.toEdit.update( task, err => {
             this.$emit( 'saved', { err } );

@@ -47,7 +47,7 @@
 
         syllabMode: this.task ? this.task.syllab.mode : Task.defaultSyllab.mode,
         syllabTemporary: this.task ? this.task.syllab.temporary : Task.defaultSyllab.temporary,
-        syllabAdjustForWordLength: this.task ? this.task.syllab.adjustForWordLength : Task.defaultSyllab.adjustForWordLength,
+        syllabAdjustForWordLength: this.task ? this.task.syllab.threshold.adjustForWordLength : Task.defaultSyllab.threshold.adjustForWordLength,
 
         syllabModes: Object.keys( Syllabifier.MODES ),
       };
@@ -70,7 +70,7 @@
 
         result.syllab.mode = this.syllabMode;
         result.syllab.temporary = this.syllabTemporary;
-        result.syllab.adjustForWordLength = this.syllabAdjustForWordLength;
+        result.syllab.threshold.adjustForWordLength = this.syllabAdjustForWordLength;
 
         return result;
       }

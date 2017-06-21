@@ -11,8 +11,8 @@ export default class School {
         this.id = id;
         this.name = name;   // ""
         this.email = email; // ""
-        this.teachers = []; // array o fids of Teacher
-        this.students = []; // array of ids of Student
+        this.teachers = {}; // list of { id: name } of Teacher
+        this.students = {}; // list of { id: name } of Student
     }
 
     static get db() {
@@ -40,13 +40,16 @@ export default class School {
             name: name,
             email: email,
             school: this.id,
-            intros: [],
-            classes: []
+            intros: {},
+            classes: {}
         }, (err, id) => {
             if (!err) {
-                this.teachers.push( id );
+                this.teachers[ id ] = name;
 
-                db.updateField( this, 'teachers', this.teachers, errUpdate => {
+                db.updateField( this, `teachers/${id}`, name, errUpdate => {
+                    if (errUpdate) {
+                        delete this.teachers[ id ];
+                    }
                     err = errUpdate;
                 });
             }
@@ -65,6 +68,31 @@ export default class School {
         });
     }
 
+    createStudent( name, email, grade, cb ) {
+        db.add( Student, {
+            name: name,
+            email: email,
+            grade: grade,
+            school: this.id,
+            classes: {},
+            sessions: {},
+            assignments: {}
+        }, (err, id) => {
+            if (!err) {
+                this.students[ id ] = name;
+
+                db.updateField( this, `students/${id}`, name, errUpdate => {
+                    if (errUpdate) {
+                        delete this.students[ id ];
+                    }
+                    err = errUpdate;
+                });
+            }
+
+            cb( err, id );
+        });
+    }
+
     getStudents( cb ) {
         return db.getFromIDs( Student, this.students, (err, students) => {
             if (err) {
@@ -72,42 +100,6 @@ export default class School {
             }
 
             cb( undefined, students );
-        });
-    }
-
-    getClasses( cb ) {
-        const classes = [];
-        return this.getTeachers( (err, teachers) => {
-            if (err) {
-                return cb( err );
-            }
-
-            teachers.forEach( teacher => {
-                classes.push( ...teacher.classes );
-            });
-        }).then( values => {
-            return db.getFromIDs( Class, classes, cb);
-        });
-    }
-
-    createStudent( name, email, grade, cb ) {
-        db.add( Student, {
-            name: name,
-            email: email,
-            grade: grade,
-            school: this.id,
-            classes: [],
-            sessions: [],
-        }, (err, id) => {
-            if (!err) {
-                this.students.push( id );
-
-                db.updateField( this, 'students', this.students, errUpdate => {
-                    err = errUpdate;
-                });
-            }
-
-            cb( err, id );
         });
     }
 

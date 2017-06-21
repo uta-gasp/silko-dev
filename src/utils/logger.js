@@ -1,4 +1,4 @@
-let enabled = !!window['webpackHotUpdate'];
+const enabled = !!window['webpackHotUpdate'];
 
 function random( max, step = 1, min = 0) {
     min = Math.ceil( min );

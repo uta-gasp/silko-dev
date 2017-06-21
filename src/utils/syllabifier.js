@@ -38,11 +38,7 @@ export default class Syllabifier {
     }
 
     get setup() {
-        return new SyllabificationFeedback(
-            !!this.rule,
-            this.options.threshold.value,
-            this.hyphen
-        );
+        return new SyllabificationFeedback( { ...this.options, hyphen: this.hyphen, enabled: !!this.rule } );
     }
 
     prepare( text ) {

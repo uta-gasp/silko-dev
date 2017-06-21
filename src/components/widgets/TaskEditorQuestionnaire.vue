@@ -47,7 +47,6 @@
 </template>
 
 <script>
-
   import Question from '@/model/session/question.js';
 
   export default {
@@ -65,10 +64,7 @@
 
         questions: this.task ? Array.from( this.task.questionnaire ) : [],
 
-        types: {
-          text: { name: 'text', text: 'whole text' },
-          word: { name: 'word', text: 'long-gazed word' },
-        },
+        types: Question.types,
       };
     },
 

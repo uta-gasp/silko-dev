@@ -16,10 +16,7 @@ export default class Speaker {
     }
 
     get setup() {
-        return new SpeechFeedback(
-            !!this.voice,
-            this.options.threshold.value
-        );
+        return new SpeechFeedback({ ...this.options, enabled: !!this.voice } );
     }
 
     // @wordFocus - WordFocus

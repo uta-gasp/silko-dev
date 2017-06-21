@@ -5,11 +5,12 @@ import Intro from './intro.js';
 import db from '@/db/db.js';
 
 class Threshold {
-    constructor( value, smart, min, max ) {
+    constructor( value, smart, min, max, adjustForWordLength ) {
         this.value = value;
         this.smart = smart;
         this.min = min;
         this.max = max;
+        this.adjustForWordLength = adjustForWordLength;
     }
 };
 
@@ -45,15 +46,14 @@ export default class Task {
             exceptions: {},
             mode: 'colors',
             temporary: false,
-            adjustForWordLength: false,
-            threshold: new Threshold( 3000, false, 1500, 3000 )
+            threshold: new Threshold( 3000, false, 1500, 3000, false )
         };
     }
 
     static get defaultSpeech() {
         return {
             language: '',
-            threshold: new Threshold( 4000, false, 3000, 4000 )
+            threshold: new Threshold( 4000, false, 3000, 4000, false )
         };
     }
 

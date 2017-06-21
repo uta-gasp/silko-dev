@@ -62,11 +62,7 @@
       },
 
       finish( e ) {
-        this.$emit( 'finished' );
-// return setTimeout( () => {
-//   this.$emit( 'saved', { err: null, keys: { data: 'data-key', session: 'session-key' } } );
-// }, 500);
-
+        this.$emit( 'finished', { longGazedWords: this.collector.longGazedWords } );
         this.collector.stop( (err, keys) => {
           this.$emit( 'saved', { err, keys } );
         });

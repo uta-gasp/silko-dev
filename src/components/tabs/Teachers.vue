@@ -73,7 +73,6 @@
 
         schools: [],
         teachers: [],
-        classes: [],
       };
     },
 
@@ -120,14 +119,12 @@
       init() {
         if (Admin.isLogged) {
           this.loadSchools().then( () => {
-            return this.loadTeachers();
+            this.loadTeachers();
           });
         }
         else if (School.isLogged) {
           this.school = School.instance;
-          this.loadSchoolClasses().then( () => {
-            return this.loadTeachers();
-          });
+          this.loadTeachers();
         }
       },
 
@@ -143,16 +140,6 @@
         });
       },
 
-      loadSchoolClasses() {
-        return this.school.getClasses( (err, classes) => {
-          if (err) {
-            return `Cannot retrieve classes.\n\n${err}`;
-          }
-
-          this.classes = classes;
-        });
-      },
-
       loadTeachers() {
         const onDone = (err, teachers) => {
           if (err) {
@@ -160,7 +147,12 @@
           }
 
           this.teachers = teachers.sort( (a, b) => {
-            return a.name.toLowerCase() < b.name.toLowerCase();
+            if (a.school !== b.school) {
+              return a.school > b.school;
+            }
+            else {
+              return a.name.toLowerCase() > b.name.toLowerCase();
+            }
           });
         };
 
@@ -218,7 +210,6 @@
         };
 
         if (this.school) {
-          // return console.log( 'school', this.school.name, 'creates teacher:',  this.newName.trim(), this.newEmail.trim() );
           this.school.createTeacher( this.newName.trim(), this.newEmail.trim(), onFinished );
         }
         else {  // admin
@@ -227,7 +218,6 @@
               return onFinished( err );
             }
 
-            //return console.log( 'admind creates teacher:',  this.newName.trim(), this.newEmail.trim(), 'for school', school.name );
             school.createTeacher( this.newName.trim(), this.newEmail.trim(), onFinished );
           });
         }
@@ -238,10 +228,11 @@
       },
 
       getListOfTeacherClasses( teacher ) {
-        return teacher
-          .getListOfClasses( this.classes )
-          .map( cls => cls.name )
-          .join( ', ' );
+        const classes = [];
+        for (let id in teacher.classes) {
+          classes.push( teacher.classes[ id ] );
+        }
+        return classes.join( ', ' );
       }
     },
 

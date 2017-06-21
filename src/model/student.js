@@ -12,8 +12,8 @@ export default class Student {
         this.name = name;
         this.school = school;
         this.grade = grade;
-        this.classes = [];
-        this.sessions = [];
+        this.classes = {};
+        this.sessions = {};
         this.assignments = {};
     }
 
@@ -33,21 +33,21 @@ export default class Student {
         return db.getAll( Student, cb );
     }
 
-    addClass( cls, cb ) {
-        this.classes.push( cls );
-        return db.updateField( this, 'classes', this.classes, cb );
+    addClass( id, name, cb ) {
+        this.classes[ id ] = name;
+        return db.updateField( this, `classes/${id}`, name, cb );
     }
 
-    removeClass( cls, cb ) {
-        this.classes = this.classes.filter( item => item !== cls );
+    removeClass( id, cb ) {
+        delete this.classes[ id ];
 
-        this.setAssignment( cls, null, err => {
+        this.setAssignment( id, null, err => {
             if (err) {
                 return console.log( err );
             }
         });
 
-        return db.updateField( this, 'classes', this.classes, cb );
+        return db.deleteField( this, `classes/${id}`, cb );
     }
 
     setAssignment( cls, task, cb ) {
@@ -108,23 +108,20 @@ export default class Student {
         return db.get( Task, task, cb );
     }
 
-    getListOfClasses( classes ) {
-        return classes.filter( cls => this.classes.includes( cls.id ) );
-    }
-
     taskDone( task, session, cb ) {
-        this.sessions.push( session );
-        db.updateField( this, 'sessions', this.sessions, err => {
+        this.sessions[ session ] = task;
+        db.updateField( this, `sessions/${session}`, task, err => {
             if (err) {
                 return cb( err );
             }
 
-            this.setAssignment( task, null, cb );
+            // TODO enable this in production
+            // this.setAssignment( task, null, cb );
         });
     }
 
-    addAnswers( dataKey, answers, cb ) {
-        db.update( `/${Data.db}/${dataKey}/answers`, answers, err => {
+    addQuestionnaire( dataKey, questionnaire, cb ) {
+        db.update( `/${Data.db}/${dataKey}/questionnaire`, questionnaire, err => {
             if (err) {
                 return cb( err );
             }

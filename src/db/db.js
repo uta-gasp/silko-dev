@@ -6,19 +6,32 @@ const config = require( `@/config/db.${process.env.NODE_ENV}.js` ).config;
 
 class DB {
     // Constructor
-    // @param debug - if true, the the test databse is used
-    constructor( debug ) {
+    constructor() {
         if (!window['firebase']) {
             return window.alert( 'Cannot access Firebase' );
-        };
+        }
 
-        firebase.initializeApp( config );
+        if (!firebase.apps.length) {
+            this._init( firebase.initializeApp( config ) );
+        }
+        else {
+            firebase.apps[0].delete().then( () => {
+                this._init( firebase.initializeApp( config ) );
+            }).catch( err => {
+                console.log( 'DB APP', err );
+            });
+        }
+    }
 
-        this.fb = firebase.database().ref();
+    _init( app ) {
+        this.fb = firebase.database( app ).ref();
+
         this.auth = firebase.auth();
         this._user = null;
         this.ignoreUserSwitch = false;
         this.currentPassword = '';
+
+        // this.r = (new Date()).toString().match(/\s(\d+:\d+:\d+)\s/)[1];
 
         this.auth.onAuthStateChanged( this._onUserChanged.bind( this ) );
     }
@@ -69,11 +82,13 @@ class DB {
             // 2. Send password reset email
             // 3. log in back to the current user
             this.ignoreUserSwitch = true;
-            this.auth.createUserWithEmailAndPassword( obj.email, 'aaa111' ).then( user => {
+            this.auth.createUserWithEmailAndPassword( obj.email, 'gdfvgdfv' ).then( user => {
                 //user.sendEmailVerification();
 
                 setTimeout( () => {
-                    this.auth.sendPasswordResetEmail( obj.email );
+                    if (obj.email.indexOf( '@fake.') < 0) {    // TODO: remove this
+                        this.auth.sendPasswordResetEmail( obj.email );
+                    }
                 } , 1000 );
 
                 const ref = this.fb.child( cls.db ).push( obj );
@@ -182,7 +197,7 @@ class DB {
         const promises = [];
         const errors = [];
 
-        ids.forEach( id => {
+        this._toArray( ids ).forEach( id => {
             const ref = this.fb.child( `${cls.db}/${id}` );
             promises.push( ref.once( 'value', snapshot => {
                 if (!snapshot.exists()) {
@@ -248,7 +263,8 @@ class DB {
 
     deleteItems( cls, ids ) {
         const promises = [];
-        ids.forEach( id => {
+
+        this._toArray( ids ).forEach( id => {
             const ref = this.fb.child( `${cls.db}/${id}` );
             promises.push( ref.remove() );
         });
@@ -273,7 +289,10 @@ class DB {
                 this.ignoreUserSwitch = false;
                 return setTimeout( () => {
                     this.auth.signInWithEmailAndPassword( this.user.email, this.currentPassword ).catch( err => {
-                        this.logout();
+                        if (err) {
+                            console.dir( 'TODO handle error', err );
+                        }
+                        this.logOut();
                     });
                 }, 100);
             }
@@ -294,25 +313,35 @@ class DB {
                     eventBus.$emit( 'login' );
                 });
             });
-        } else {
+        } else if (this._user) {
             this._user = null;
             eventBus.$emit( 'logout' );
         }
     }
+
+    _toArray( obj ) {
+        let result;
+        if (obj instanceof Array) {
+            result = obj;
+        }
+        else if (typeof obj === 'object') {
+            result = [];
+            for (let key in obj) {
+                result.push( key );
+            }
+        }
+        else if (typeof obj === 'boolean'
+              || typeof obj === 'number'
+              || typeof obj === 'string') {
+            result = [ obj ];
+        }
+        else {
+            result = [];
+        }
+
+        return result;
+    }
 }
-/* Mock-up of a DB snapshot
-class Snapshot {
-    constructor( cls ) {
-        this._key = 'asdfafadfdsf';
-        this._value = new cls( this._key );
-    }
-    val() {
-        return this._value;
-    }
-    get key() {
-        return this._key;
-    }
-}*/
 
 const db = new DB();
 export default db;

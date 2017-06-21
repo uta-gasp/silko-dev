@@ -15,8 +15,8 @@ export default class Admin {
         db.add( School, {
             name: name,
             email: email,
-            teachers: [],
-            students: []
+            teachers: {},
+            students: {}
         }, (err, id) => {
             cb( err, id );
         });
@@ -36,21 +36,22 @@ export default class Admin {
 
         db.updateField( user, 'school', newSchoolID, err => {
             if (err) {
+                user.school = prevSchoolID;
                 return console.log( err ); // TODO handle error
             }
 
             const prevSchool = schools.find( school => school.id === prevSchoolID );
             const newSchool = schools.find( school => school.id === newSchoolID );
 
-            prevSchool[ list ] = prevSchool[ list ].filter( id => id !== user.id );
-            newSchool[ list ].push( user.id );
+            delete prevSchool[ list ][ user.id ];
+            newSchool[ list ][ user.id ] = user.name;
 
-            db.updateField( newSchool, list, newSchool[ list ], err => {
+            db.updateField( newSchool, `${list}/${user.id}`, user.name, err => {
                 if (err) {
                     return console.log( err ); // TODO handle error
                 }
 
-                db.updateField( prevSchool, list, prevSchool[ list ], err => {
+                db.deleteField( prevSchool, `${list}/${user.id}`, err => {
                     if (err) {
                         return console.log( err ); // TODO handle error
                     }

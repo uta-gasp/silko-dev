@@ -10,8 +10,8 @@ export default class Class {
         this.id = id;
         this.name = name;
         this.owner = owner;
-        this.tasks = [];
-        this.students = [];     // arrays of ids of Student
+        this.tasks = {};
+        this.students = {};     // arrays of ids of Student
     }
 
     static get db() {
@@ -25,20 +25,21 @@ export default class Class {
             name: task.name,
             owner: this.owner,
             cls: this.id,
-            type: 'text',
+            type: type,
             intro: task.intro,
             pages: Task.textToPages( task.text ),
             syllab: task.syllab,
-            speech: task.speech
+            speech: task.speech,
+            questionnaire: task.questionnaire
         }, (err, id) => {
             if (err) {
                 return cb( err );
             }
 
-            this.tasks.push( id );
-            db.updateField( this, 'tasks', this.tasks, err => {
+            this.tasks[ id ] = task.name;
+            db.updateField( this, `tasks/${id}`, task.name, err => {
                 if (err) {
-                    this.tasks.pop();
+                    delete this.tasks[ id ];
                 }
 
                 cb( err, id );
@@ -51,9 +52,8 @@ export default class Class {
     }
 
     deleteTask( task, cb ) {
-        this.tasks = this.tasks.filter( item => item !== task.id );
-
-        db.updateField( this, 'tasks', this.tasks, cb );
+        delete this.tasks[ task.id ];
+        db.deleteField( this, `tasks/${task.id}`, cb );
 
         db.getFromIDs( Student, this.students, (err, students) => {
             if (err) {
@@ -61,12 +61,6 @@ export default class Class {
             }
 
             students.forEach( student => {
-                // student.removeClass( this.id, err => {
-                //     if (err) {
-                //         return console.log( err );
-                //     }
-                // });
-
                 if (student.assignments[ this.id ] === task.id) {
                     student.setAssignment( this.id, null, err => {
                         if (err) {
@@ -86,19 +80,20 @@ export default class Class {
         db.getFromIDs( Student, this.students, cb );
     }
 
-    addStudents( ids, cb ) {
-        const newStudents = this.students.concat( ids );
-        db.updateField( this, 'students', newStudents, err => {
-            if (!err) {
-                this.students = newStudents;
+    addStudents( newStudents, cb ) {
+        const joinedStudents = { ...this.students, ...newStudents };
 
-                db.getFromIDs( Student, ids, (err, students) => {
+        db.updateField( this, 'students', joinedStudents, err => {
+            if (!err) {
+                this.students = joinedStudents;
+
+                db.getFromIDs( Student, newStudents, (err, students) => {
                     if (err) {
                         return console.log( err );
                     }
 
                     students.forEach( student => {
-                        student.addClass( this.id, err => {
+                        student.addClass( this.id, this.name, err => {
                             if (err) {
                                 return console.log( err );
                             }
@@ -112,9 +107,8 @@ export default class Class {
     }
 
     removeStudent( student, cb ) {
-        this.students = this.students.filter( item => item !== student.id );
-
-        db.updateField( this, 'students', this.students, cb );
+        delete this.students[ student.id ];
+        db.deleteField( this, `students/${student.id}`, cb );
 
         db.get( Student, student.id, (err, _student) => {
             if (err) {

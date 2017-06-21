@@ -10,6 +10,7 @@
 </template>
 
 <script>
+  import Question from '@/model/session/question.js';
 
   export default {
     name: 'questionnaire-page',
@@ -17,7 +18,9 @@
     data() {
       return {
         questionIndex: 0,
-        questions: this.questionnaire.map( question => Object.assign( { answer: null }, question ) )
+        questions: this.questionnaire.
+            map( question => Object.assign( { answer: null }, question ) ).
+            filter( question => question.type === Question.types.text.name || this.longGazedWords.includes( question.word ) )
       };
     },
 
@@ -25,6 +28,10 @@
       questionnaire: {
         type: Array,
         required: true,
+        default: () => []
+      },
+      longGazedWords: {
+        type: Array,
         default: () => []
       }
     },
@@ -41,7 +48,7 @@
         this.question.answer = answer;
 
         if (this.questionIndex === this.questions.length - 1) {
-          return this.$emit( 'finished', { questions: this.questions } );
+          return this.$emit( 'finished', { questionnaire: this.questions } );
         }
 
         this.questionIndex++;

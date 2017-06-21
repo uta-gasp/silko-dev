@@ -14,8 +14,8 @@ export default class Teacher {
         this.name = name;       // ""
         this.email = email;     // ""
         this.school = school;   // id
-        this.intros = [];       // array of ids of Intro
-        this.classes = [];      // array of ids of Class
+        this.intros = {};       // array of ids of Intro
+        this.classes = {};      // array of ids of Class
     }
 
     static get db() {
@@ -44,8 +44,8 @@ export default class Teacher {
             email: email,
             grade: grade,
             school: this.school,
-            classes: [],
-            sessions: [],
+            classes: {},
+            sessions: {},
             assignments: {}
         }, (err, id) => {
             if (err) {
@@ -57,9 +57,9 @@ export default class Teacher {
                     return cb( err );
                 }
 
-                school.students.push( id );
+                school.students[ id ] = name;
 
-                db.updateField( school, 'students', school.students, errUpdate => {
+                db.updateField( school, `students/${id}`, name, errUpdate => {
                     err = errUpdate;
                 });
 
@@ -89,10 +89,10 @@ export default class Teacher {
                 return cb( err );
             }
 
-            this.intros.push( id );
-            db.updateField( this, 'intros', this.intros, err => {
+            this.intros[ id ] = name;
+            db.updateField( this, `intros/${id}`, name, err => {
                 if (err) {
-                    this.intros.pop();
+                    delete this.intros[ id ];
                 }
 
                 cb( err );
@@ -105,9 +105,9 @@ export default class Teacher {
     }
 
     deleteIntro( intro, cb ) {
-        this.intros = this.intros.filter( item => item !== intro.id );
+        delete this.intros[ intro.id ];
 
-        db.updateField( this, 'intros', this.intros, cb );
+        db.deleteField( this, `intros/${intro.id}`, cb );
 
         db.getFromIDs( Class, this.classes, (err, classes) => {
             if (err) {
@@ -143,17 +143,17 @@ export default class Teacher {
         db.add( Class, {
             name: name,
             owner: this.id,
-            tasks: [],
-            students: []
+            tasks: {},
+            students: {}
         }, (err, id) => {
             if (err) {
                 return cb( err );
             }
 
-            this.classes.push( id );
-            db.updateField( this, 'classes', this.classes, err => {
+            this.classes[ id ] = name;
+            db.updateField( this, `classes/${id}`, name, err => {
                 if (err) {
-                    this.classes.pop();
+                    delete this.classes[ id ];
                 }
 
                 cb( err );
@@ -166,9 +166,8 @@ export default class Teacher {
     }
 
     deleteClass( cls, cb ) {
-        this.classes = this.classes.filter( item => item !== cls.id );
-
-        db.updateField( this, 'classes', this.classes, cb );
+        delete this.classes[ cls.id ];
+        db.deleteField( this, `classes/${cls.id}`, cb );
 
         db.deleteItems( Task, cls.tasks );
 
@@ -189,10 +188,6 @@ export default class Teacher {
         db.delete( cls, err => {
             // ignore the error
         });
-    }
-
-    getListOfClasses( classes ) {
-        return classes.filter( cls => this.classes.includes( cls.id ) );
     }
 }
 

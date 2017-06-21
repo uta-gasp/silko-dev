@@ -84,7 +84,6 @@
         default: 'Create'
       },
       task: {
-        type: Object,
         required: true,
         default: () => { return {}; }
       },
