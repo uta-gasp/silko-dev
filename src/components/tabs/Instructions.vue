@@ -1,5 +1,5 @@
 <template lang="pug">
-  #intros
+  #instructions
     modal-notification(type="danger" :show="showCreationError")
       span Failed to create an instruction: {{ creationError }}.
     modal-notification(type="success" :show="showCreationSuccess")
@@ -58,7 +58,7 @@
   import RemoveWarning from '@/components/widgets/RemoveWarning';
 
   export default {
-    name: 'introductions',
+    name: 'instructions',
 
     components: {
       'modal-notification': ModalNotification,
@@ -130,7 +130,7 @@
         });
 
         if (exists) {
-          this.setCreationError( 'An introduction of this name exists already' );
+          this.setCreationError( 'An instructions of this name exists already' );
         }
         else {
           this.createIntro( e );
@@ -186,7 +186,7 @@
     },
 
     created() {
-      console.log('Introductions component created');
+      console.log('Instructions component created');
       eventBus.$on( 'logout', () => {
         this.checkAccess();
       });

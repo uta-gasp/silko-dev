@@ -14,11 +14,11 @@ class DB {
         if (!firebase.apps.length) {
             this._init( firebase.initializeApp( config ) );
         }
-        else {
+        else {  // In HOT-RELOAD db objects still sits in memory, therefore the default database must be released
             firebase.apps[0].delete().then( () => {
                 this._init( firebase.initializeApp( config ) );
             }).catch( err => {
-                console.log( 'DB APP', err );
+                console.log( 'DB', err );
             });
         }
     }

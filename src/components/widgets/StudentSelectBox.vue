@@ -8,7 +8,8 @@
       .has-text-centered(v-if="!isGradeSelected()")
         i Select a grade
       div(v-for="grade in grades" v-if="isGradeSelected( grade )")
-        .card.student(:class="{ 'is-selected' : student.selected }"
+        .card.student(
+          :class="{ 'is-selected' : student.selected }"
           v-if="hasStudents( grade )"
           v-for="student in grade.students")
           .card-content.title.is-6(@click="selectStudent( student )") {{ student.ref.name }}
@@ -99,8 +100,8 @@
 
 <style lang="less" scoped>
   .students {
-    min-height: 50vh;
-    max-height: 90vh;
+    min-height: 20em;
+    max-height: 26em;
     margin-bottom: 1em;
     overflow-y: auto;
   }

@@ -1,7 +1,7 @@
 <template lang="pug">
   .nav.has-shadow(v-show="!isAssignment")
     .nav-left
-      router-link.nav-item.is-brand(to="/")
+      router-link.nav-item(to="/")
         h2.logo Silko
         //- img(src="../assets/icon-32.png")
       router-link.nav-item.is-tab(to="/schools" v-if="isAdmin")
@@ -13,7 +13,7 @@
       router-link.nav-item.is-tab(to="/students" v-if="isAdmin || isSchool || isTeacher")
         i.fa.fa-child
         span Students
-      router-link.nav-item.is-tab(to="/intros" v-if="isTeacher")
+      router-link.nav-item.is-tab(to="/instructions" v-if="isTeacher")
         i.fa.fa-info
         span Instructions
       router-link.nav-item.is-tab(to="/classes" v-if="isTeacher")
@@ -24,8 +24,8 @@
         span Assignments
     .nav-right(v-if="user")
       .user-block.is-small
-        span.user {{user.name}}
-        span.user {{user.ref.name}}
+        span.user {{ user.name }}
+        span.user {{ user.ref.name }}
       span.nav-item
         a.button(v-on:click="logOut()") Logout
 </template>
@@ -85,8 +85,8 @@
 </script>
 
 <style lang="less" scoped>
-  .nav-item > * {
-    margin: 4px;
+  .nav-item > i {
+    margin-right: 8px;
   }
 
   .user-block {
