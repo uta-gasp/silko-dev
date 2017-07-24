@@ -1,6 +1,6 @@
 import UserCreator from './user-creator.js';
 
-import eventBus  from '@/utils/event-bus.js';
+import eventBus from '@/utils/event-bus.js';
 
 const config = require( `@/config/db.${process.env.NODE_ENV}.js` ).config;
 

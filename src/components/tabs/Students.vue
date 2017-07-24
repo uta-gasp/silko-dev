@@ -48,7 +48,8 @@
 </template>
 
 <script>
-  import eventBus  from '@/utils/event-bus.js';
+  import eventBus from '@/utils/event-bus.js';
+  import dataUtils from '@/utils/data-utils.js';
 
   import Admin from '@/model/admin.js';
   import School from '@/model/school.js';
@@ -152,9 +153,7 @@
             return `Cannot retrieve schools.\n\n${err}`;
           }
 
-          this.schools = schools.sort( (a, b) => {
-            return a.name.toLowerCase() > b.name.toLowerCase();
-          });
+          this.schools = schools.sort( dataUtils.byName );
         });
       },
 

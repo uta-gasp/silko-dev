@@ -1,7 +1,7 @@
 {
   "name": "eyeschool",
   "version": "0.0.1",
-  "description": "Reading Aid for schools",
+  "description": "Reading aid for schools",
   "author": "oleg.spakov <oleg.spakov@uta.fi>",
   "private": false,
   "scripts": {

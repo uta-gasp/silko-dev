@@ -48,7 +48,8 @@
 </template>
 
 <script>
-  import eventBus  from '@/utils/event-bus.js';
+  import eventBus from '@/utils/event-bus.js';
+  import dataUtils from '@/utils/data-utils.js';
 
   import Teacher from '@/model/teacher.js';
 
@@ -107,9 +108,7 @@
             return `TODO Cannot retrieve intros.\n\n${err}`;
           }
 
-          this.intros = intros.sort( (a, b) => {
-            return a.name.toLowerCase() > b.name.toLowerCase();
-          });
+          this.intros = intros.sort( dataUtils.byName );
         });
       },
 

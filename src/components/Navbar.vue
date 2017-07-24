@@ -19,6 +19,9 @@
       router-link.nav-item.is-tab(to="/classes" v-if="isTeacher")
         i.fa.fa-database
         span Classes
+      router-link.nav-item.is-tab(to="/results" v-if="isTeacher")
+        i.fa.fa-pie-chart
+        span Results
       router-link.nav-item.is-tab(to="/assignments" v-if="isStudent")
         i.fa.fa-tasks
         span Assignments

@@ -23,7 +23,7 @@
           thead
             tr
               th Name
-              th Texts
+              th Tasks
               th Students
               th.is-narrow
           tbody
@@ -42,7 +42,8 @@
 </template>
 
 <script>
-  import eventBus  from '@/utils/event-bus.js';
+  import eventBus from '@/utils/event-bus.js';
+  import dataUtils from '@/utils/data-utils.js';
 
   import Teacher from '@/model/teacher.js';
 
@@ -112,9 +113,7 @@
             return `Cannot retrieve classes.\n\n${err}`;
           }
 
-          this.classes = classes.sort( (a, b) => {
-            return a.name.toLowerCase() > b.name.toLowerCase();
-          });
+          this.classes = classes.sort( dataUtils.byName );
         });
       },
 
@@ -124,9 +123,7 @@
             return `Cannot retrieve intros.\n\n${err}`;
           }
 
-          this.intros = intros.sort( (a, b) => {
-            return a.name.toLowerCase() > b.name.toLowerCase();
-          });
+          this.intros = intros.sort( dataUtils.byName );
         });
       },
 

@@ -27,6 +27,8 @@
 </template>
 
 <script>
+  import dataUtils from '@/utils/data-utils.js';
+
   import stringification from '@/components/mixins/stringification.js';
 
   import ModalEditorContainer from '@/components/widgets/ModalEditorContainer';
@@ -104,9 +106,7 @@
             return `Cannot retrieve tasks.\n\n${err}`;
           }
 
-          this.tasks = tasks.sort( (a, b) => {
-            return a.name.toLowerCase() > b.name.toLowerCase();
-          });
+          this.tasks = tasks.sort( dataUtils.byName );
         });
       },
 

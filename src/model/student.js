@@ -2,6 +2,7 @@ import Recordable from './commons/recordable.js';
 
 import Class from './class.js';
 import Task from './task.js';
+import Session from './session.js';
 import Data from './data.js';
 
 import db from '@/db/db.js';
@@ -128,6 +129,14 @@ export default class Student {
 
             cb();
         });
+    }
+
+    getSessions( cb ) {
+        db.getFromIDs( Session, this.sessions, cb );
+    }
+
+    getData( ids, cb ) {
+        db.getFromIDs( Data, ids, cb );
     }
 }
 
