@@ -10,7 +10,7 @@
 
     div.fullscreen(ref="fullscreen")
       task-page(
-        v-show="isRunning"
+        v-if="isRunning"
         :texts="texts"
         :task="task"
         :student="student"

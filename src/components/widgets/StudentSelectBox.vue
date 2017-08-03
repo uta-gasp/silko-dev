@@ -1,6 +1,6 @@
 <template lang="pug">
   #student-select-box
-    div.tabs.is-centered.is-boxed
+    div.tabs.is-centered.is-boxed(v-if="grades.length > 1")
       ul.ul
         li(:class="{ 'is-active': isGradeSelected( grade ) }" v-for="grade in grades" :key="grade")
           a(@click="selectGrade( grade )") {{ grade.name }}
@@ -12,7 +12,7 @@
           :class="{ 'is-selected' : student.selected }"
           v-if="hasStudents( grade )"
           v-for="student in grade.students")
-          .card-content.title.is-6(@click="selectStudent( student )") {{ student.ref.name }}
+          .card-content.title.is-6(@click="selectStudent( student, $event )") {{ student.ref.name }}
         .has-text-centered(v-if="!hasStudents( grade )")
           i No available students
     .field
@@ -20,7 +20,7 @@
         .level
           .level-left
             .level-item
-              button.button.is-primary(@click="accept") Save
+              button.button.is-primary(@click="accept") Select
             .level-item
           .level-right
             .level-item
@@ -40,10 +40,10 @@
     },
 
     props: {
-      grades: {
+      grades: {     // [{ name, students: [{ ref=Student, selected=Boolean }] }]
         type: Array,
         default: []
-      }
+      },
     },
 
     methods: {
@@ -65,8 +65,26 @@
         return grade && grade.students ? !!grade.students.length : false;
       },
 
+      selectMultipleStudents( student, event ) {
+        if (event.shiftKey) {
+          const index = this.currentGrade.students.indexOf( student );
+          for (let i = index - 1; i >= 0; i--) {
+            const student = this.currentGrade.students[i];
+            if (student.selected) {
+              break;
+            }
+
+            student.selected = true;
+          }
+        }
+      },
+
       selectStudent( student, e ) {
         student.selected = !student.selected;
+
+        if (student.selected) {
+          this.selectMultipleStudents( student, e );
+        }
       },
 
       selectAllStudents( e ) {
@@ -94,6 +112,12 @@
 
         this.$emit( 'accept', { students: selected } );
       }
+    },
+
+    mounted() {
+      if (this.grades.length === 1) {
+        this.selectGrade( this.grades[0] );
+      }
     }
   };
 </script>
@@ -112,6 +136,7 @@
 
   .student {
     cursor: cell;
+    user-select: none;
   }
 
   .is-selected {

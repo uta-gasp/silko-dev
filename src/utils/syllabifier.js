@@ -33,6 +33,19 @@ export default class Syllabifier {
         };
     }
 
+    static getPrefixAndSuffix( word, hyphen ) {
+        const chars = Array.from( word );
+        const prefix = [];
+        const postfix = [];
+
+        let i = 0;
+        while (i < chars.length && chars[i++] === hyphen) { prefix.push( hyphen ); }
+        i = chars.length - 1;
+        while (i >= 0 && chars[i--] === hyphen) { postfix.push( hyphen ); }
+
+        return [ prefix.join(''), postfix.join('') ];
+    }
+
     get enabled() {
         return !!this.rule;
     }
@@ -54,7 +67,7 @@ export default class Syllabifier {
                 return word;
             }
 
-            const syllabifiedWord = this._syllabifyWord( word, this.hyphen );
+            const syllabifiedWord = this.syllabifyWord( word, this.hyphen );
             const hyphenCount = syllabifiedWord.length - word.length;
             const halfHyphenCount = Math.round( hyphenCount / 2 );
 
@@ -106,7 +119,7 @@ export default class Syllabifier {
 
         wordFocus.syllabified = true;
 
-        el.innerHTML = this._syllabifyWord( wordFocus.word, this.hyphenHtml );
+        el.innerHTML = this.syllabifyWord( wordFocus.word, this.hyphenHtml );
 
         if (this.options.temporary) {
             setTimeout( () => {
@@ -117,12 +130,12 @@ export default class Syllabifier {
         return true;
     }
 
-    syllabifyWord( el, word ) {
+    syllabifyingWord( el, word ) {
         if (!this.rule) {
             return false;
         }
 
-        el.innerHTML = this._syllabifyWord( word, this.hyphenHtml );
+        el.innerHTML = this.syllabifyWord( word, this.hyphenHtml );
 
         return true;
     }
@@ -139,7 +152,7 @@ export default class Syllabifier {
         ));
     }
 
-    _syllabifyWord( word, hyphen ) {
+    syllabifyWord( word, hyphen ) {
         logger.info( 'syllabifying', word );
 
         if (this.options.mode === 'colors') {

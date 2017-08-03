@@ -28,7 +28,7 @@
     methods: {
 
       close( e ) {
-        this.$emit( 'close' );
+        this.$emit( 'close', { cancelled: true } );
       }
 
     }

@@ -135,7 +135,7 @@ export default class Student {
         db.getFromIDs( Session, this.sessions, cb );
     }
 
-    getData( ids, cb ) {
+    static getData( ids, cb ) {
         db.getFromIDs( Data, ids, cb );
     }
 }
