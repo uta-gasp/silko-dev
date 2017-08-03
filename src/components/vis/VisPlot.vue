@@ -5,6 +5,7 @@
     control-panel(
       :feedback="feedback"
       :text-length="textLength"
+      :initial-page-index="initialPageIndex"
       :options="options"
       :show-player="data.name.indexOf('Replay') >= 0"
       :is-player-paused="isPlayerPaused"
@@ -20,10 +21,6 @@
 </template>
 
 <script>
-  // to be implemented by descendants:
-  // - changePage
-  // - redraw
-
   import OptionsCreator from '@/vis/optionsCreator.js';
   import sgwmController from '@/vis/sgwmController.js';
 
@@ -33,10 +30,15 @@
   const COMMON_UI = {
     wordColor: '#666',
     wordHighlightColor: '#606',
-    wordRectColor: '#f00',
+    wordRectColor: '#f44',
+    drawWordFrame: true,
   };
 
   const SGWM_OPTIONS = sgwmController.initializeSettings();
+
+  // to be implemented by descendants:
+  // - changePage
+  // - redraw
 
   export default {
     components: {
@@ -56,6 +58,8 @@
 
         pageIndex: -1,
         currentPages: [],
+        defaultSession: this.data.records[0].session,
+        defaultPages: this.data.records[0].data.pages,
 
         isPlayerPaused: false
       };
@@ -74,7 +78,11 @@
       },
 
       textLength() {
-        return this.data.records[0].data.pages.length;
+        return this.defaultPages.length;
+      },
+
+      initialPageIndex() {
+        return this.defaultPages[0].isIntro ? 1 : 0;
       }
     },
 
@@ -87,6 +95,7 @@
             wordColor: { type: '#', label: 'Text color' },
             wordHighlightColor: { type: '#', label: 'Highlighting color' },
             wordRectColor: { type: '#', label: 'Word frame color' },
+            drawWordFrame: { type: Boolean, label: 'Draw word frame' },
           }, COMMON_UI )
         };
       },
@@ -122,30 +131,13 @@
 
       },
 
-      map( session ) {
-        const sgwmSession = {
-          fixations: session.fixations,
-          words: session.words.map( word => {
-            return {
-              id: word.id,
-              x: word.rect.x,
-              y: word.rect.y,
-              width: word.rect.width,
-              height: word.rect.height,
-              text: word.text
-            };
-          })
-        };
-
-        const sgwm = new SGWM();
-        const result = sgwm.map( sgwmSession );
-
-        return result;
+      map( page ) {
+        return sgwmController.map( page );
       },
     },
 
     mounted() {
-      this.setPage( { index: 0 } );
+      this.setPage( { index: this.initialPageIndex } );
     }
   }
 </script>

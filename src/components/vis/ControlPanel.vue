@@ -10,10 +10,10 @@
       template(v-if="textLength")
         .navigation
           abbr(title="Previous page")
-            button.icon-btn.prev(:class="{ disabled: !currentPage }" @click="prevPage")
+            button.icon-btn.prev(:class="{ disabled: !pageIndex }" @click="prevPage")
           .page {{ dispPage }}
           abbr(title="Next page")
-            button.icon-btn.next(:class="{ disabled: currentPage === textLength - 1 }" @click="nextPage")
+            button.icon-btn.next(:class="{ disabled: pageIndex === textLength - 1 }" @click="nextPage")
         .separator
       template(v-if="showOptionsButton")
         abbr(title="Settings")
@@ -36,8 +36,7 @@
 
     data() {
       return {
-        currentPage: 0,
-        dispPage: '',
+        pageIndex: this.initialPageIndex || 0,
       }
     },
 
@@ -45,6 +44,11 @@
       feedback: {   // { syllab, speech }
         type: Object,
         default: null,
+      },
+
+      initialPageIndex: {
+        type: Number,
+        default: 0
       },
 
       textLength: {
@@ -68,16 +72,22 @@
       },
     },
 
+    computed: {
+      dispPage() {
+        return !this.pageIndex ? 'int' : `${this.pageIndex}/${this.textLength - 1}`;
+      }
+    },
+
     methods: {
       prevPage( e ) {
-        if (this.currentPage > 0) {
-          this.setPage( this.currentPage - 1 );
+        if (this.pageIndex > 0) {
+          this.setPage( this.pageIndex - 1 );
         }
       },
 
       nextPage( e ) {
-        if (this.currentPage < this.textLength - 1) {
-          this.setPage( this.currentPage + 1 );
+        if (this.pageIndex < this.textLength - 1) {
+          this.setPage( this.pageIndex + 1 );
         }
       },
 
@@ -98,9 +108,7 @@
       },
 
       setPage( index ) {
-        this.currentPage = index;
-        this.dispPage = !index ? '' : `${index}/${this.textLength - 1}`;
-
+        this.pageIndex = index;
         this.$emit( 'page-changed', { index } );
       },
     }

@@ -4,12 +4,13 @@
   import OptionsCreator from '@/vis/optionsCreator.js';
   import Painter from '@/vis/painter.js';
   import Metric from '@/vis/metric.js';
+  import Regressions from '@/vis/regressions.js';
 
   const UI = {
     colorMetric: Metric.Type.DURATION,
 
     saccadeColor: '#08F',
-    connectionColor: '#F00',
+    regressionColor: '#000',
 
     showIDs: false,
     showConnections: true,
@@ -43,7 +44,7 @@
               colorMetric: { type: Array, items: ['none', 'duration', 'char speed', 'syllable speed'], label: 'Word color metric' },
 
               saccadeColor: { type: '#', label: 'Saccade color' },
-              connectionColor: { type: '#', label: 'Connection color' },
+              regressionColor: { type: '#', label: 'Regressive saccade color' },
 
               showIDs: { type: Boolean, label: 'Show IDs' },
               showConnections: { type: Boolean, label: 'Show word-fixation connections' },
@@ -85,28 +86,26 @@
             return;
         }
 
-        const data = {
-            fixations: page.fixations,
-            words: page.text,
-        };
-
-        const fixations = this.map( data ).fixations;
+        const fixations = this.map( page ).fixations;
+        Regressions.compute( fixations );
 
         this.painter.clean();
 
-        this.painter.drawWords( data.words, Object.assign({
-            colorMetric: UI.colorMetric,
-            drawFrame: UI.showConnections,
+        this.painter.drawWords( page.text, Object.assign({
+          colorMetric: UI.colorMetric,
+          showConnections: UI.showConnections,
         }, this.commonUI ));
 
         if (page.syllabifications) {
-            this.painter.drawSyllabifications( page.syllabifications, Object.assign( {
-              isSyllabified: this.data.records[0].session.feedbacks.mode === 'hyphen',
-              hyphen: this.data.records[0].session.feedbacks.hyphen
-            }, UI.syllab ));
+          this.painter.drawSyllabifications( page.syllabifications, Object.assign( {
+            isSyllabified: this.record.session.feedbacks.mode === 'hyphen',
+            hyphen: this.record.session.feedbacks.hyphen
+          }, UI.syllab ));
         }
         if (UI.showFixations && fixations) {
-            this.painter.drawFixations( fixations, UI );
+          this.painter.drawFixations( fixations, Object.assign({
+            connectionColor: this.commonUI.wordRectColor,
+          }, UI) );
         }
       },
     },

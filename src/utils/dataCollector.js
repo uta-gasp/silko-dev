@@ -33,14 +33,16 @@ class Timer {
 }
 
 class Page {
-    constructor() {
+    constructor( isIntroPage ) {
         this.words = new Map();
         this.data = new DataPage();
+        this.data.isIntro = isIntroPage;
     }
 }
 
 class Pages {
-    constructor() {
+    constructor( hasIntroPage ) {
+        this.hasIntroPage = hasIntroPage;
         this.items = [];
         this.pageIndex = -1;
     }
@@ -58,7 +60,7 @@ class Pages {
     }
 
     add() {
-        const page = new Page();
+        const page = new Page( !this.items.length ? this.hasIntroPage : false );
         this.items.push( page );
         this.pageIndex++;
         return page;
@@ -82,7 +84,7 @@ export default class DataCollector {
             data: null
         };
 
-        this.pages = new Pages();
+        this.pages = new Pages( !!task.intro );
         this.timer = new Timer();
 
         this.focusedElem = null;

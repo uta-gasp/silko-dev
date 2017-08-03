@@ -116,8 +116,9 @@ export default class Student {
                 return cb( err );
             }
 
-            // TODO enable this in production
+            // TODO enable this in production and remove the other line
             // this.setAssignment( task, null, cb );
+            cb();
         });
     }
 

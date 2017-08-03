@@ -65,6 +65,8 @@
         isOptionsDisplayed: false,
         isPlayerPaused: false,
 
+        defaultText: this.data.records[0].data.pages.map( page => page.text ),
+
         words: [],
         tracks: null,
 
@@ -91,7 +93,7 @@
 
     computed: {
       textLength() {
-        return this.data.records[0].data.pages.length;
+        return this.defaultText.length;
       }
     },
 
@@ -153,7 +155,7 @@
 
         const hyphenRegExp = new RegExp( `${this.data.props.syllab.hyphen}`, 'g' );
 
-        const words = this.data.records[0].data.pages[ this.pageIndex ].text.map( word => {
+        const words = this.defaultText[ this.pageIndex ].map( word => {
           return {
             text: word.text.replace( hyphenRegExp, ''),
             durations: this.tracks.map( track => 0 ),
@@ -174,15 +176,10 @@
         this.isPlayerPaused = false;
 
         const rows = this.$refs.table.querySelectorAll( 'tr' );
-        const words = this.data.records[0].data.pages[ this.pageIndex ].text;
 
         this.tracks.forEach( (track, ti) => {
-          const data = {
-            fixations: track.session[ this.pageIndex ].fixations,
-            words: words,
-          };
-
-          const mappingResult = this.map( data );
+          const words = track.session[ this.pageIndex ].text;
+          const mappingResult = sgwmController.map( track.session[ this.pageIndex ] );
 
           track.start(
             mappingResult.fixations,
@@ -197,27 +194,6 @@
 
       stopAll() {
         this.tracks.forEach( track => track.stop() );
-      },
-
-      map( session ) {
-        const sgwmSession = {
-          fixations: session.fixations,
-          words: session.words.map( word => {
-            return {
-              id: word.id,
-              x: word.rect.x,
-              y: word.rect.y,
-              width: word.rect.width,
-              height: word.rect.height,
-              text: word.text
-            };
-          })
-        };
-
-        const sgwm = new SGWM();
-        const result = sgwm.map( sgwmSession );
-
-        return result;
       },
 
       colorizeCell( cell, duration ) {

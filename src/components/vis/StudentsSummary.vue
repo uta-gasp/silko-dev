@@ -14,47 +14,42 @@
               span(v-if="index === 1") {{ `${(stat / 60).toFixed(0)}:${secondsToString( stat % 60 )}` }}
               span(v-else) {{ stat }}
 
-    control-panel(:options="options" :show-options-button="false"
+    control-panel(:options="options"
       @show-options="showOptions"
       @close="close"
     )
-    //- options(v-show="isOptionsDisplayed" :values="options" @close="closeOptions" @apply="applyOptions")
+    options(v-show="isOptionsDisplayed" :values="options" @close="closeOptions" @apply="applyOptions")
 
 </template>
 
 <script>
+  import Regressions from '@/vis/regressions.js';
+  import sgwmController from '@/vis/sgwmController.js';
   // import OptionsCreator from '@/vis/optionsCreator.js';
 
   import ControlPanel from '@/components/vis/controlPanel';
-  // import Options from '@/components/vis/Options';
+  import Options from '@/components/vis/Options';
 
-  const UI = {
-  };
+  const SGWM_OPTIONS = sgwmController.initializeSettings();
 
   export default {
     name: 'student-summary',
 
      components: {
       'control-panel': ControlPanel,
-      // 'options': Options,
+      'options': Options,
     },
 
    data() {
       return {
-        // isOptionsDisplayed: false,
+        isOptionsDisplayed: false,
 
         students: [],
 
         // options representation for editor
-        // options: {
-        //   gazePlot: {
-        //     id: 'studentSummary',
-        //     title: 'Student summary',
-        //     options: OptionsCreator.createOptions({
-        //       // units: { type: Array, items: Object.values( UNITS ), label: 'Units' },
-        //     }, UI )
-        //   }
-        // },
+        options: {
+          _sgwm: sgwmController.createOptions(),
+        },
 
         sortedStatIndex: -1,
         nameSortDir: 1,
@@ -66,6 +61,7 @@
           { name: 'Seconds per word', sortDir: 0 },
           { name: 'Fixation, ms', sortDir: 0 },
           { name: 'Hyphenations', sortDir: 0 },
+          { name: 'Regressions', sortDir: 0 },
         ],
       };
     },
@@ -88,21 +84,22 @@
     },
 
     methods: {
-      // showOptions( e ) {
-      //   this.isOptionsDisplayed = true;
-      // },
+      showOptions( e ) {
+        this.isOptionsDisplayed = true;
+      },
 
       close( e ) {
         this.$emit( 'close' );
       },
 
-      // applyOptions( e ) {
-      //   // this.makeStudents();
-      // },
+      applyOptions( e ) {
+        sgwmController.save();
+        this.makeStudents();
+      },
 
-      // closeOptions( e ) {
-      //   this.isOptionsDisplayed = false;
-      // },
+      closeOptions( e ) {
+        this.isOptionsDisplayed = false;
+      },
 
       statNameClass( stat, index ) {
         return {
@@ -152,6 +149,7 @@
         let duration = 0;
         let sessionCount = 0;
         let wordCount = 0;
+        let regressionCount = 0;
         let fixations = {
             count: 0,
             duration: 0,
@@ -189,6 +187,11 @@
                 };
             }, fixations);
 
+            regressionCount += pages.reduce( (acc, page) => {
+              const mappedPage = sgwmController.map( page );
+              return acc + Regressions.compute( mappedPage.fixations );
+            }, 0);
+
             sessionCount++;
         });
 
@@ -199,6 +202,7 @@
         result.push( (duration / wordCount / 1000).toFixed(2) );
         result.push( Math.round( fixations.duration / fixations.count ) );
         result.push( fixations.hyphenations / student.sessions.length );
+        result.push( regressionCount );
 
         return result;
       },
@@ -251,6 +255,27 @@
         });
 
         this.students = students;
+      },
+
+      map( session ) {
+        const sgwmSession = {
+          fixations: session.fixations,
+          words: session.words.map( word => {
+            return {
+              id: word.id,
+              x: word.rect.x,
+              y: word.rect.y,
+              width: word.rect.width,
+              height: word.rect.height,
+              text: word.text
+            };
+          })
+        };
+
+        const sgwm = new SGWM();
+        const result = sgwm.map( sgwmSession );
+
+        return result;
       },
     },
 

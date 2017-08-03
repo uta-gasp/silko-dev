@@ -124,4 +124,26 @@ export default class sgwm {
     static get settings() {
         return _SGWM;
     }
+
+    static map( page ) {
+
+        const sgwmSession = {
+          fixations: page.fixations,
+          words: page.text.map( word => {
+            return {
+              id: word.id,
+              x: word.rect.x,
+              y: word.rect.y,
+              width: word.rect.width,
+              height: word.rect.height,
+              text: word.text
+            };
+          })
+        };
+
+        const sgwm = new SGWM();
+        const result = sgwm.map( sgwmSession );
+
+        return result;
+    }
 };

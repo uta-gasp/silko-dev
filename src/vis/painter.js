@@ -158,7 +158,7 @@ export default class Painter {
             ctx.fillText( suffix, rc.x + rc.width, rc.y + 0.8 * rc.height );
         }
 
-        if (settings.drawFrame) {
+        if (settings.showConnections || settings.drawWordFrame) {
             ctx.strokeStyle = settings.wordRectColor;
             ctx.lineWidth = 1;
             ctx.strokeRect( rc.x, rc.y, rc.width, rc.height);
@@ -168,7 +168,7 @@ export default class Painter {
     _drawSaccade( from, to, settings ) {
         const ctx = this.ctx;
 
-        ctx.strokeStyle = settings.saccadeColor;
+        ctx.strokeStyle = to.isRegression ? settings.regressionColor : settings.saccadeColor;
         ctx.beginPath();
         ctx.moveTo( settings.showIDs ? (from._x ? from._x : from.x) : from.x, from.y );
         ctx.lineTo( settings.showIDs ? (to._x ? to._x : to.x) : to.x, to.y );
@@ -200,6 +200,11 @@ export default class Painter {
         ctx.beginPath();
         ctx.arc( fixation.x, fixation.y, circleSize, 0, 2*Math.PI);
         ctx.fill();
+
+        if (fixation.isRegression) {
+            ctx.strokeStyle = settings.regressionColor;
+            ctx.stroke();
+        }
 
         if (fixation.merged) {
             ctx.strokeStyle = MERGED_FIXATION_BORDER_COLOR;

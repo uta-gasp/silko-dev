@@ -53,7 +53,7 @@
       student-select-box(:grades="gradeWithStudents" @accept="continueDeferredWithStudents")
 
     modal-editor-container(v-if="studentWithSessions" title="Sessions" @close="closeSessionSelectionBox")
-      session-select-box(:students="studentWithSessions" :multiple="!isGazePlot" @accept="continueDeferredWithSessions")
+      session-select-box(:students="studentWithSessions" :multiple="false" @accept="continueDeferredWithSessions")
 
     gaze-plot(v-if="isShowing( VISUALIZATIONS.gazePlot )" :data="visualization" @close="closeVisualization")
 
@@ -215,12 +215,6 @@
           studentsSummary: 'StudentsSummary',
         }
       };
-    },
-
-    computed: {
-      isGazePlot( ) {
-        return this.deferredVisualization ? this.deferredVisualization.name === this.VISUALIZATIONS.gazePlot : true;
-      }
     },
 
     methods: {

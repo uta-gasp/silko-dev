@@ -9,6 +9,7 @@ export default class DataPage {
         this.fixations = fixations || [];                  // array of Fixation
         this.syllabifications = syllabifications || [];    // array of FeedbackEvent
         this.speech = speech || [];                        // array of FeedbackEvent
+        this.isIntro = false;
     }
 
     // this.fixations contain samples, as GazeTracking configures GazeTargets to stream samples :),

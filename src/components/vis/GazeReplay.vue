@@ -80,6 +80,9 @@
       },
 
       redraw() {
+        this.painter.clean();
+
+        this.drawText();
         this.drawNames();
       },
 
@@ -98,7 +101,7 @@
       start() {
         this.isPlayerPaused = false;
 
-        this.drawNames();
+        this.redraw();
 
         this.tracks.forEach( (track, ti) => {
           track.start(
@@ -118,9 +121,9 @@
                 });
               },
               syllabification: syllabification => {
-                this.painter.setFont( this.data.records[0].session.font );
+                this.painter.setFont( this.defaultSession.font );
                 this.painter.drawSyllabification( syllabification, Object.assign({
-                  syllab: Object.assign( {}, this.data.records[0].session.feedbacks.syllabification ),
+                  syllab: Object.assign( {}, this.defaultSession.feedbacks.syllabification ),
                 }, this.commonUI, UI.syllab));
               }
             }
@@ -136,24 +139,21 @@
           };
         });
 
-        this.drawOnCanvas( names );
-      },
-
-      drawOnCanvas( names ) {
-        this.painter.clean();
-
-        this.painter.setFont( this.data.records[0].session.font );
-        this.painter.drawWords( this.currentPages[0].text, Object.assign({
-            colorMetric: UI.colorMetric,
-            drawFrame: false,
-        }, this.commonUI ));
-
         this.painter.drawNames( names, {
           fontSize: UI.nameFontSize,
           fontFamily: UI.nameFontFamily,
           nameSpacing: UI.nameSpacing,
           location: LEGEND_LOCATION
         });
+      },
+
+      drawText() {
+        this.painter.setFont( this.defaultSession.font );
+        this.painter.drawWords( this.currentPages[0].text, Object.assign({
+            colorMetric: UI.colorMetric,
+        }, this.commonUI, {
+            drawWordFrame: false,
+        }));
       },
     },
 
