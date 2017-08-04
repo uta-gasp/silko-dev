@@ -11,7 +11,7 @@
           tr(v-for="student in students" :key="student.ref.id")
             td {{ student.ref.name }}
             td(v-for="(stat, index) in student.statistics")
-              span(v-if="index === 1") {{ `${(stat / 60).toFixed(0)}:${secondsToString( stat % 60 )}` }}
+              span(v-if="index === 1") {{ `${Math.floor(stat / 60).toFixed(0)}:${secondsToString( stat % 60 )}` }}
               span(v-else) {{ stat }}
 
     control-panel(:options="options"
@@ -159,21 +159,24 @@
         student.sessions.forEach( session => {
             const pages = session.data.pages;
 
+            let firstPage;
             let lastPage;
-            for (let i = pages.length - 1; i >= 0; i--) {
-                const page = pages[i];
-                if (page.fixations) {
-                    lastPage = page;
-                    break;
-                }
-            }
+            pages.forEach( page => {
+              if (!firstPage && page.fixations) {
+                firstPage = page;
+              }
+              if (page.fixations) {
+                lastPage = page;
+              }
+            })
 
-            if (!lastPage) {
+            if (!firstPage || !lastPage) {
                 return;
             }
 
+            const firstFixation = firstPage.fixations[0];
             const lastFixation = lastPage.fixations[ lastPage.fixations.length - 1 ];
-            duration += lastFixation.tsSync + lastFixation.duration;
+            duration += (lastFixation.ts + lastFixation.duration) - firstFixation.ts;
 
             wordCount += pages.reduce( (acc, page) => {
                 return acc + page.text.length;
