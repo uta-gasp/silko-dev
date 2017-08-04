@@ -34,7 +34,7 @@
         this.isLoggedIn = true;
       });
     },
-  }
+  };
 </script>
 
 <style lang="less" scoped>

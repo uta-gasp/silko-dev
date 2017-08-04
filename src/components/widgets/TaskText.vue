@@ -16,7 +16,7 @@
           'font-style': 'normal',
           'font-weight': 'bold',
         },
-      }
+      };
     },
   };
 </script>

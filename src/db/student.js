@@ -1,6 +1,7 @@
 import User from './user.js';
 
 class StudentUser extends User {
+
     constructor( user, student ) {
         super( user );
 
@@ -10,6 +11,7 @@ class StudentUser extends User {
     get isStudent() {
         return true;
     }
+
 }
 
 export default StudentUser;

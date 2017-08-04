@@ -8,6 +8,7 @@ import Data from './data.js';
 import db from '@/db/db.js';
 
 export default class Student {
+
     constructor( id, name, school, grade ) {
         this.id = id;
         this.name = name;
@@ -44,7 +45,7 @@ export default class Student {
 
         this.setAssignment( id, null, err => {
             if (err) {
-                return console.log( err );
+                return console.error( err );
             }
         });
 
@@ -67,7 +68,7 @@ export default class Student {
             }
 
             cb( err );
-        }
+        };
 
         if (task) {
             return db.setField( this, `assignments/${cls}`, task, onDone );
@@ -100,7 +101,7 @@ export default class Student {
             });
 
             Promise.all( promises ).then( values => {
-                cb( undefined, result );
+                cb( null, result );
             });
         });
     }
@@ -139,6 +140,7 @@ export default class Student {
     static getData( ids, cb ) {
         db.getFromIDs( Data, ids, cb );
     }
+
 }
 
 Recordable.apply( Student );

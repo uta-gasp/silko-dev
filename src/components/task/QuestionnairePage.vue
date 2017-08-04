@@ -18,9 +18,9 @@
     data() {
       return {
         questionIndex: 0,
-        questions: this.questionnaire.
-            map( question => Object.assign( { answer: null }, question ) ).
-            filter( question => question.type === Question.types.text.name || this.longGazedWords.includes( question.word ) )
+        questions: this.questionnaire
+            .map( question => Object.assign( { answer: null }, question ) )
+            .filter( question => question.type === Question.types.text.name || this.longGazedWords.includes( question.word ) )
       };
     },
 
@@ -38,8 +38,8 @@
 
     computed: {
       question() {
-        return this.questionIndex >= 0 && this.questionIndex < this.questions.length ?
-          this.questions[ this.questionIndex ] : {};
+        return this.questionIndex >= 0 && this.questionIndex < this.questions.length
+          ? this.questions[ this.questionIndex ] : {};
       }
     },
 

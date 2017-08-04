@@ -1,6 +1,6 @@
 import Syllabifier from '@/utils/syllabifier.js';
 
-import Metric from '@/vis/metric.js';
+// import Metric from '@/vis/metric.js';
 import Colors from '@/vis/colors.js';
 
 const WORD_HIGHLIGHT_COLOR = '#606';
@@ -21,10 +21,11 @@ const MERGED_FIXATION_BORDER_COLOR = '#808';
 const CHECK_MARK = String.fromCharCode( 0x2713 );
 
 export default class Painter {
+
     constructor( el, settings ) {
         this.width = parseInt( window.getComputedStyle( el ).width );
         this.height = parseInt( window.getComputedStyle( el ).height );
-        el.setAttribute( 'width',  this.width );
+        el.setAttribute( 'width', this.width );
         el.setAttribute( 'height', this.height );
 
         this.settings = settings;
@@ -43,12 +44,11 @@ export default class Painter {
     }
 
     drawWords( words, settings ) {
-
-        const metricRange = Metric.compute( words, settings.colorMetric );
+        // const metricRange = Metric.compute( words, settings.colorMetric );
 
         words.forEach( word => {
             const wordSettings = Object.assign({
-                alpha: 0//Metric.getAlpha( word, settings.colorMetric, metricRange )
+                alpha: 0    // Metric.getAlpha( word, settings.colorMetric, metricRange )
             }, settings );
 
             this._drawWord( word, wordSettings);
@@ -68,9 +68,9 @@ export default class Painter {
         ctx.textBaseline = 'alphabetic';
 
         const rc = event.rect;
-        const word = this.settings.isSyllabified ?
-            this.syllabifier.syllabifyWord( event.text, this.settings.hyphen ) :
-            event.text;
+        const word = this.settings.isSyllabified
+            ? this.syllabifier.syllabifyWord( event.text, this.settings.hyphen )
+            : event.text;
 
         ctx.fillStyle = settings.background;
         ctx.fillRect( rc.x, rc.y, rc.width, rc.height);
@@ -198,7 +198,7 @@ export default class Painter {
         const circleSize = Math.round( Math.sqrt( fixation.duration ) ) / 2;
 
         ctx.beginPath();
-        ctx.arc( fixation.x, fixation.y, circleSize, 0, 2*Math.PI);
+        ctx.arc( fixation.x, fixation.y, circleSize, 0, 2 * Math.PI);
         ctx.fill();
 
         if (fixation.isRegression) {
@@ -210,9 +210,10 @@ export default class Painter {
             ctx.strokeStyle = MERGED_FIXATION_BORDER_COLOR;
             ctx.lineWidth = 3;
             ctx.beginPath();
-            ctx.arc( fixation.x, fixation.y, circleSize + 3, 0, 2*Math.PI);
+            ctx.arc( fixation.x, fixation.y, circleSize + 3, 0, 2 * Math.PI);
             ctx.stroke();
             ctx.lineWidth = 1;
         }
     }
-}
+
+};

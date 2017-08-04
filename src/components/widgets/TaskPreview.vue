@@ -23,7 +23,7 @@
   import TaskText from '@/components/widgets/TaskText';
 
   import TextPresenter from '@/utils/textPresenter.js';
-  import FeedbackProvider from '@/utils/feedbackProvider.js'
+  import FeedbackProvider from '@/utils/feedbackProvider.js';
 
   export default {
     name: 'task-preview',
@@ -84,7 +84,7 @@
 
       syllabify( e ) {
         if (e.target.classList.contains( 'word' )) {
-          const text = this.feedbackProvider.syllabifier.unprepare( e.target.textContent )
+          const text = this.feedbackProvider.syllabifier.unprepare( e.target.textContent );
           if (text) {
             this.feedbackProvider.syllabifier.syllabifyWord( e.target, text );
           }
@@ -93,7 +93,7 @@
 
       pronounce( e ) {
         if (e.target.classList.contains( 'word' )) {
-          const text = this.feedbackProvider.syllabifier.unprepare( e.target.textContent )
+          const text = this.feedbackProvider.syllabifier.unprepare( e.target.textContent );
           if (text) {
             this.feedbackProvider.speaker.say( text );
           }

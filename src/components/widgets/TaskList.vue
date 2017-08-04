@@ -156,6 +156,8 @@
       removeWarningClosed( e ) {
         if (e.confirm) {
           const id = this.toDelete.id;
+
+          /* eslint-disable handle-callback-err */
           this.parent.deleteTask( this.toDelete, err => {
             this.$emit( 'deleted', { task: id } );
             this.loadTasks();

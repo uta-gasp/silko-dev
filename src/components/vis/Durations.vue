@@ -1,6 +1,6 @@
 <template lang="pug">
   #vis-durations
-    .title {{ data.title }}
+    vis-title {{ data.title }}
     .list
       .record(v-for="word in words")
         .word {{ word.text }}
@@ -20,6 +20,7 @@
 
   import ControlPanel from '@/components/vis/controlPanel';
   import Options from '@/components/vis/Options';
+  import VisTitle from '@/components/vis/VisTitle';
 
   const UNITS = {
     MS: 'ms',
@@ -36,6 +37,7 @@
      components: {
       'control-panel': ControlPanel,
       'options': Options,
+      'vis-title': VisTitle,
     },
 
    data() {
@@ -100,7 +102,8 @@
         this.data.records.forEach( record => {
           record.data.pages[ this.pageIndex ].words.forEach( word => {
             totalDuration += this.appendWord( words, word );
-          ;})
+          ;
+});
         });
 
         const descending = (a, b) => b[1].focusing.duration - a[1].focusing.duration;
@@ -155,17 +158,6 @@
 </script>
 
 <style lang="less" scoped>
-  .title {
-    position: fixed;
-    width: 100vw;
-    color: #444;
-    font: 18px 'Roboto Condensed', Arial, sans-serif;
-    top: 0;
-    left: 0;
-    text-align: center;
-    line-height: 32px;
-  }
-
   #vis-durations {
     position: fixed;
     left: 0;
@@ -176,13 +168,13 @@
     background-color: white;
 
     .list {
-      margin: 2em auto 0;
+      margin: 48px auto 0;
 
       background-color: rgba(255, 255, 220, 0.8);
       border: solid 1px;
 
       width: 20vw;
-      height: ~"calc(100vh - 2em)";
+      height: ~"calc(100vh - 48px)";
       overflow-y: auto;
 
       text-align: left;

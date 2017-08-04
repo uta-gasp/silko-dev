@@ -27,7 +27,7 @@
         this.$emit( 'toggle' );
       }
     },
-  }
+  };
 </script>
 
 <style lang="less" scoped>

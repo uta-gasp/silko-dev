@@ -13,6 +13,7 @@ import db from '../db/db.js';
 const MIN_FIXATION_DURATION = 80;
 
 class Timer {
+
     constructor() {
         this._date = null;
         this._start = 0;
@@ -30,17 +31,21 @@ class Timer {
     get date() {
         return this._date;
     }
+
 }
 
 class Page {
+
     constructor( isIntroPage ) {
         this.words = new Map();
         this.data = new DataPage();
         this.data.isIntro = isIntroPage;
     }
+
 }
 
 class Pages {
+
     constructor( hasIntroPage ) {
         this.hasIntroPage = hasIntroPage;
         this.items = [];
@@ -69,9 +74,11 @@ class Pages {
     done() {
         this.pageIndex = -1;
     }
+
 };
 
 export default class DataCollector {
+
     constructor( task, student, font, feedbacks ) {
         this.session = {
             date: (new Date()).toJSON(),
@@ -147,7 +154,6 @@ export default class DataCollector {
     // Arguments:
     //        word:         - the focused word  (DOM element)
     setFocusedWord( el ) {
-
         if (this.focusedElem === el || !this.pages.ready) {
             return;
         }
@@ -216,7 +222,6 @@ export default class DataCollector {
     };
 
    _save( cb ) {
-
         const data = {
             task: this.session.task,
             student: this.session.student,
@@ -238,8 +243,9 @@ export default class DataCollector {
                     return cb( err );
                 }
 
-                cb( undefined, { data: dataKey, session: sessionKey } );
+                cb( null, { data: dataKey, session: sessionKey } );
             });
         });
    };
-}
+
+};

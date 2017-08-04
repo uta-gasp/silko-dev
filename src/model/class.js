@@ -6,6 +6,7 @@ import Student from './student.js';
 import db from '@/db/db.js';
 
 export default class Class {
+
     constructor( id, name, owner ) {
         this.id = id;
         this.name = name;
@@ -57,14 +58,14 @@ export default class Class {
 
         db.getFromIDs( Student, this.students, (err, students) => {
             if (err) {
-                return console.log( err );
+                return console.error( err );
             }
 
             students.forEach( student => {
                 if (student.assignments[ this.id ] === task.id) {
                     student.setAssignment( this.id, null, err => {
                         if (err) {
-                            return console.log( err );
+                            return console.error( err );
                         }
                     });
                 }
@@ -72,7 +73,7 @@ export default class Class {
         });
 
         db.delete( task, err => {
-            // ignore the error
+            console.error( err );
         });
     }
 
@@ -89,17 +90,17 @@ export default class Class {
 
                 db.getFromIDs( Student, newStudents, (err, students) => {
                     if (err) {
-                        return console.log( err );
+                        return console.error( err );
                     }
 
                     students.forEach( student => {
                         student.addClass( this.id, this.name, err => {
                             if (err) {
-                                return console.log( err );
+                                return console.error( err );
                             }
                         });
                     });
-                })
+                });
             }
 
             cb( err );
@@ -112,22 +113,23 @@ export default class Class {
 
         db.get( Student, student.id, (err, _student) => {
             if (err) {
-                return console.log( err );
+                return console.error( err );
             }
 
             student.removeClass( this.id, err => {
                 if (err) {
-                    return console.log( err );
+                    return console.error( err );
                 }
             });
 
             student.setAssignment( this.id, null, err => {
                 if (err) {
-                    return console.log( err );
+                    return console.error( err );
                 }
             });
-        })
+        });
     }
+
 }
 
 Recordable.apply( Class );

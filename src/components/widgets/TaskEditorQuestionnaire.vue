@@ -77,17 +77,17 @@
 
     computed: {
       canAdd() {
-        return this.type === this.types.word ? this.word.length > 0 : true
-          && this.question.length > 5
-          && this.answer0.length > 0
-          && this.answer1.length > 0
-          && this.answer2.length > 0
-          && this.answer3.length > 0;
+        return this.type === this.types.word ? this.word.length > 0 : true &&
+          this.question.length > 5 &&
+            this.answer0.length > 0 &&
+            this.answer1.length > 0 &&
+            this.answer2.length > 0 &&
+            this.answer3.length > 0;
       },
 
       answers() {
-        return Array.from({ length: 4 }).map( (v,i) => {
-          return this[ `answer${i}` ]
+        return Array.from({ length: 4 }).map( (v, i) => {
+          return this[ `answer${i}` ];
         });
       },
 
@@ -122,7 +122,7 @@
     created() {
       this.type = this.types.text;
     }
-  }
+  };
 </script>
 
 <style lang="less" scoped>

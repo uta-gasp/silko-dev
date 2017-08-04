@@ -1,4 +1,5 @@
 export default class WordFocusing {
+
     constructor() {
         this.count = 0;      // int
         this.first = 0;      // ms
@@ -17,4 +18,5 @@ export default class WordFocusing {
     stop( ts ) {
         this.duration += ts - this.last;
     }
+
 }

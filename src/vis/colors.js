@@ -119,7 +119,7 @@ function clone( str, count ) {
 
 function componentToHex( c ) {
     const hex = c.toString(16);
-    return hex.length === 1 ? "0" + hex : hex;
+    return hex.length === 1 ? '0' + hex : hex;
 }
 
 // function rgbToHex( r, g, b ) {
@@ -144,14 +144,14 @@ function rgbaToHex( r, g, b, a ) {
 }
 
 export default class Colors {
+
     static mix( colors ) {
         let c = 0;
         let m = 0;
         let y = 0;
         let k = 0;
         let w = 0;
-        for ( let i = 0; i < colors.length; i += 1 )
-        {
+        for ( let i = 0; i < colors.length; i += 1 ) {
             const color = rgb2cmyk( colors[ i ].color );
             const weight = colors[ i ].weight;
             c += color.c * weight;
@@ -181,7 +181,6 @@ export default class Colors {
         b = Math.round( (1.0 - b) * 255.0 );
         return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
     };
-
 
     static get colors() {
         return COLORS;
@@ -220,6 +219,5 @@ export default class Colors {
         const b = Number.parseInt( rgb.substr( 5, 2), 16 );
         return `rgba(${r},${g},${b},${a})`;
     }
-}
 
-
+};

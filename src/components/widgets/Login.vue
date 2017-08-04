@@ -24,7 +24,7 @@
 </template>
 
 <script>
-  import login from '@/utils/login.js'
+  import login from '@/utils/login.js';
 
   import TemporalError from '@/components/widgets/TemporalError';
 
@@ -77,7 +77,7 @@
       },
 
     }
-  }
+  };
 </script>
 
 <style lang="less" scoped>

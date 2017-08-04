@@ -141,7 +141,7 @@
           const date = new Date( dateString );
           const hours = this.formatTimeComponent( date.getHours() );
           const minutes = this.formatTimeComponent( date.getMinutes() );
-          return `${date.getDate()}.${date.getMonth()+1}.${date.getFullYear()} ${hours}:${minutes} `;
+          return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()} ${hours}:${minutes} `;
       },
     },
 

@@ -1,4 +1,5 @@
 export default class Fixation {
+
     constructor( ts, tsSync, x, y, duration ) {
         this.ts = ts;               // ms
         this.tsSync = tsSync;       // ms
@@ -16,4 +17,5 @@ export default class Fixation {
             etudFixation.duration
         );
     }
+
 }

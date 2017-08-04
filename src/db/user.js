@@ -1,4 +1,5 @@
 export default class User {
+
     constructor( user ) {
         if (!user) {
             return;
@@ -12,4 +13,5 @@ export default class User {
     get ref() {
         return this._ref;
     }
+
 }

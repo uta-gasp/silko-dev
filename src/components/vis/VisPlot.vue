@@ -1,7 +1,7 @@
 <template lang="pug">
   #vis-plot(ref="root")
     canvas(ref="canvas")
-    .title {{ data.title }}
+    vis-title {{ data.title }}
     control-panel(
       :feedback="feedback"
       :text-length="textLength"
@@ -26,6 +26,7 @@
 
   import ControlPanel from '@/components/vis/controlPanel';
   import Options from '@/components/vis/Options';
+  import VisTitle from '@/components/vis/VisTitle';
 
   const COMMON_UI = {
     wordColor: '#666',
@@ -34,7 +35,7 @@
     drawWordFrame: true,
   };
 
-  const SGWM_OPTIONS = sgwmController.initializeSettings();
+  sgwmController.initializeSettings();
 
   // to be implemented by descendants:
   // - changePage
@@ -44,6 +45,7 @@
     components: {
       'control-panel': ControlPanel,
       'options': Options,
+      'vis-title': VisTitle,
     },
 
     data() {
@@ -139,7 +141,7 @@
     mounted() {
       this.setPage( { index: this.initialPageIndex } );
     }
-  }
+  };
 </script>
 
 <style lang="less" scoped>
@@ -164,17 +166,6 @@
       &.invisible {
         display: none;
       }
-    }
-
-    .title {
-      position: fixed;
-      width: 100vw;
-      color: #444;
-      font: 18px 'Roboto Condensed', Arial, sans-serif;
-      top: 0;
-      left: 0;
-      text-align: center;
-      line-height: 32px;
     }
 
     canvas {

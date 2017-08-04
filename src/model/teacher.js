@@ -9,6 +9,7 @@ import Task from './task.js';
 import db from '@/db/db.js';
 
 export default class Teacher {
+
     constructor( id, name, email, school ) {
         this.id = id;
         this.name = name;       // ""
@@ -111,13 +112,13 @@ export default class Teacher {
 
         db.getFromIDs( Class, this.classes, (err, classes) => {
             if (err) {
-                return console.log( err );
+                return console.error( err );
             }
 
             classes.forEach( cls => {
                 db.getFromIDs( Task, cls.tasks, (err, tasks) => {
                     if (err) {
-                        return console.log( err );
+                        return console.error( err );
                     }
 
                     tasks.forEach( task => {
@@ -125,17 +126,19 @@ export default class Teacher {
                             task.intro = '';
                             db.updateField( task, 'intro', task.intro, err => {
                                 if (err) {
-                                    return console.log( err );
+                                    return console.error( err );
                                 }
                             });
                         }
-                    })
-                })
-            })
+                    });
+                });
+            });
         });
 
         db.delete( intro, err => {
-            // ignore the error
+            if (err) {
+                console.error( err );
+            }
         });
     }
 
@@ -173,22 +176,25 @@ export default class Teacher {
 
         db.getFromIDs( Student, cls.students, (err, students) => {
             if (err) {
-                return console.log( err );
+                return console.error( err );
             }
 
             students.forEach( student => {
                 student.removeClass( cls.id, err => {
                     if (err) {
-                        return console.log( err );
+                        return console.error( err );
                     }
                 });
             });
         });
 
         db.delete( cls, err => {
-            // ignore the error
+            if (err) {
+                console.error( err );
+            }
         });
     }
+
 }
 
 Recordable.apply( Teacher );

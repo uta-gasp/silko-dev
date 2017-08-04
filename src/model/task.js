@@ -5,6 +5,7 @@ import Intro from './intro.js';
 import db from '@/db/db.js';
 
 class Threshold {
+
     constructor( value, smart, min, max, adjustForWordLength ) {
         this.value = value;
         this.smart = smart;
@@ -12,9 +13,11 @@ class Threshold {
         this.max = max;
         this.adjustForWordLength = adjustForWordLength;
     }
+
 };
 
 export default class Task {
+
     constructor( id ) {
         this.id = id;
         this.name = '';
@@ -102,7 +105,7 @@ export default class Task {
         lines.forEach( line => {
             line = line.trim();
             const parts = line.split( Task.wordSyllabSeparator );
-            if (parts.length != 2) {
+            if (parts.length !== 2) {
                 return;
             }
 
@@ -112,9 +115,9 @@ export default class Task {
                 return;
             }
 
-            result[ word ] = syllabText.split( Task.syllabSeparator ).
-                filter( item => item.length ).
-                join( Task.syllabSeparator );
+            result[ word ] = syllabText.split( Task.syllabSeparator )
+                .filter( item => item.length )
+                .join( Task.syllabSeparator );
         });
 
         return result;
@@ -145,6 +148,7 @@ export default class Task {
     getIntro( cb ) {
         return db.get( Intro, this.intro, cb );
     }
+
 }
 
 Recordable.apply( Task );

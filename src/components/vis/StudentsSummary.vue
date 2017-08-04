@@ -1,6 +1,6 @@
 <template lang="pug">
   #student-summary
-    .title {{ data.title }}
+    vis-title {{ data.title }}
     .container
       table
         thead
@@ -29,8 +29,9 @@
 
   import ControlPanel from '@/components/vis/controlPanel';
   import Options from '@/components/vis/Options';
+  import VisTitle from '@/components/vis/VisTitle';
 
-  const SGWM_OPTIONS = sgwmController.initializeSettings();
+  sgwmController.initializeSettings();
 
   export default {
     name: 'student-summary',
@@ -38,6 +39,7 @@
      components: {
       'control-panel': ControlPanel,
       'options': Options,
+      'vis-title': VisTitle,
     },
 
    data() {
@@ -147,7 +149,7 @@
         result.push( student.sessions.length );
 
         let duration = 0;
-        let sessionCount = 0;
+        // let sessionCount = 0;
         let wordCount = 0;
         let regressionCount = 0;
         let fixations = {
@@ -168,7 +170,7 @@
               if (page.fixations) {
                 lastPage = page;
               }
-            })
+            });
 
             if (!firstPage || !lastPage) {
                 return;
@@ -195,7 +197,7 @@
               return acc + Regressions.compute( mappedPage.fixations );
             }, 0);
 
-            sessionCount++;
+            // sessionCount++;
         });
 
         const totalDuration = new Date( 0, 0, 0, 0, 0, Math.round( duration / 1000 ) );
@@ -251,9 +253,9 @@
             return sortDirection > 0 ? a.ref.name < b.ref.name : a.ref.name > b.ref.name;
           }
           else {
-            return sortDirection > 0 ?
-              b.statistics[ statIndex ] - a.statistics[ statIndex ] :
-              a.statistics[ statIndex ] - b.statistics[ statIndex ] ;
+            return sortDirection > 0
+              ? b.statistics[ statIndex ] - a.statistics[ statIndex ]
+              : a.statistics[ statIndex ] - b.statistics[ statIndex ];
           }
         });
 
@@ -298,17 +300,6 @@
     height: 100vh;
     z-index: 100;
     background-color: white;
-
-    .title {
-      position: fixed;
-      width: 100vw;
-      color: #444;
-      font: 18px 'Roboto Condensed', Arial, sans-serif;
-      top: 0;
-      left: 0;
-      text-align: center;
-      line-height: 32px;
-    }
 
     .container {
       position: fixed;

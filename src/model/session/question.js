@@ -4,6 +4,7 @@ const TYPES = {
 };
 
 export default class Question {
+
     constructor( type, word, question, answers ) {
         this.type = type;
         this.word = word;
@@ -14,4 +15,5 @@ export default class Question {
     static get types() {
         return TYPES;
     }
+
 };

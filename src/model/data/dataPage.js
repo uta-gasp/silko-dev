@@ -3,8 +3,9 @@ import TextWord from '../commons/textWord.js';
 const WORD_SELECTOR = '.word';
 
 export default class DataPage {
+
     constructor( text, words, fixations, syllabifications, speech ) {
-        this.text = text || TextWord.fromAll( WORD_SELECTOR )  // array of TextWord
+        this.text = text || TextWord.fromAll( WORD_SELECTOR );  // array of TextWord
         this.words = words || [];                          // array of DataWord
         this.fixations = fixations || [];                  // array of Fixation
         this.syllabifications = syllabifications || [];    // array of FeedbackEvent
@@ -62,4 +63,5 @@ export default class DataPage {
 
         this.words = focusedWords;
     }
+
 }

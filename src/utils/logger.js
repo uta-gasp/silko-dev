@@ -9,6 +9,7 @@ function random( max, step = 1, min = 0) {
 }
 
 class Logger {
+
     constructor( name ) {
         this.name = name;
         this.enabled = true;
@@ -30,14 +31,14 @@ class Logger {
     ok() {
         if (this.enabled) {
             const args = this._stringify( arguments );
-            console.log( `%c  `, format, this._format( args ) );
+            console.log( `%c  `, this.format, this._format( args ) );
         }
     }
 
     error() {
         if (this.enabled) {
             const args = this._stringify( arguments );
-            console.error( `%c  `, format, this._format( args ) );
+            console.error( `%c  `, this.format, this._format( args ) );
         }
     }
 
@@ -46,8 +47,9 @@ class Logger {
     }
 
     _format( args ) {
-        return `${this.name}: ${args}`
+        return `${this.name}: ${args}`;
     }
+
 }
 
 export default function( module ) {

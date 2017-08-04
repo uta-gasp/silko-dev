@@ -143,12 +143,11 @@
               selected: false
             });
           }
-        })
+        });
 
         grades.forEach( grade => {
           grade.students.sort();
         });
-
 
         return grades.sort( (a, b) => {
           if (a.name[0] <= '9' && b.name[0] > '9') {
@@ -197,6 +196,7 @@
       },
 
       remove( student, e ) {
+        /* eslint-disable handle-callback-err */
         this.parent.removeStudent( student, err => {
           this.loadStudents();
         });
@@ -209,7 +209,6 @@
     }
   };
 </script>
-
 
 <style lang="less" scoped>
   .table {

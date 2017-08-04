@@ -23,7 +23,7 @@
 </template>
 
 <script>
-  import eventBus  from '@/utils/event-bus.js';
+  import eventBus from '@/utils/event-bus.js';
 
   import Student from '@/model/student.js';
 
@@ -90,7 +90,7 @@
     mounted() {
       this.init();
     }
-  }
+  };
 </script>
 
 <style lang="less" scoped>

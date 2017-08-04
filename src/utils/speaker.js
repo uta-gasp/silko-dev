@@ -7,6 +7,7 @@ const LONG_WORD_MIN_LENGTH = 7;
 const EXTRA_THRESHOLD_FOR_CHAR = 0.05;
 
 export default class Speaker {
+
     constructor( options ) {
         this.options = { ...options };
         this.options.threshold.factor = 4;
@@ -67,6 +68,7 @@ export default class Speaker {
             wordReadingDuration * this.options.threshold.factor
         ));
     }
+
 };
 
 const voices = {

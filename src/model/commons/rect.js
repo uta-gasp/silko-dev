@@ -1,4 +1,5 @@
 export default class Rect {
+
     constructor( x, y, width, height ) {
         this.x = x;             // px
         this.y = y;             // px
@@ -15,4 +16,5 @@ export default class Rect {
         return new Rect( Math.round( rect.x ), Math.round( rect.y ),
             Math.round( rect.width ), Math.round( rect.height ) );
     }
+
 }

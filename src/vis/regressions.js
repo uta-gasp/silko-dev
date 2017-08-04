@@ -3,7 +3,6 @@ export default class Regressions {
     // adds "isRegression: Boolean" to fixations that
     // returns the number of regressions
     static compute( mappedFixations ) {
-
         let regressionCount = 0;
         let lastWordID = -1;
         let isPrevFixProgressive = true;
@@ -32,4 +31,5 @@ export default class Regressions {
 
         return regressionCount;
     }
-}
+
+};

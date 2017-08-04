@@ -121,7 +121,7 @@
         this.$emit( 'input', this.currentModel );
       },
     }
-  }
+  };
 </script>
 
 <style lang="less" scoped>

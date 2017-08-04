@@ -93,7 +93,7 @@
       },
 
       toDeleteName() {
-        return this.toDelete ? this.toDelete.name : '' ;
+        return this.toDelete ? this.toDelete.name : '';
       }
     },
 
@@ -182,6 +182,7 @@
 
       removeWarningClosed( e ) {
         if (e.confirm) {
+          /* eslint-disable handle-callback-err */
           this.teacher.deleteClass( this.toDelete, err => {
             this.loadClasses();
           });
@@ -241,7 +242,7 @@
     mounted() {
       this.init();
     }
-  }
+  };
 </script>
 
 <style lang="less" scoped>

@@ -9,8 +9,8 @@ const REENTRY_THRESHOLD = 1000;
 const SAMPLE_DURATION = 30;
 
 export default class FeedbackProvider {
-    constructor( syllab, speech ) {
 
+    constructor( syllab, speech ) {
         this.syllabifier = new Syllabifier( syllab );
         this.speaker = new Speaker( speech );
 
@@ -33,7 +33,6 @@ export default class FeedbackProvider {
 
     // Resets the highlighting
     cleanup() {
-
         if (this.currentWord) {
             this.currentWord.classList.remove( this.highlighClassName );
             this.currentWord = null;
@@ -71,8 +70,7 @@ export default class FeedbackProvider {
     // Arguments:
     //   el: - the focused word DOM element
     setFocusedWord( el ) {
-
-        if (this.currentWord != el) {
+        if (this.currentWord !== el) {
             // if (this.highlightingEnabled) {
             //     if (this.currentWord) {
             //         this.currentWord.classList.remove( this.highlighClassName );
@@ -95,7 +93,7 @@ export default class FeedbackProvider {
                         wordFocus.focusRecorded = false;
                     }
 
-                    const now = performance.now();
+                    const now = window.performance.now();
                     if (now - wordFocus.lastSample > REENTRY_THRESHOLD) {
                         wordFocus.entries++;
                     }
@@ -110,7 +108,6 @@ export default class FeedbackProvider {
 
     _tick() {
         for (let key of this.words.keys()) {
-
             const wordFocus = this.words.get( key );
             wordFocus.accumulatedTime = Math.max( 0,
                 wordFocus.accumulatedTime + (key === this.currentWord ? SAMPLE_DURATION : -SAMPLE_DURATION)
@@ -130,4 +127,5 @@ export default class FeedbackProvider {
             }
         }
     };
+
 };

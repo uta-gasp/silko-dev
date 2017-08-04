@@ -1,6 +1,7 @@
 import Rect from './rect.js';
 
 export default class TextWord {
+
     constructor( id, text, rect ) {
         this.id = id;       // int (in text)
         this.text = text;   // string
@@ -22,4 +23,5 @@ export default class TextWord {
 
         return list;
     }
+
 }

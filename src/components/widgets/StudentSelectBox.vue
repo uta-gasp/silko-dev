@@ -2,7 +2,7 @@
   #student-select-box
     div.tabs.is-centered.is-boxed(v-if="grades.length > 1")
       ul.ul
-        li(:class="{ 'is-active': isGradeSelected( grade ) }" v-for="grade in grades" :key="grade")
+        li(:class="{ 'is-active': isGradeSelected( grade ) }" v-for="grade in grades" :key="grade.name")
           a(@click="selectGrade( grade )") {{ grade.name }}
     .students
       .has-text-centered(v-if="!isGradeSelected()")

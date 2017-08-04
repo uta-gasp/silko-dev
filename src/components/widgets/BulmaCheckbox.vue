@@ -42,7 +42,7 @@
       }
 
     }
-  }
+  };
 </script>
 
 <style lang="less" scoped>

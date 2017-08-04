@@ -1,4 +1,5 @@
 export default class Font {
+
     constructor( family, size, style, weight ) {
         this.family = family;   // string
         this.size = size;       // string
@@ -14,4 +15,5 @@ export default class Font {
             style['font-weight']
         );
     }
+
 }

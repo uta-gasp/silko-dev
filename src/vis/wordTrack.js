@@ -1,4 +1,5 @@
 export default class WordTrack {
+
     constructor( root, userName, session, id ) {
         this.root = root;
         this.name = userName;
@@ -123,4 +124,5 @@ export default class WordTrack {
             this.pointer.classList.add( 'invisible' );
         }
     };
+
 };

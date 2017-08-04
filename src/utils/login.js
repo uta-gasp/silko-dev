@@ -1,9 +1,6 @@
 import db from '@/db/db.js';
 
 class Login {
-    constructor() {
-
-    }
 
     logIn( email, password, cb ) {
         return db.logIn( email, password, cb );
@@ -16,6 +13,7 @@ class Login {
     get user() {
         return db.user;
     }
+
 }
 
 const login = new Login();

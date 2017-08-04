@@ -1,11 +1,3 @@
-    // import Syllabifier from 'utils/syllabifier.js';
-// const syllabifier = new Syllabifier({
-//     language:
-//     threshold: {
-//         factor
-//     }
-// });
-
 function mapDurationToAlpha( word, maxDuration ) {
     let result = 0;
     if (word.duration > DURATION_TRANSPARENT) {
@@ -47,8 +39,8 @@ const Type = {
 };
 
 export default class Metric {
-    static compute( words, metricType ) {
 
+    static compute( words, metricType ) {
         let maxRange = 0;
 
         words.forEach( word => {
@@ -62,11 +54,11 @@ export default class Metric {
                     regressionCount: 0
                 } );
 
-                //const wordText = syllabifier.unprepare( word.text );
+                // const wordText = syllabifier.unprepare( word.text );
                 word.duration = params.duration;
                 word.regressionCount = params.regressionCount;
-                word.charSpeed = 0; //1000 * wordText.length / word.duration;
-                word.syllableSpeed = 0; //1000 * syllabifier.syllables( wordText ).length / word.duration;
+                word.charSpeed = 0; // 1000 * wordText.length / word.duration;
+                word.syllableSpeed = 0; // 1000 * syllabifier.syllables( wordText ).length / word.duration;
 
                 let metricValue = 0;
                 switch (metricType) {
@@ -97,4 +89,5 @@ export default class Metric {
     static get Type() {
         return Type;
     }
-}
+
+};

@@ -8,6 +8,7 @@ const LONG_WORD_MIN_LENGTH = 7;
 const EXTRA_THRESHOLD_FOR_CHAR = 0.05;
 
 export default class Syllabifier {
+
     constructor( options ) {
         this.options = { ...options };
         this.options.threshold.factor = 4;
@@ -28,8 +29,8 @@ export default class Syllabifier {
 
     static get MODES() {
         return {
-            hyphen: String.fromCharCode( 0x00B7 ), //DOTS: 00B7 2010 2022 2043 LINES: 2758 22EE 205E 237F
-            colors: [ 'black', 'red'] //, '#0af'
+            hyphen: String.fromCharCode( 0x00B7 ), // DOTS: 00B7 2010 2022 2043 LINES: 2758 22EE 205E 237F
+            colors: [ 'black', 'red' ] //, '#0af'
         };
     }
 
@@ -55,7 +56,6 @@ export default class Syllabifier {
     }
 
     prepare( text ) {
-
         if (!this.rule || this.options.mode !== 'hyphen') {
             return text;
         }
@@ -71,7 +71,7 @@ export default class Syllabifier {
             const hyphenCount = syllabifiedWord.length - word.length;
             const halfHyphenCount = Math.round( hyphenCount / 2 );
 
-            return  '<span class="hyphens">' +
+            return '<span class="hyphens">' +
                         (Array( halfHyphenCount + 1 ).join( this.hyphen ) ) +
                     '</span>' +
                     word +
@@ -236,11 +236,11 @@ export default class Syllabifier {
 
         return colorizedSyllabs.join('');
     }
+
 };
 
 const rules = {
     Finnish( word, hyphen ) {
-
         const vowels = [ 'a', 'o', 'u', 'i', 'e', 'ä', 'ö', 'y' ];
         const consonants = [ 'b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm',
                             'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'z' ];
@@ -268,8 +268,8 @@ const rules = {
                 if (i < word.length - 1) {
                     const charPrevious = word[ i + 1 ];
                     const typePrevious = getType( charPrevious );
-                    if (charPrevious !== char && typePrevious === type
-                        && !diftongs.includes( char + charPrevious )) {
+                    if (charPrevious !== char && typePrevious === type &&
+                        !diftongs.includes( char + charPrevious )) {
                         result.unshift( hyphen );
                         vowelsInRow = 0;
                     }

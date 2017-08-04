@@ -61,7 +61,7 @@
         showCreationSuccess: 0, // random value to trigger the notification
 
         schools: []
-      }
+      };
     },
 
     computed: {
@@ -75,9 +75,9 @@
       },
 
       canCreate() {
-        return !this.isCreating
-          && this.isNewNameValid
-          && this.isNewEmailValid;
+        return !this.isCreating &&
+          this.isNewNameValid &&
+          this.isNewEmailValid;
       }
     },
 
@@ -145,7 +145,7 @@
     filters: {
       count( obj ) {
         let result = 0;
-        for (let key in obj) {
+        for (let _ in obj) {
           result++;
         }
         return result;
@@ -168,7 +168,7 @@
     mounted() {
       this.loadSchools();
     }
-  }
+  };
 </script>
 
 <style lang="less" scoped>

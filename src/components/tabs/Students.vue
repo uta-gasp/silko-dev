@@ -109,11 +109,11 @@
       },
 
       canCreateStudent() {
-        return !this.isCreating
-          && this.isNewNameValid
-          && this.isNewEmailValid
-          && this.isNewGradeValid
-          && this.isSchoolValid;
+        return !this.isCreating &&
+          this.isNewNameValid &&
+          this.isNewEmailValid &&
+          this.isNewGradeValid &&
+          this.isSchoolValid;
       },
 
       schoolItems() {
@@ -185,7 +185,7 @@
               return `Cannot retrieve school.\n\n${err}`;
             }
             school.getStudents( onDone );
-          })
+          });
         }
         else {
           Student.list( onDone );
@@ -283,7 +283,7 @@
     mounted() {
       this.init();
     }
-  }
+  };
 </script>
 
 <style lang="less" scoped>

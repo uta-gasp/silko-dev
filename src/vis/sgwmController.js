@@ -3,6 +3,7 @@ import OptionsCreator from '@/vis/optionsCreator.js';
 const _SGWM = {};
 
 export default class sgwm {
+
     static initializeSettings() {
         const SGWM = window.SGWM;
         let settings;
@@ -95,7 +96,7 @@ export default class sgwm {
                         'ProgressionMergerSettings.removeSingleFixationLines': { type: Boolean, label: 'Remove unmerged single fixations' },
                         'ProgressionMergerSettings.correctForEmptyLines': { type: Boolean, label: 'Account for empty lines' },
                         'ProgressionMergerSettings.currentLineSupportInCorrection': { type: Number, step: 0.05, label: '\tsupport current line by' },
-                        //'ProgressionMergerSettings.emptyLineDetectorFactor': { type: Number, step: 0.05, label: '\tempty line factor, lines' },
+                        // 'ProgressionMergerSettings.emptyLineDetectorFactor': { type: Number, step: 0.05, label: '\tempty line factor, lines' },
                         'ProgressionMergerSettings.intelligentFirstLineMapping': { type: Boolean, label: 'Intelligent first reading line search' },
                     })
                 },
@@ -126,7 +127,6 @@ export default class sgwm {
     }
 
     static map( page ) {
-
         const sgwmSession = {
           fixations: page.fixations,
           words: page.text.map( word => {
@@ -146,4 +146,5 @@ export default class sgwm {
 
         return result;
     }
+
 };

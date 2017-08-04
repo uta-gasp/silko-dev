@@ -5,6 +5,7 @@ let colorIndex = 0;
 const FIXATION_GROW_INTERVAL = 100;
 
 export default class ReplayTrack {
+
     constructor( root, userName, session ) {
         this.root = root;
         this.name = userName;
@@ -32,7 +33,6 @@ export default class ReplayTrack {
         this.__next = this._next.bind( this );
     }
 
-
     start( pageIndex, callbacks ) {
         this.callbacks = callbacks || {};
         this.callbacks.fixation = this.callbacks.fixation || (() => {});
@@ -41,7 +41,7 @@ export default class ReplayTrack {
 
         this.fixations = this.session[ pageIndex ].fixations;
         if (!this.fixations) {
-            onCompleted();
+            this.callbacks.completed();
             return;
         }
 
@@ -201,4 +201,5 @@ export default class ReplayTrack {
             }, (fixationEndsAt - syllabification.ts) );
         }
     };
+
 };

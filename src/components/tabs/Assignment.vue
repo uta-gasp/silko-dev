@@ -28,7 +28,7 @@
   import Student from '@/model/student.js';
 
   import gazeTracking from '@/utils/gazeTracking.js';
-  import eventBus  from '@/utils/event-bus.js';
+  import eventBus from '@/utils/event-bus.js';
 
   import ModalError from '@/components/widgets/ModalError';
 
@@ -92,15 +92,16 @@
 
           this.student.loadTask( taskID, (err, task ) => {
             if (err) {
-              return this.errorText = err;
+              this.errorText = err;
+              return;
             }
 
             this.task = task;
-
           }).then( value => {
             this.task.getIntro( (err, intro) => {
               if (err) {
-                return this.errorText = err;
+                this.errorText = err;
+                return;
               }
 
               this.intro = intro;
@@ -174,14 +175,14 @@
         if (this.questionnaire) {
           this.student.addQuestionnaire( this.keys.data, this.questionnaire, err => {
             if (err) {
-              console.log( 'TODO questionnaire done', e.err );
+              console.log( 'TODO questionnaire done', err );
             }
           });
         }
 
         this.student.taskDone( this.task.cls, this.keys.session, err => {
           if (err) {
-            console.log( 'TODO task done', e.err );
+            console.log( 'TODO task done', err );
           }
         });
       }
@@ -202,7 +203,7 @@
     mounted() {
       this.init();
     }
-  }
+  };
 </script>
 
 <style lang="less" scoped>

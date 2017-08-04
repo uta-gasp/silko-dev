@@ -24,8 +24,8 @@ export default class OptionsCreator {
 
         return result;
     }
-}
 
+}
 
 function createOptionReference( id, receiver ) {
     return value => {

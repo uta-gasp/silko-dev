@@ -3,9 +3,8 @@ export default class Recordable {
 
     // Extends classes to be upload/downloaded into/from a database
     static apply( cls ) {
-
         // Check whether the object hold all data fields defined in the target class
-        cls.validate = function ( obj ) {
+        cls.validate = function( obj ) {
             return Object.getOwnPropertyNames( new cls.prototype.constructor() ).every( key => {
                 // check all properties but the key
                 if (key === 'id') {
@@ -23,6 +22,8 @@ export default class Recordable {
         // Create a class object from the snapshot received from a database
         cls.from = function( snapshot ) {
             const record = snapshot.val();
+
+            /* eslint-disable new-cap */
             const obj = new cls( snapshot.key );
 
             return Object.assign( obj, record );
@@ -40,4 +41,5 @@ export default class Recordable {
         //     }
         // };
     }
+
 }

@@ -5,6 +5,7 @@ import eventBus from '@/utils/event-bus.js';
 const config = require( `@/config/db.${process.env.NODE_ENV}.js` ).config;
 
 class DB {
+
     // Constructor
     constructor() {
         if (!window['firebase']) {
@@ -47,12 +48,12 @@ class DB {
     // @param cb - callback( err, user )
     logIn( email, password, cb ) {
         if (!this.fb) {
-            cb( {code: 'conn/database-access', message: 'Not connected to the database' } );
+            cb( new Error( 'Not connected to the database' ) );
         }
 
         this.auth.signInWithEmailAndPassword( email, password ).then( user => {
             this.currentPassword = password;
-            cb( undefined, user );
+            cb( null, user );
         }).catch( err => {
             cb( err );
         });
@@ -60,8 +61,8 @@ class DB {
 
     // logs the user out
     logOut() {
-        if (!this.fb) {
-            cb( {code: 'conn/database-access', message: 'Not connected to the database' } );
+        if (!this.auth) {
+            return;
         }
 
         this.auth.signOut();
@@ -74,7 +75,7 @@ class DB {
     // @return - id of the created record
     add( cls, obj, cb ) {
         if (cls.validate && !cls.validate( obj )) {
-            return cb( `${JSON.stringify( obj )} is not of a class '${cls.name}'` );
+            return cb( new Error( `${JSON.stringify( obj )} is not of a class '${cls.name}'` ) );
         }
 
         if (obj.email) {
@@ -83,13 +84,13 @@ class DB {
             // 3. log in back to the current user
             this.ignoreUserSwitch = true;
             this.auth.createUserWithEmailAndPassword( obj.email, 'gdfvgdfv' ).then( user => {
-                //user.sendEmailVerification();
+                // user.sendEmailVerification();
 
                 setTimeout( () => {
                     if (obj.email.indexOf( '@fake.') < 0) {    // TODO: remove this
                         this.auth.sendPasswordResetEmail( obj.email );
                     }
-                } , 1000 );
+                }, 1000 );
 
                 const ref = this.fb.child( cls.db ).push( obj );
 
@@ -101,14 +102,14 @@ class DB {
                 };
                 this.fb.child( 'users' ).update( userRecord );
 
-                cb( undefined, ref.key );
+                cb( null, ref.key );
             }).catch( err => {
                 cb( err );
             });
         }
         else {
             const ref = this.fb.child( cls.db ).push( obj );
-            cb( undefined, ref.key );
+            cb( null, ref.key );
         }
     }
 
@@ -177,11 +178,10 @@ class DB {
         const ref = this.fb.child( `${cls.db}/${id}` );
         return ref.once( 'value', snapshot => {
             if (!snapshot.exists()) {
-                return cb( `${cls.db}/${id} do not exist` );
+                return cb( new Error( `${cls.db}/${id} do not exist` ) );
             }
 
-            cb( undefined, cls.from( snapshot ) );
-
+            cb( null, cls.from( snapshot ) );
         }, err => {
             cb( err );
         });
@@ -205,7 +205,6 @@ class DB {
                 }
 
                 results.push( cls.from( snapshot ) );
-
             }, err => {
                 errors.push( err );
             }));
@@ -230,8 +229,7 @@ class DB {
                 objs.push( cls.from( childSnapshot ) );
             });
 
-            cb( undefined, objs );
-
+            cb( null, objs );
         }, err => {
             cb( err );
         });
@@ -245,7 +243,7 @@ class DB {
         const ref = this.fb.child( cls.db );
         return ref.once( 'value', snapshot => {
             if (!snapshot.exists()) {
-                return cb( `${cls.db} do not exist` );
+                return cb( new Error( `${cls.db} do not exist` ) );
             }
 
             const objs = [];
@@ -254,8 +252,7 @@ class DB {
                 objs.push( cls.from( childSnapshot ) );
             });
 
-            cb( undefined, objs );
-
+            cb( null, objs );
         }, err => {
             cb( err );
         });
@@ -313,7 +310,8 @@ class DB {
                     eventBus.$emit( 'login' );
                 });
             });
-        } else if (this._user) {
+        }
+        else if (this._user) {
             this._user = null;
             eventBus.$emit( 'logout' );
         }
@@ -330,9 +328,9 @@ class DB {
                 result.push( key );
             }
         }
-        else if (typeof obj === 'boolean'
-              || typeof obj === 'number'
-              || typeof obj === 'string') {
+        else if (typeof obj === 'boolean' ||
+                 typeof obj === 'number' ||
+                 typeof obj === 'string') {
             result = [ obj ];
         }
         else {
@@ -341,6 +339,7 @@ class DB {
 
         return result;
     }
+
 }
 
 const db = new DB();

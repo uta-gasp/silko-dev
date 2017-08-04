@@ -1,6 +1,7 @@
 import Recordable from './commons/recordable.js';
 
 export default class Session {
+
     constructor( id ) {
         this.id = id;
         this.date = (new Date()).toJSON();
@@ -16,6 +17,7 @@ export default class Session {
     static get db() {
         return 'sessions';
     }
+
 }
 
 Recordable.apply( Session );

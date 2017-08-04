@@ -1,6 +1,6 @@
 <template lang="pug">
   #word-replay
-    .title {{ data.title }}
+    vis-title {{ data.title }}
     .list(ref="root")
       table(ref="table")
         thead
@@ -44,8 +44,9 @@
 
   import ControlPanel from '@/components/vis/controlPanel';
   import Options from '@/components/vis/Options';
+  import VisTitle from '@/components/vis/VisTitle';
 
-  const SGWM_OPTIONS = sgwmController.initializeSettings();
+  sgwmController.initializeSettings();
 
   const UI = {
     levelDuration: 500,
@@ -57,6 +58,7 @@
      components: {
       'control-panel': ControlPanel,
       'options': Options,
+      'vis-title': VisTitle,
     },
 
    data() {
@@ -212,14 +214,14 @@
           this.colorizeCell( cell, rawWord.totalDuration );
 
           track.pointer.style = `left: ${cell.offsetLeft + (cell.offsetWidth - track.pointerSize) / 2}px; top: ${cell.offsetTop + (cell.offsetHeight - track.pointerSize) / 2}px`;
-        }
+        };
       },
 
       onTrackCompleted( track, row ) {
         return () => {
           // const cell = row.cells[ track.id + 1 ];
           // cell.classList.remove( 'hidden' );
-        }
+        };
       },
     },
 
@@ -236,17 +238,6 @@
 </script>
 
 <style lang="less" scoped>
-  .title {
-    position: fixed;
-    width: 100vw;
-    color: #444;
-    font: 18px 'Roboto Condensed', Arial, sans-serif;
-    top: 0;
-    left: 0;
-    text-align: center;
-    line-height: 32px;
-  }
-
   #word-replay {
     position: fixed;
     left: 0;
@@ -259,13 +250,13 @@
     .list {
       position: absolute;
       left: 50%;
-      top: 2em;
+      top: 48px;
       bottom: 8px;
       max-width: 100vw;
       transform: translate(-50%, 0);
       padding-right: 1px;
 
-      height: ~"calc(100vh - 2em)";
+      height: ~"calc(100vh - 48px)";
       overflow-y: auto;
 
       border: 1px solid #444;

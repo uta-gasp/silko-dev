@@ -181,7 +181,7 @@
     created() {
       this.currentTab = this.tabs.text;
     }
-  }
+  };
 </script>
 
 <style lang="less" scoped>

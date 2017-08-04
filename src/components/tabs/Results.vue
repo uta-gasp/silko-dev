@@ -35,8 +35,8 @@
                   th
                   th
                   th
-                  th.is-pulled-right
-                    button.button.is-primary(:disabled="!isLoaded" @click="selectClassStudents( cls, VISUALIZATIONS.studentsSummary )") Statistics
+                  th
+                    button.button.is-primary.is-pulled-right(:disabled="!isLoaded" @click="selectClassStudents( cls, VISUALIZATIONS.studentsSummary )") Summary
               tbody
                 tr(v-for="student in cls.students" :key="student.ref.id")
                   td {{ student.ref.name }}
@@ -85,31 +85,38 @@
   import StudentsSummary from '@/components/vis/StudentsSummary';
 
   class _Session {
+
     constructor( ref, student, task, cls ) {
       this.ref = ref;           // Session
       this.student = student;   // Student
       this.task = { id: task.id, name: task.name };
       this.cls = { id: cls.id, name: cls.name };
     }
-  }
+
+}
 
   class _Student {
+
     constructor( ref ) {
       this.ref = ref;     // Student
       this.sessions = []; // [ _Session ]
     }
-  }
+
+}
 
   class _Task {
+
     constructor( id, name ) {
       this.id = id;
       this.name = name;
       this.students = new Set();  // ( _Student )
       this.sessions = [];         // [ _Session ]
     }
-  }
+
+}
 
   class _Class {
+
     constructor( ref, tasks ) {
       this.ref = ref;     // Class
       this.tasks = tasks; // [ _Task ]
@@ -161,24 +168,29 @@
         cb();
       });
     }
-  }
+
+}
 
   class _Record {
+
     constructor( session, data ) {
       this.student = session.student;
       this.session = session.ref;
       this.task = session.task;
       this.cls = session.cls;
-      this.data = data.find( item => item.id === session.ref.data )
+      this.data = data.find( item => item.id === session.ref.data );
     }
-  }
 
-  class _VisualizationInitialData{
+}
+
+  class _VisualizationInitialData {
+
     constructor( name, sessions ) {
       this.name = name;
       this.sessions = sessions;
     }
-  }
+
+}
 
   export default {
     name: 'results',
@@ -321,7 +333,9 @@
 
       selectSession( student, deferredVisualizationName ) {
         if (student.sessions.length === 1) {
-          this.visualizeSessions( student.sessions, deferredVisualizationName );
+          this.visualizeSessions( student.sessions, deferredVisualizationName, {
+            student: student.ref.name
+          });
           return;
         }
 
@@ -348,7 +362,9 @@
           e.students[ session.student.id ]
         );
 
-        this.visualizeSessions( sessions, this.deferredVisualization.name );
+        this.visualizeSessions( sessions, this.deferredVisualization.name, {
+          student: e.students.length === 1 ? e.students[0] : null
+        });
 
         this.closeStudentSelectionBox();
       },
@@ -358,17 +374,20 @@
           e.sessions[ session.ref.id ]
         );
 
-        this.visualizeSessions( sessions, this.deferredVisualization.name );
+        this.visualizeSessions( sessions, this.deferredVisualization.name, {
+          student: sessions.length === 1 ? sessions[0].student.name : null,
+          session: e.sessions.length === 1 ? e.sessions[0] : null
+        });
 
         this.closeSessionSelectionBox();
       },
 
-      visualizeSessions( sessions, name ) {
+      visualizeSessions( sessions, name, params ) {
         if (!sessions || !sessions.length) {
           return;
         }
 
-        const grade = this.gradeWithStudents ? this.gradeWithStudents[0] : null;
+        params.grade = this.gradeWithStudents ? this.gradeWithStudents[0] : null;
 
         const dataIDs = sessions.map( session => session.ref.data );
         Student.getData( dataIDs, (err, data) => {
@@ -377,7 +396,7 @@
           }
 
           const records = sessions.map( session => new _Record( session, data ) );
-          const visSpecData = this[ 'create' + name ]( records, grade );
+          const visSpecData = this[ 'create' + name ]( records, params );
 
           const r = records[0];
           const props = {
@@ -399,30 +418,33 @@
         };
       },
 
-      createDurations( records ) {
+      createDurations( records, params ) {
         const r = records[0];
+        const student = params.student ? ` for ${params.student}` : '';
         return {
-          title: `Word reading durations in "${r.task.name}"`,
+          title: `Word reading durations in "${r.task.name}"${student}`,
         };
       },
 
-      createGazeReplay( records ) {
+      createGazeReplay( records, params ) {
         const r = records[0];
+        const student = params.student ? ` for ${params.student}` : '';
         return {
-          title: `Gaze replay in "${r.task.name}"`,
+          title: `Gaze replay in "${r.task.name}"${student}`,
         };
       },
 
-      createWordReplay( records ) {
+      createWordReplay( records, params ) {
         const r = records[0];
+        const student = params.student ? ` for ${params.student}` : '';
         return {
-          title: `Word replay in "${r.task.name}"`
+          title: `Word replay in "${r.task.name}"${student}`
        };
       },
 
-      createStudentsSummary( records, grade ) {
+      createStudentsSummary( records, params ) {
         return {
-          title: `${grade.students.length} students from ${grade.name}`
+          title: `${params.grade.students.length} students from ${params.grade.name}`
         };
       },
 
@@ -450,7 +472,7 @@
     mounted() {
       this.init();
     }
-  }
+  };
 </script>
 
 <style lang="less" scoped>

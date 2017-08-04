@@ -3,6 +3,7 @@ import School from '@/model/school.js';
 import db from '@/db/db.js';
 
 export default class Admin {
+
     constructor() {
         this.name = 'Admin';
     }
@@ -37,7 +38,7 @@ export default class Admin {
         db.updateField( user, 'school', newSchoolID, err => {
             if (err) {
                 user.school = prevSchoolID;
-                return console.log( err ); // TODO handle error
+                return console.error( err ); // TODO handle error
             }
 
             const prevSchool = schools.find( school => school.id === prevSchoolID );
@@ -48,15 +49,16 @@ export default class Admin {
 
             db.updateField( newSchool, `${list}/${user.id}`, user.name, err => {
                 if (err) {
-                    return console.log( err ); // TODO handle error
+                    return console.error( err ); // TODO handle error
                 }
 
                 db.deleteField( prevSchool, `${list}/${user.id}`, err => {
                     if (err) {
-                        return console.log( err ); // TODO handle error
+                        return console.error( err ); // TODO handle error
                     }
                 });
             });
         });
     }
+
 };

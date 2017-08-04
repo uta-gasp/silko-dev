@@ -32,7 +32,6 @@ let lastState = {};
 class GazeTracking {
 
     constructor() {
-
         this.serviceCheckTimer = null;
 
         window.GazeTargets.init({
@@ -62,19 +61,21 @@ class GazeTracking {
             state: state => {
                 lastState = state;
                 if (state.device) {
-                    device = state.device
+                    device = state.device;
                 }
                 else if (!state.isConnected) {
                     device = '';
                 }
 
                 if (state.isTracking) {
-                    if (callbacks.started)
+                    if (callbacks.started) {
                         callbacks.started();
+                    }
                 }
                 else if (state.isStopped) {
-                    if (callbacks.stopped)
+                    if (callbacks.stopped) {
                         callbacks.stopped();
+                    }
                 }
 
                 if (callbacks.stateUpdated) {
@@ -88,12 +89,14 @@ class GazeTracking {
 
             target: (event, target) => {
                 if (event === 'focused') {
-                    if (callbacks.wordFocused)
+                    if (callbacks.wordFocused) {
                         callbacks.wordFocused( target );
+                    }
                 }
                 else if (event === 'left') {
-                    if (callbacks.wordLeft)
+                    if (callbacks.wordLeft) {
                         callbacks.wordLeft( target );
+                    }
                 }
             },
 
@@ -157,6 +160,7 @@ class GazeTracking {
             }
         }, RECONNECT_INTERVAL);
     }
+
 }
 
 const gazeTracking = new GazeTracking();

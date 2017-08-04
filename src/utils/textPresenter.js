@@ -21,6 +21,7 @@ const STYLE_NAMES = [   // must correspond to the styles in TaskText.vue
 ];
 
 export default class TextPresenter {
+
     constructor( task, firstPage, container, syllabifier ) {
         // this.task = task;
         // this.firstPage = firstPage;
@@ -107,7 +108,6 @@ export default class TextPresenter {
     //      For example, "This is\b a text|n" will expand
     //      to HTML "<span class="n">This <span class="b">is</span> a text</span>"
     _lineToElement( line ) {
-
         const styledLine = this._parseStyles( line );
 
         const el = document.createElement( 'div' );
@@ -150,8 +150,7 @@ export default class TextPresenter {
             return `<span class="${classes.join(' ')}" style="${css.join(';')}">${s}${text}</span>${s}`;
         }
 
-        return line.replace( RE_WORD, applyStyleAndSpace ).
-                    replace( RE_LINE, applyStyle );
+        return line.replace( RE_WORD, applyStyleAndSpace ).replace( RE_LINE, applyStyle );
     }
 
     // Splits the text nodes into words, each in its own span.word element
@@ -160,12 +159,12 @@ export default class TextPresenter {
 
         const nodeIterator = document.createNodeIterator(
             this.container,
-            NodeFilter.SHOW_TEXT,
+            window.NodeFilter.SHOW_TEXT,
             { acceptNode: node => {
-                if ( ! /^\s*$/.test( node.data ) ) {
-                    return NodeFilter.FILTER_ACCEPT;
+                if ( !/^\s*$/.test( node.data ) ) {
+                    return window.NodeFilter.FILTER_ACCEPT;
                 }
-                return NodeFilter.FILTER_REJECT;
+                return window.NodeFilter.FILTER_REJECT;
             }}
         );
 
@@ -174,13 +173,11 @@ export default class TextPresenter {
         const docFrags = [];
 
         while ((node = nodeIterator.nextNode())) {
-
             let word;
             let index = 0;
             const docFrag = document.createDocumentFragment();
 
             while ((word = re.exec( node.textContent )) !== null) {
-
                 if (index < word.index) {
                     const space = document.createTextNode( node.textContent.substring( index, word.index ) );
                     docFrag.appendChild( space );
@@ -203,4 +200,5 @@ export default class TextPresenter {
             item.node.parentNode.replaceChild( item.docFrag, item.node );
         });
     }
+
 };

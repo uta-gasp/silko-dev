@@ -2,12 +2,10 @@ import Vue from 'vue';
 import jsdom from 'jsdom';
 import StudentSelectionBox from 'widgets/StudentSelectBox.vue';
 
-const renderer = require('vue-server-renderer').createRenderer();
+const renderer = require( 'vue-server-renderer' ).createRenderer();
 
-describe('Test suite for StudentSelectionBox', () => {
-
-  it('Dummy testing...', () => {
-
+describe( 'Test suite for StudentSelectionBox', () => {
+  it( 'Dummy testing...', () => {
     const ClonedComponent = Vue.extend( StudentSelectionBox );
     const NewComponent = new ClonedComponent({
       data() {
@@ -21,7 +19,5 @@ describe('Test suite for StudentSelectionBox', () => {
       const selectButton = dom.window.document.querySelector( '.level-left button' );
       expect( selectButton.textContent ).toContain( 'Select' );
     });
-
   });
-
 });

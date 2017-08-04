@@ -92,10 +92,10 @@
       },
 
       canCreate() {
-        return !this.isCreating
-          && this.isNewNameValid
-          && this.isNewEmailValid
-          && this.isSchoolValid;
+        return !this.isCreating &&
+          this.isNewNameValid &&
+          this.isNewEmailValid &&
+          this.isSchoolValid;
       },
 
       isAdmin() {
@@ -250,7 +250,7 @@
     mounted() {
       this.init();
     }
-  }
+  };
 </script>
 
 <style lang="less" scoped>

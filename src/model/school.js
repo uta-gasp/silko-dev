@@ -2,11 +2,11 @@ import Recordable from './commons/recordable.js';
 
 import Teacher from './teacher.js';
 import Student from './student.js';
-import Class from './class.js';
 
 import db from '@/db/db.js';
 
 export default class School {
+
     constructor( id, email, name ) {
         this.id = id;
         this.name = name;   // ""
@@ -64,7 +64,7 @@ export default class School {
                 return cb( err );
             }
 
-            cb( undefined, teachers );
+            cb( null, teachers );
         });
     }
 
@@ -99,7 +99,7 @@ export default class School {
                 return cb( err );
             }
 
-            cb( undefined, students );
+            cb( null, students );
         });
     }
 
@@ -133,6 +133,7 @@ export default class School {
 
     //     cb( _err );
     // }
+
 }
 
 Recordable.apply( School );

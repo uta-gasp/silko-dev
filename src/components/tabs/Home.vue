@@ -33,7 +33,7 @@
   import eventBus from '@/utils/event-bus.js';
   import login from '@/utils/login.js';
 
-  import Login from '@/components/widgets/Login'
+  import Login from '@/components/widgets/Login';
 
   export default {
     name: 'home',
@@ -46,7 +46,7 @@
       return {
         isLoginVisible: true,
         user: null
-      }
+      };
     },
 
     computed: {
@@ -59,7 +59,7 @@
         else if (this.isSchool) { return 'a school'; }
         else if (this.isTeacher) { return 'a teacher'; }
         else if (this.isStudent) { return 'a student'; }
-        else { return 'an anonym' }
+        else { return 'an anonym'; }
       }
     },
 
@@ -79,7 +79,7 @@
 
     mounted() {
     }
-  }
+  };
 </script>
 
 <style lang="less" scoped>

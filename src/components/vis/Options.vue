@@ -62,18 +62,17 @@
       },
 
       reset( e ) {
-        localStorage.removeItem( ID );
-        location.reload();
+        window.localStorage.removeItem( ID );
+        window.location.reload();
       },
 
       loadSettings() {
-        const options = JSON.parse( localStorage.getItem( ID ) );
+        const options = JSON.parse( window.localStorage.getItem( ID ) );
         if (!options) {
           return;
         }
 
         const pop = (storage, values) => {
-
           for (let name in storage) {
             const value = values[ name ];
             const saved = storage[ name ];
@@ -111,7 +110,7 @@
 
         push( options, this.values );
 
-        localStorage.setItem( ID, JSON.stringify( options) );
+        window.localStorage.setItem( ID, JSON.stringify( options) );
       },
 
       update() {
@@ -328,7 +327,7 @@
       this.loadSettings();
       this.bind();
     }
-  }
+  };
 </script>
 
 <style lang="less" scoped>

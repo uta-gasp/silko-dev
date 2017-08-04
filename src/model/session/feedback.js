@@ -1,4 +1,5 @@
 export default class Feedback {
+
     constructor( options ) {
         this.enabled = options.enabled;         // boolean
         this.language = options.language;       // boolean
@@ -8,4 +9,5 @@ export default class Feedback {
             adjustForWordLength: options.threshold.adjustForWordLength, // boolean
         };
     }
+
 }

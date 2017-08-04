@@ -1,6 +1,7 @@
 import Recordable from './commons/recordable.js';
 
 export default class Data {
+
     constructor( id, task, student, pages, text ) {
         this.id = id;
         this.task = task;
@@ -11,6 +12,7 @@ export default class Data {
     static get db() {
         return 'data';
     }
+
 }
 
 Recordable.apply( Data );

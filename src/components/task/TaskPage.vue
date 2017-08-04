@@ -12,7 +12,7 @@
   import TaskText from '@/components/widgets/TaskText';
 
   import TextPresenter from '@/utils/textPresenter.js';
-  import FeedbackProvider from '@/utils/feedbackProvider.js'
+  import FeedbackProvider from '@/utils/feedbackProvider.js';
   import DataCollector from '@/utils/dataCollector.js';
   import gazeTracking from '@/utils/gazeTracking.js';
 

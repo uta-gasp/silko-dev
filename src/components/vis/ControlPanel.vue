@@ -37,7 +37,7 @@
     data() {
       return {
         pageIndex: this.initialPageIndex || 0,
-      }
+      };
     },
 
     props: {

@@ -34,7 +34,7 @@
 </template>
 
 <script>
-  import eventBus  from '@/utils/event-bus.js';
+  import eventBus from '@/utils/event-bus.js';
   import login from '@/utils/login.js';
 
   export default {
@@ -43,7 +43,7 @@
     data() {
       return {
         user: null
-      }
+      };
     },
 
     methods: {
@@ -84,7 +84,7 @@
         this.user = null;
       });
     }
-  }
+  };
 </script>
 
 <style lang="less" scoped>

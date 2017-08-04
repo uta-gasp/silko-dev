@@ -70,7 +70,7 @@
           syllab: this.syllab,
           speech: this.speech,
           syllabExceptions: this.syllabExceptions
-        }
+        };
 
         result.syllab.mode = this.syllabMode;
         result.syllab.temporary = this.syllabTemporary;
@@ -90,7 +90,7 @@
       syllabTemporary() { this.$emit( 'input', this.model ); },
       syllabAdjustForWordLength() { this.$emit( 'input', this.model ); },
     },
-  }
+  };
 </script>
 
 <style lang="less" scoped>
