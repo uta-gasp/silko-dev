@@ -2313,7 +2313,7 @@
         connect: function () {
             utils.debug('ETUDriver', 'WebSocket created');
 
-            var protocol = 'ws'; //location.protocol.indexOf("https" >= 0) ? 'wss' : 'ws';
+            var protocol = location.protocol.indexOf("https" >= 0) ? 'wss' : 'ws';
             var wsURI = protocol + '://localhost:' + settings.port + '/';
             websocket = new WebSocket(wsURI);
             websocket.onopen    = onWebSocketOpen;
