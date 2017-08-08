@@ -1,5 +1,5 @@
 <template lang="pug">
-  #assignments
+  #assignments.section
     nav.panel
       p.panel-heading Assignments
       .panel-block

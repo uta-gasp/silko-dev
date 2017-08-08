@@ -1,8 +1,8 @@
 <template lang="pug">
   #app
     navbar(v-show="isLoggedIn")
-    section.section
-      .container.is-fluid
+    section.section.is-paddingless
+      .container.is-fluid.is-marginless
         router-view
 </template>
 

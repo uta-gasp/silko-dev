@@ -2,11 +2,12 @@ import Recordable from './commons/recordable.js';
 
 export default class Data {
 
-    constructor( id, task, student, pages, text ) {
+    constructor( id ) {
         this.id = id;
-        this.task = task;
-        this.student = student;
-        this.pages = pages; // array of DataPage
+        this.task = null;           // id
+        this.student = null;        // id
+        this.pages = null;          // [ DataPage ]
+        this.questionnaire = null;  // [ Question ]
     }
 
     static get db() {

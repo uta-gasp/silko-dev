@@ -6,7 +6,10 @@
           p {{ question.question }}
 
         .answers
-          button.button.answer.is-large.is-light(v-for="answer in question.answers" @click="reply( answer )") {{ answer }}
+          button.button.answer.is-large.is-light(
+            :class="asnwerRevealedClass( answer )"
+            v-for="answer in question.answers"
+            @click="reply( answer )") {{ answer.text }}
 </template>
 
 <script>
@@ -40,18 +43,32 @@
       question() {
         return this.questionIndex >= 0 && this.questionIndex < this.questions.length
           ? this.questions[ this.questionIndex ] : {};
-      }
+      },
     },
 
     methods: {
-      reply( answer ) {
-        this.question.answer = answer;
+      asnwerRevealedClass( answer ) {
+        return {
+          'is-success': this.question.answer && this.question.answer.text === answer.text && answer.isCorrect,
+          'is-danger': this.question.answer && this.question.answer.text === answer.text && !answer.isCorrect
+        };
+      },
 
-        if (this.questionIndex === this.questions.length - 1) {
-          return this.$emit( 'finished', { questionnaire: this.questions } );
+      reply( answer ) {
+        if (this.question.answer) {
+          return;
         }
 
-        this.questionIndex++;
+        this.question.answer = answer;
+
+        window.setTimeout( () => {
+          if (this.questionIndex === this.questions.length - 1) {
+            this.$emit( 'finished', { questionnaire: this.questions } );
+            return;
+          }
+
+          this.questionIndex++;
+        }, 2000 );
       }
     },
   };

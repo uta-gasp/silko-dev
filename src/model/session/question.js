@@ -9,7 +9,7 @@ export default class Question {
         this.type = type;
         this.word = word;
         this.question = question;
-        this.answers = answers;
+        this.answers = answers; // { text, isCorrect }
     }
 
     static get types() {

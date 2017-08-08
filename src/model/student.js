@@ -118,8 +118,8 @@ export default class Student {
             }
 
             // TODO enable this in production and remove the other line
-            // this.setAssignment( task, null, cb );
-            cb();
+            this.setAssignment( task, null, cb );
+            // cb();
         });
     }
 
@@ -135,6 +135,35 @@ export default class Student {
 
     getSessions( cb ) {
         db.getFromIDs( Session, this.sessions, cb );
+    }
+
+    deleteSession( id, cb ) {
+        const session = this.sessions[ id ];
+        if (!session) {
+            return cb( new Error( 'Session does not exist' ) );
+        }
+
+        delete this.sessions;
+
+        db.deleteField( this, `sessions/${id}`, err => {
+            if (err) {
+                return cb( err );
+            }
+
+            db.get( Session, id, (err, session) => {
+                if (err) {
+                    return cb( err );
+                }
+
+                const promises = [];
+                promises.push( db.deleteItems( Data, [ session.data ], err => {} ) );
+                promises.push( db.deleteItems( Session, [ id ], err => {} ) );
+
+                Promise.all( promises ).then( () => {
+                    cb( null );
+                });
+            });
+        });
     }
 
     static getData( ids, cb ) {

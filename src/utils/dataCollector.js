@@ -229,7 +229,8 @@ export default class DataCollector {
                 page.data.filterFixations( MIN_FIXATION_DURATION );
                 page.data.setWords( page.words );
                 return page.data;
-            })
+            }),
+            questionnaire: null,
         };
 
         db.add( Data, data, (err, dataKey) => {

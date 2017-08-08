@@ -17,21 +17,21 @@
             input.input(type="text" placeholder="Question" v-model="question")
           p.control
             .columns.is-inlined
-              .column
-                input.input(type="text" placeholder="answer" v-model="answer0")
-              .column
-                input.input(type="text" placeholder="answer" v-model="answer1")
-              .column
-                input.input(type="text" placeholder="answer" v-model="answer2")
-              .column
-                input.input(type="text" placeholder="answer" v-model="answer3")
+              .column(v-for="answer in answers")
+                p.control.has-icon
+                  input.input(type="text" placeholder="answer" v-model="answer.text")
+                  template(v-if="answer.text")
+                    span.icon.is-small.is-left.checkbox(v-if="!answer.isCorrect")
+                      i.fa.fa-check(@click="selectCorrect( answer )")
+                    span.icon.is-small.is-left.checkbox.is-success(v-else)
+                      i.fa.fa-check-circle(@click="selectCorrect( answer )")
           p.control
             button.button.is-primary(:disabled="!canAdd" @click="add") Add
 
       .panel-block.questions.is-paddingless
         table.table
           tbody
-            tr(v-for="question in questions" :key="question")
+            tr(v-for="question in questions" :key="question.question")
               td.is-narrow
                 template(v-if="question.type === 'word'")
                   p.word.is-inline-block {{ question.word }}
@@ -39,7 +39,9 @@
                   .heading.is-inline-block {{ question.type }}
               td
                 span.is-inline-block {{ question.question }}
-                i.is-inline-block.is-pulled-right.answers {{ question.answers.join( ', ' ) }}
+                //- i.is-inline-block.is-pulled-right.answers {{ answersToString( question ) }}
+                i.is-inline-block.is-pulled-right.answers
+                  span.answer(:class="{ 'is-correct': answer.isCorrect }" v-for="answer in question.answers") {{ answer.text }}
               td.is-narrow
                 button.button.is-danger(@click="remove( question )")
                   i.fa.fa-remove
@@ -57,10 +59,12 @@
         type: '',
         word: '',
         question: '',
-        answer0: '',
-        answer1: '',
-        answer2: '',
-        answer3: '',
+        answers: [
+          { text: '', isCorrect: true },
+          { text: '', isCorrect: false },
+          { text: '', isCorrect: false },
+          { text: '', isCorrect: false },
+        ],
 
         questions: this.task ? Array.from( this.task.questionnaire ) : [],
 
@@ -79,16 +83,7 @@
       canAdd() {
         return this.type === this.types.word ? this.word.length > 0 : true &&
           this.question.length > 5 &&
-            this.answer0.length > 0 &&
-            this.answer1.length > 0 &&
-            this.answer2.length > 0 &&
-            this.answer3.length > 0;
-      },
-
-      answers() {
-        return Array.from({ length: 4 }).map( (v, i) => {
-          return this[ `answer${i}` ];
-        });
+          this.answers.every( answer => answer.text.length );
       },
 
       model() {
@@ -105,6 +100,10 @@
     },
 
     methods: {
+      answersToString( question ) {
+        return question.answers.map( answer => answer.text ).join( ', ' )
+      },
+
       add( e ) {
         this.questions.push( new Question(
           this.type.name,
@@ -116,6 +115,12 @@
 
       remove( question ) {
         this.questions = this.questions.filter( item => item !== question );
+      },
+
+      selectCorrect( answer ) {
+        console.log('reverse');
+        this.answers.forEach( answer => { answer.isCorrect = false; } );
+        answer.isCorrect = true;
       }
     },
 
@@ -154,6 +159,31 @@
   .answers {
     font-size: 0.8em;
   }
+
+  .is-correct {
+    color: #23d160;
+  }
+
+  .answer + .answer:before {
+    content: ', ';
+    color: black;
+  }
+
+  // overwrite Bulma
+  .control.has-icon .input:focus + .icon {
+    color: #dbdbdb;
+  }
+
+  .control.has-icon .input + .icon.is-success,
+  .control.has-icon .input:focus + .icon.is-success {
+    color: #23d160;
+  }
+
+  .control.has-icon .icon.checkbox {
+    pointer-events: auto;
+  }
+
+  // --- end ---
 
   .column:not(:first-of-type) {
     padding-left: 0.25em;

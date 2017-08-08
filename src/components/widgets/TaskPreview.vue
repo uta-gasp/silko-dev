@@ -64,7 +64,8 @@
 
       syllabifyAll( e ) {
         this.textPresenter.words.forEach( (text, el ) => {
-          this.feedbackProvider.syllabifier.syllabifyWord( el, text );
+          // console.log('--', text)
+          this.feedbackProvider.syllabifier.syllabifyElementText( el, text );
         });
       },
 
@@ -86,7 +87,7 @@
         if (e.target.classList.contains( 'word' )) {
           const text = this.feedbackProvider.syllabifier.unprepare( e.target.textContent );
           if (text) {
-            this.feedbackProvider.syllabifier.syllabifyWord( e.target, text );
+            this.feedbackProvider.syllabifier.syllabifyElementText( e.target, text );
           }
         }
       },

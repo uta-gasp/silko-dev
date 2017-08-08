@@ -2,7 +2,13 @@ import UserCreator from './user-creator.js';
 
 import eventBus from '@/utils/event-bus.js';
 
-const config = require( `@/config/db.${process.env.NODE_ENV}.js` ).config;
+// TODO remove the first line, uncomment the other
+const config = require( `@/config/db.development.js` ).config;
+// const config = require( `@/config/db.${process.env.NODE_ENV}.js` ).config;
+
+function ctor( obj ) {
+    return Object.getPrototypeOf( obj ).constructor;
+}
 
 class DB {
 
@@ -68,6 +74,14 @@ class DB {
         this.auth.signOut();
     }
 
+    resetPassword( email, cb ) {
+        this.auth.sendPasswordResetEmail( email ).then( _ => {
+            cb( null );
+        }).catch( err => {
+            cb( err );
+        });
+    }
+
     // Adds a new record
     // @param cls - class
     // @param obj - object to store
@@ -75,7 +89,9 @@ class DB {
     // @return - id of the created record
     add( cls, obj, cb ) {
         if (cls.validate && !cls.validate( obj )) {
-            return cb( new Error( `${JSON.stringify( obj )} is not of a class '${cls.name}'` ) );
+            let objString = JSON.stringify( obj );
+            objString = objString.substr( 0, Math.min( objString.length, 50 ) );
+            return cb( new Error( `"${objString}" is not of a class '${cls.name}'` ) );
         }
 
         if (obj.email) {
@@ -132,7 +148,7 @@ class DB {
     // @return - Promose
     updateField( obj, field, value, cb ) {
         const updates = {};
-        updates[ `/${obj.__proto__.constructor.db}/${obj.id}/${field}` ] = value;
+        updates[ `/${ctor(obj).db}/${obj.id}/${field}` ] = value;
         return this.fb.update( updates, cb );
     }
 
@@ -146,12 +162,12 @@ class DB {
 
         if (upd instanceof Array) {
             upd.forEach( item => {
-                updates[ `/${obj.__proto__.constructor.db}/${obj.id}/${item.field}` ] = item.value;
+                updates[ `/${ctor(obj).db}/${obj.id}/${item.field}` ] = item.value;
             });
         }
         else {
             for (let field in upd) {
-                updates[ `/${obj.__proto__.constructor.db}/${obj.id}/${field}` ] = upd[ field ];
+                updates[ `/${ctor(obj).db}/${obj.id}/${field}` ] = upd[ field ];
             }
         }
 
@@ -165,7 +181,7 @@ class DB {
     // @param cb - callback( err )
     // @return - Promose
     setField( obj, field, value, cb ) {
-        const ref = this.fb.child( `/${obj.__proto__.constructor.db}/${obj.id}` );
+        const ref = this.fb.child( `/${ctor(obj).db}/${obj.id}` );
         return ref.child( field ).set( value, cb );
     }
 
@@ -270,12 +286,12 @@ class DB {
     }
 
     delete( obj, cb ) {
-        const ref = this.fb.child( `${obj.__proto__.constructor.db}/${obj.id}` );
+        const ref = this.fb.child( `${ctor(obj).db}/${obj.id}` );
         return ref.remove().then( () => cb() ).catch( err => cb( err ) );
     }
 
     deleteField( obj, field, cb ) {
-        const ref = this.fb.child( `${obj.__proto__.constructor.db}/${obj.id}/${field}` );
+        const ref = this.fb.child( `${ctor(obj).db}/${obj.id}/${field}` );
         return ref.remove().then( () => cb() ).catch( err => cb( err ) );
     }
 

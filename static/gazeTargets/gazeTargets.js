@@ -2428,6 +2428,7 @@
 
     var onWebSocketOpen = function (evt) {
         utils.debug('ETUDriver', 'WebSocket opened');
+        currentStateFlags = stateFlags.none;
         var state = getState(stateFlags.none);
 
         panel.setLabel(stateLabel.connected);

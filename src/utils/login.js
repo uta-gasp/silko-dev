@@ -10,6 +10,10 @@ class Login {
         return db.logOut();
     }
 
+    resetPassword( email, cb ) {
+        return db.resetPassword( email, cb );
+    }
+
     get user() {
         return db.user;
     }

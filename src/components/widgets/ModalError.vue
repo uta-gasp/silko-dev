@@ -1,11 +1,11 @@
 <template lang="pug">
   #modal-error.modal(:class="{ 'is-active': !!text }")
-      .modal-background
-      .modal-content
-        .notification.is-danger
-          .heading.has-text-centered Assignment error
-          .has-text-centered {{ text }}
-      button.modal-close(@click="close")
+    .modal-background
+    .modal-content
+      .notification.is-danger
+        .heading.has-text-centered Assignment error
+        .has-text-centered {{ text }}
+    button.modal-close(@click="close")
 </template>
 
 <script>

@@ -1,5 +1,5 @@
 <template lang="pug">
-  #schools
+  #schools.section
     modal-notification(type="danger" :show="showCreationError")
       span Failed to add a school: {{ creationError }}
     modal-notification(type="success" :show="showCreationSuccess")

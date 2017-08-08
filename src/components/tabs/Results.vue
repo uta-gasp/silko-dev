@@ -1,5 +1,5 @@
 <template lang="pug">
-  #results
+  #results.section
     .container(v-if="!classes.length")
       i No data was recorded yet
     //- .tile.is-ancestor(v-else)
@@ -36,10 +36,13 @@
                   th
                   th
                   th
+                  th
                     button.button.is-primary.is-pulled-right(:disabled="!isLoaded" @click="selectClassStudents( cls, VISUALIZATIONS.studentsSummary )") Summary
               tbody
                 tr(v-for="student in cls.students" :key="student.ref.id")
                   td {{ student.ref.name }}
+                  td.is-narrow
+                    button.button.is-warning(:disabled="!isLoaded || !student.sessions.length" @click="editSessions( student )") Edit
                   td.is-narrow
                     button.button.is-primary(:disabled="!isLoaded" @click="selectSession( student, VISUALIZATIONS.gazePlot )") Gaze plot
                   td.is-narrow
@@ -49,11 +52,23 @@
                   td.is-narrow
                     button.button.is-primary(:disabled="!isLoaded" @click="selectSession( student, VISUALIZATIONS.wordReplay )") Word replay
 
-    modal-editor-container(v-if="gradeWithStudents" title="Students" @close="closeStudentSelectionBox")
+    modal-editor-container(
+      v-if="gradeWithStudents"
+      :title="gradeWithStudents[0].name"
+      @close="closeStudentSelectionBox")
       student-select-box(:grades="gradeWithStudents" @accept="continueDeferredWithStudents")
 
-    modal-editor-container(v-if="studentWithSessions" title="Sessions" @close="closeSessionSelectionBox")
+    modal-editor-container(
+      v-if="studentWithSessions"
+      :title="studentWithSessions[0].name"
+      @close="closeSessionSelectionBox")
       session-select-box(:students="studentWithSessions" :multiple="false" @accept="continueDeferredWithSessions")
+
+    modal-editor-container(
+      v-if="editingStudent"
+      :title="`Sessions of ${editingStudent.ref.name}`"
+      @close="closeSessionEditingBox")
+      session-editing-box(:student="editingStudent" @deleted="sessionDeleted")
 
     gaze-plot(v-if="isShowing( VISUALIZATIONS.gazePlot )" :data="visualization" @close="closeVisualization")
 
@@ -77,6 +92,7 @@
   import ModalEditorContainer from '@/components/widgets/ModalEditorContainer';
   import StudentSelectBox from '@/components/widgets/StudentSelectBox';
   import SessionSelectBox from '@/components/widgets/SessionSelectBox';
+  import SessionEditBox from '@/components/widgets/SessionEditBox';
 
   import GazePlot from '@/components/vis/GazePlot';
   import Durations from '@/components/vis/Durations';
@@ -199,6 +215,7 @@
       'modal-editor-container': ModalEditorContainer,
       'student-select-box': StudentSelectBox,
       'session-select-box': SessionSelectBox,
+      'session-editing-box': SessionEditBox,
       'gaze-plot': GazePlot,
       'durations': Durations,
       'gaze-replay': GazeReplay,
@@ -211,6 +228,9 @@
         teacher: null,
         isLoaded: false,
         deferredVisualization: null,
+
+        editingStudent: null,
+        reloadAfterEditing: false,
 
         gradeWithStudents: null,
         studentWithSessions: null,
@@ -290,11 +310,25 @@
         this.deferredVisualization = null;
       },
 
+      closeSessionEditingBox( e ) {
+        this.editingStudent = null;
+
+        if (this.reloadAfterEditing) {
+          this.init();
+        }
+
+        this.reloadAfterEditing = false;
+      },
+
+      editSessions( student ) {
+        this.editingStudent = student;
+      },
+
       selectStudents( task, deferredVisualizationName ) {
         this.deferredVisualization = new _VisualizationInitialData( deferredVisualizationName, task.sessions );
 
         const grade = {
-          name: '',
+          name: `Students completed "${task.name}"`,
           students: []
         };
 
@@ -317,7 +351,7 @@
         this.deferredVisualization = new _VisualizationInitialData( deferredVisualizationName, sessions );
 
         const grade = {
-          name: cls.ref.name,
+          name: `Students of "${cls.ref.name}"`,
           students: []
         };
 
@@ -342,7 +376,7 @@
         this.deferredVisualization = new _VisualizationInitialData( deferredVisualizationName, student.sessions );
 
         const studentWithSessions = {
-          name: '',
+          name: `Sessions of ${student.ref.name}`,
           sessions: []
         };
 
@@ -380,6 +414,10 @@
         });
 
         this.closeSessionSelectionBox();
+      },
+
+      sessionDeleted( e ) {
+        this.reloadAfterEditing = true;
       },
 
       visualizeSessions( sessions, name, params ) {
@@ -478,5 +516,9 @@
 <style lang="less" scoped>
   .card.is-fullwidth {
     width: 100%;
+  }
+
+  .card-header-title {
+    color: #fff;
   }
 </style>

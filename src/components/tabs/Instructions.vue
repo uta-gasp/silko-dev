@@ -1,5 +1,5 @@
 <template lang="pug">
-  #instructions
+  #instructions.section
     modal-notification(type="danger" :show="showCreationError")
       span Failed to create an instruction: {{ creationError }}.
     modal-notification(type="success" :show="showCreationSuccess")

@@ -130,7 +130,7 @@ export default class Syllabifier {
         return true;
     }
 
-    syllabifyingWord( el, word ) {
+    syllabifyElementText( el, word ) {
         if (!this.rule) {
             return false;
         }

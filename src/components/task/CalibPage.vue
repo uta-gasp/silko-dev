@@ -77,6 +77,7 @@
       gazeTracking.setCallback( 'stateUpdated', 'calib', state => {
         this.isConnected = state.isConnected && !state.isTracking && !state.isBusy;
         this.isETUDConnected = state.isServiceRunning;
+        this.isCalibrated = state.isCalibrated;
       });
     },
 

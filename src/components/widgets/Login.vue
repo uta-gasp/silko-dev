@@ -17,10 +17,10 @@
 
       p.control
         .has-text-centered
-          a.button.is-primary(:disabled="inProgress" @click="login") Log in
+          button.button.is-primary(:disabled="inProgress" @click="login") Log in
 
-      .error
-        temporal-error(:show="showError" :error="errorText")
+    .error
+      temporal-error(:show="showError" :error="errorText")
 </template>
 
 <script>
@@ -37,8 +37,8 @@
 
     data() {
       return {
-        email: 'oleque.szpakow@gmail.com',
-        password: 'gdfvgdfv',
+        email: '',
+        password: '',
 
         inProgress: false,
         errorText: '',
@@ -47,7 +47,6 @@
     },
 
     computed: {
-
       isEmailValid() {
         return !this.email || /(.{2,})@(\w{2,}\.\w{2,})/.test( this.email );
       },
@@ -75,7 +74,6 @@
           }
         });
       },
-
     }
   };
 </script>
@@ -88,6 +86,6 @@
   }
 
   .error {
-    margin-top: 1em;
+    margin-top: 0.5em;
   }
 </style>

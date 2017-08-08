@@ -1,5 +1,5 @@
 <template lang="pug">
-  #classes
+  #classes.section
     modal-notification(type="danger" :show="showError")
       span The {{ notification.obj }} was not {{ notification.action }}: {{ errorMessage }}
     modal-notification(type="success" :show="showSuccess")
