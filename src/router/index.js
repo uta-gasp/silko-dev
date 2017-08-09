@@ -13,20 +13,19 @@ import Assignment from '@/components/tabs/Assignment';
 
 Vue.use( Router );
 
-const path = process.env.URL_PATH;
-
 export default new Router({
   routes: [
-    { path: `${path}/`, component: Home },
-    { path: `${path}/schools`, component: Schools },
-    { path: `${path}/teachers`, component: Teachers },
-    { path: `${path}/students`, component: Students },
-    { path: `${path}/instructions`, component: Instructions },
-    { path: `${path}/classes`, component: Classes },
-    { path: `${path}/results`, component: Results },
-    { path: `${path}/assignments`, component: Assignments },
-    { path: `${path}/assignment/:id`, component: Assignment },
+    { path: '/', component: Home },
+    { path: '/schools', component: Schools },
+    { path: '/teachers', component: Teachers },
+    { path: '/students', component: Students },
+    { path: '/instructions', component: Instructions },
+    { path: '/classes', component: Classes },
+    { path: '/results', component: Results },
+    { path: '/assignments', component: Assignments },
+    { path: '/assignment/:id', component: Assignment },
   ],
+  base: `${process.env.URL_PATH}/`,
   linkActiveClass: 'is-active',
   mode: 'history',
 });

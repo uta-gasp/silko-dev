@@ -109,7 +109,7 @@
       this.cls = { id: cls.id, name: cls.name };
     }
 
-}
+  }
 
   class _Student {
 
@@ -118,7 +118,7 @@
       this.sessions = []; // [ _Session ]
     }
 
-}
+  }
 
   class _Task {
 
@@ -129,7 +129,7 @@
       this.sessions = [];         // [ _Session ]
     }
 
-}
+  }
 
   class _Class {
 
@@ -185,7 +185,7 @@
       });
     }
 
-}
+  }
 
   class _Record {
 
@@ -197,7 +197,7 @@
       this.data = data.find( item => item.id === session.ref.data );
     }
 
-}
+  }
 
   class _VisualizationInitialData {
 
@@ -206,7 +206,7 @@
       this.sessions = sessions;
     }
 
-}
+  }
 
   export default {
     name: 'results',

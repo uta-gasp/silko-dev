@@ -17,7 +17,7 @@
     methods: {
 
       back( e ) {
-        this.$router.replace( `../assignments` );
+        this.$router.replace( '../assignments' );
       }
 
     }

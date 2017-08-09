@@ -87,7 +87,7 @@
         if (this.student) {
           const taskID = this.student.assignments[ this.$route.params.id ];
           if (!taskID) {
-            return this.$router.replace( '/assignments' );
+            return this.$router.replace( 'assignments' );
           }
 
           this.student.loadTask( taskID, (err, task ) => {

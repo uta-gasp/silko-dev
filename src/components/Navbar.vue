@@ -4,25 +4,25 @@
       router-link.nav-item(to="/")
         h2.logo Silko
         //- img(src="../assets/icon-32.png")
-      router-link.nav-item.is-tab(:to="`${path}/schools`" v-if="isAdmin")
+      router-link.nav-item.is-tab(to="/schools" v-if="isAdmin")
         i.fa.fa-university
         span Schools
-      router-link.nav-item.is-tab(:to="`${path}/teachers`" v-if="isAdmin || isSchool")
+      router-link.nav-item.is-tab(to="/teachers" v-if="isAdmin || isSchool")
         i.fa.fa-users
         span Teachers
-      router-link.nav-item.is-tab(:to="`${path}/students`" v-if="isAdmin || isSchool || isTeacher")
+      router-link.nav-item.is-tab(to="/students" v-if="isAdmin || isSchool || isTeacher")
         i.fa.fa-child
         span Students
-      router-link.nav-item.is-tab(:to="`${path}/instructions`" v-if="isTeacher")
+      router-link.nav-item.is-tab(to="/instructions" v-if="isTeacher")
         i.fa.fa-info
         span Instructions
-      router-link.nav-item.is-tab(:to="`${path}/classes`" v-if="isTeacher")
+      router-link.nav-item.is-tab(to="/classes" v-if="isTeacher")
         i.fa.fa-database
         span Classes
-      router-link.nav-item.is-tab(:to="`${path}/results`" v-if="isTeacher")
+      router-link.nav-item.is-tab(to="/results" v-if="isTeacher")
         i.fa.fa-pie-chart
         span Results
-      router-link.nav-item.is-tab(:to="`${path}/assignments`" v-if="isStudent")
+      router-link.nav-item.is-tab(to="/assignments" v-if="isStudent")
         i.fa.fa-tasks
         span Assignments
     .nav-right(v-if="user")
@@ -43,7 +43,6 @@
     data() {
       return {
         user: null,
-        path: process.env.URL_PATH,
       };
     },
 
