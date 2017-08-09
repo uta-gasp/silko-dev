@@ -32,182 +32,182 @@
 </template>
 
 <script>
-  import dataUtils from '@/utils/data-utils.js';
+import dataUtils from '@/utils/data-utils.js';
 
-  import stringification from '@/components/mixins/stringification.js';
+import stringification from '@/components/mixins/stringification.js';
 
-  import ModalEditorContainer from '@/components/widgets/ModalEditorContainer';
-  import StudentSelectBox from '@/components/widgets/StudentSelectBox';
+import ModalEditorContainer from '@/components/widgets/ModalEditorContainer';
+import StudentSelectBox from '@/components/widgets/StudentSelectBox';
 
-  export default {
-    name: 'student-list',
+export default {
+  name: 'student-list',
 
-    mixins: [ stringification ],
+  mixins: [ stringification ],
 
-    components: {
-      'modal-editor-container': ModalEditorContainer,
-      'student-select-box': StudentSelectBox,
+  components: {
+    'modal-editor-container': ModalEditorContainer,
+    'student-select-box': StudentSelectBox,
+  },
+
+  data() {
+    return {
+      parent: this.cls,
+      students: [],
+      tasks: [],
+      schoolGrades: [],
+
+      isEditing: false,
+      currentGrade: null,
+    };
+  },
+
+  props: {
+    cls: {
+      type: Object,
+      default: null,
     },
-
-    data() {
-      return {
-        parent: this.cls,
-        students: [],
-        tasks: [],
-        schoolGrades: [],
-
-        isEditing: false,
-        currentGrade: null,
-      };
+    teacher: {
+      type: Object,
+      default: null,
     },
-
-    props: {
-      cls: {
-        type: Object,
-        default: null
-      },
-      teacher: {
-        type: Object,
-        default: null
-      },
-      refresh: {
-        type: Number,
-        default: 0
-      }
+    refresh: {
+      type: Number,
+      default: 0,
     },
+  },
 
-    watch: {
-      refresh() {
-        this.loadTasks();
-      }
+  watch: {
+    refresh() {
+      this.loadTasks();
     },
+  },
 
-    methods: {
+  methods: {
 
-      loadTasks() {
-        this.parent.getTasks( (err, tasks) => {
-          if (err) {
-            return `Cannot retrieve tasks.\n\n${err}`;
-          }
-
-          this.tasks = tasks.sort( dataUtils.byName );
-
-          this.loadStudents();
-        });
-      },
-
-      loadStudents() {
-        this.parent.getStudents( (err, students) => {
-          if (err) {
-            return `Cannot retrieve students.\n\n${err}`;
-          }
-
-          this.students = students.sort( dataUtils.byName );
-        });
-      },
-
-      loadAvailableStudents() {
-        this.teacher.getSchool( (err, school) => {
-          if (err) {
-            return `Cannot retrieve the teacher's school.\n\n${err}`;
-          }
-
-          school.getStudents( (err, students) => {
-            if (err) {
-              return `Cannot retrieve school's students.\n\n${err}`;
-            }
-
-            this.schoolGrades = this.makeGrades( students );
-          });
-        });
-      },
-
-      makeGrades( students ) {
-        const grades = [];
-        students.forEach( student => {
-          let grade = grades.find( item => {
-            return item.name === student.grade.toLowerCase();
-          });
-
-          if (!grade) {
-            grade = {
-              name: student.grade.toLowerCase(),
-              students: []
-            };
-            grades.push( grade );
-          }
-
-          if (!this.students.find( item => item.id === student.id ) ) {
-            grade.students.push({
-              ref: student,
-              selected: false
-            });
-          }
-        });
-
-        grades.forEach( grade => {
-          grade.students.sort();
-        });
-
-        return grades.sort( (a, b) => {
-          if (a.name[0] <= '9' && b.name[0] > '9') {
-            return true;
-          }
-          else if (a.name[0] > '9' && b.name[0] <= '9') {
-            return false;
-          }
-          return a.name > b.name;
-        });
-      },
-
-      openEditor( e ) {
-        this.loadAvailableStudents();
-        this.isEditing = true;
-      },
-
-      addNewStudents( e ) {
-        if (e.students) {
-          this.parent.addStudents( e.students, err => {
-            if (err) {
-              return console.log( 'TODO display the error', err );
-            }
-
-            this.loadStudents();
-          });
+    loadTasks() {
+      this.parent.getTasks( ( err, tasks ) => {
+        if ( err ) {
+          return `Cannot retrieve tasks.\n\n${err}`;
         }
 
-        this.closeEditor();
-      },
+        this.tasks = tasks.sort( dataUtils.byName );
 
-      closeEditor( e ) {
-        this.isEditing = false;
-      },
-
-      getAssignment( student ) {
-        return student.assignments ? student.assignments[ this.parent.id ] : '';
-      },
-
-      setAssignment( student, e ) {
-        student.setAssignment( this.parent.id, e.target.value, err => {
-          if (err) {
-            console.log( 'TODO display error', err );
-          }
-        });
-      },
-
-      remove( student, e ) {
-        /* eslint-disable handle-callback-err */
-        this.parent.removeStudent( student, err => {
-          this.loadStudents();
-        });
-      },
+        this.loadStudents();
+      } );
     },
 
-    mounted() {
-      this.loadTasks();
+    loadStudents() {
+      this.parent.getStudents( ( err, students ) => {
+        if ( err ) {
+          return `Cannot retrieve students.\n\n${err}`;
+        }
+
+        this.students = students.sort( dataUtils.byName );
+      } );
+    },
+
+    loadAvailableStudents() {
+      this.teacher.getSchool( ( err, school ) => {
+        if ( err ) {
+          return `Cannot retrieve the teacher's school.\n\n${err}`;
+        }
+
+        school.getStudents( ( err, students ) => {
+          if ( err ) {
+            return `Cannot retrieve school's students.\n\n${err}`;
+          }
+
+          this.schoolGrades = this.makeGrades( students );
+        } );
+      } );
+    },
+
+    makeGrades( students ) {
+      const grades = [];
+      students.forEach( student => {
+        let grade = grades.find( item => {
+          return item.name === student.grade.toLowerCase();
+        } );
+
+        if ( !grade ) {
+          grade = {
+            name: student.grade.toLowerCase(),
+            students: [],
+          };
+          grades.push( grade );
+        }
+
+        if ( !this.students.find( item => item.id === student.id ) ) {
+          grade.students.push( {
+            ref: student,
+            selected: false,
+          } );
+        }
+      } );
+
+      grades.forEach( grade => {
+        grade.students.sort();
+      } );
+
+      return grades.sort( ( a, b ) => {
+        if ( a.name[0] <= '9' && b.name[0] > '9' ) {
+          return true;
+        }
+        else if ( a.name[0] > '9' && b.name[0] <= '9' ) {
+          return false;
+        }
+        return a.name > b.name;
+      } );
+    },
+
+    openEditor( e ) {
       this.loadAvailableStudents();
-    }
-  };
+      this.isEditing = true;
+    },
+
+    addNewStudents( e ) {
+      if ( e.students ) {
+        this.parent.addStudents( e.students, err => {
+          if ( err ) {
+            return console.log( 'TODO display the error', err );
+          }
+
+          this.loadStudents();
+        } );
+      }
+
+      this.closeEditor();
+    },
+
+    closeEditor( e ) {
+      this.isEditing = false;
+    },
+
+    getAssignment( student ) {
+      return student.assignments ? student.assignments[ this.parent.id ] : '';
+    },
+
+    setAssignment( student, e ) {
+      student.setAssignment( this.parent.id, e.target.value, err => {
+        if ( err ) {
+          console.log( 'TODO display error', err );
+        }
+      } );
+    },
+
+    remove( student, e ) {
+      /* eslint-disable handle-callback-err */
+      this.parent.removeStudent( student, err => {
+        this.loadStudents();
+      } );
+    },
+  },
+
+  mounted() {
+    this.loadTasks();
+    this.loadAvailableStudents();
+  },
+};
 </script>
 
 <style lang="less" scoped>

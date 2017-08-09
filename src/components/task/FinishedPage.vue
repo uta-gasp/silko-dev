@@ -6,20 +6,20 @@
 </template>
 
 <script>
-  export default {
-    name: 'finished-page',
+export default {
+  name: 'finished-page',
 
-    props: {
-      saving: Boolean,
-      texts: Object
+  props: {
+    saving: Boolean,
+    texts: Object,
+  },
+
+  methods: {
+
+    back( e ) {
+      this.$router.replace( '../assignments' );
     },
 
-    methods: {
-
-      back( e ) {
-        this.$router.replace( '../assignments' );
-      }
-
-    }
-  };
+  },
+};
 </script>

@@ -8,26 +8,26 @@
 </template>
 
 <script>
-  export default {
-    name: 'player',
+export default {
+  name: 'player',
 
-    props: {
-      isPaused: {
-        type: Boolean,
-        default: false
-      }
+  props: {
+    isPaused: {
+      type: Boolean,
+      default: false,
+    },
+  },
+
+  methods: {
+    restart( e ) {
+      this.$emit( 'restart' );
     },
 
-    methods: {
-      restart( e ) {
-        this.$emit( 'restart' );
-      },
-
-      toggle( e ) {
-        this.$emit( 'toggle' );
-      }
+    toggle( e ) {
+      this.$emit( 'toggle' );
     },
-  };
+  },
+};
 </script>
 
 <style lang="less" scoped>

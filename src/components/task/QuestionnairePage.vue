@@ -13,65 +13,65 @@
 </template>
 
 <script>
-  import Question from '@/model/session/question.js';
+import Question from '@/model/session/question.js';
 
-  export default {
-    name: 'questionnaire-page',
+export default {
+  name: 'questionnaire-page',
 
-    data() {
+  data() {
+    return {
+      questionIndex: 0,
+      questions: this.questionnaire
+        .map( question => Object.assign( { answer: null }, question ) )
+        .filter( question => question.type === Question.types.text.name || this.longGazedWords.includes( question.word ) ),
+    };
+  },
+
+  props: {
+    questionnaire: {
+      type: Array,
+      required: true,
+      default: () => [],
+    },
+    longGazedWords: {
+      type: Array,
+      default: () => [],
+    },
+  },
+
+  computed: {
+    question() {
+      return this.questionIndex >= 0 && this.questionIndex < this.questions.length
+        ? this.questions[ this.questionIndex ] : {};
+    },
+  },
+
+  methods: {
+    asnwerRevealedClass( answer ) {
       return {
-        questionIndex: 0,
-        questions: this.questionnaire
-            .map( question => Object.assign( { answer: null }, question ) )
-            .filter( question => question.type === Question.types.text.name || this.longGazedWords.includes( question.word ) )
+        'is-success': this.question.answer && this.question.answer.text === answer.text && answer.isCorrect,
+        'is-danger': this.question.answer && this.question.answer.text === answer.text && !answer.isCorrect,
       };
     },
 
-    props: {
-      questionnaire: {
-        type: Array,
-        required: true,
-        default: () => []
-      },
-      longGazedWords: {
-        type: Array,
-        default: () => []
+    reply( answer ) {
+      if ( this.question.answer ) {
+        return;
       }
-    },
 
-    computed: {
-      question() {
-        return this.questionIndex >= 0 && this.questionIndex < this.questions.length
-          ? this.questions[ this.questionIndex ] : {};
-      },
-    },
+      this.question.answer = answer;
 
-    methods: {
-      asnwerRevealedClass( answer ) {
-        return {
-          'is-success': this.question.answer && this.question.answer.text === answer.text && answer.isCorrect,
-          'is-danger': this.question.answer && this.question.answer.text === answer.text && !answer.isCorrect
-        };
-      },
-
-      reply( answer ) {
-        if (this.question.answer) {
+      window.setTimeout( () => {
+        if ( this.questionIndex === this.questions.length - 1 ) {
+          this.$emit( 'finished', { questionnaire: this.questions } );
           return;
         }
 
-        this.question.answer = answer;
-
-        window.setTimeout( () => {
-          if (this.questionIndex === this.questions.length - 1) {
-            this.$emit( 'finished', { questionnaire: this.questions } );
-            return;
-          }
-
-          this.questionIndex++;
-        }, 2000 );
-      }
+        this.questionIndex++;
+      }, 2000 );
     },
-  };
+  },
+};
 </script>
 
 <style lang="less" scoped>

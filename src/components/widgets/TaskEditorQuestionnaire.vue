@@ -49,85 +49,85 @@
 </template>
 
 <script>
-  import Question from '@/model/session/question.js';
+import Question from '@/model/session/question.js';
 
-  export default {
-    name: 'task-editor-questionnaire',
+export default {
+  name: 'task-editor-questionnaire',
 
-    data() {
-      return {
-        type: '',
-        word: '',
-        question: '',
-        answers: [
-          { text: '', isCorrect: true },
-          { text: '', isCorrect: false },
-          { text: '', isCorrect: false },
-          { text: '', isCorrect: false },
-        ],
+  data() {
+    return {
+      type: '',
+      word: '',
+      question: '',
+      answers: [
+        { text: '', isCorrect: true },
+        { text: '', isCorrect: false },
+        { text: '', isCorrect: false },
+        { text: '', isCorrect: false },
+      ],
 
-        questions: this.task ? Array.from( this.task.questionnaire ) : [],
+      questions: this.task ? Array.from( this.task.questionnaire ) : [],
 
-        types: Question.types,
-      };
+      types: Question.types,
+    };
+  },
+
+  props: {
+    task: {
+      type: Object,
+      default: () => { return {}; },
     },
+  },
 
-    props: {
-      task: {
-        type: Object,
-        default: () => { return {}; }
-      },
-    },
-
-    computed: {
-      canAdd() {
-        return this.type === this.types.word ? this.word.length > 0 : true &&
+  computed: {
+    canAdd() {
+      return this.type === this.types.word ? this.word.length > 0 : true &&
           this.question.length > 5 &&
           this.answers.every( answer => answer.text.length );
-      },
-
-      model() {
-        return {
-          questionnaire: this.questions,
-        };
-      }
     },
 
-    watch: {
-      questions() {
-        this.$emit( 'input', this.model );
-      },
+    model() {
+      return {
+        questionnaire: this.questions,
+      };
+    },
+  },
+
+  watch: {
+    questions() {
+      this.$emit( 'input', this.model );
+    },
+  },
+
+  methods: {
+    answersToString( question ) {
+      return question.answers.map( answer => answer.text ).join( ', ' );
     },
 
-    methods: {
-      answersToString( question ) {
-        return question.answers.map( answer => answer.text ).join( ', ' )
-      },
-
-      add( e ) {
-        this.questions.push( new Question(
-          this.type.name,
-          this.type === this.types.word ? this.word : '',
-          this.question,
-          this.answers,
-        ));
-      },
-
-      remove( question ) {
-        this.questions = this.questions.filter( item => item !== question );
-      },
-
-      selectCorrect( answer ) {
-        console.log('reverse');
-        this.answers.forEach( answer => { answer.isCorrect = false; } );
-        answer.isCorrect = true;
-      }
+    add( e ) {
+      this.questions.push( new Question(
+        this.type.name,
+        this.type === this.types.word ? this.word : '',
+        this.question,
+        this.answers,
+      ) );
     },
 
-    created() {
-      this.type = this.types.text;
-    }
-  };
+    remove( question ) {
+      this.questions = this.questions.filter( item => item !== question );
+    },
+
+    selectCorrect( answer ) {
+      console.log( 'reverse' );
+      this.answers.forEach( answer => { answer.isCorrect = false; } );
+      answer.isCorrect = true;
+    },
+  },
+
+  created() {
+    this.type = this.types.text;
+  },
+};
 </script>
 
 <style lang="less" scoped>

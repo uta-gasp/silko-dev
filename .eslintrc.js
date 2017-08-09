@@ -9,13 +9,13 @@ module.exports = {
         "EventEmitter": true,
     },
     "rules": {
-        "space-in-parens": 0,
-        "indent": 0,
+        "space-in-parens": ["error", "always", { "exceptions": ["empty"] }],
+        "indent": ["error", 2],
         "semi": ["error", "always"],
         "space-before-function-paren": ["error", "never"],
         "brace-style": ["error", "stroustrup", { "allowSingleLine": true }],
         "no-multi-spaces": ["error", { "ignoreEOLComments": true }],
-        "comma-dangle": 0,
+        "comma-dangle": ["error", "always-multiline"],
         "padded-blocks": ["error", { "blocks": "never", "classes": "always",  }]
     }
 };

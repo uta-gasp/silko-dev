@@ -2,15 +2,15 @@ import User from './user.js';
 
 class TeacherUser extends User {
 
-    constructor( user, teacher ) {
-        super( user );
+  constructor( user, teacher ) {
+    super( user );
 
-        this._ref = teacher;
-    }
+    this._ref = teacher;
+  }
 
-    get isTeacher() {
-        return true;
-    }
+  get isTeacher() {
+    return true;
+  }
 
 }
 

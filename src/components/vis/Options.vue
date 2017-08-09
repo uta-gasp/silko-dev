@@ -21,313 +21,313 @@
 </template>
 
 <script>
-  import Colors from '@/vis/colors.js';
+import Colors from '@/vis/colors.js';
 
-  const ID = 'silko';
+const ID = 'silko';
 
-  export default {
-    name: 'options',
+export default {
+  name: 'options',
 
-    data() {
-      return {
-      };
+  data() {
+    return {
+    };
+  },
+
+  props: {
+    values: {
+      type: Object,
+      required: true,
     },
+  },
 
-    props: {
-      values: {
-        type: Object,
-        required: true
+  methods: {
+    close( e ) {
+      if ( e.target === this.$el ) {
+        this.$emit( 'close' );
       }
     },
 
-    methods: {
-      close( e ) {
-        if (e.target === this.$el) {
-          this.$emit( 'close' );
-        }
-      },
+    save( e ) {
+      this.saveSettings();
+      this.update();
 
-      save( e ) {
-        this.saveSettings();
-        this.update();
-
-        this.$emit( 'apply' );
-        this.$emit( 'close' );
-      },
-
-      apply( e ) {
-        this.update();
-
-        this.$emit( 'apply' );
-      },
-
-      reset( e ) {
-        window.localStorage.removeItem( ID );
-        window.location.reload();
-      },
-
-      loadSettings() {
-        const options = JSON.parse( window.localStorage.getItem( ID ) );
-        if (!options) {
-          return;
-        }
-
-        const pop = (storage, values) => {
-          for (let name in storage) {
-            const value = values[ name ];
-            const saved = storage[ name ];
-            if (!value) {
-                continue;
-            }
-
-            if (typeof saved === 'object') {
-                pop( saved, value );
-            }
-            else if (typeof value.ref === 'function') {
-                value.ref( saved );
-            }
-          }
-        };
-
-        pop( options, this.values );
-      },
-
-      saveSettings() {
-        const options = {};
-
-        const push = (storage, values) => {
-          for (let name in values) {
-            const value = values[ name ];
-            if (typeof value.ref === 'function') {
-              storage[ name ] = value.ref();
-            }
-            else if (typeof value === 'object') {
-              storage[ name ] = { };
-              push( storage[ name ], value );
-            }
-          }
-        };
-
-        push( options, this.values );
-
-        window.localStorage.setItem( ID, JSON.stringify( options) );
-      },
-
-      update() {
-        for (let valueID in this.values) {
-          const val = this.values[ valueID ];
-          if (typeof val.update === 'function') {
-            val.update();
-          }
-        }
-      },
-
-      show( activeVisID ) {
-        const container = this.$refs.container;
-        const groups = container.querySelectorAll( '.group' );
-        groups.forEach( group => {
-          const id = group.id;
-          if (id[0] === '_' || !activeVisID || id.indexOf( activeVisID ) === 0) {
-            group.classList.remove( 'hidden' );
-          }
-          else {
-            group.classList.add( 'hidden' );
-          }
-        });
-      },
-
-      bind() {
-        const container = this.$refs.container;
-
-        for (let visID in this.values) {
-          const vis = this.values[ visID ];
-
-          const group = document.createElement( 'div' );
-          group.classList.add( 'group' );
-          group.id = vis.id + '_group';
-
-          const name = document.createElement( 'div' );
-          name.classList.add( 'name' );
-          name.textContent = vis.title;
-          group.appendChild( name );
-
-          if (vis.options instanceof Array) {
-            vis.options.forEach( item => {
-              const subGroup = this.createSubGroup( item, vis.id );
-              group.appendChild( subGroup );
-            });
-          }
-          else {
-            for (let optionID in vis.options) {
-              const option = vis.options[ optionID ];
-              const row = this.createRow( option, vis.id + '_' + optionID );
-              group.appendChild( row );
-            }
-          }
-
-          container.appendChild( group );
-        }
-      },
-
-      createSubGroup( sub, visID ) {
-        const subgroup = document.createElement( 'div' );
-        subgroup.classList.add( 'subgroup' );
-
-        const name = document.createElement( 'div' );
-        name.classList.add( 'subname' );
-        name.textContent = sub.title;
-        subgroup.appendChild( name );
-
-        for (let optionID in sub.options) {
-          const option = sub.options[ optionID ];
-          const row = this.createRow( option, visID + '_' + optionID);
-          subgroup.appendChild( row );
-        }
-
-        return subgroup;
-      },
-
-      createRow( option, id ) {
-        const row = document.createElement( 'div' );
-        row.classList.add( 'row' );
-
-        const label = document.createElement( 'div' );
-        label.classList.add( 'row-label' );
-        label.textContent = option.label;
-        row.appendChild( label );
-
-        if (option.type === Array) {
-          row.appendChild( this.createSelect( option, id ) );
-        }
-        else if (option.type === Boolean) {
-          row.appendChild( this.createCheckbox( option, id ) );
-        }
-        else if (option.type === String) {
-          row.appendChild( this.createTextInput( option, id ) );
-        }
-        else if (option.type === '#') {
-          row.appendChild( this.createColorbox( option, id ) );
-        }
-        else if (option.type === Number) {
-          row.appendChild( this.createNumberInput( option, id ) );
-        }
-
-        return row;
-      },
-
-      createSelect( option, id ) {
-        const select = document.createElement( 'select' );
-        select.classList.add( 'value' );
-        select.classList.add( id );
-
-        option.items.forEach( itemName => {
-          const item = document.createElement( 'option' );
-          item.value = itemName;
-          item.textContent = itemName;
-          select.appendChild( item );
-        });
-
-        select.selectedIndex = option.ref();
-        select.addEventListener( 'change', e => {
-          option.ref( option.items[ e.target.selectedIndex ] );
-        });
-
-        return select;
-      },
-
-      createCheckbox( option, id ) {
-        const container = document.createElement( 'span' );
-
-        const checkbox = document.createElement( 'input' );
-        checkbox.type = 'checkbox';
-        checkbox.classList.add( id );
-
-        checkbox.checked = option.ref();
-        checkbox.addEventListener( 'click', e => {
-          option.ref( e.target.checked );
-        });
-
-        const label = document.createElement( 'label' );
-        const div = document.createElement( 'div' );
-        div.textContent = '\u2714';
-
-        label.appendChild( div );
-        container.appendChild( checkbox );
-        container.appendChild( label );
-
-        return container;
-      },
-
-      createTextInput( option, id ) {
-        const input = document.createElement( 'input' );
-        input.type = 'text';
-        input.classList.add( 'value' );
-        input.classList.add( id );
-
-        const val = option.ref();
-        input.value = val;
-        input.addEventListener( 'click', e => {
-          option.ref( e.target.value );
-        });
-
-        return input;
-      },
-
-      createColorbox( option, id ) {
-        const input = document.createElement( 'input' );
-        input.type = 'color';
-        input.classList.add( 'value' );
-        input.classList.add( id );
-
-        const val = option.ref();
-        if (val[0] === '#') {
-          input.value = Colors.validateColor( val );
-          input.addEventListener( 'change', e => {
-            option.ref( e.target.value );
-          });
-        }
-        else {
-          const color = Colors.cssColorToHex( val );
-          input.value = color.hex;
-          input.alpha = color.a;
-          input.addEventListener( 'change', e => {
-            option.ref( Colors.hexToRgba( e.target.value, e.target.alpha ) );
-          });
-        }
-
-        return input;
-      },
-
-      createNumberInput( option, id ) {
-        const number = document.createElement( 'input' );
-        number.type = 'number';
-        if (option.step !== undefined) {
-          number.step = option.step;
-        }
-        if (option.min !== undefined) {
-          number.min = option.min;
-        }
-        if (option.max !== undefined) {
-          number.max = option.max;
-        }
-        number.classList.add( 'value' );
-        number.classList.add( id );
-
-        number.value = option.ref();
-        number.addEventListener( 'change', e => {
-          option.ref( +e.target.value );
-        });
-
-        return number;
-      },
-
+      this.$emit( 'apply' );
+      this.$emit( 'close' );
     },
 
-    mounted() {
-      this.loadSettings();
-      this.bind();
-    }
-  };
+    apply( e ) {
+      this.update();
+
+      this.$emit( 'apply' );
+    },
+
+    reset( e ) {
+      window.localStorage.removeItem( ID );
+      window.location.reload();
+    },
+
+    loadSettings() {
+      const options = JSON.parse( window.localStorage.getItem( ID ) );
+      if ( !options ) {
+        return;
+      }
+
+      const pop = ( storage, values ) => {
+        for ( let name in storage ) {
+          const value = values[ name ];
+          const saved = storage[ name ];
+          if ( !value ) {
+            continue;
+          }
+
+          if ( typeof saved === 'object' ) {
+            pop( saved, value );
+          }
+          else if ( typeof value.ref === 'function' ) {
+            value.ref( saved );
+          }
+        }
+      };
+
+      pop( options, this.values );
+    },
+
+    saveSettings() {
+      const options = {};
+
+      const push = ( storage, values ) => {
+        for ( let name in values ) {
+          const value = values[ name ];
+          if ( typeof value.ref === 'function' ) {
+            storage[ name ] = value.ref();
+          }
+          else if ( typeof value === 'object' ) {
+            storage[ name ] = { };
+            push( storage[ name ], value );
+          }
+        }
+      };
+
+      push( options, this.values );
+
+      window.localStorage.setItem( ID, JSON.stringify( options ) );
+    },
+
+    update() {
+      for ( let valueID in this.values ) {
+        const val = this.values[ valueID ];
+        if ( typeof val.update === 'function' ) {
+          val.update();
+        }
+      }
+    },
+
+    show( activeVisID ) {
+      const container = this.$refs.container;
+      const groups = container.querySelectorAll( '.group' );
+      groups.forEach( group => {
+        const id = group.id;
+        if ( id[0] === '_' || !activeVisID || id.indexOf( activeVisID ) === 0 ) {
+          group.classList.remove( 'hidden' );
+        }
+        else {
+          group.classList.add( 'hidden' );
+        }
+      } );
+    },
+
+    bind() {
+      const container = this.$refs.container;
+
+      for ( let visID in this.values ) {
+        const vis = this.values[ visID ];
+
+        const group = document.createElement( 'div' );
+        group.classList.add( 'group' );
+        group.id = vis.id + '_group';
+
+        const name = document.createElement( 'div' );
+        name.classList.add( 'name' );
+        name.textContent = vis.title;
+        group.appendChild( name );
+
+        if ( vis.options instanceof Array ) {
+          vis.options.forEach( item => {
+            const subGroup = this.createSubGroup( item, vis.id );
+            group.appendChild( subGroup );
+          } );
+        }
+        else {
+          for ( let optionID in vis.options ) {
+            const option = vis.options[ optionID ];
+            const row = this.createRow( option, vis.id + '_' + optionID );
+            group.appendChild( row );
+          }
+        }
+
+        container.appendChild( group );
+      }
+    },
+
+    createSubGroup( sub, visID ) {
+      const subgroup = document.createElement( 'div' );
+      subgroup.classList.add( 'subgroup' );
+
+      const name = document.createElement( 'div' );
+      name.classList.add( 'subname' );
+      name.textContent = sub.title;
+      subgroup.appendChild( name );
+
+      for ( let optionID in sub.options ) {
+        const option = sub.options[ optionID ];
+        const row = this.createRow( option, visID + '_' + optionID );
+        subgroup.appendChild( row );
+      }
+
+      return subgroup;
+    },
+
+    createRow( option, id ) {
+      const row = document.createElement( 'div' );
+      row.classList.add( 'row' );
+
+      const label = document.createElement( 'div' );
+      label.classList.add( 'row-label' );
+      label.textContent = option.label;
+      row.appendChild( label );
+
+      if ( option.type === Array ) {
+        row.appendChild( this.createSelect( option, id ) );
+      }
+      else if ( option.type === Boolean ) {
+        row.appendChild( this.createCheckbox( option, id ) );
+      }
+      else if ( option.type === String ) {
+        row.appendChild( this.createTextInput( option, id ) );
+      }
+      else if ( option.type === '#' ) {
+        row.appendChild( this.createColorbox( option, id ) );
+      }
+      else if ( option.type === Number ) {
+        row.appendChild( this.createNumberInput( option, id ) );
+      }
+
+      return row;
+    },
+
+    createSelect( option, id ) {
+      const select = document.createElement( 'select' );
+      select.classList.add( 'value' );
+      select.classList.add( id );
+
+      option.items.forEach( itemName => {
+        const item = document.createElement( 'option' );
+        item.value = itemName;
+        item.textContent = itemName;
+        select.appendChild( item );
+      } );
+
+      select.selectedIndex = option.ref();
+      select.addEventListener( 'change', e => {
+        option.ref( option.items[ e.target.selectedIndex ] );
+      } );
+
+      return select;
+    },
+
+    createCheckbox( option, id ) {
+      const container = document.createElement( 'span' );
+
+      const checkbox = document.createElement( 'input' );
+      checkbox.type = 'checkbox';
+      checkbox.classList.add( id );
+
+      checkbox.checked = option.ref();
+      checkbox.addEventListener( 'click', e => {
+        option.ref( e.target.checked );
+      } );
+
+      const label = document.createElement( 'label' );
+      const div = document.createElement( 'div' );
+      div.textContent = '\u2714';
+
+      label.appendChild( div );
+      container.appendChild( checkbox );
+      container.appendChild( label );
+
+      return container;
+    },
+
+    createTextInput( option, id ) {
+      const input = document.createElement( 'input' );
+      input.type = 'text';
+      input.classList.add( 'value' );
+      input.classList.add( id );
+
+      const val = option.ref();
+      input.value = val;
+      input.addEventListener( 'click', e => {
+        option.ref( e.target.value );
+      } );
+
+      return input;
+    },
+
+    createColorbox( option, id ) {
+      const input = document.createElement( 'input' );
+      input.type = 'color';
+      input.classList.add( 'value' );
+      input.classList.add( id );
+
+      const val = option.ref();
+      if ( val[0] === '#' ) {
+        input.value = Colors.validateColor( val );
+        input.addEventListener( 'change', e => {
+          option.ref( e.target.value );
+        } );
+      }
+      else {
+        const color = Colors.cssColorToHex( val );
+        input.value = color.hex;
+        input.alpha = color.a;
+        input.addEventListener( 'change', e => {
+          option.ref( Colors.hexToRgba( e.target.value, e.target.alpha ) );
+        } );
+      }
+
+      return input;
+    },
+
+    createNumberInput( option, id ) {
+      const number = document.createElement( 'input' );
+      number.type = 'number';
+      if ( option.step !== undefined ) {
+        number.step = option.step;
+      }
+      if ( option.min !== undefined ) {
+        number.min = option.min;
+      }
+      if ( option.max !== undefined ) {
+        number.max = option.max;
+      }
+      number.classList.add( 'value' );
+      number.classList.add( id );
+
+      number.value = option.ref();
+      number.addEventListener( 'change', e => {
+        option.ref( +e.target.value );
+      } );
+
+      return number;
+    },
+
+  },
+
+  mounted() {
+    this.loadSettings();
+    this.bind();
+  },
+};
 </script>
 
 <style lang="less" scoped>

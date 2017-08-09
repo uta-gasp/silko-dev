@@ -17,32 +17,32 @@
 </template>
 
 <script>
-  export default {
-    name: 'remove-warning',
+export default {
+  name: 'remove-warning',
 
-    data() {
-      return {
-      };
+  data() {
+    return {
+    };
+  },
+
+  props: {
+    object: String,
+    name: String,
+    data: Object,
+  },
+
+  methods: {
+
+    reject( e ) {
+      this.$emit( 'close', { confirm: false, data: this.data } );
     },
 
-    props: {
-      object: String,
-      name: String,
-      data: Object
+    confirm( e ) {
+      this.$emit( 'close', { confirm: true, data: this.data } );
     },
 
-    methods: {
-
-      reject( e ) {
-        this.$emit( 'close', { confirm: false, data: this.data } );
-      },
-
-      confirm( e ) {
-        this.$emit( 'close', { confirm: true, data: this.data } );
-      },
-
-    }
-  };
+  },
+};
 </script>
 
 <style lang="less" scoped>

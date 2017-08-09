@@ -48,159 +48,159 @@
 </template>
 
 <script>
-  import eventBus from '@/utils/event-bus.js';
-  import dataUtils from '@/utils/data-utils.js';
+import eventBus from '@/utils/event-bus.js';
+import dataUtils from '@/utils/data-utils.js';
 
-  import Teacher from '@/model/teacher.js';
+import Teacher from '@/model/teacher.js';
 
-  import ModalNotification from '@/components/widgets/ModalNotification';
-  import ModalEditorContainer from '@/components/widgets/ModalEditorContainer';
-  import IntroEditor from '@/components/widgets/IntroEditor';
-  import RemoveWarning from '@/components/widgets/RemoveWarning';
+import ModalNotification from '@/components/widgets/ModalNotification';
+import ModalEditorContainer from '@/components/widgets/ModalEditorContainer';
+import IntroEditor from '@/components/widgets/IntroEditor';
+import RemoveWarning from '@/components/widgets/RemoveWarning';
 
-  export default {
-    name: 'instructions',
+export default {
+  name: 'instructions',
 
-    components: {
-      'modal-notification': ModalNotification,
-      'modal-editor-container': ModalEditorContainer,
-      'intro-editor': IntroEditor,
-      'remove-warning': RemoveWarning
+  components: {
+    'modal-notification': ModalNotification,
+    'modal-editor-container': ModalEditorContainer,
+    'intro-editor': IntroEditor,
+    'remove-warning': RemoveWarning,
+  },
+
+  data() {
+    return {
+      teacher: null,
+
+      resetNew: 0, // random value to trigger the field reset in TextEditor
+
+      isCreating: false,
+      creationError: '',
+      showCreationError: 0,   // random value to trigger the notification
+      showCreationSuccess: 0, // random value to trigger the notification
+
+      intros: [],
+
+      toDelete: null,
+      toEdit: null,
+    };
+  },
+
+  computed: {
+
+    toDeleteName() {
+      return this.toDelete ? this.toDelete.name : '';
     },
+  },
 
-    data() {
-      return {
-        teacher: null,
+  methods: {
 
-        resetNew: 0, // random value to trigger the field reset in TextEditor
-
-        isCreating: false,
-        creationError: '',
-        showCreationError: 0,   // random value to trigger the notification
-        showCreationSuccess: 0, // random value to trigger the notification
-
-        intros: [],
-
-        toDelete: null,
-        toEdit: null
-      };
-    },
-
-    computed: {
-
-      toDeleteName() {
-        return this.toDelete ? this.toDelete.name : '';
+    init() {
+      this.teacher = Teacher.instance;
+      if ( this.teacher ) {
+        this.loadIntros();
       }
     },
 
-    methods: {
-
-      init() {
-        this.teacher = Teacher.instance;
-        if (this.teacher) {
-          this.loadIntros();
+    loadIntros() {
+      this.teacher.getIntros( ( err, intros ) => {
+        if ( err ) {
+          return `TODO Cannot retrieve intros.\n\n${err}`;
         }
-      },
 
-      loadIntros() {
-        this.teacher.getIntros( (err, intros) => {
-          if (err) {
-            return `TODO Cannot retrieve intros.\n\n${err}`;
-          }
+        this.intros = intros.sort( dataUtils.byName );
+      } );
+    },
 
-          this.intros = intros.sort( dataUtils.byName );
-        });
-      },
+    checkAccess() {
+      if ( !Teacher.isLogged ) {
+        this.$router.replace( '/' );
+      }
+    },
 
-      checkAccess() {
-        if (!Teacher.isLogged) {
-          this.$router.replace( '/' );
-        }
-      },
+    setCreationError( msg ) {
+      this.creationError = msg;
+      this.showCreationError = Math.random();
+    },
 
-      setCreationError( msg ) {
-        this.creationError = msg;
-        this.showCreationError = Math.random();
-      },
+    tryToCreate( e ) {
+      const exists = this.intros.some( intro => {
+        return intro.name.toLowerCase() === e.name.toLowerCase();
+      } );
 
-      tryToCreate( e ) {
-        const exists = this.intros.some( intro => {
-          return intro.name.toLowerCase() === e.name.toLowerCase();
-        });
+      if ( exists ) {
+        this.setCreationError( 'An instructions of this name exists already' );
+      }
+      else {
+        this.createIntro( e );
+      }
+    },
 
-        if (exists) {
-          this.setCreationError( 'An instructions of this name exists already' );
+    createIntro( newIntro ) {
+      this.isCreating = true;
+
+      this.teacher.createIntro( newIntro.name, newIntro.texts, ( err, id ) => {
+        this.isCreating = false;
+
+        if ( err ) {
+          this.setCreationError( err );
         }
         else {
-          this.createIntro( e );
-        }
-      },
-
-      createIntro( newIntro ) {
-        this.isCreating = true;
-
-        this.teacher.createIntro( newIntro.name, newIntro.texts, (err, id) => {
-          this.isCreating = false;
-
-          if (err) {
-            this.setCreationError( err );
-          }
-          else {
-            this.loadIntros();
-
-            this.showCreationSuccess = Math.random();
-            this.resetNew = Math.random();
-          }
-        });
-      },
-
-      remove( item, e ) {
-        this.toDelete = item;
-      },
-
-      edit( item, e ) {
-        this.toEdit = item;
-      },
-
-      saveEdited( e ) {
-        this.toEdit.updateTexts( e.texts, err => {
           this.loadIntros();
-        });
 
-        this.closeEditor();
-      },
-
-      closeEditor( e ) {
-        this.toEdit = null;
-      },
-
-      removeWarningClosed( e ) {
-        if (e.confirm) {
-          /* eslint-disable handle-callback-err */
-          this.teacher.deleteIntro( this.toDelete, err => {
-            this.loadIntros();
-          });
+          this.showCreationSuccess = Math.random();
+          this.resetNew = Math.random();
         }
-        this.toDelete = null;
-      },
+      } );
     },
 
-    created() {
-      console.log('Instructions component created');
-      eventBus.$on( 'logout', () => {
-        this.checkAccess();
-      });
-      eventBus.$on( 'login', () => {
-        this.init();
-      });
+    remove( item, e ) {
+      this.toDelete = item;
+    },
 
+    edit( item, e ) {
+      this.toEdit = item;
+    },
+
+    saveEdited( e ) {
+      this.toEdit.updateTexts( e.texts, err => {
+        this.loadIntros();
+      } );
+
+      this.closeEditor();
+    },
+
+    closeEditor( e ) {
+      this.toEdit = null;
+    },
+
+    removeWarningClosed( e ) {
+      if ( e.confirm ) {
+        /* eslint-disable handle-callback-err */
+        this.teacher.deleteIntro( this.toDelete, err => {
+          this.loadIntros();
+        } );
+      }
+      this.toDelete = null;
+    },
+  },
+
+  created() {
+    console.log( 'Instructions component created' );
+    eventBus.$on( 'logout', () => {
       this.checkAccess();
-    },
-
-    mounted() {
+    } );
+    eventBus.$on( 'login', () => {
       this.init();
-    }
-  };
+    } );
+
+    this.checkAccess();
+  },
+
+  mounted() {
+    this.init();
+  },
+};
 </script>
 
 <style lang="less" scoped>

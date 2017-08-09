@@ -30,96 +30,96 @@
 </template>
 
 <script>
-  export default {
-    name: 'student-select-box',
+export default {
+  name: 'student-select-box',
 
-    data() {
-      return {
-        currentGrade: null,
-      };
+  data() {
+    return {
+      currentGrade: null,
+    };
+  },
+
+  props: {
+    grades: {     // [{ name, students: [{ ref=Student, selected=Boolean }] }]
+      type: Array,
+      default: [],
+    },
+  },
+
+  methods: {
+
+    selectGrade( grade, e ) {
+      this.currentGrade = grade;
     },
 
-    props: {
-      grades: {     // [{ name, students: [{ ref=Student, selected=Boolean }] }]
-        type: Array,
-        default: []
-      },
+    isGradeSelected( grade ) {
+      if ( !this.currentGrade ) {
+        return false;
+      }
+
+      return grade ? this.currentGrade.name === grade.name : !!this.currentGrade;
     },
 
-    methods: {
+    hasStudents( grade ) {
+      grade = grade || this.currentGrade;
+      return grade && grade.students ? !!grade.students.length : false;
+    },
 
-      selectGrade( grade, e ) {
-        this.currentGrade = grade;
-      },
-
-      isGradeSelected( grade ) {
-        if (!this.currentGrade) {
-          return false;
-        }
-
-        return grade ? this.currentGrade.name === grade.name : !!this.currentGrade;
-      },
-
-      hasStudents( grade ) {
-        grade = grade || this.currentGrade;
-        return grade && grade.students ? !!grade.students.length : false;
-      },
-
-      selectMultipleStudents( student, event ) {
-        if (event.shiftKey) {
-          const index = this.currentGrade.students.indexOf( student );
-          for (let i = index - 1; i >= 0; i--) {
-            const student = this.currentGrade.students[i];
-            if (student.selected) {
-              break;
-            }
-
-            student.selected = true;
+    selectMultipleStudents( student, event ) {
+      if ( event.shiftKey ) {
+        const index = this.currentGrade.students.indexOf( student );
+        for ( let i = index - 1; i >= 0; i-- ) {
+          const student = this.currentGrade.students[i];
+          if ( student.selected ) {
+            break;
           }
-        }
-      },
 
-      selectStudent( student, e ) {
-        student.selected = !student.selected;
-
-        if (student.selected) {
-          this.selectMultipleStudents( student, e );
-        }
-      },
-
-      selectAllStudents( e ) {
-        this.currentGrade.students.forEach( student => {
           student.selected = true;
-        });
-      },
-
-      removeAllStudents( e ) {
-        this.currentGrade.students.forEach( student => {
-          student.selected = false;
-        });
-      },
-
-      accept( e ) {
-        const selected = {};
-
-        this.grades.forEach( grade => {
-          grade.students.forEach( student => {
-            if (student.selected) {
-              selected[ student.ref.id ] = student.ref.name;
-            }
-          });
-        });
-
-        this.$emit( 'accept', { students: selected } );
+        }
       }
     },
 
-    mounted() {
-      if (this.grades.length === 1) {
-        this.selectGrade( this.grades[0] );
+    selectStudent( student, e ) {
+      student.selected = !student.selected;
+
+      if ( student.selected ) {
+        this.selectMultipleStudents( student, e );
       }
+    },
+
+    selectAllStudents( e ) {
+      this.currentGrade.students.forEach( student => {
+        student.selected = true;
+      } );
+    },
+
+    removeAllStudents( e ) {
+      this.currentGrade.students.forEach( student => {
+        student.selected = false;
+      } );
+    },
+
+    accept( e ) {
+      const selected = {};
+
+      this.grades.forEach( grade => {
+        grade.students.forEach( student => {
+          if ( student.selected ) {
+            selected[ student.ref.id ] = student.ref.name;
+          }
+        } );
+      } );
+
+      this.$emit( 'accept', { students: selected } );
+    },
+  },
+
+  mounted() {
+    if ( this.grades.length === 1 ) {
+      this.selectGrade( this.grades[0] );
     }
-  };
+  },
+};
 </script>
 
 <style lang="less" scoped>

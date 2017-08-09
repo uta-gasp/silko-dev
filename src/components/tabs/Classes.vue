@@ -42,207 +42,207 @@
 </template>
 
 <script>
-  import eventBus from '@/utils/event-bus.js';
-  import dataUtils from '@/utils/data-utils.js';
+import eventBus from '@/utils/event-bus.js';
+import dataUtils from '@/utils/data-utils.js';
 
-  import Teacher from '@/model/teacher.js';
+import Teacher from '@/model/teacher.js';
 
-  import ModalNotification from '@/components/widgets/ModalNotification';
-  import TaskList from '@/components/widgets/TaskList';
-  import StudentList from '@/components/widgets/StudentList';
-  import RemoveWarning from '@/components/widgets/RemoveWarning';
+import ModalNotification from '@/components/widgets/ModalNotification';
+import TaskList from '@/components/widgets/TaskList';
+import StudentList from '@/components/widgets/StudentList';
+import RemoveWarning from '@/components/widgets/RemoveWarning';
 
-  export default {
-    name: 'classes',
+export default {
+  name: 'classes',
 
-    components: {
-      'modal-notification': ModalNotification,
-      'task-list': TaskList,
-      'student-list': StudentList,
-      'remove-warning': RemoveWarning
-    },
+  components: {
+    'modal-notification': ModalNotification,
+    'task-list': TaskList,
+    'student-list': StudentList,
+    'remove-warning': RemoveWarning,
+  },
 
-    data() {
-      return {
-        teacher: null,
+  data() {
+    return {
+      teacher: null,
 
-        newName: '',
+      newName: '',
 
-        isCreating: false,
-        errorMessage: '',
-        showError: 0,   // random value to trigger the notification
-        showSuccess: 0, // random value to trigger the notification
-        refreshStudents: 0,
+      isCreating: false,
+      errorMessage: '',
+      showError: 0,   // random value to trigger the notification
+      showSuccess: 0, // random value to trigger the notification
+      refreshStudents: 0,
 
-        notification: {
-          action: '',
-          obj: ''
-        },
-
-        classes: [],
-        intros: [],
-
-        toDelete: null,
-      };
-    },
-
-    computed: {
-
-      canCreate() {
-        return this.newName.length > 2;
+      notification: {
+        action: '',
+        obj: '',
       },
 
-      toDeleteName() {
-        return this.toDelete ? this.toDelete.name : '';
+      classes: [],
+      intros: [],
+
+      toDelete: null,
+    };
+  },
+
+  computed: {
+
+    canCreate() {
+      return this.newName.length > 2;
+    },
+
+    toDeleteName() {
+      return this.toDelete ? this.toDelete.name : '';
+    },
+  },
+
+  methods: {
+
+    init() {
+      this.teacher = Teacher.instance;
+      if ( this.teacher ) {
+        this.loadClasses();
+        this.loadIntros();
       }
     },
 
-    methods: {
+    loadClasses() {
+      this.teacher.getClasses( ( err, classes ) => {
+        if ( err ) {
+          return `Cannot retrieve classes.\n\n${err}`;
+        }
 
-      init() {
-        this.teacher = Teacher.instance;
-        if (this.teacher) {
+        this.classes = classes.sort( dataUtils.byName );
+      } );
+    },
+
+    loadIntros() {
+      this.teacher.getIntros( ( err, intros ) => {
+        if ( err ) {
+          return `Cannot retrieve intros.\n\n${err}`;
+        }
+
+        this.intros = intros.sort( dataUtils.byName );
+      } );
+    },
+
+    checkAccess() {
+      if ( !Teacher.isLogged ) {
+        this.$router.replace( '/' );
+      }
+    },
+
+    setError( msg ) {
+      this.errorMessage = msg;
+      this.showError = Math.random();
+    },
+
+    tryToCreate( e ) {
+      if ( !this.canCreate ) {
+        return;
+      }
+
+      this.notification.action = 'created';
+      this.notification.obj = 'class';
+
+      const exists = this.classes.some( cls => {
+        return cls.name.toLowerCase() === this.newName.toLowerCase();
+      } );
+
+      if ( exists ) {
+        this.setError( 'A class of this name exists already' );
+      }
+      else {
+        this.createClass( this.newName );
+      }
+    },
+
+    createClass( name ) {
+      this.isCreating = true;
+
+      this.teacher.createClass( name, ( err, id ) => {
+        this.isCreating = false;
+
+        if ( err ) {
+          this.setError( err );
+        }
+        else {
           this.loadClasses();
-          this.loadIntros();
-        }
-      },
 
-      loadClasses() {
-        this.teacher.getClasses( (err, classes) => {
-          if (err) {
-            return `Cannot retrieve classes.\n\n${err}`;
-          }
-
-          this.classes = classes.sort( dataUtils.byName );
-        });
-      },
-
-      loadIntros() {
-        this.teacher.getIntros( (err, intros) => {
-          if (err) {
-            return `Cannot retrieve intros.\n\n${err}`;
-          }
-
-          this.intros = intros.sort( dataUtils.byName );
-        });
-      },
-
-      checkAccess() {
-        if (!Teacher.isLogged) {
-          this.$router.replace( '/' );
-        }
-      },
-
-      setError( msg ) {
-        this.errorMessage = msg;
-        this.showError = Math.random();
-      },
-
-      tryToCreate( e ) {
-        if (!this.canCreate) {
-          return;
-        }
-
-        this.notification.action = 'created';
-        this.notification.obj = 'class';
-
-        const exists = this.classes.some( cls => {
-          return cls.name.toLowerCase() === this.newName.toLowerCase();
-        });
-
-        if (exists) {
-          this.setError( 'A class of this name exists already' );
-        }
-        else {
-          this.createClass( this.newName );
-        }
-      },
-
-      createClass( name ) {
-        this.isCreating = true;
-
-        this.teacher.createClass( name, (err, id) => {
-          this.isCreating = false;
-
-          if (err) {
-            this.setError( err );
-          }
-          else {
-            this.loadClasses();
-
-            this.showSuccess = Math.random();
-            this.newName = '';
-          }
-        });
-      },
-
-      removeClass( item, e ) {
-        this.toDelete = item;
-      },
-
-      removeWarningClosed( e ) {
-        if (e.confirm) {
-          /* eslint-disable handle-callback-err */
-          this.teacher.deleteClass( this.toDelete, err => {
-            this.loadClasses();
-          });
-        }
-
-        this.toDelete = null;
-      },
-
-      taskSaved( e ) {
-        this.notification.action = 'updated';
-        this.notification.obj = 'task';
-        if (e.err) {
-          this.setError( e.err );
-        }
-        else {
           this.showSuccess = Math.random();
+          this.newName = '';
         }
-      },
+      } );
+    },
 
-      taskCreated( e ) {
-        this.notification.action = 'created';
-        this.notification.obj = 'task';
-        if (e.err) {
-          this.setError( e.err );
-        }
-        else {
-          this.showSuccess = Math.random();
-          this.refreshStudents = Math.random();
-        }
-      },
+    removeClass( item, e ) {
+      this.toDelete = item;
+    },
 
-      taskDeleted( e ) {
-        this.refreshStudents = Math.random();
-      },
+    removeWarningClosed( e ) {
+      if ( e.confirm ) {
+        /* eslint-disable handle-callback-err */
+        this.teacher.deleteClass( this.toDelete, err => {
+          this.loadClasses();
+        } );
+      }
 
-      studentAdded( e ) {
+      this.toDelete = null;
+    },
 
-      },
-
-      studentRemoved( e ) {
-
+    taskSaved( e ) {
+      this.notification.action = 'updated';
+      this.notification.obj = 'task';
+      if ( e.err ) {
+        this.setError( e.err );
+      }
+      else {
+        this.showSuccess = Math.random();
       }
     },
 
-    created() {
-      console.log('Classes component created');
-      eventBus.$on( 'logout', () => {
-        this.checkAccess();
-      });
-      eventBus.$on( 'login', () => {
-        this.init();
-      });
-
-      this.checkAccess();
+    taskCreated( e ) {
+      this.notification.action = 'created';
+      this.notification.obj = 'task';
+      if ( e.err ) {
+        this.setError( e.err );
+      }
+      else {
+        this.showSuccess = Math.random();
+        this.refreshStudents = Math.random();
+      }
     },
 
-    mounted() {
+    taskDeleted( e ) {
+      this.refreshStudents = Math.random();
+    },
+
+    studentAdded( e ) {
+
+    },
+
+    studentRemoved( e ) {
+
+    },
+  },
+
+  created() {
+    console.log( 'Classes component created' );
+    eventBus.$on( 'logout', () => {
+      this.checkAccess();
+    } );
+    eventBus.$on( 'login', () => {
       this.init();
-    }
-  };
+    } );
+
+    this.checkAccess();
+  },
+
+  mounted() {
+    this.init();
+  },
+};
 </script>
 
 <style lang="less" scoped>

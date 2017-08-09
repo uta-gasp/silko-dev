@@ -31,123 +31,123 @@
 </template>
 
 <script>
-  export default {
-    name: 'item-select-box',
+export default {
+  name: 'item-select-box',
 
-    data() {
-      return {
-        currentItem: null,
-      };
+  data() {
+    return {
+      currentItem: null,
+    };
+  },
+
+  props: {
+    items: {     // [{ is, text, subitems: [{ id, text, selected=Boolean }] }]
+      type: Array,
+      required: true,
+    },
+    multiple: {
+      type: Boolean,
+      default: true,
+    },
+    itemName: {
+      type: String,
+      required: true,
+    },
+    subitemName: {
+      type: String,
+      required: true,
+    },
+  },
+
+  methods: {
+
+    selectItem( item, e ) {
+      this.currentItem = item;
     },
 
-    props: {
-      items: {     // [{ is, text, subitems: [{ id, text, selected=Boolean }] }]
-        type: Array,
-        required: true,
-      },
-      multiple: {
-        type: Boolean,
-        default: true,
-      },
-      itemName: {
-        type: String,
-        required: true,
-      },
-      subitemName: {
-        type: String,
-        required: true,
-      },
+    isItemSelected( item ) {
+      if ( !this.currentItem ) {
+        return false;
+      }
+
+      return item ? this.currentItem.id === item.id : !!this.currentItem;
     },
 
-    methods: {
+    hasSubitems( item ) {
+      item = item || this.currentItem;
+      return item && item.subitems ? !!item.subitems.length : false;
+    },
 
-      selectItem( item, e ) {
-        this.currentItem = item;
-      },
-
-      isItemSelected( item ) {
-        if (!this.currentItem) {
-          return false;
-        }
-
-        return item ? this.currentItem.id === item.id : !!this.currentItem;
-      },
-
-      hasSubitems( item ) {
-        item = item || this.currentItem;
-        return item && item.subitems ? !!item.subitems.length : false;
-      },
-
-      selectMultipleSubitems( subitem, event ) {
-        if (event.shiftKey) {
-          const index = this.currentItem.subitems.indexOf( subitem );
-          for (let i = index - 1; i >= 0; i--) {
-            const subitem = this.currentItem.subitems[i];
-            if (subitem.selected) {
-              break;
-            }
-
-            subitem.selected = true;
+    selectMultipleSubitems( subitem, event ) {
+      if ( event.shiftKey ) {
+        const index = this.currentItem.subitems.indexOf( subitem );
+        for ( let i = index - 1; i >= 0; i-- ) {
+          const subitem = this.currentItem.subitems[i];
+          if ( subitem.selected ) {
+            break;
           }
-        }
-      },
 
-      selectSubitem( subitem, e ) {
-        if (!this.multiple) {
-          this.items.forEach( item => {
-            item.subitems.forEach( subitem => {
-              subitem.selected = false;
-            });
-          });
-        }
-
-        subitem.selected = !subitem.selected;
-
-        if (subitem.selected) {
-          this.selectMultipleSubitems( subitem, e );
-        }
-      },
-
-      selectAllSubitems( e ) {
-        this.currentItem.subitems.forEach( subitem => {
           subitem.selected = true;
-        });
-      },
+        }
+      }
+    },
 
-      removeAllSubitems( e ) {
-        this.currentItem.subitems.forEach( subitem => {
-          subitem.selected = false;
-        });
-      },
-
-      accept( e ) {
-        const selected = {};
-        let selectedOnly = null;
-
+    selectSubitem( subitem, e ) {
+      if ( !this.multiple ) {
         this.items.forEach( item => {
           item.subitems.forEach( subitem => {
-            if (subitem.selected) {
-              selected[ subitem.id ] = subitem.text;
-              if (!this.multiple) {
-                selectedOnly = subitem;
-              }
-            }
-          });
-        });
+            subitem.selected = false;
+          } );
+        } );
+      }
 
-        this.$emit( 'accept', {
-          subitems: selected,
-          selected: selectedOnly,
-        });
-      },
+      subitem.selected = !subitem.selected;
+
+      if ( subitem.selected ) {
+        this.selectMultipleSubitems( subitem, e );
+      }
     },
 
-    mounted() {
-      if (this.items.length === 1) {
-        this.selectItem( this.items[0] );
-      }
+    selectAllSubitems( e ) {
+      this.currentItem.subitems.forEach( subitem => {
+        subitem.selected = true;
+      } );
+    },
+
+    removeAllSubitems( e ) {
+      this.currentItem.subitems.forEach( subitem => {
+        subitem.selected = false;
+      } );
+    },
+
+    accept( e ) {
+      const selected = {};
+      let selectedOnly = null;
+
+      this.items.forEach( item => {
+        item.subitems.forEach( subitem => {
+          if ( subitem.selected ) {
+            selected[ subitem.id ] = subitem.text;
+            if ( !this.multiple ) {
+              selectedOnly = subitem;
+            }
+          }
+        } );
+      } );
+
+      this.$emit( 'accept', {
+        subitems: selected,
+        selected: selectedOnly,
+      } );
+    },
+  },
+
+  mounted() {
+    if ( this.items.length === 1 ) {
+      this.selectItem( this.items[0] );
     }
-  };
+  },
+};
 </script>
 
 <style lang="less" scoped>

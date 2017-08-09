@@ -20,102 +20,102 @@
 </template>
 
 <script>
-  import TaskText from '@/components/widgets/TaskText';
+import TaskText from '@/components/widgets/TaskText';
 
-  import TextPresenter from '@/utils/textPresenter.js';
-  import FeedbackProvider from '@/utils/feedbackProvider.js';
+import TextPresenter from '@/utils/textPresenter.js';
+import FeedbackProvider from '@/utils/feedbackProvider.js';
 
-  export default {
-    name: 'task-preview',
+export default {
+  name: 'task-preview',
 
-    components: {
-      'task-text': TaskText,
+  components: {
+    'task-text': TaskText,
+  },
+
+  data() {
+    return {
+      textPresenter: null,
+      feedbackProvider: null,
+    };
+  },
+
+  props: {
+    firstPage: {
+      type: String,
+      default: '',
+    },
+    task: {
+      type: Object,
+    },
+  },
+
+  computed: {
+
+    hasNextPage() {
+      return this.textPresenter ? this.textPresenter.hasNextPage : false;
     },
 
-    data() {
-      return {
-        textPresenter: null,
-        feedbackProvider: null,
-      };
+    hasPrevPage() {
+      return this.textPresenter ? this.textPresenter.hasPrevPage : false;
+    },
+  },
+
+  methods: {
+
+    syllabifyAll( e ) {
+      this.textPresenter.words.forEach( ( text, el ) => {
+        // console.log('--', text)
+        this.feedbackProvider.syllabifier.syllabifyElementText( el, text );
+      } );
     },
 
-    props: {
-      firstPage: {
-        type: String,
-        default: ''
-      },
-      task: {
-        type: Object,
-      },
+    next( e ) {
+      this.textPresenter.nextPage();
+      this.feedbackProvider.reset();
     },
 
-    computed: {
+    prev( e ) {
+      this.textPresenter.prevPage();
+      this.feedbackProvider.reset();
+    },
 
-      hasNextPage() {
-        return this.textPresenter ? this.textPresenter.hasNextPage : false;
-      },
+    close( e ) {
+      this.$emit( 'close' );
+    },
 
-      hasPrevPage() {
-        return this.textPresenter ? this.textPresenter.hasPrevPage : false;
+    syllabify( e ) {
+      if ( e.target.classList.contains( 'word' ) ) {
+        const text = this.feedbackProvider.syllabifier.unprepare( e.target.textContent );
+        if ( text ) {
+          this.feedbackProvider.syllabifier.syllabifyElementText( e.target, text );
+        }
       }
     },
 
-    methods: {
-
-      syllabifyAll( e ) {
-        this.textPresenter.words.forEach( (text, el ) => {
-          // console.log('--', text)
-          this.feedbackProvider.syllabifier.syllabifyElementText( el, text );
-        });
-      },
-
-      next( e ) {
-        this.textPresenter.nextPage();
-        this.feedbackProvider.reset();
-      },
-
-      prev( e ) {
-        this.textPresenter.prevPage();
-        this.feedbackProvider.reset();
-      },
-
-      close( e ) {
-        this.$emit( 'close' );
-      },
-
-      syllabify( e ) {
-        if (e.target.classList.contains( 'word' )) {
-          const text = this.feedbackProvider.syllabifier.unprepare( e.target.textContent );
-          if (text) {
-            this.feedbackProvider.syllabifier.syllabifyElementText( e.target, text );
-          }
+    pronounce( e ) {
+      if ( e.target.classList.contains( 'word' ) ) {
+        const text = this.feedbackProvider.syllabifier.unprepare( e.target.textContent );
+        if ( text ) {
+          this.feedbackProvider.speaker.say( text );
         }
-      },
-
-      pronounce( e ) {
-        if (e.target.classList.contains( 'word' )) {
-          const text = this.feedbackProvider.syllabifier.unprepare( e.target.textContent );
-          if (text) {
-            this.feedbackProvider.speaker.say( text );
-          }
-        }
-      },
+      }
     },
+  },
 
-    mounted() {
-      this.feedbackProvider = new FeedbackProvider( this.task.syllab, this.task.speech );
-      this.feedbackProvider.init();
+  mounted() {
+    this.feedbackProvider = new FeedbackProvider( this.task.syllab, this.task.speech );
+    this.feedbackProvider.init();
 
-      const textEl = this.$refs.container.$refs.text;
-      this.textPresenter = new TextPresenter( this.task, this.firstPage, textEl, this.feedbackProvider.syllabifier );
+    const textEl = this.$refs.container.$refs.text;
+    this.textPresenter = new TextPresenter( this.task, this.firstPage, textEl, this.feedbackProvider.syllabifier );
 
-      this.next();
-    },
+    this.next();
+  },
 
-    beforeDestroy() {
-      this.feedbackProvider.cleanup();
-    }
-  };
+  beforeDestroy() {
+    this.feedbackProvider.cleanup();
+  },
+};
 </script>
 
 <style lang="less" scoped>

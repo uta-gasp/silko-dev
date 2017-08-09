@@ -27,60 +27,60 @@
 </template>
 
 <script>
-  export default {
-    name: 'feedback-editor',
+export default {
+  name: 'feedback-editor',
 
-    data() {
+  data() {
+    return {
+      language: this.value.language,
+      thresholdIsSmart: this.value.threshold.smart,
+      thresholdMin: this.value.threshold.min,
+      thresholdMax: this.value.threshold.max,
+      thresholdValue: this.value.threshold.value,
+    };
+  },
+
+  props: {
+    value: {
+      type: Object,
+      required: true,
+    },
+    header: {
+      type: String,
+      required: true,
+    },
+  },
+
+  computed: {
+    canEditCalibThresholdParams() {
+      return this.language && this.thresholdIsSmart;
+    },
+
+    isLanguageSelected() {
+      return !!this.language;
+    },
+
+    model() {
       return {
-        language: this.value.language,
-        thresholdIsSmart: this.value.threshold.smart,
-        thresholdMin: this.value.threshold.min,
-        thresholdMax: this.value.threshold.max,
-        thresholdValue: this.value.threshold.value,
+        language: this.language,
+        threshold: {
+          smart: this.thresholdIsSmart,
+          min: this.thresholdMin,
+          max: this.thresholdMax,
+          value: this.thresholdValue,
+        },
       };
     },
+  },
 
-    props: {
-      value: {
-        type: Object,
-        required: true
-      },
-      header: {
-        type: String,
-        required: true
-      },
-    },
-
-    computed: {
-      canEditCalibThresholdParams() {
-        return this.language && this.thresholdIsSmart;
-      },
-
-      isLanguageSelected() {
-        return !!this.language;
-      },
-
-      model() {
-        return {
-          language: this.language,
-          threshold: {
-            smart: this.thresholdIsSmart,
-            min: this.thresholdMin,
-            max: this.thresholdMax,
-            value: this.thresholdValue
-          }
-        };
-      },
-    },
-
-    watch: {
-      language() { this.$emit( 'input', this.model ); },
-      thresholdIsSmart() { this.$emit( 'input', this.model ); },
-      thresholdMin() { this.$emit( 'input', this.model ); },
-      thresholdMax() { this.$emit( 'input', this.model ); },
-      thresholdValue() { this.$emit( 'input', this.model ); },
-    }
-  };
+  watch: {
+    language() { this.$emit( 'input', this.model ); },
+    thresholdIsSmart() { this.$emit( 'input', this.model ); },
+    thresholdMin() { this.$emit( 'input', this.model ); },
+    thresholdMax() { this.$emit( 'input', this.model ); },
+    thresholdValue() { this.$emit( 'input', this.model ); },
+  },
+};
 
 </script>
 

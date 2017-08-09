@@ -77,149 +77,149 @@
 </template>
 
 <script>
-  import eventBus from '@/utils/event-bus.js';
-  import login from '@/utils/login.js';
+import eventBus from '@/utils/event-bus.js';
+import login from '@/utils/login.js';
 
-  // import School from '@/model/school.js';
+// import School from '@/model/school.js';
 
-  import Login from '@/components/widgets/Login';
-  import ModalEditorContainer from '@/components/widgets/ModalEditorContainer';
-  import ItemSelectionBox from '@/components/widgets/ItemSelectionBox';
-  import ModalNotification from '@/components/widgets/ModalNotification';
+import Login from '@/components/widgets/Login';
+import ModalEditorContainer from '@/components/widgets/ModalEditorContainer';
+import ItemSelectionBox from '@/components/widgets/ItemSelectionBox';
+import ModalNotification from '@/components/widgets/ModalNotification';
 
-  export default {
-    name: 'home',
+export default {
+  name: 'home',
 
-    components: {
-      'login': Login,
-      'modal-editor-container': ModalEditorContainer,
-      'item-selection-box': ItemSelectionBox,
-      'modal-notification': ModalNotification,
+  components: {
+    'login': Login,
+    'modal-editor-container': ModalEditorContainer,
+    'item-selection-box': ItemSelectionBox,
+    'modal-notification': ModalNotification,
+  },
+
+  data() {
+    return {
+      isLoginVisible: true,
+      user: null,
+
+      schools: null,
+      schoolToRegester: null,
+
+      isGettingEmail: false,
+      email: '',
+
+      showSuccess: 0,
+      success: '',
+
+      showFailure: 0,
+      failure: '',
+    };
+  },
+
+  computed: {
+    isAdmin() { return this.user && this.user.isAdmin; },
+    isSchool() { return this.user && this.user.isSchool; },
+    isTeacher() { return this.user && this.user.isTeacher; },
+    isStudent() { return this.user && this.user.isStudent; },
+    userTitle() {
+      if ( this.isAdmin ) { return 'an admin'; }
+      else if ( this.isSchool ) { return 'a school'; }
+      else if ( this.isTeacher ) { return 'a teacher'; }
+      else if ( this.isStudent ) { return 'a student'; }
+      else { return 'an anonym'; }
     },
 
-    data() {
-      return {
-        isLoginVisible: true,
-        user: null,
+    isEmailValid() {
+      return !this.email || /(.{2,})@(\w{2,}\.\w{2,})/.test( this.email );
+    },
+  },
 
-        schools: null,
-        schoolToRegester: null,
+  methods: {
+    register( e ) {
+      this.schools = true;
 
-        isGettingEmail: false,
-        email: '',
+      // School.list( (err, schools) => {
+      //   if (err) {
+      //     return; // TODO: handle error
+      //   }
 
-        showSuccess: 0,
-        success: '',
-
-        showFailure: 0,
-        failure: '',
-      };
+      //   this.schools = [{
+      //     id: 0,
+      //     text: 'Schools',
+      //     subitems: schools.map( school => {
+      //       return {
+      //         id: school.id,
+      //         text: school.name,
+      //         selected: false
+      //       };
+      //     })
+      //   }];
+      // });
     },
 
-    computed: {
-      isAdmin() { return this.user && this.user.isAdmin; },
-      isSchool() { return this.user && this.user.isSchool; },
-      isTeacher() { return this.user && this.user.isTeacher; },
-      isStudent() { return this.user && this.user.isStudent; },
-      userTitle() {
-        if (this.isAdmin) { return 'an admin'; }
-        else if (this.isSchool) { return 'a school'; }
-        else if (this.isTeacher) { return 'a teacher'; }
-        else if (this.isStudent) { return 'a student'; }
-        else { return 'an anonym'; }
-      },
+    sendResistrationRequest( e ) {
+      this.closeSelectionBox();
 
-      isEmailValid() {
-        return !this.email || /(.{2,})@(\w{2,}\.\w{2,})/.test( this.email );
-      },
+      this.schoolToRegester = e.selected;
+
+      this.isGettingEmail = true;
     },
 
-    methods: {
-      register( e ) {
-        this.schools = true;
+    remindPassword( e ) {
+      this.isGettingEmail = true;
+    },
 
-        // School.list( (err, schools) => {
-        //   if (err) {
-        //     return; // TODO: handle error
-        //   }
+    closeSelectionBox( e ) {
+      this.schools = null;
+    },
 
-        //   this.schools = [{
-        //     id: 0,
-        //     text: 'Schools',
-        //     subitems: schools.map( school => {
-        //       return {
-        //         id: school.id,
-        //         text: school.name,
-        //         selected: false
-        //       };
-        //     })
-        //   }];
-        // });
-      },
+    closeEmailBox( e ) {
+      this.isGettingEmail = false;
+    },
 
-      sendResistrationRequest( e ) {
-        this.closeSelectionBox();
+    send( e ) {
+      // TODO: send email
 
-        this.schoolToRegester = e.selected;
-
-        this.isGettingEmail = true;
-      },
-
-      remindPassword( e ) {
-        this.isGettingEmail = true;
-      },
-
-      closeSelectionBox( e ) {
-        this.schools = null;
-      },
-
-      closeEmailBox( e ) {
-        this.isGettingEmail = false;
-      },
-
-      send( e ) {
-        // TODO: send email
-
-        if (this.schoolToRegester) {
-          this.success = `The registration request for "${this.email}" has been sent.`;
-          this.schoolToRegester = null;
-          this.showSuccess = Math.random();
-        }
-        else {
-          login.resetPassword( this.email, err => {
-            if (err) {
-              this.failure = `Cannot send the registration request for "${this.email}".`;
-              this.showFailure = Math.random();
-            }
-            else {
-              this.success = `The password reset request has been sent to "${this.email}".`;
-              this.showSuccess = Math.random();
-            }
-            this.email = '';
-          });
-        }
-
-        this.closeEmailBox();
+      if ( this.schoolToRegester ) {
+        this.success = `The registration request for "${this.email}" has been sent.`;
+        this.schoolToRegester = null;
+        this.showSuccess = Math.random();
       }
+      else {
+        login.resetPassword( this.email, err => {
+          if ( err ) {
+            this.failure = `Cannot send the registration request for "${this.email}".`;
+            this.showFailure = Math.random();
+          }
+          else {
+            this.success = `The password reset request has been sent to "${this.email}".`;
+            this.showSuccess = Math.random();
+          }
+          this.email = '';
+        } );
+      }
+
+      this.closeEmailBox();
     },
+  },
 
-    created() {
-      eventBus.$on( 'login', id => {
-        // this.isLoginVisible = false;
-        this.user = login.user;
-      });
-      eventBus.$on( 'logout', id => {
-        this.user = null;
-        // this.isLoginVisible = true;
-      });
-
-      // this.isLoginVisible = !login.user;
+  created() {
+    eventBus.$on( 'login', id => {
+      // this.isLoginVisible = false;
       this.user = login.user;
-    },
+    } );
+    eventBus.$on( 'logout', id => {
+      this.user = null;
+      // this.isLoginVisible = true;
+    } );
 
-    mounted() {
-    }
-  };
+    // this.isLoginVisible = !login.user;
+    this.user = login.user;
+  },
+
+  mounted() {
+  },
+};
 </script>
 
 <style lang="less" scoped>

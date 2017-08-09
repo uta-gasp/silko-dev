@@ -69,59 +69,59 @@
 </template>
 
 <script>
-  import Task from '@/model/task.js';
+import Task from '@/model/task.js';
 
-  export default {
-    name: 'task-editor-text',
+export default {
+  name: 'task-editor-text',
 
-    data() {
+  data() {
+    return {
+      name: this.task ? this.task.name : '',
+      intro: this.task ? this.task.intro : '',
+      text: this.task ? Task.pagesToText( this.task.pages ) : '',
+    };
+  },
+
+  props: {
+    task: {
+      type: Object,
+      default: () => { return {}; },
+    },
+    intros: {
+      type: Array,
+      default: () => [],
+    },
+  },
+
+  computed: {
+
+    isNewTask() {
+      return !this.task;
+    },
+
+    currentModel() {
       return {
-        name: this.task ? this.task.name : '',
-        intro: this.task ? this.task.intro : '',
-        text: this.task ? Task.pagesToText( this.task.pages ) : '',
+        name: this.name,
+        intro: this.intro,
+        text: this.text,
       };
     },
+  },
 
-    props: {
-      task: {
-        type: Object,
-        default: () => { return {}; }
-      },
-      intros: {
-        type: Array,
-        default: () => []
-      }
+  watch: {
+    name( value ) {
+      this.$emit( 'input', this.currentModel );
     },
 
-    computed: {
-
-      isNewTask() {
-        return !this.task;
-      },
-
-      currentModel() {
-        return {
-          name: this.name,
-          intro: this.intro,
-          text: this.text
-        };
-      }
+    intro( value ) {
+      this.$emit( 'input', this.currentModel );
     },
 
-    watch: {
-      name( value ) {
-        this.$emit( 'input', this.currentModel );
-      },
-
-      intro( value ) {
-        this.$emit( 'input', this.currentModel );
-      },
-
-      text( value ) {
-        this.$emit( 'input', this.currentModel );
-      },
-    }
-  };
+    text( value ) {
+      this.$emit( 'input', this.currentModel );
+    },
+  },
+};
 </script>
 
 <style lang="less" scoped>

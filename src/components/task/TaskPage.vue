@@ -9,110 +9,110 @@
 </template>
 
 <script>
-  import TaskText from '@/components/widgets/TaskText';
+import TaskText from '@/components/widgets/TaskText';
 
-  import TextPresenter from '@/utils/textPresenter.js';
-  import FeedbackProvider from '@/utils/feedbackProvider.js';
-  import DataCollector from '@/utils/dataCollector.js';
-  import gazeTracking from '@/utils/gazeTracking.js';
+import TextPresenter from '@/utils/textPresenter.js';
+import FeedbackProvider from '@/utils/feedbackProvider.js';
+import DataCollector from '@/utils/dataCollector.js';
+import gazeTracking from '@/utils/gazeTracking.js';
 
-  import Font from '@/model/session/font.js';
+import Font from '@/model/session/font.js';
 
-  export default {
-    name: 'task-page',
+export default {
+  name: 'task-page',
 
-    components: {
-      'task-text': TaskText,
+  components: {
+    'task-text': TaskText,
+  },
+
+  data() {
+    return {
+      textPresenter: null,
+      feedbackProvider: null,
+      collector: null,
+      font: Font.from( TaskText.data().textStyle ),
+    };
+  },
+
+  props: {
+    texts: Object,
+    task: Object,
+    student: Object,
+  },
+
+  computed: {
+    hasNextPage() {
+      return this.textPresenter ? this.textPresenter.hasNextPage : false;
     },
+  },
 
-    data() {
-      return {
-        textPresenter: null,
-        feedbackProvider: null,
-        collector: null,
-        font: Font.from( TaskText.data().textStyle )
-      };
-    },
+  methods: {
 
-    props: {
-      texts: Object,
-      task: Object,
-      student: Object,
-    },
-
-    computed: {
-      hasNextPage() {
-        return this.textPresenter ? this.textPresenter.hasNextPage : false;
+    next( e ) {
+      let wordReadingDuration;
+      if ( this.textPresenter.page === 0 && this.texts.firstPage ) {
+        wordReadingDuration = this.collector.wordReadingDuration;
       }
+
+      this.textPresenter.nextPage();
+      this.collector.nextPage();
+      this.feedbackProvider.reset( wordReadingDuration );
+
+      gazeTracking.updateTargets();
     },
 
-    methods: {
-
-      next( e ) {
-        let wordReadingDuration;
-        if (this.textPresenter.page === 0 && this.texts.firstPage) {
-          wordReadingDuration = this.collector.wordReadingDuration;
-        }
-
-        this.textPresenter.nextPage();
-        this.collector.nextPage();
-        this.feedbackProvider.reset( wordReadingDuration );
-
-        gazeTracking.updateTargets();
-      },
-
-      finish( e ) {
-        this.$emit( 'finished', { longGazedWords: this.collector.longGazedWords } );
-        this.collector.stop( (err, keys) => {
-          this.$emit( 'saved', { err, keys } );
-        });
-      },
+    finish( e ) {
+      this.$emit( 'finished', { longGazedWords: this.collector.longGazedWords } );
+      this.collector.stop( ( err, keys ) => {
+        this.$emit( 'saved', { err, keys } );
+      } );
     },
+  },
 
-    mounted() {
-      this.feedbackProvider = new FeedbackProvider( this.task.syllab, this.task.speech );
-      this.feedbackProvider.init();
+  mounted() {
+    this.feedbackProvider = new FeedbackProvider( this.task.syllab, this.task.speech );
+    this.feedbackProvider.init();
 
-      const textEl = this.$refs.container.$refs.text;
-      this.textPresenter = new TextPresenter( this.task, this.texts.firstPage, textEl, this.feedbackProvider.syllabifier );
+    const textEl = this.$refs.container.$refs.text;
+    this.textPresenter = new TextPresenter( this.task, this.texts.firstPage, textEl, this.feedbackProvider.syllabifier );
 
-      this.collector = new DataCollector( this.task, this.student, this.font, this.feedbackProvider.setup );
-      this.feedbackProvider.events.addListener( 'syllabified', data => this.collector.syllabified( data ) );
-      this.feedbackProvider.events.addListener( 'pronounced', data => this.collector.pronounced( data ) );
+    this.collector = new DataCollector( this.task, this.student, this.font, this.feedbackProvider.setup );
+    this.feedbackProvider.events.addListener( 'syllabified', data => this.collector.syllabified( data ) );
+    this.feedbackProvider.events.addListener( 'pronounced', data => this.collector.pronounced( data ) );
 
-      gazeTracking.setCallback( 'stateUpdated', 'task-page', state => {
-        if (state.isConnected && state.isTracking && !state.isBusy) {
-          this.collector.start();
-        }
-      });
-      gazeTracking.setCallback( 'wordFocused', 'task-page', word => {
-        if (!this.textPresenter.isInstructionPage) {
-          this.feedbackProvider.setFocusedWord( word );
-        }
-        this.collector.setFocusedWord( word, this.textPresenter.page );
-      });
-      gazeTracking.setCallback( 'wordLeft', 'task-page', word => {
-        if (!this.textPresenter.isInstructionPage) {
-          this.feedbackProvider.setFocusedWord( null );
-        }
-        this.collector.setFocusedWord( null );
-      });
-      gazeTracking.setCallback( 'gazePoint', 'task-page', gazePoint => {
-        this.collector.addGazePoint( gazePoint, this.textPresenter.page );
-      });
+    gazeTracking.setCallback( 'stateUpdated', 'task-page', state => {
+      if ( state.isConnected && state.isTracking && !state.isBusy ) {
+        this.collector.start();
+      }
+    } );
+    gazeTracking.setCallback( 'wordFocused', 'task-page', word => {
+      if ( !this.textPresenter.isInstructionPage ) {
+        this.feedbackProvider.setFocusedWord( word );
+      }
+      this.collector.setFocusedWord( word, this.textPresenter.page );
+    } );
+    gazeTracking.setCallback( 'wordLeft', 'task-page', word => {
+      if ( !this.textPresenter.isInstructionPage ) {
+        this.feedbackProvider.setFocusedWord( null );
+      }
+      this.collector.setFocusedWord( null );
+    } );
+    gazeTracking.setCallback( 'gazePoint', 'task-page', gazePoint => {
+      this.collector.addGazePoint( gazePoint, this.textPresenter.page );
+    } );
 
-      this.next();
-    },
+    this.next();
+  },
 
-    beforeDestroy() {
-      this.feedbackProvider.cleanup();
+  beforeDestroy() {
+    this.feedbackProvider.cleanup();
 
-      gazeTracking.clearCallback( 'stateUpdated', 'task-page');
-      gazeTracking.clearCallback( 'wordFocused', 'task-page' );
-      gazeTracking.clearCallback( 'wordLeft', 'task-page' );
-      gazeTracking.clearCallback( 'gazePoint', 'task-page' );
-    }
-  };
+    gazeTracking.clearCallback( 'stateUpdated', 'task-page' );
+    gazeTracking.clearCallback( 'wordFocused', 'task-page' );
+    gazeTracking.clearCallback( 'wordLeft', 'task-page' );
+    gazeTracking.clearCallback( 'gazePoint', 'task-page' );
+  },
+};
 </script>
 
 <style lang="less" scoped>

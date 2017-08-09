@@ -7,34 +7,34 @@
 </template>
 
 <script>
-  import NavBar from '@/components/navbar';
+import NavBar from '@/components/navbar';
 
-  import eventBus from '@/utils/event-bus.js';
-  import login from '@/utils/login.js';
+import eventBus from '@/utils/event-bus.js';
+import login from '@/utils/login.js';
 
-  export default {
-    name: 'app',
+export default {
+  name: 'app',
 
-    components: {
-      navbar: NavBar
-    },
+  components: {
+    navbar: NavBar,
+  },
 
-    data() {
-      return {
-        isLoggedIn: !!login.user
-      };
-    },
+  data() {
+    return {
+      isLoggedIn: !!login.user,
+    };
+  },
 
-    created() {
-      console.log('App component created');
-      eventBus.$on( 'logout', () => {
-        this.isLoggedIn = false;
-      });
-      eventBus.$on( 'login', () => {
-        this.isLoggedIn = true;
-      });
-    },
-  };
+  created() {
+    console.log( 'App component created' );
+    eventBus.$on( 'logout', () => {
+      this.isLoggedIn = false;
+    } );
+    eventBus.$on( 'login', () => {
+      this.isLoggedIn = true;
+    } );
+  },
+};
 </script>
 
 <style lang="less" scoped>

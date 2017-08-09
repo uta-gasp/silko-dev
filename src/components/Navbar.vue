@@ -34,57 +34,56 @@
 </template>
 
 <script>
-  import eventBus from '@/utils/event-bus.js';
-  import login from '@/utils/login.js';
+import eventBus from '@/utils/event-bus.js';
+import login from '@/utils/login.js';
 
-  export default {
-    name: 'navbar',
+export default {
+  name: 'navbar',
 
-    data() {
-      return {
-        user: null,
-      };
+  data() {
+    return {
+      user: null,
+    };
+  },
+
+  methods: {
+    logOut() {
+      login.logOut();
+    },
+  },
+
+  computed: {
+
+    isAdmin() {
+      return this.user ? this.user.isAdmin : false;
     },
 
-    methods: {
-
-      logOut() {
-        login.logOut();
-      }
+    isSchool() {
+      return this.user ? this.user.isSchool : false;
     },
 
-    computed: {
-
-      isAdmin() {
-        return this.user ? this.user.isAdmin : false;
-      },
-
-      isSchool() {
-        return this.user ? this.user.isSchool : false;
-      },
-
-      isTeacher() {
-        return this.user ? this.user.isTeacher : false;
-      },
-
-      isStudent() {
-        return this.user ? this.user.isStudent : false;
-      },
-
-      isAssignment() {
-        return this.$route.path.indexOf( '/assignment/' ) >= 0;
-      }
+    isTeacher() {
+      return this.user ? this.user.isTeacher : false;
     },
 
-    created() {
-      eventBus.$on( 'login', () => {
-        this.user = login.user;
-      });
-      eventBus.$on( 'logout', () => {
-        this.user = null;
-      });
-    }
-  };
+    isStudent() {
+      return this.user ? this.user.isStudent : false;
+    },
+
+    isAssignment() {
+      return this.$route.path.indexOf( '/assignment/' ) >= 0;
+    },
+  },
+
+  created() {
+    eventBus.$on( 'login', () => {
+      this.user = login.user;
+    } );
+    eventBus.$on( 'logout', () => {
+      this.user = null;
+    } );
+  },
+};
 </script>
 
 <style lang="less" scoped>

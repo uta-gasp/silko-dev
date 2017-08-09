@@ -21,127 +21,127 @@
 </template>
 
 <script>
-  import OptionsCreator from '@/vis/optionsCreator.js';
-  import sgwmController from '@/vis/sgwmController.js';
+import OptionsCreator from '@/vis/optionsCreator.js';
+import sgwmController from '@/vis/sgwmController.js';
 
-  import ControlPanel from '@/components/vis/controlPanel';
-  import Options from '@/components/vis/Options';
-  import VisTitle from '@/components/vis/VisTitle';
+import ControlPanel from '@/components/vis/controlPanel';
+import Options from '@/components/vis/Options';
+import VisTitle from '@/components/vis/VisTitle';
 
-  const COMMON_UI = {
-    wordColor: '#666',
-    wordHighlightColor: '#606',
-    wordRectColor: '#f44',
-    drawWordFrame: true,
-  };
+const COMMON_UI = {
+  wordColor: '#666',
+  wordHighlightColor: '#606',
+  wordRectColor: '#f44',
+  drawWordFrame: true,
+};
 
-  sgwmController.initializeSettings();
+sgwmController.initializeSettings();
 
-  // to be implemented by descendants:
-  // - changePage
-  // - redraw
+// to be implemented by descendants:
+// - changePage
+// - redraw
 
-  export default {
-    components: {
-      'control-panel': ControlPanel,
-      'options': Options,
-      'vis-title': VisTitle,
+export default {
+  components: {
+    'control-panel': ControlPanel,
+    'options': Options,
+    'vis-title': VisTitle,
+  },
+
+  data() {
+    return {
+      isOptionsDisplayed: false,
+      options: {
+        _common: this.createCommonOptions( COMMON_UI ),
+        _sgwm: sgwmController.createOptions(),
+      },
+
+      commonUI: COMMON_UI,
+
+      pageIndex: -1,
+      currentPages: [],
+      defaultSession: this.data.records[0].session,
+      defaultPages: this.data.records[0].data.pages,
+
+      isPlayerPaused: false,
+    };
+  },
+
+  props: {
+    data: {   // { name, title, records, props }
+      type: Object,
+      required: true,
+    },
+  },
+
+  computed: {
+    feedback() {
+      return this.data.records.length === 1 ? this.data.props : null;
     },
 
-    data() {
+    textLength() {
+      return this.defaultPages.length;
+    },
+
+    initialPageIndex() {
+      return this.defaultPages[0].isIntro ? 1 : 0;
+    },
+  },
+
+  methods: {
+    createCommonOptions() {
       return {
-        isOptionsDisplayed: false,
-        options: {
-          _common: this.createCommonOptions( COMMON_UI ),
-          _sgwm: sgwmController.createOptions(),
-        },
-
-        commonUI: COMMON_UI,
-
-        pageIndex: -1,
-        currentPages: [],
-        defaultSession: this.data.records[0].session,
-        defaultPages: this.data.records[0].data.pages,
-
-        isPlayerPaused: false
+        id: '_common',
+        title: 'Common',
+        options: OptionsCreator.createOptions( {
+          wordColor: { type: '#', label: 'Text color' },
+          wordHighlightColor: { type: '#', label: 'Highlighting color' },
+          wordRectColor: { type: '#', label: 'Word frame color' },
+          drawWordFrame: { type: Boolean, label: 'Draw word frame' },
+        }, COMMON_UI ),
       };
     },
 
-    props: {
-      data: {   // { name, title, records, props }
-        type: Object,
-        required: true,
-      }
+    setPage( e ) {
+      this.pageIndex = e.index;
+      this.currentPages = this.data.records.map( record => record.data.pages[ e.index ] );
+      this.changePage();
     },
 
-    computed: {
-      feedback() {
-        return this.data.records.length === 1 ? this.data.props : null;
-      },
-
-      textLength() {
-        return this.defaultPages.length;
-      },
-
-      initialPageIndex() {
-        return this.defaultPages[0].isIntro ? 1 : 0;
-      }
+    showOptions( e ) {
+      this.isOptionsDisplayed = true;
     },
 
-    methods: {
-      createCommonOptions() {
-        return {
-          id: '_common',
-          title: 'Common',
-          options: OptionsCreator.createOptions({
-            wordColor: { type: '#', label: 'Text color' },
-            wordHighlightColor: { type: '#', label: 'Highlighting color' },
-            wordRectColor: { type: '#', label: 'Word frame color' },
-            drawWordFrame: { type: Boolean, label: 'Draw word frame' },
-          }, COMMON_UI )
-        };
-      },
-
-      setPage( e ) {
-        this.pageIndex = e.index;
-        this.currentPages = this.data.records.map( record => record.data.pages[ e.index ] );
-        this.changePage();
-      },
-
-      showOptions( e ) {
-        this.isOptionsDisplayed = true;
-      },
-
-      close( e ) {
-        this.$emit( 'close' );
-      },
-
-      applyOptions( e ) {
-        sgwmController.save();
-        this.redraw();
-      },
-
-      closeOptions( e ) {
-        this.isOptionsDisplayed = false;
-      },
-
-      restartPlayer( e ) {
-
-      },
-
-      togglePlayer( e ) {
-
-      },
-
-      map( page ) {
-        return sgwmController.map( page );
-      },
+    close( e ) {
+      this.$emit( 'close' );
     },
 
-    mounted() {
-      this.setPage( { index: this.initialPageIndex } );
-    }
-  };
+    applyOptions( e ) {
+      sgwmController.save();
+      this.redraw();
+    },
+
+    closeOptions( e ) {
+      this.isOptionsDisplayed = false;
+    },
+
+    restartPlayer( e ) {
+
+    },
+
+    togglePlayer( e ) {
+
+    },
+
+    map( page ) {
+      return sgwmController.map( page );
+    },
+  },
+
+  mounted() {
+    this.setPage( { index: this.initialPageIndex } );
+  },
+};
 </script>
 
 <style lang="less" scoped>

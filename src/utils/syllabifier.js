@@ -9,303 +9,303 @@ const EXTRA_THRESHOLD_FOR_CHAR = 0.05;
 
 export default class Syllabifier {
 
-    constructor( options ) {
-        this.options = { ...options };
-        this.options.threshold.factor = 4;
+  constructor( options ) {
+    this.options = { ...options };
+    this.options.threshold.factor = 4;
 
-        this.hyphen = Syllabifier.MODES[ 'hyphen' ];
+    this.hyphen = Syllabifier.MODES[ 'hyphen' ];
 
-        this.hyphenHtml = `<span class="hyphen">${this.hyphen}</span>`;
+    this.hyphenHtml = `<span class="hyphen">${this.hyphen}</span>`;
 
-        this.rule = rules[ this.options.language ];
+    this.rule = rules[ this.options.language ];
 
-        this.exceptions = {};
-        for (let word in this.options.exceptions) {
-            this.exceptions[ word.toLowerCase() ] = this.options.exceptions[ word ].replace( ' ', this.hyphen ).toLowerCase();
-        }
-
-        logger.info( 'created', options );
+    this.exceptions = {};
+    for ( let word in this.options.exceptions ) {
+      this.exceptions[ word.toLowerCase() ] = this.options.exceptions[ word ].replace( ' ', this.hyphen ).toLowerCase();
     }
 
-    static get MODES() {
-        return {
-            hyphen: String.fromCharCode( 0x00B7 ), // DOTS: 00B7 2010 2022 2043 LINES: 2758 22EE 205E 237F
-            colors: [ 'black', 'red' ] //, '#0af'
-        };
+    logger.info( 'created', options );
+  }
+
+  static get MODES() {
+    return {
+      hyphen: String.fromCharCode( 0x00B7 ), // DOTS: 00B7 2010 2022 2043 LINES: 2758 22EE 205E 237F
+      colors: [ 'black', 'red' ], //, '#0af'
+    };
+  }
+
+  static getPrefixAndSuffix( word, hyphen ) {
+    const chars = Array.from( word );
+    const prefix = [];
+    const postfix = [];
+
+    let i = 0;
+    while ( i < chars.length && chars[i++] === hyphen ) { prefix.push( hyphen ); }
+    i = chars.length - 1;
+    while ( i >= 0 && chars[i--] === hyphen ) { postfix.push( hyphen ); }
+
+    return [ prefix.join( '' ), postfix.join( '' ) ];
+  }
+
+  get enabled() {
+    return !!this.rule;
+  }
+
+  get setup() {
+    return new SyllabificationFeedback( { ...this.options, hyphen: this.hyphen, enabled: !!this.rule } );
+  }
+
+  prepare( text ) {
+    if ( !this.rule || this.options.mode !== 'hyphen' ) {
+      return text;
     }
 
-    static getPrefixAndSuffix( word, hyphen ) {
-        const chars = Array.from( word );
-        const prefix = [];
-        const postfix = [];
+    logger.info( 'preparing' );
 
-        let i = 0;
-        while (i < chars.length && chars[i++] === hyphen) { prefix.push( hyphen ); }
-        i = chars.length - 1;
-        while (i >= 0 && chars[i--] === hyphen) { postfix.push( hyphen ); }
+    const prepareWord = word => {
+      if ( !word ) {
+        return word;
+      }
 
-        return [ prefix.join(''), postfix.join('') ];
-    }
+      const syllabifiedWord = this.syllabifyWord( word, this.hyphen );
+      const hyphenCount = syllabifiedWord.length - word.length;
+      const halfHyphenCount = Math.round( hyphenCount / 2 );
 
-    get enabled() {
-        return !!this.rule;
-    }
-
-    get setup() {
-        return new SyllabificationFeedback( { ...this.options, hyphen: this.hyphen, enabled: !!this.rule } );
-    }
-
-    prepare( text ) {
-        if (!this.rule || this.options.mode !== 'hyphen') {
-            return text;
-        }
-
-        logger.info( 'preparing' );
-
-        const prepareWord = word => {
-            if (!word) {
-                return word;
-            }
-
-            const syllabifiedWord = this.syllabifyWord( word, this.hyphen );
-            const hyphenCount = syllabifiedWord.length - word.length;
-            const halfHyphenCount = Math.round( hyphenCount / 2 );
-
-            return '<span class="hyphens">' +
-                        (Array( halfHyphenCount + 1 ).join( this.hyphen ) ) +
+      return '<span class="hyphens">' +
+                        ( Array( halfHyphenCount + 1 ).join( this.hyphen ) ) +
                     '</span>' +
                     word +
                     '<span class="hyphens">' +
-                        (Array( hyphenCount - halfHyphenCount + 1 ).join( this.hyphen ) ) +
+                        ( Array( hyphenCount - halfHyphenCount + 1 ).join( this.hyphen ) ) +
                     '</span>';
-        };
+    };
 
-        if (text instanceof Array) {
-            return text.map( line => {
-                const words = line.split( ' ' ).map( word => word.toLowerCase() );
-                return words.map( prepareWord ).join( ' ' );
-            });
-        }
-        else {
-            return prepareWord( text );
-        }
+    if ( text instanceof Array ) {
+      return text.map( line => {
+        const words = line.split( ' ' ).map( word => word.toLowerCase() );
+        return words.map( prepareWord ).join( ' ' );
+      } );
+    }
+    else {
+      return prepareWord( text );
+    }
+  }
+
+  unprepare( text ) {
+    return text.replace( new RegExp( this.hyphen, 'g' ), '' );
+  }
+
+  // @wordFocus - WordFocus
+  inspect( el, wordFocus ) {
+    if ( !this.rule ) {
+      return false;
     }
 
-    unprepare( text ) {
-        return text.replace( new RegExp( this.hyphen, 'g' ), '' );
+    // We consider the common threshold as the threshold for relatively short words
+    // For long words, each addition character increases the threhold
+    let threshold = this.options.threshold.value;
+    if ( this.options.threshold.adjustForWordLength ) {
+      threshold *= Math.max( 1, 1 + ( wordFocus.word.length - LONG_WORD_MIN_LENGTH ) * EXTRA_THRESHOLD_FOR_CHAR );
     }
 
-    // @wordFocus - WordFocus
-    inspect( el, wordFocus ) {
-        if (!this.rule) {
-            return false;
-        }
-
-        // We consider the common threshold as the threshold for relatively short words
-        // For long words, each addition character increases the threhold
-        let threshold = this.options.threshold.value;
-        if (this.options.threshold.adjustForWordLength) {
-            threshold *= Math.max( 1, 1 + (wordFocus.word.length - LONG_WORD_MIN_LENGTH) * EXTRA_THRESHOLD_FOR_CHAR );
-        }
-
-        const mustSyllabify =
+    const mustSyllabify =
             !wordFocus.syllabified &&
             wordFocus.entries === 1 &&
             wordFocus.accumulatedTime > threshold;
 
-        if (!mustSyllabify) {
-            return false;
-        }
-
-        wordFocus.syllabified = true;
-
-        el.innerHTML = this.syllabifyWord( wordFocus.word, this.hyphenHtml );
-
-        if (this.options.temporary) {
-            setTimeout( () => {
-                this._restore( el );
-            }, RESTORE_INTERVAL );
-        }
-
-        return true;
+    if ( !mustSyllabify ) {
+      return false;
     }
 
-    syllabifyElementText( el, word ) {
-        if (!this.rule) {
-            return false;
-        }
+    wordFocus.syllabified = true;
 
-        el.innerHTML = this.syllabifyWord( word, this.hyphenHtml );
+    el.innerHTML = this.syllabifyWord( wordFocus.word, this.hyphenHtml );
 
-        return true;
+    if ( this.options.temporary ) {
+      setTimeout( () => {
+        this._restore( el );
+      }, RESTORE_INTERVAL );
     }
 
-    setAvgWordReadingDuration( wordReadingDuration ) {
-        if (!this.options.threshold.smart || !wordReadingDuration) {
-            return;
-        }
+    return true;
+  }
 
-        this.options.threshold.value =
+  syllabifyElementText( el, word ) {
+    if ( !this.rule ) {
+      return false;
+    }
+
+    el.innerHTML = this.syllabifyWord( word, this.hyphenHtml );
+
+    return true;
+  }
+
+  setAvgWordReadingDuration( wordReadingDuration ) {
+    if ( !this.options.threshold.smart || !wordReadingDuration ) {
+      return;
+    }
+
+    this.options.threshold.value =
             Math.max( this.options.threshold.min,
-            Math.min( this.options.threshold.max,
-            wordReadingDuration * this.options.threshold.factor
-        ));
+              Math.min( this.options.threshold.max,
+                wordReadingDuration * this.options.threshold.factor
+              ) );
+  }
+
+  syllabifyWord( word, hyphen ) {
+    logger.info( 'syllabifying', word );
+
+    if ( this.options.mode === 'colors' ) {
+      hyphen = this.hyphen;
     }
 
-    syllabifyWord( word, hyphen ) {
-        logger.info( 'syllabifying', word );
-
-        if (this.options.mode === 'colors') {
-            hyphen = this.hyphen;
-        }
-
-        let result;
-        const exception = Object.keys( this.exceptions ).find( exception => this._isException( word, exception ));
-        if (exception) {
-            result = this._formatException( word, exception, this.exceptions[ exception ], hyphen );
-        }
-        else {
-            result = this.rule( word, hyphen );
-        }
-
-        if (this.options.mode === 'colors') {
-            const syllabs = result.split( this.hyphen );
-            result = this._colorize( syllabs );
-        }
-
-        return result;
+    let result;
+    const exception = Object.keys( this.exceptions ).find( exception => this._isException( word, exception ) );
+    if ( exception ) {
+      result = this._formatException( word, exception, this.exceptions[ exception ], hyphen );
+    }
+    else {
+      result = this.rule( word, hyphen );
     }
 
-    _restore( el ) {
-        let text = null;
-        try {
-            text = el.textContent;
-        }
-        catch (e) {
-            logger.error( 'restoring: element do not exist' );
-        }
-
-        logger.info( 'restoring', text );
-
-        if (text) {
-            const syllabs = text.split( this.hyphen );
-            el.innerHTML = syllabs.join('');
-        }
+    if ( this.options.mode === 'colors' ) {
+      const syllabs = result.split( this.hyphen );
+      result = this._colorize( syllabs );
     }
 
-    _isException( word, exception ) {
-        return word.toLowerCase().indexOf( exception ) >= 0;
+    return result;
+  }
+
+  _restore( el ) {
+    let text = null;
+    try {
+      text = el.textContent;
+    }
+    catch ( e ) {
+      logger.error( 'restoring: element do not exist' );
     }
 
-    _formatException( word, exception, syllabified, hyphen ) {
-        const start = word.toLowerCase().indexOf( exception );
-        const length = exception.length;
-        const prefix = word.substr( 0, start );
-        const postfix = word.substr( start + length );
-        const chars = Array.from( syllabified );
+    logger.info( 'restoring', text );
 
-        for (let i = start, j = 0; i < start + length; i++) {
-            let c = word.charAt( i );
-            if (c === c.toUpperCase()) {    // this is not a letter
-                chars[j] = c;
-            }
+    if ( text ) {
+      const syllabs = text.split( this.hyphen );
+      el.innerHTML = syllabs.join( '' );
+    }
+  }
 
-            while (chars[ ++j ] === this.hyphen) { }    // just copy hyphens
-        }
+  _isException( word, exception ) {
+    return word.toLowerCase().indexOf( exception ) >= 0;
+  }
 
-        let result = chars.join('');
-        if (this.hyphen !== hyphen) {
-            const re = new RegExp( this.hyphen, 'g' );
-            result = result.replace( re, hyphen );
-        }
+  _formatException( word, exception, syllabified, hyphen ) {
+    const start = word.toLowerCase().indexOf( exception );
+    const length = exception.length;
+    const prefix = word.substr( 0, start );
+    const postfix = word.substr( start + length );
+    const chars = Array.from( syllabified );
 
-        return prefix + result + postfix;
+    for ( let i = start, j = 0; i < start + length; i++ ) {
+      let c = word.charAt( i );
+      if ( c === c.toUpperCase() ) {    // this is not a letter
+        chars[j] = c;
+      }
+
+      while ( chars[ ++j ] === this.hyphen ) { }    // just copy hyphens
     }
 
-    _colorize( syllabs ) {
-        const colors = Syllabifier.MODES[ 'colors' ];
-        let colorIndex = 0;
-
-        const colorizedSyllabs = syllabs.map( syllab => {
-            const result = `<span style="color: ${colors[ colorIndex ]}">${syllab}</span>`;
-            if (++colorIndex === colors.length) {
-                colorIndex = 0;
-            }
-            return result;
-        });
-
-        return colorizedSyllabs.join('');
+    let result = chars.join( '' );
+    if ( this.hyphen !== hyphen ) {
+      const re = new RegExp( this.hyphen, 'g' );
+      result = result.replace( re, hyphen );
     }
+
+    return prefix + result + postfix;
+  }
+
+  _colorize( syllabs ) {
+    const colors = Syllabifier.MODES[ 'colors' ];
+    let colorIndex = 0;
+
+    const colorizedSyllabs = syllabs.map( syllab => {
+      const result = `<span style="color: ${colors[ colorIndex ]}">${syllab}</span>`;
+      if ( ++colorIndex === colors.length ) {
+        colorIndex = 0;
+      }
+      return result;
+    } );
+
+    return colorizedSyllabs.join( '' );
+  }
 
 };
 
 const rules = {
-    Finnish( word, hyphen ) {
-        const vowels = [ 'a', 'o', 'u', 'i', 'e', 'ä', 'ö', 'y' ];
-        const consonants = [ 'b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm',
-                            'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'z' ];
-        const diftongs = [ 'ai', 'ei', 'oi', 'ui', 'yi', 'äi', 'öi', 'au', 'eu',
-                            'iu', 'ou', 'ey', 'iy', 'äy', 'öy', 'ie', 'uo', 'yö' ];
+  Finnish( word, hyphen ) {
+    const vowels = [ 'a', 'o', 'u', 'i', 'e', 'ä', 'ö', 'y' ];
+    const consonants = [ 'b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm',
+      'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'z' ];
+    const diftongs = [ 'ai', 'ei', 'oi', 'ui', 'yi', 'äi', 'öi', 'au', 'eu',
+      'iu', 'ou', 'ey', 'iy', 'äy', 'öy', 'ie', 'uo', 'yö' ];
 
-        const getType = c => vowels.includes( c ) ? 'V' : ( consonants.includes( c ) ? 'C' : '_' );
+    const getType = c => vowels.includes( c ) ? 'V' : ( consonants.includes( c ) ? 'C' : '_' );
 
-        const result = [];
+    const result = [];
 
-        let hasVowel = false;
-        let vowelsInRow = 0;
+    let hasVowel = false;
+    let vowelsInRow = 0;
 
-        for (let i = word.length - 1; i >= 0; i--) {
-            let separate = false;
-            const char = word[i];
-            const type = getType( char );
-            const charNext = i > 0 ? word[i - 1] : null;
-            const typeNext = charNext ? getType( charNext ) : '_';
+    for ( let i = word.length - 1; i >= 0; i-- ) {
+      let separate = false;
+      const char = word[i];
+      const type = getType( char );
+      const charNext = i > 0 ? word[i - 1] : null;
+      const typeNext = charNext ? getType( charNext ) : '_';
 
-            if (type === 'V') {
-                hasVowel = true;
-                vowelsInRow++;
+      if ( type === 'V' ) {
+        hasVowel = true;
+        vowelsInRow++;
 
-                if (i < word.length - 1) {
-                    const charPrevious = word[ i + 1 ];
-                    const typePrevious = getType( charPrevious );
-                    if (charPrevious !== char && typePrevious === type &&
-                        !diftongs.includes( char + charPrevious )) {
-                        result.unshift( hyphen );
-                        vowelsInRow = 0;
-                    }
-                    else if ( char === 'i' && result[0] === 'e' && result[1] === 'n') { // handle '-ien' ending
-                        result.unshift( hyphen );
-                        vowelsInRow = 0;
-                    }
-                    else if (vowelsInRow === 3) { // this is a compound word... split as "V-VV" (incorrect for eg maailma)
-                        result.unshift( hyphen );
-                        vowelsInRow = 0;
-                    }
-                }
-            }
-            else if (type === 'C' && hasVowel) {
-                vowelsInRow = 0;
-
-                separate = i > 0;
-                if (i === 1) {  // prevent the two leading consonants to separate (eg. 'kreikka' )
-                    // const charNext = word[i - 1];
-                    // const typeNext = getType( charNext );
-                    if (typeNext === type) {
-                        separate = false;
-                    }
-                }
-            }
-
-            result.unshift( char );
-
-            if (separate) {
-                if (type !== '_' && typeNext !== '_') {
-                    result.unshift( hyphen );
-                }
-                hasVowel = false;
-            }
+        if ( i < word.length - 1 ) {
+          const charPrevious = word[ i + 1 ];
+          const typePrevious = getType( charPrevious );
+          if ( charPrevious !== char && typePrevious === type &&
+                        !diftongs.includes( char + charPrevious ) ) {
+            result.unshift( hyphen );
+            vowelsInRow = 0;
+          }
+          else if ( char === 'i' && result[0] === 'e' && result[1] === 'n' ) { // handle '-ien' ending
+            result.unshift( hyphen );
+            vowelsInRow = 0;
+          }
+          else if ( vowelsInRow === 3 ) { // this is a compound word... split as "V-VV" (incorrect for eg maailma)
+            result.unshift( hyphen );
+            vowelsInRow = 0;
+          }
         }
+      }
+      else if ( type === 'C' && hasVowel ) {
+        vowelsInRow = 0;
 
-        return result.join('');
+        separate = i > 0;
+        if ( i === 1 ) {  // prevent the two leading consonants to separate (eg. 'kreikka' )
+          // const charNext = word[i - 1];
+          // const typeNext = getType( charNext );
+          if ( typeNext === type ) {
+            separate = false;
+          }
+        }
+      }
+
+      result.unshift( char );
+
+      if ( separate ) {
+        if ( type !== '_' && typeNext !== '_' ) {
+          result.unshift( hyphen );
+        }
+        hasVowel = false;
+      }
     }
+
+    return result.join( '' );
+  },
 };

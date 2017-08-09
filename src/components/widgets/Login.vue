@@ -2,7 +2,7 @@
   #login
     .field
       p.control.has-icons-left.has-icons-right
-        input.input(type="email" placeholder="Email" v-model="email" @keyup.enter="login")
+        input.input(type="email" placeholder="Email" autofocus="autofocus" v-model="email" @keyup.enter="login")
         span.icon.is-small.is-left
           i.fa.fa-envelope
         span.icon.is-small.is-right(v-if="!isEmailValid")
@@ -24,58 +24,58 @@
 </template>
 
 <script>
-  import login from '@/utils/login.js';
+import login from '@/utils/login.js';
 
-  import TemporalError from '@/components/widgets/TemporalError';
+import TemporalError from '@/components/widgets/TemporalError';
 
-  export default {
-    name: 'login',
+export default {
+  name: 'login',
 
-    components: {
-      'temporal-error': TemporalError
+  components: {
+    'temporal-error': TemporalError,
+  },
+
+  data() {
+    return {
+      email: '',
+      password: '',
+
+      inProgress: false,
+      errorText: '',
+      showError: 0,  // random value to trigger the notification
+    };
+  },
+
+  computed: {
+    isEmailValid() {
+      return !this.email || /(.{2,})@(\w{2,}\.\w{2,})/.test( this.email );
     },
 
-    data() {
-      return {
-        email: '',
-        password: '',
+    isPasswordValid() {
+      return !this.password || this.password.length > 5;
+    },
+  },
 
-        inProgress: false,
-        errorText: '',
-        showError: 0  // random value to trigger the notification
-      };
+  methods: {
+
+    setError( msg ) {
+      this.errorText = msg;
+      this.showError = Math.random();
     },
 
-    computed: {
-      isEmailValid() {
-        return !this.email || /(.{2,})@(\w{2,}\.\w{2,})/.test( this.email );
-      },
+    login( e ) {
+      this.inProgress = true;
 
-      isPasswordValid() {
-        return !this.password || this.password.length > 5;
-      }
+      login.logIn( this.email, this.password, ( err, user ) => {
+        this.inProgress = false;
+
+        if ( err ) {
+          return this.setError( err.message );
+        }
+      } );
     },
-
-    methods: {
-
-      setError( msg ) {
-        this.errorText = msg;
-        this.showError = Math.random();
-      },
-
-      login( e ) {
-        this.inProgress = true;
-
-        login.logIn( this.email, this.password, (err, user) => {
-          this.inProgress = false;
-
-          if (err) {
-            return this.setError( err.message );
-          }
-        });
-      },
-    }
-  };
+  },
+};
 </script>
 
 <style lang="less" scoped>

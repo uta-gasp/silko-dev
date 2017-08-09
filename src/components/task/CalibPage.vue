@@ -27,64 +27,64 @@
 </template>
 
 <script>
-  import gazeTracking from '@/utils/gazeTracking.js';
+import gazeTracking from '@/utils/gazeTracking.js';
 
-  export default {
-    name: 'calib-page',
+export default {
+  name: 'calib-page',
 
-    data() {
-      return {
-        isConnected: (gazeTracking.state.isConnected && !gazeTracking.state.isTracking && !gazeTracking.state.isBusy) || false,
-        isETUDConnected: gazeTracking.state.isServiceRunning || false,
-        isCalibrated: gazeTracking.state.isCalibrated || false,
-      };
+  data() {
+    return {
+      isConnected: ( gazeTracking.state.isConnected && !gazeTracking.state.isTracking && !gazeTracking.state.isBusy ) || false,
+      isETUDConnected: gazeTracking.state.isServiceRunning || false,
+      isCalibrated: gazeTracking.state.isCalibrated || false,
+    };
+  },
+
+  props: {
+    texts: Object,
+  },
+
+  computed: {
+    calibInstruction() {
+      return this.texts.calibInstruction ? this.texts.calibInstruction.split( '\n' ) : '';
+    },
+  },
+
+  methods: {
+    showETUDOptions( e ) {
+      gazeTracking.showOptions();
     },
 
-    props: {
-      texts: Object
+    reload( e ) {
+      this.$router.replace( '/assignments' );
+      // window.location.assign( window.location.origin );
     },
 
-    computed: {
-      calibInstruction() {
-        return this.texts.calibInstruction ? this.texts.calibInstruction.split( '\n' ) : '';
-      }
+    calibrate( e ) {
+      this.$emit( 'close', { skip: false } );
     },
 
-    methods: {
-      showETUDOptions( e ) {
-        gazeTracking.showOptions();
-      },
-
-      reload( e ) {
-        this.$router.replace( '/assignments' );
-        // window.location.assign( window.location.origin );
-      },
-
-      calibrate( e ) {
-        this.$emit( 'close', { skip: false } );
-      },
-
-      skip( e ) {
-        this.$emit( 'close', { skip: true } );
-      },
-
-      cancel( e ) {
-        this.$router.replace( '/assignments' );
-      }
+    skip( e ) {
+      this.$emit( 'close', { skip: true } );
     },
 
-    created() {
-      gazeTracking.setCallback( 'stateUpdated', 'calib', state => {
-        this.isConnected = state.isConnected && !state.isTracking && !state.isBusy;
-        this.isETUDConnected = state.isServiceRunning;
-        this.isCalibrated = state.isCalibrated;
-      });
+    cancel( e ) {
+      this.$router.replace( '/assignments' );
     },
+  },
 
-    beforeDestroy() {
-      gazeTracking.clearCallback( 'stateUpdated', 'calib' );
-    },
-  };
+  created() {
+    gazeTracking.setCallback( 'stateUpdated', 'calib', state => {
+      this.isConnected = state.isConnected && !state.isTracking && !state.isBusy;
+      this.isETUDConnected = state.isServiceRunning;
+      this.isCalibrated = state.isCalibrated;
+    } );
+  },
+
+  beforeDestroy() {
+    gazeTracking.clearCallback( 'stateUpdated', 'calib' );
+  },
+};
 </script>
 
 <style lang="less" scoped>

@@ -8,46 +8,46 @@
 </template>
 
 <script>
-  const MSG_SHOW_DURATION = 4000;
+const MSG_SHOW_DURATION = 4000;
 
-  export default {
-    name: 'creation-success',
+export default {
+  name: 'creation-success',
 
-    data() {
-      return {
-        showState: false,
-        timer: null
-      };
-    },
+  data() {
+    return {
+      showState: false,
+      timer: null,
+    };
+  },
 
-    props: {
-      type: String,
-      show: Number
-    },
+  props: {
+    type: String,
+    show: Number,
+  },
 
-    watch: {
-      show() {
-        this.showState = true;
-        if (this.timer) {
-          clearTimeout( this.timer );
-        }
-        this.timer = setTimeout( () => {
-          this.showState = false;
-          this.timer = null;
-        }, MSG_SHOW_DURATION);
+  watch: {
+    show() {
+      this.showState = true;
+      if ( this.timer ) {
+        clearTimeout( this.timer );
       }
+      this.timer = setTimeout( () => {
+        this.showState = false;
+        this.timer = null;
+      }, MSG_SHOW_DURATION );
     },
+  },
 
-    computed: {
-      notificationClass() {
-        return 'is-' + this.type;
-      }
+  computed: {
+    notificationClass() {
+      return 'is-' + this.type;
     },
+  },
 
-    mounted() {
-      this.showState = false;
-    }
-  };
+  mounted() {
+    this.showState = false;
+  },
+};
 </script>
 
 <style lang="less" scoped>

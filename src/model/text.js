@@ -2,12 +2,12 @@ import Recordable from './commons/recordable.js';
 
 export default class Text {
 
-    constructor( id, task, student ) {
-        this.id = id;
-        this.task = task;
-        this.student = student;
-        this.pages = []; // array of arrays of TextWord
-    }
+  constructor( id, task, student ) {
+    this.id = id;
+    this.task = task;
+    this.student = student;
+    this.pages = []; // array of arrays of TextWord
+  }
 
 }
 

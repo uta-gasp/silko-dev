@@ -23,74 +23,74 @@
 </template>
 
 <script>
-  import eventBus from '@/utils/event-bus.js';
+import eventBus from '@/utils/event-bus.js';
 
-  import Student from '@/model/student.js';
+import Student from '@/model/student.js';
 
-  export default {
-    name: 'assignments',
+export default {
+  name: 'assignments',
 
-    data() {
-      return {
-        student: null,
-        assignments: [],  // {cls, task}
-        assignment: '',
-      };
+  data() {
+    return {
+      student: null,
+      assignments: [],  // {cls, task}
+      assignment: '',
+    };
+  },
+
+  computed: {
+
+    hasAssignment() {
+      return !!this.assignments.length;
     },
+  },
 
-    computed: {
+  methods: {
 
-      hasAssignment() {
-        return !!this.assignments.length;
-      },
-    },
-
-    methods: {
-
-      init() {
-        this.student = Student.instance;
-        if (this.student) {
-          this.loadAssignments();
-        }
-      },
-
-      loadAssignments() {
-        this.student.loadAssignments( (err, assignments) => {
-          if (err) {
-            return console.log( 'TODO loadAssignments', err );
-          }
-
-          this.assignments = assignments;
-        });
-      },
-
-      checkAccess() {
-        if (!Student.isLogged) {
-          this.$router.replace( '/' );
-        }
-      },
-
-      start( assignment, e ) {
-        this.$router.replace( `/assignment/${assignment.cls.id}` );
+    init() {
+      this.student = Student.instance;
+      if ( this.student ) {
+        this.loadAssignments();
       }
     },
 
-    created() {
-      console.log('Assignments component created');
-      eventBus.$on( 'logout', () => {
-        this.checkAccess();
-      });
-      eventBus.$on( 'login', () => {
-        this.init();
-      });
+    loadAssignments() {
+      this.student.loadAssignments( ( err, assignments ) => {
+        if ( err ) {
+          return console.log( 'TODO loadAssignments', err );
+        }
 
-      this.checkAccess();
+        this.assignments = assignments;
+      } );
     },
 
-    mounted() {
+    checkAccess() {
+      if ( !Student.isLogged ) {
+        this.$router.replace( '/' );
+      }
+    },
+
+    start( assignment, e ) {
+      this.$router.replace( `/assignment/${assignment.cls.id}` );
+    },
+  },
+
+  created() {
+    console.log( 'Assignments component created' );
+    eventBus.$on( 'logout', () => {
+      this.checkAccess();
+    } );
+    eventBus.$on( 'login', () => {
       this.init();
-    }
-  };
+    } );
+
+    this.checkAccess();
+  },
+
+  mounted() {
+    this.init();
+  },
+};
 </script>
 
 <style lang="less" scoped>

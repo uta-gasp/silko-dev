@@ -27,94 +27,94 @@
 </template>
 
 <script>
-  import gazeTracking from '@/utils/gazeTracking.js';
+import gazeTracking from '@/utils/gazeTracking.js';
 
-  import TaskPage from '@/components/task/TaskPage';
+import TaskPage from '@/components/task/TaskPage';
 
-  import fullscreen from '@/components/mixins/fullscreen.js';
+import fullscreen from '@/components/mixins/fullscreen.js';
 
-  export default {
-    name: 'start-page',
+export default {
+  name: 'start-page',
 
-    mixins: [ fullscreen ],
+  mixins: [ fullscreen ],
 
-    components: {
-      'task-page': TaskPage,
+  components: {
+    'task-page': TaskPage,
+  },
+
+  data() {
+    return {
+      isConnected: ( gazeTracking.state.isConnected && !gazeTracking.state.isTracking && !gazeTracking.state.isBusy ) || false,
+      isCalibrated: ( gazeTracking.state.isCalibrated && !gazeTracking.state.isTracking && !gazeTracking.state.isBusy ) || false,
+      isRunning: ( gazeTracking.state.isConnected && gazeTracking.state.isTracking && !gazeTracking.state.isBusy ) || false,
+      isReading: false,
+      isFullscreen: false,
+    };
+  },
+
+  props: {
+    texts: Object,
+    task: Object,
+    student: Object,
+  },
+
+  computed: {
+    startInstruction() {
+      return this.texts.startInstruction ? this.texts.startInstruction.split( '\n' ) : '';
+    },
+  },
+
+  methods: {
+
+    start( e ) {
+      this.isReading = true;
+      this.makeFullscreen( this.$refs.fullscreen );
+      gazeTracking.start();
     },
 
-    data() {
-      return {
-        isConnected: (gazeTracking.state.isConnected && !gazeTracking.state.isTracking && !gazeTracking.state.isBusy) || false,
-        isCalibrated: (gazeTracking.state.isCalibrated && !gazeTracking.state.isTracking && !gazeTracking.state.isBusy) || false,
-        isRunning: (gazeTracking.state.isConnected && gazeTracking.state.isTracking && !gazeTracking.state.isBusy) || false,
-        isReading: false,
-        isFullscreen: false,
-      };
+    cancel( e ) {
+      this.$emit( 'close', { cancelled: true } );
     },
 
-    props: {
-      texts: Object,
-      task: Object,
-      student: Object,
+    finishedReading( e ) {
+      this.isReading = false;
+      this.$emit( 'close', { finished: true, ...e } );
+      this.closeFullscreen();
+      gazeTracking.stop();
     },
 
-    computed: {
-      startInstruction() {
-        return this.texts.startInstruction ? this.texts.startInstruction.split( '\n' ) : '';
+    gazeDataSaved( e ) {
+      this.$emit( 'saved', e );
+    },
+  },
+
+  watch: {
+    isRunning( value ) {
+      if ( !value && this.isFullscreen && this.isReading ) {
+        setTimeout( () => {
+          this.closeFullscreen();
+          this.$router.replace( '/assignments' );
+        }, 4000 );
       }
     },
+  },
 
-    methods: {
+  created() {
+    gazeTracking.setCallback( 'stateUpdated', 'start', state => {
+      this.isConnected = state.isConnected && !state.isTracking && !state.isBusy;
+      this.isCalibrated = state.isCalibrated && !state.isTracking && !state.isBusy;
+      this.isRunning = state.isConnected && state.isTracking && !state.isBusy;
+    } );
 
-      start( e ) {
-        this.isReading = true;
-        this.makeFullscreen( this.$refs.fullscreen );
-        gazeTracking.start();
-      },
+    this.onFullscreenChanges( isFullscreen => {
+      this.isFullscreen = isFullscreen;
+    } );
+  },
 
-      cancel( e ) {
-        this.$emit( 'close', { cancelled: true } );
-      },
-
-      finishedReading( e ) {
-        this.isReading = false;
-        this.$emit( 'close', { finished: true, ...e } );
-        this.closeFullscreen();
-        gazeTracking.stop();
-      },
-
-      gazeDataSaved( e ) {
-        this.$emit( 'saved', e );
-      },
-    },
-
-    watch: {
-      isRunning( value ) {
-        if (!value && this.isFullscreen && this.isReading) {
-          setTimeout( () => {
-            this.closeFullscreen();
-            this.$router.replace( '/assignments' );
-          }, 4000);
-        }
-      }
-    },
-
-    created() {
-      gazeTracking.setCallback( 'stateUpdated', 'start', state => {
-        this.isConnected = state.isConnected && !state.isTracking && !state.isBusy;
-        this.isCalibrated = state.isCalibrated && !state.isTracking && !state.isBusy;
-        this.isRunning = state.isConnected && state.isTracking && !state.isBusy;
-      });
-
-      this.onFullscreenChanges( isFullscreen => {
-        this.isFullscreen = isFullscreen;
-      });
-    },
-
-    beforeDestroy() {
-      gazeTracking.clearCallback( 'stateUpdated', 'start' );
-    }
-  };
+  beforeDestroy() {
+    gazeTracking.clearCallback( 'stateUpdated', 'start' );
+  },
+};
 </script>
 
 <style lang="less" scoped>

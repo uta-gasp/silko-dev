@@ -10,29 +10,29 @@
 </template>
 
 <script>
-  export default {
-    name: 'modal-editor-container',
+export default {
+  name: 'modal-editor-container',
 
-    data() {
-      return {
-      };
+  data() {
+    return {
+    };
+  },
+
+  props: {
+    title: {
+      type: String,
+      default: 'Editor',
+    },
+  },
+
+  methods: {
+
+    close( e ) {
+      this.$emit( 'close', { cancelled: true } );
     },
 
-    props: {
-      title: {
-        type: String,
-        default: 'Editor'
-      }
-    },
-
-    methods: {
-
-      close( e ) {
-        this.$emit( 'close', { cancelled: true } );
-      }
-
-    }
-  };
+  },
+};
 </script>
 
 <style lang="less" scoped>

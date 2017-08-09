@@ -27,70 +27,70 @@
 </template>
 
 <script>
-  import Task from '@/model/task.js';
+import Task from '@/model/task.js';
 
-  import Syllabifier from '@/utils/syllabifier.js';
+import Syllabifier from '@/utils/syllabifier.js';
 
-  import FeedbackEditor from '@/components/widgets/feedbackEditor';
-  import BulmaCheckbox from '@/components/widgets/bulmaCheckbox';
+import FeedbackEditor from '@/components/widgets/feedbackEditor';
+import BulmaCheckbox from '@/components/widgets/bulmaCheckbox';
 
-  export default {
-    name: 'task-editor-feedback',
+export default {
+  name: 'task-editor-feedback',
 
-    components: {
-      'feedback-editor': FeedbackEditor,
-      'bulma-checkbox': BulmaCheckbox,
+  components: {
+    'feedback-editor': FeedbackEditor,
+    'bulma-checkbox': BulmaCheckbox,
+  },
+
+  data() {
+    return {
+      speech: this.task ? this.task.speech : Task.defaultSpeech,
+      speechAdjustForWordLength: this.task ? this.task.speech.threshold.adjustForWordLength : Task.defaultSpeech.threshold.adjustForWordLength,
+
+      syllab: this.task ? this.task.syllab : Task.defaultSyllab,
+      syllabExceptions: this.task ? Task.syllabsToText( this.task.syllab.exceptions ) : '',
+      syllabMode: this.task ? this.task.syllab.mode : Task.defaultSyllab.mode,
+      syllabTemporary: this.task ? this.task.syllab.temporary : Task.defaultSyllab.temporary,
+      syllabAdjustForWordLength: this.task ? this.task.syllab.threshold.adjustForWordLength : Task.defaultSyllab.threshold.adjustForWordLength,
+
+      syllabModes: Object.keys( Syllabifier.MODES ),
+    };
+  },
+
+  props: {
+    task: {
+      type: Object,
+      default: () => { return {}; },
     },
+  },
 
-    data() {
-      return {
-        speech: this.task ? this.task.speech : Task.defaultSpeech,
-        speechAdjustForWordLength: this.task ? this.task.speech.threshold.adjustForWordLength : Task.defaultSpeech.threshold.adjustForWordLength,
-
-        syllab: this.task ? this.task.syllab : Task.defaultSyllab,
-        syllabExceptions: this.task ? Task.syllabsToText( this.task.syllab.exceptions ) : '',
-        syllabMode: this.task ? this.task.syllab.mode : Task.defaultSyllab.mode,
-        syllabTemporary: this.task ? this.task.syllab.temporary : Task.defaultSyllab.temporary,
-        syllabAdjustForWordLength: this.task ? this.task.syllab.threshold.adjustForWordLength : Task.defaultSyllab.threshold.adjustForWordLength,
-
-        syllabModes: Object.keys( Syllabifier.MODES ),
+  computed: {
+    model() {
+      const result = {
+        syllab: this.syllab,
+        speech: this.speech,
+        syllabExceptions: this.syllabExceptions,
       };
+
+      result.syllab.mode = this.syllabMode;
+      result.syllab.temporary = this.syllabTemporary;
+      result.syllab.threshold.adjustForWordLength = this.syllabAdjustForWordLength;
+      result.speech.threshold.adjustForWordLength = this.speechAdjustForWordLength;
+
+      return result;
     },
+  },
 
-    props: {
-      task: {
-        type: Object,
-        default: () => { return {}; }
-      },
-    },
-
-    computed: {
-      model() {
-        const result = {
-          syllab: this.syllab,
-          speech: this.speech,
-          syllabExceptions: this.syllabExceptions
-        };
-
-        result.syllab.mode = this.syllabMode;
-        result.syllab.temporary = this.syllabTemporary;
-        result.syllab.threshold.adjustForWordLength = this.syllabAdjustForWordLength;
-        result.speech.threshold.adjustForWordLength = this.speechAdjustForWordLength;
-
-        return result;
-      }
-    },
-
-    watch: {
-      speech() { this.$emit( 'input', this.model ); },
-      speechAdjustForWordLength() { this.$emit( 'input', this.model ); },
-      syllab() { this.$emit( 'input', this.model ); },
-      syllabExceptions() { this.$emit( 'input', this.model ); },
-      syllabMode() { this.$emit( 'input', this.model ); },
-      syllabTemporary() { this.$emit( 'input', this.model ); },
-      syllabAdjustForWordLength() { this.$emit( 'input', this.model ); },
-    },
-  };
+  watch: {
+    speech() { this.$emit( 'input', this.model ); },
+    speechAdjustForWordLength() { this.$emit( 'input', this.model ); },
+    syllab() { this.$emit( 'input', this.model ); },
+    syllabExceptions() { this.$emit( 'input', this.model ); },
+    syllabMode() { this.$emit( 'input', this.model ); },
+    syllabTemporary() { this.$emit( 'input', this.model ); },
+    syllabAdjustForWordLength() { this.$emit( 'input', this.model ); },
+  },
+};
 </script>
 
 <style lang="less" scoped>

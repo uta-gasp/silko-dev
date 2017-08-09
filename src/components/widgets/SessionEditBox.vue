@@ -25,70 +25,70 @@
 </template>
 
 <script>
-  export default {
-    name: 'session-edit-box',
+export default {
+  name: 'session-edit-box',
 
-    data() {
-      return {
-        sessionToDelete: null,
-        _student: this.student || [],
-      };
+  data() {
+    return {
+      sessionToDelete: null,
+      _student: this.student || [],
+    };
+  },
+
+  props: {
+    student: {     // [_Student]
+      type: Object,
+      required: true,
+    },
+  },
+
+  methods: {
+    formatTimeComponent( timeComponent ) {
+      let formattedTimeComponent = '' + timeComponent;
+      if ( formattedTimeComponent.length < 2 ) {
+        formattedTimeComponent = '0' + formattedTimeComponent;
+      }
+      return formattedTimeComponent;
     },
 
-    props: {
-      student: {     // [_Student]
-        type: Object,
-        required: true,
-      },
+    formatDate( dateString ) {
+      const date = new Date( dateString );
+      const hours = this.formatTimeComponent( date.getHours() );
+      const minutes = this.formatTimeComponent( date.getMinutes() );
+      return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()} ${hours}:${minutes} `;
     },
 
-    methods: {
-      formatTimeComponent( timeComponent ) {
-          let formattedTimeComponent = '' + timeComponent;
-          if (formattedTimeComponent.length < 2) {
-              formattedTimeComponent = '0' + formattedTimeComponent;
-          }
-          return formattedTimeComponent;
-      },
+    sessionToString( session ) {
+      if ( !session ) {
+        return '';
+      }
 
-      formatDate( dateString ) {
-          const date = new Date( dateString );
-          const hours = this.formatTimeComponent( date.getHours() );
-          const minutes = this.formatTimeComponent( date.getMinutes() );
-          return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()} ${hours}:${minutes} `;
-      },
+      return `${session.task.name} at ${this.formatDate( session.ref.date )}`;
+    },
 
-      sessionToString( session ) {
-        if (!session) {
-          return '';
+    showDeleteWarning( session ) {
+      this.sessionToDelete = session;
+    },
+
+    deleteSession() {
+      const sessionID = this.sessionToDelete.ref.id;
+      this.student.ref.deleteSession( sessionID, err => {
+        if ( err ) {
+          return console.log( 'TODO: handle error', err );
         }
 
-        return `${session.task.name} at ${this.formatDate( session.ref.date )}`;
-      },
+        this.student.sessions = this.student.sessions.filter( session => session.ref.id !== sessionID );
+        this.$emit( 'deleted', { session: sessionID } );
+      } );
 
-      showDeleteWarning( session ) {
-        this.sessionToDelete = session;
-      },
-
-      deleteSession() {
-        const sessionID = this.sessionToDelete.ref.id;
-        this.student.ref.deleteSession( sessionID, err => {
-          if (err) {
-            return console.log('TODO: handle error', err)
-          }
-
-          this.student.sessions = this.student.sessions.filter( session => session.ref.id !== sessionID );
-          this.$emit( 'deleted', { session: sessionID } );
-        });
-
-        this.sessionToDelete = null;
-      },
-
-      cancel() {
-        this.sessionToDelete = null;
-      }
+      this.sessionToDelete = null;
     },
-  };
+
+    cancel() {
+      this.sessionToDelete = null;
+    },
+  },
+};
 </script>
 
 <style lang="less" scoped>

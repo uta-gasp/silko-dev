@@ -4,21 +4,21 @@
 </template>
 
 <script>
-  export default {
-    name: 'task-text',
+export default {
+  name: 'task-text',
 
-    data() {
-      return {
-        textStyle: {
-          'color': '#775',
-          'font-family': 'Calibri, Arial, sans-serif',
-          'font-size': '20pt',
-          'font-style': 'normal',
-          'font-weight': 'bold',
-        },
-      };
-    },
-  };
+  data() {
+    return {
+      textStyle: {
+        'color': '#775',
+        'font-family': 'Calibri, Arial, sans-serif',
+        'font-size': '20pt',
+        'font-style': 'normal',
+        'font-weight': 'bold',
+      },
+    };
+  },
+};
 </script>
 
 <style lang="less" scoped>

@@ -36,205 +36,205 @@
 </template>
 
 <script>
-  import Vue from 'vue';
+import Vue from 'vue';
 
-  import OptionsCreator from '@/vis/optionsCreator.js';
-  import sgwmController from '@/vis/sgwmController.js';
-  import WordTrack from '@/vis/wordTrack.js';
+import OptionsCreator from '@/vis/optionsCreator.js';
+import sgwmController from '@/vis/sgwmController.js';
+import WordTrack from '@/vis/wordTrack.js';
 
-  import ControlPanel from '@/components/vis/controlPanel';
-  import Options from '@/components/vis/Options';
-  import VisTitle from '@/components/vis/VisTitle';
+import ControlPanel from '@/components/vis/controlPanel';
+import Options from '@/components/vis/Options';
+import VisTitle from '@/components/vis/VisTitle';
 
-  sgwmController.initializeSettings();
+sgwmController.initializeSettings();
 
-  const UI = {
-    levelDuration: 500,
-  };
+const UI = {
+  levelDuration: 500,
+};
 
-  export default {
-    name: 'word-replay',
+export default {
+  name: 'word-replay',
 
-     components: {
-      'control-panel': ControlPanel,
-      'options': Options,
-      'vis-title': VisTitle,
+  components: {
+    'control-panel': ControlPanel,
+    'options': Options,
+    'vis-title': VisTitle,
+  },
+
+  data() {
+    return {
+      pageIndex: 0,
+      isOptionsDisplayed: false,
+      isPlayerPaused: false,
+
+      defaultText: this.data.records[0].data.pages.map( page => page.text ),
+
+      words: [],
+      tracks: null,
+
+      // options representation for editor
+      options: {
+        wordReplay: {
+          id: 'wordReplay',
+          title: 'Word replay',
+          options: OptionsCreator.createOptions( {
+            levelDuration: { type: Number, step: 50, label: 'Level duration, ms' },
+          }, UI ),
+        },
+        _sgwm: sgwmController.createOptions(),
+      },
+    };
+  },
+
+  props: {
+    data: {   // { name, title, records, props }
+      type: Object,
+      required: true,
+    },
+  },
+
+  computed: {
+    textLength() {
+      return this.defaultText.length;
+    },
+  },
+
+  methods: {
+    setPage( e ) {
+      if ( this.tracks ) {
+        this.stopAll();
+      }
+
+      this.pageIndex = e.index;
+      this.makeList();
+
+      Vue.nextTick( () => {
+        this.start();
+      } );
     },
 
-   data() {
-      return {
-        pageIndex: 0,
-        isOptionsDisplayed: false,
-        isPlayerPaused: false,
+    showOptions( e ) {
+      this.isOptionsDisplayed = true;
+    },
 
-        defaultText: this.data.records[0].data.pages.map( page => page.text ),
+    close( e ) {
+      this.$emit( 'close' );
+    },
 
-        words: [],
-        tracks: null,
+    applyOptions( e ) {
+      sgwmController.save();
 
-        // options representation for editor
-        options: {
-          wordReplay: {
-            id: 'wordReplay',
-            title: 'Word replay',
-            options: OptionsCreator.createOptions({
-              levelDuration: { type: Number, step: 50, label: 'Level duration, ms' },
-            }, UI )
-          },
-          _sgwm: sgwmController.createOptions(),
-        },
+      const rows = this.$refs.table.querySelectorAll( 'tr' );
+      this.tracks.forEach( track => {
+        track.words.forEach( word => {
+          this.colorizeCell( rows[ word.id + 1 ].cells[ track.id + 1 ], word.totalDuration );
+        } );
+      } );
+    },
+
+    closeOptions( e ) {
+      this.isOptionsDisplayed = false;
+    },
+
+    restartPlayer( e ) {
+      this.stopAll();
+      this.makeList();
+
+      Vue.nextTick( () => {
+        this.start();
+      } );
+    },
+
+    togglePlayer( e ) {
+      this.isPlayerPaused = !this.isPlayerPaused;
+      this.tracks.forEach( track => track.togglePause() );
+    },
+
+    makeList() {
+      if ( !this.tracks ) {
+        this.createTracks();
+      }
+
+      const hyphenRegExp = new RegExp( `${this.data.props.syllab.hyphen}`, 'g' );
+
+      const words = this.defaultText[ this.pageIndex ].map( word => {
+        return {
+          text: word.text.replace( hyphenRegExp, '' ),
+          durations: this.tracks.map( track => 0 ),
+          key: Math.random(),
+        };
+      } );
+
+      this.words = words;
+    },
+
+    createTracks() {
+      this.tracks = this.data.records.map( ( record, index ) => {
+        return new WordTrack( this.$refs.root, record.student.name, record.data.pages, index );
+      } );
+    },
+
+    start() {
+      this.isPlayerPaused = false;
+
+      const rows = this.$refs.table.querySelectorAll( 'tr' );
+
+      this.tracks.forEach( ( track, ti ) => {
+        const words = track.session[ this.pageIndex ].text;
+        const mappingResult = sgwmController.map( track.session[ this.pageIndex ] );
+
+        track.start(
+          mappingResult.fixations,
+          words,
+          this.onWordFixated( track, rows ),
+          this.onTrackCompleted( track, rows[ words.length + 1 ] ),
+        );
+      } );
+
+      this.$refs.root.scrollTop = 0;
+    },
+
+    stopAll() {
+      this.tracks.forEach( track => track.stop() );
+    },
+
+    colorizeCell( cell, duration ) {
+      const levels = ( duration ? 1 : 0 ) + Math.floor( duration / UI.levelDuration );
+      const tone = 255 - 24 * Math.min( 10, levels );
+      const rgb = `rgb(${tone},${tone},${tone})`;
+      cell.style.backgroundColor = rgb;
+    },
+
+    onWordFixated( track, rows ) {
+      return ( word, duration, pointer ) => {
+        const rawWord = track.words[ word.id ];
+        rawWord.totalDuration = rawWord.totalDuration + duration;
+
+        const cell = rows[ word.id + 1 ].cells[ track.id + 1 ];
+        this.colorizeCell( cell, rawWord.totalDuration );
+
+        track.pointer.style = `left: ${cell.offsetLeft + ( cell.offsetWidth - track.pointerSize ) / 2}px; top: ${cell.offsetTop + ( cell.offsetHeight - track.pointerSize ) / 2}px`;
       };
     },
 
-    props: {
-      data: {   // { name, title, records, props }
-        type: Object,
-        required: true,
-      }
+    onTrackCompleted( track, row ) {
+      return () => {
+        // const cell = row.cells[ track.id + 1 ];
+        // cell.classList.remove( 'hidden' );
+      };
     },
+  },
 
-    computed: {
-      textLength() {
-        return this.defaultText.length;
-      }
-    },
+  mounted() {
+    console.log( 'Word replay created' );
 
-    methods: {
-      setPage( e ) {
-        if (this.tracks) {
-          this.stopAll();
-        }
+    this.setPage( { index: 0 } );
+  },
 
-        this.pageIndex = e.index;
-        this.makeList();
-
-        Vue.nextTick( () => {
-          this.start();
-        });
-      },
-
-      showOptions( e ) {
-        this.isOptionsDisplayed = true;
-      },
-
-      close( e ) {
-        this.$emit( 'close' );
-      },
-
-      applyOptions( e ) {
-        sgwmController.save();
-
-        const rows = this.$refs.table.querySelectorAll( 'tr' );
-        this.tracks.forEach( track => {
-          track.words.forEach( word => {
-            this.colorizeCell( rows[ word.id + 1 ].cells[ track.id + 1 ], word.totalDuration );
-          });
-        });
-      },
-
-      closeOptions( e ) {
-        this.isOptionsDisplayed = false;
-      },
-
-      restartPlayer( e ) {
-        this.stopAll();
-        this.makeList();
-
-        Vue.nextTick( () => {
-          this.start();
-        });
-      },
-
-      togglePlayer( e ) {
-        this.isPlayerPaused = !this.isPlayerPaused;
-        this.tracks.forEach( track => track.togglePause() );
-      },
-
-      makeList() {
-        if (!this.tracks) {
-          this.createTracks();
-        }
-
-        const hyphenRegExp = new RegExp( `${this.data.props.syllab.hyphen}`, 'g' );
-
-        const words = this.defaultText[ this.pageIndex ].map( word => {
-          return {
-            text: word.text.replace( hyphenRegExp, ''),
-            durations: this.tracks.map( track => 0 ),
-            key: Math.random()
-          };
-        });
-
-        this.words = words;
-      },
-
-      createTracks() {
-        this.tracks = this.data.records.map( (record, index) => {
-          return new WordTrack( this.$refs.root, record.student.name, record.data.pages, index );
-        });
-      },
-
-      start() {
-        this.isPlayerPaused = false;
-
-        const rows = this.$refs.table.querySelectorAll( 'tr' );
-
-        this.tracks.forEach( (track, ti) => {
-          const words = track.session[ this.pageIndex ].text;
-          const mappingResult = sgwmController.map( track.session[ this.pageIndex ] );
-
-          track.start(
-            mappingResult.fixations,
-            words,
-            this.onWordFixated( track, rows ),
-            this.onTrackCompleted( track, rows[ words.length + 1 ] ),
-          );
-        });
-
-        this.$refs.root.scrollTop = 0;
-      },
-
-      stopAll() {
-        this.tracks.forEach( track => track.stop() );
-      },
-
-      colorizeCell( cell, duration ) {
-        const levels = (duration ? 1 : 0) + Math.floor( duration / UI.levelDuration );
-        const tone = 255 - 24 * Math.min( 10, levels );
-        const rgb = `rgb(${tone},${tone},${tone})`;
-        cell.style.backgroundColor = rgb;
-      },
-
-      onWordFixated( track, rows ) {
-        return (word, duration, pointer) => {
-          const rawWord = track.words[ word.id ];
-          rawWord.totalDuration = rawWord.totalDuration + duration;
-
-          const cell = rows[ word.id + 1 ].cells[ track.id + 1 ];
-          this.colorizeCell( cell, rawWord.totalDuration );
-
-          track.pointer.style = `left: ${cell.offsetLeft + (cell.offsetWidth - track.pointerSize) / 2}px; top: ${cell.offsetTop + (cell.offsetHeight - track.pointerSize) / 2}px`;
-        };
-      },
-
-      onTrackCompleted( track, row ) {
-        return () => {
-          // const cell = row.cells[ track.id + 1 ];
-          // cell.classList.remove( 'hidden' );
-        };
-      },
-    },
-
-    mounted() {
-      console.log('Word replay created');
-
-      this.setPage( { index: 0 } );
-    },
-
-    beforeDestroy() {
-      this.stopAll();
-    },
-  };
+  beforeDestroy() {
+    this.stopAll();
+  },
+};
 </script>
 
 <style lang="less" scoped>

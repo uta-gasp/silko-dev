@@ -7,42 +7,42 @@
 </template>
 
 <script>
-  export default {
-    name: 'bulma-checkbox',
+export default {
+  name: 'bulma-checkbox',
 
-    data() {
-      return {
-        checked: !!this.value || false
-      };
+  data() {
+    return {
+      checked: !!this.value || false,
+    };
+  },
+
+  props: {
+    value: {
+      type: Boolean,
+      default: false,
     },
-
-    props: {
-      value: {
-        type: Boolean,
-        default: false
-      },
-      label: {
-        type: String,
-      },
-      disabled: {
-        type: Boolean,
-        default: false
-      }
+    label: {
+      type: String,
     },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+  },
 
-    methods: {
+  methods: {
 
-      toggle( e ) {
-        if (this.disabled) {
-          return;
-        }
-
-        this.checked = !this.checked;
-        this.$emit( 'input', this.checked );
+    toggle( e ) {
+      if ( this.disabled ) {
+        return;
       }
 
-    }
-  };
+      this.checked = !this.checked;
+      this.$emit( 'input', this.checked );
+    },
+
+  },
+};
 </script>
 
 <style lang="less" scoped>

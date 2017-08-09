@@ -35,140 +35,140 @@
 </template>
 
 <script>
-  import eventBus from '@/utils/event-bus.js';
-  import dataUtils from '@/utils/data-utils.js';
+import eventBus from '@/utils/event-bus.js';
+import dataUtils from '@/utils/data-utils.js';
 
-  import Admin from '@/model/admin.js';
-  import School from '@/model/school.js';
+import Admin from '@/model/admin.js';
+import School from '@/model/school.js';
 
-  import ModalNotification from '@/components/widgets/ModalNotification';
+import ModalNotification from '@/components/widgets/ModalNotification';
 
-  export default {
-    name: 'schools',
+export default {
+  name: 'schools',
 
-    components: {
-      'modal-notification': ModalNotification,
+  components: {
+    'modal-notification': ModalNotification,
+  },
+
+  data() {
+    return {
+      newName: '',
+      newEmail: '',
+
+      isCreating: false,
+      creationError: '',
+      showCreationError: 0,   // random value to trigger the notification
+      showCreationSuccess: 0, // random value to trigger the notification
+
+      schools: [],
+    };
+  },
+
+  computed: {
+
+    isNewNameValid() {
+      return this.newName.trim().length > 2;
     },
 
-    data() {
-      return {
-        newName: '',
-        newEmail: '',
-
-        isCreating: false,
-        creationError: '',
-        showCreationError: 0,   // random value to trigger the notification
-        showCreationSuccess: 0, // random value to trigger the notification
-
-        schools: []
-      };
+    isNewEmailValid() {
+      return /(.{2,})@(\w{2,}\.\w{2,})/.test( this.newEmail.trim() );
     },
 
-    computed: {
-
-      isNewNameValid() {
-        return this.newName.trim().length > 2;
-      },
-
-      isNewEmailValid() {
-        return /(.{2,})@(\w{2,}\.\w{2,})/.test( this.newEmail.trim() );
-      },
-
-      canCreate() {
-        return !this.isCreating &&
+    canCreate() {
+      return !this.isCreating &&
           this.isNewNameValid &&
           this.isNewEmailValid;
+    },
+  },
+
+  methods: {
+
+    loadSchools() {
+      School.list( ( err, schools ) => {
+        if ( err ) {
+          return `Cannot retrieve schools.\n\n${err}`;
+        }
+
+        this.schools = schools.sort( dataUtils.byName );
+      } );
+    },
+
+    checkAccess() {
+      if ( !Admin.isLogged ) {
+        this.$router.replace( '/' );
       }
     },
 
-    methods: {
+    setCreationError( msg ) {
+      this.creationError = msg;
+      this.showCreationError = Math.random();
+    },
 
-      loadSchools() {
-        School.list( (err, schools) => {
-          if (err) {
-            return `Cannot retrieve schools.\n\n${err}`;
-          }
+    tryToCreate( e ) {
+      if ( !this.canCreate ) {
+        return;
+      }
 
-          this.schools = schools.sort( dataUtils.byName );
-        });
-      },
-
-      checkAccess() {
-        if (!Admin.isLogged) {
-          this.$router.replace( '/' );
-        }
-      },
-
-      setCreationError( msg ) {
-        this.creationError = msg;
-        this.showCreationError = Math.random();
-      },
-
-      tryToCreate( e ) {
-        if (!this.canCreate) {
-          return;
-        }
-
-        const exists = this.schools.some( school => {
-          return false ||
+      const exists = this.schools.some( school => {
+        return false ||
             school.name.toLowerCase() === this.newName.toLowerCase().trim() ||
             school.email.toLowerCase() === this.newEmail.toLowerCase().trim();
-        });
+      } );
 
-        if (exists) {
-          this.setCreationError( 'A school with this name or email exists already' );
+      if ( exists ) {
+        this.setCreationError( 'A school with this name or email exists already' );
+      }
+      else {
+        this.createSchool();
+      }
+    },
+
+    createSchool() {
+      this.isCreating = true;
+      Admin.createSchool( this.newName.trim(), this.newEmail.trim(), ( err, id ) => {
+        this.isCreating = false;
+
+        if ( err ) {
+          this.setCreationError( err );
         }
         else {
-          this.createSchool();
+          this.newName = '';
+          this.newEmail = '';
+          this.loadSchools();
+
+          this.showCreationSuccess = Math.random();
         }
-      },
-
-      createSchool() {
-        this.isCreating = true;
-        Admin.createSchool( this.newName.trim(), this.newEmail.trim(), (err, id) => {
-          this.isCreating = false;
-
-          if (err) {
-            this.setCreationError( err );
-          }
-          else {
-            this.newName = '';
-            this.newEmail = '';
-            this.loadSchools();
-
-            this.showCreationSuccess = Math.random();
-          }
-        });
-      }
+      } );
     },
+  },
 
-    filters: {
-      count( obj ) {
-        let result = 0;
-        for (let _ in obj) {
-          result++;
-        }
-        return result;
+  filters: {
+    count( obj ) {
+      let result = 0;
+      for ( let _ in obj ) {
+        result++;
       }
+      return result;
     },
+  },
 
-    created() {
-      // BUG - every logging in creates additional Schools.vue instance, even after logging out
-      console.log('Schools component created');
-      eventBus.$on( 'logout', () => {
-        this.checkAccess();
-      });
-      eventBus.$on( 'login', () => {
-        this.loadSchools();
-      });
-
+  created() {
+    // BUG - every logging in creates additional Schools.vue instance, even after logging out
+    console.log( 'Schools component created' );
+    eventBus.$on( 'logout', () => {
       this.checkAccess();
-    },
-
-    mounted() {
+    } );
+    eventBus.$on( 'login', () => {
       this.loadSchools();
-    }
-  };
+    } );
+
+    this.checkAccess();
+  },
+
+  mounted() {
+    this.loadSchools();
+  },
+};
 </script>
 
 <style lang="less" scoped>

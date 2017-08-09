@@ -8,71 +8,71 @@ const EXTRA_THRESHOLD_FOR_CHAR = 0.05;
 
 export default class Speaker {
 
-    constructor( options ) {
-        this.options = { ...options };
-        this.options.threshold.factor = 4;
+  constructor( options ) {
+    this.options = { ...options };
+    this.options.threshold.factor = 4;
 
-        this.voice = voices[ this.options.language ];
+    this.voice = voices[ this.options.language ];
+  }
+
+  get enabled() {
+    return !!this.voice;
+  }
+
+  get setup() {
+    return new SpeechFeedback( { ...this.options, enabled: !!this.voice } );
+  }
+
+  // @wordFocus - WordFocus
+  inspect( el, wordFocus ) {
+    if ( !this.voice ) {
+      return false;
     }
 
-    get enabled() {
-        return !!this.voice;
+    let threshold = this.options.threshold.value;
+    if ( this.options.threshold.adjustForWordLength ) {
+      threshold *= Math.max( 1, 1 + ( wordFocus.word.length - LONG_WORD_MIN_LENGTH ) * EXTRA_THRESHOLD_FOR_CHAR );
     }
 
-    get setup() {
-        return new SpeechFeedback({ ...this.options, enabled: !!this.voice } );
-    }
-
-    // @wordFocus - WordFocus
-    inspect( el, wordFocus ) {
-        if (!this.voice) {
-            return false;
-        }
-
-        let threshold = this.options.threshold.value;
-        if (this.options.threshold.adjustForWordLength) {
-            threshold *= Math.max( 1, 1 + (wordFocus.word.length - LONG_WORD_MIN_LENGTH) * EXTRA_THRESHOLD_FOR_CHAR );
-        }
-
-        const mustPronounce =
+    const mustPronounce =
             !wordFocus.pronounced &&
             wordFocus.entries === 1 &&
             wordFocus.accumulatedTime > threshold;
 
-        if (!mustPronounce) {
-            return false;
-        }
-
-        wordFocus.pronounced = true;
-        this.voice( wordFocus.word );
-
-        return true;
+    if ( !mustPronounce ) {
+      return false;
     }
 
-    say( word ) {
-        if (!this.voice) {
-            return;
-        }
+    wordFocus.pronounced = true;
+    this.voice( wordFocus.word );
 
-        this.voice( word );
+    return true;
+  }
+
+  say( word ) {
+    if ( !this.voice ) {
+      return;
     }
 
-    setAvgWordReadingDuration( wordReadingDuration ) {
-        if (!this.options.threshold.smart || !wordReadingDuration) {
-            return;
-        }
+    this.voice( word );
+  }
 
-        this.options.threshold.value =
+  setAvgWordReadingDuration( wordReadingDuration ) {
+    if ( !this.options.threshold.smart || !wordReadingDuration ) {
+      return;
+    }
+
+    this.options.threshold.value =
             Math.max( this.options.threshold.min,
-            Math.min( this.options.threshold.max,
-            wordReadingDuration * this.options.threshold.factor
-        ));
-    }
+              Math.min( this.options.threshold.max,
+                wordReadingDuration * this.options.threshold.factor
+              ) );
+  }
 
 };
 
 const voices = {
-    Finnish( word ) {
-        responsiveVoice.speak( word, 'Finnish Female' );
-    }
+  Finnish( word ) {
+    responsiveVoice.speak( word, 'Finnish Female' );
+  },
 };

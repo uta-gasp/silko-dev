@@ -25,94 +25,94 @@
 </template>
 
 <script>
-  import Player from '@/components/vis/Player';
+import Player from '@/components/vis/Player';
 
-  export default {
-    name: 'control-panel',
+export default {
+  name: 'control-panel',
 
-    components: {
-      'player': Player,
+  components: {
+    'player': Player,
+  },
+
+  data() {
+    return {
+      pageIndex: this.initialPageIndex || 0,
+    };
+  },
+
+  props: {
+    feedback: {   // { syllab, speech }
+      type: Object,
+      default: null,
     },
 
-    data() {
-      return {
-        pageIndex: this.initialPageIndex || 0,
-      };
+    initialPageIndex: {
+      type: Number,
+      default: 0,
     },
 
-    props: {
-      feedback: {   // { syllab, speech }
-        type: Object,
-        default: null,
-      },
-
-      initialPageIndex: {
-        type: Number,
-        default: 0
-      },
-
-      textLength: {
-        type: Number,
-        default: 0,
-      },
-
-      showOptionsButton: {
-        type: Boolean,
-        default: true
-      },
-
-      showPlayer: {
-        type: Boolean,
-        default: false
-      },
-
-      isPlayerPaused: {
-        type: Boolean,
-        default: false
-      },
+    textLength: {
+      type: Number,
+      default: 0,
     },
 
-    computed: {
-      dispPage() {
-        return !this.pageIndex ? 'int' : `${this.pageIndex}/${this.textLength - 1}`;
+    showOptionsButton: {
+      type: Boolean,
+      default: true,
+    },
+
+    showPlayer: {
+      type: Boolean,
+      default: false,
+    },
+
+    isPlayerPaused: {
+      type: Boolean,
+      default: false,
+    },
+  },
+
+  computed: {
+    dispPage() {
+      return !this.pageIndex ? 'int' : `${this.pageIndex}/${this.textLength - 1}`;
+    },
+  },
+
+  methods: {
+    prevPage( e ) {
+      if ( this.pageIndex > 0 ) {
+        this.setPage( this.pageIndex - 1 );
       }
     },
 
-    methods: {
-      prevPage( e ) {
-        if (this.pageIndex > 0) {
-          this.setPage( this.pageIndex - 1 );
-        }
-      },
+    nextPage( e ) {
+      if ( this.pageIndex < this.textLength - 1 ) {
+        this.setPage( this.pageIndex + 1 );
+      }
+    },
 
-      nextPage( e ) {
-        if (this.pageIndex < this.textLength - 1) {
-          this.setPage( this.pageIndex + 1 );
-        }
-      },
+    showOptions( e ) {
+      this.$emit( 'show-options' );
+    },
 
-      showOptions( e ) {
-        this.$emit( 'show-options' );
-      },
+    restartPlayer( e ) {
+      this.$emit( 'restart-player' );
+    },
 
-      restartPlayer( e ) {
-        this.$emit( 'restart-player' );
-      },
+    togglePlayer( e ) {
+      this.$emit( 'toggle-player' );
+    },
 
-      togglePlayer( e ) {
-        this.$emit( 'toggle-player' );
-      },
+    close( e ) {
+      this.$emit( 'close' );
+    },
 
-      close( e ) {
-        this.$emit( 'close' );
-      },
-
-      setPage( index ) {
-        this.pageIndex = index;
-        this.$emit( 'page-changed', { index } );
-      },
-    }
-  };
+    setPage( index ) {
+      this.pageIndex = index;
+      this.$emit( 'page-changed', { index } );
+    },
+  },
+};
 </script>
 
 <style lang="less" scoped>

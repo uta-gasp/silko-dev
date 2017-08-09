@@ -9,27 +9,27 @@
 </template>
 
 <script>
-  export default {
-    name: 'assignments',
+export default {
+  name: 'assignments',
 
-    data() {
-      return {
-      };
+  data() {
+    return {
+    };
+  },
+
+  props: {
+    text: {
+      type: String,
+      default: '',
+    },
+  },
+
+  methods: {
+
+    close( e ) {
+      this.$emit( 'close' );
     },
 
-    props: {
-      text: {
-        type: String,
-        default: ''
-      }
-    },
-
-    methods: {
-
-      close( e ) {
-        this.$emit('close');
-      }
-
-    }
-  };
+  },
+};
 </script>

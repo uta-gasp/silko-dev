@@ -3,31 +3,31 @@ export default {
   methods: {
 
     makeFullscreen( element ) {
-      if (element.requestFullscreen) {
+      if ( element.requestFullscreen ) {
         element.requestFullscreen();
       }
-      else if (element.mozRequestFullScreen) {
+      else if ( element.mozRequestFullScreen ) {
         element.mozRequestFullScreen();
       }
-      else if (element.webkitRequestFullscreen) {
+      else if ( element.webkitRequestFullscreen ) {
         element.webkitRequestFullscreen();
       }
-      else if (element.msRequestFullscreen) {
+      else if ( element.msRequestFullscreen ) {
         element.msRequestFullscreen();
       }
     },
 
     closeFullscreen() {
-      if (document.exitFullscreen) {
+      if ( document.exitFullscreen ) {
         document.exitFullscreen();
       }
-      else if (document.mozCancelFullScreen) {
+      else if ( document.mozCancelFullScreen ) {
         document.mozCancelFullScreen();
       }
-      else if (document.webkitExitFullscreen) {
+      else if ( document.webkitExitFullscreen ) {
         document.webkitExitFullscreen();
       }
-      else if (document.msExitFullscreen) {
+      else if ( document.msExitFullscreen ) {
         document.msExitFullscreen();
       }
     },
@@ -35,32 +35,34 @@ export default {
     onFullscreenChanges( cb ) {
       const handler = e => {
         /* eslint-disable standard/no-callback-literal */
-        if (document.fullscreenElement) {
+        if ( document.fullscreenElement ) {
           return cb( !!document.fullscreenElement );
         }
-        else if (document.mozFullScreenEnabled) {
+        else if ( document.mozFullScreenEnabled ) {
           return cb( !!document.mozFullScreenEnabled );
         }
-        else if (document.webkitFullscreenEnabled) {
+        else if ( document.webkitFullscreenEnabled ) {
           return cb( !!document.webkitFullscreenEnabled );
         }
-        else if (document.msFullscreenEnabled) {
+        else if ( document.msFullscreenEnabled ) {
           return cb( !!document.msFullscreenEnabled );
         }
       };
 
-      if (document.onfullscreenchange !== undefined) {
+      if ( document.onfullscreenchange !== undefined ) {
         document.onfullscreenchange = handler;
       }
-      else if (document.onmozfullscreenchange !== undefined) {
+      else if ( document.onmozfullscreenchange !== undefined ) {
         document.onmozfullscreenchange = handler;
       }
-      else if (document.onwebkitfullscreenchange !== undefined) {
+      else if ( document.onwebkitfullscreenchange !== undefined ) {
         document.onwebkitfullscreenchange = handler;
       }
-      else if (document.onmsfullscreenchange !== undefined) {
+      else if ( document.onmsfullscreenchange !== undefined ) {
         document.onmsfullscreenchange = handler;
       }
-    }
-  }
+    },
+
+  },
+
 };

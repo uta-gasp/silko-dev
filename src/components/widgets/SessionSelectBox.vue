@@ -33,124 +33,124 @@
 </template>
 
 <script>
-  export default {
-    name: 'session-select-box',
+export default {
+  name: 'session-select-box',
 
-    data() {
-      return {
-        currentStudent: null,
-      };
+  data() {
+    return {
+      currentStudent: null,
+    };
+  },
+
+  props: {
+    students: {     // [{ name, sessions: [{ ref=Session, selected=Boolean }] }]
+      type: Array,
+      required: true,
+      default: [],
+    },
+    multiple: {
+      type: Boolean,
+      default: true,
+    },
+  },
+
+  methods: {
+
+    selectStudent( student, e ) {
+      this.currentStudent = student;
     },
 
-    props: {
-      students: {     // [{ name, sessions: [{ ref=Session, selected=Boolean }] }]
-        type: Array,
-        required: true,
-        default: []
-      },
-      multiple: {
-        type: Boolean,
-        default: true
-      },
+    isStudentSelected( student ) {
+      if ( !this.currentStudent ) {
+        return false;
+      }
+
+      return student ? this.currentStudent.name === student.name : !!this.currentStudent;
     },
 
-    methods: {
+    hasSessions( student ) {
+      student = student || this.currentStudent;
+      return student && student.sessions ? !!student.sessions.length : false;
+    },
 
-      selectStudent( student, e ) {
-        this.currentStudent = student;
-      },
-
-      isStudentSelected( student ) {
-        if (!this.currentStudent) {
-          return false;
-        }
-
-        return student ? this.currentStudent.name === student.name : !!this.currentStudent;
-      },
-
-      hasSessions( student ) {
-        student = student || this.currentStudent;
-        return student && student.sessions ? !!student.sessions.length : false;
-      },
-
-      selectMultipleSessions( session, event ) {
-        if (event.shiftKey) {
-          const index = this.currentStudent.sessions.indexOf( session );
-          for (let i = index - 1; i >= 0; i--) {
-            const session = this.currentStudent.sessions[i];
-            if (session.selected) {
-              break;
-            }
-
-            session.selected = true;
+    selectMultipleSessions( session, event ) {
+      if ( event.shiftKey ) {
+        const index = this.currentStudent.sessions.indexOf( session );
+        for ( let i = index - 1; i >= 0; i-- ) {
+          const session = this.currentStudent.sessions[i];
+          if ( session.selected ) {
+            break;
           }
-        }
-      },
 
-      selectSession( session, e ) {
-        if (!this.multiple) {
-          this.students.forEach( student => {
-            student.sessions.forEach( session => {
-              session.selected = false;
-            });
-          });
-        }
-
-        session.selected = !session.selected;
-
-        if (session.selected) {
-          this.selectMultipleSessions( session, e );
-        }
-      },
-
-      selectAllSessions( e ) {
-        this.currentStudent.sessions.forEach( session => {
           session.selected = true;
-        });
-      },
+        }
+      }
+    },
 
-      removeAllSessions( e ) {
-        this.currentStudent.sessions.forEach( session => {
-          session.selected = false;
-        });
-      },
-
-      accept( e ) {
-        const selected = {};
-
+    selectSession( session, e ) {
+      if ( !this.multiple ) {
         this.students.forEach( student => {
           student.sessions.forEach( session => {
-            if (session.selected) {
-              selected[ session.ref.id ] = session.ref.date;
-            }
-          });
-        });
+            session.selected = false;
+          } );
+        } );
+      }
 
-        this.$emit( 'accept', { sessions: selected } );
-      },
+      session.selected = !session.selected;
 
-      formatTimeComponent( timeComponent ) {
-          let formattedTimeComponent = '' + timeComponent;
-          if (formattedTimeComponent.length < 2) {
-              formattedTimeComponent = '0' + formattedTimeComponent;
-          }
-          return formattedTimeComponent;
-      },
-
-      formatDate( dateString ) {
-          const date = new Date( dateString );
-          const hours = this.formatTimeComponent( date.getHours() );
-          const minutes = this.formatTimeComponent( date.getMinutes() );
-          return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()} ${hours}:${minutes} `;
-      },
+      if ( session.selected ) {
+        this.selectMultipleSessions( session, e );
+      }
     },
 
-    mounted() {
-      if (this.students.length === 1) {
-        this.selectStudent( this.students[0] );
+    selectAllSessions( e ) {
+      this.currentStudent.sessions.forEach( session => {
+        session.selected = true;
+      } );
+    },
+
+    removeAllSessions( e ) {
+      this.currentStudent.sessions.forEach( session => {
+        session.selected = false;
+      } );
+    },
+
+    accept( e ) {
+      const selected = {};
+
+      this.students.forEach( student => {
+        student.sessions.forEach( session => {
+          if ( session.selected ) {
+            selected[ session.ref.id ] = session.ref.date;
+          }
+        } );
+      } );
+
+      this.$emit( 'accept', { sessions: selected } );
+    },
+
+    formatTimeComponent( timeComponent ) {
+      let formattedTimeComponent = '' + timeComponent;
+      if ( formattedTimeComponent.length < 2 ) {
+        formattedTimeComponent = '0' + formattedTimeComponent;
       }
+      return formattedTimeComponent;
+    },
+
+    formatDate( dateString ) {
+      const date = new Date( dateString );
+      const hours = this.formatTimeComponent( date.getHours() );
+      const minutes = this.formatTimeComponent( date.getMinutes() );
+      return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()} ${hours}:${minutes} `;
+    },
+  },
+
+  mounted() {
+    if ( this.students.length === 1 ) {
+      this.selectStudent( this.students[0] );
     }
-  };
+  },
+};
 </script>
 
 <style lang="less" scoped>

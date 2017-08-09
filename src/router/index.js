@@ -13,7 +13,7 @@ import Assignment from '@/components/tabs/Assignment';
 
 Vue.use( Router );
 
-export default new Router({
+export default new Router( {
   routes: [
     { path: '/', component: Home },
     { path: '/schools', component: Schools },
@@ -28,4 +28,4 @@ export default new Router({
   base: `${process.env.URL_PATH}/`,
   linkActiveClass: 'is-active',
   mode: 'history',
-});
+} );

@@ -4,9 +4,9 @@
 </template>
 
 <script>
-  export default {
-    name: 'vis-title',
-  };
+export default {
+  name: 'vis-title',
+};
 </script>
 
 <style lang="less" scoped>
