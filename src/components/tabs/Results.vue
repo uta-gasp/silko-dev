@@ -56,17 +56,17 @@
       v-if="gradeWithStudents"
       :title="gradeWithStudents[0].name"
       @close="closeStudentSelectionBox")
-      student-select-box(:grades="gradeWithStudents" @accept="continueDeferredWithStudents")
+      item-selection-box(:items="gradeWithStudents" item-name="grade" subitem-name="student" @accept="continueDeferredWithStudents")
 
     modal-editor-container(
       v-if="studentWithSessions"
-      :title="studentWithSessions[0].name"
+      :title="studentWithSessions[0].text"
       @close="closeSessionSelectionBox")
-      session-select-box(:students="studentWithSessions" :multiple="false" @accept="continueDeferredWithSessions")
+      item-selection-box(:multiple="false" :items="studentWithSessions" item-name="student" subitem-name="session" @accept="continueDeferredWithSessions")
 
     modal-editor-container(
       v-if="editingStudent"
-      :title="`Sessions of ${editingStudent.ref.name}`"
+      :title="`Sessions by ${editingStudent.ref.name}`"
       @close="closeSessionEditingBox")
       session-editing-box(:student="editingStudent" @deleted="sessionDeleted")
 
@@ -86,13 +86,14 @@
 import eventBus from '@/utils/event-bus.js';
 import dataUtils from '@/utils/data-utils.js';
 
+import Formatter from '@/vis/formatter.js';
+
 import Teacher from '@/model/teacher.js';
 import Student from '@/model/student.js';
 
 import ModalEditorContainer from '@/components/widgets/ModalEditorContainer';
-import StudentSelectBox from '@/components/widgets/StudentSelectBox';
-import SessionSelectBox from '@/components/widgets/SessionSelectBox';
 import SessionEditBox from '@/components/widgets/SessionEditBox';
+import ItemSelectionBox from '@/components/widgets/ItemSelectionBox';
 
 import GazePlot from '@/components/vis/GazePlot';
 import Durations from '@/components/vis/Durations';
@@ -213,9 +214,8 @@ export default {
 
   components: {
     'modal-editor-container': ModalEditorContainer,
-    'student-select-box': StudentSelectBox,
-    'session-select-box': SessionSelectBox,
     'session-editing-box': SessionEditBox,
+    'item-selection-box': ItemSelectionBox,
     'gaze-plot': GazePlot,
     'durations': Durations,
     'gaze-replay': GazeReplay,
@@ -328,13 +328,14 @@ export default {
       this.deferredVisualization = new _VisualizationInitialData( deferredVisualizationName, task.sessions );
 
       const grade = {
-        name: `Students completed "${task.name}"`,
-        students: [],
+        text: `Students completed "${task.name}"`,
+        subitems: [],
       };
 
       task.students.forEach( student => {
-        grade.students.push( {
-          ref: student.ref,
+        grade.subitems.push( {
+          id: student.ref.id,
+          text: student.ref.name,
           selected: true,
         } );
       } );
@@ -351,13 +352,14 @@ export default {
       this.deferredVisualization = new _VisualizationInitialData( deferredVisualizationName, sessions );
 
       const grade = {
-        name: `Students of "${cls.ref.name}"`,
-        students: [],
+        text: `Students of "${cls.ref.name}"`,
+        subitems: [],
       };
 
       cls.students.forEach( student => {
-        grade.students.push( {
-          ref: student.ref,
+        grade.subitems.push( {
+          id: student.ref.id,
+          text: student.ref.name,
           selected: true,
         } );
       } );
@@ -376,14 +378,14 @@ export default {
       this.deferredVisualization = new _VisualizationInitialData( deferredVisualizationName, student.sessions );
 
       const studentWithSessions = {
-        name: `Sessions of ${student.ref.name}`,
-        sessions: [],
+        text: `Sessions of ${student.ref.name}`,
+        subitems: [],
       };
 
       student.sessions.forEach( session => {
-        studentWithSessions.sessions.push( {
-          ref: session.ref,
-          task: session.task.name,
+        studentWithSessions.subitems.push( {
+          id: session.ref.id,
+          text: `${session.task.name} at ${Formatter.sessionDate( session.ref.date )}`,
           selected: false,
         } );
       } );
@@ -393,11 +395,11 @@ export default {
 
     continueDeferredWithStudents( e ) {
       const sessions = this.deferredVisualization.sessions.filter( session =>
-        e.students[ session.student.id ]
+        e.subitems[ session.student.id ]
       );
 
       this.visualizeSessions( sessions, this.deferredVisualization.name, {
-        student: e.students.length === 1 ? e.students[0] : null,
+        student: e.subitems.length === 1 ? e.subitems[0] : null,
       } );
 
       this.closeStudentSelectionBox();
@@ -405,12 +407,12 @@ export default {
 
     continueDeferredWithSessions( e ) {
       const sessions = this.deferredVisualization.sessions.filter( session =>
-        e.sessions[ session.ref.id ]
+        e.subitems[ session.ref.id ]
       );
 
       this.visualizeSessions( sessions, this.deferredVisualization.name, {
         student: sessions.length === 1 ? sessions[0].student.name : null,
-        session: e.sessions.length === 1 ? e.sessions[0] : null,
+        session: e.subitems.length === 1 ? e.subitems[0] : null,
       } );
 
       this.closeSessionSelectionBox();
@@ -449,7 +451,7 @@ export default {
       console.log( 'summary' );
     },
 
-    createGazePlot( records ) {
+    createGazePlot( records, params ) {
       const r = records[0];
       return {
         title: `${r.student.name} reading "${r.task.name}"`,
@@ -482,7 +484,7 @@ export default {
 
     createStudentsSummary( records, params ) {
       return {
-        title: `${params.grade.students.length} students from ${params.grade.name}`,
+        title: `${params.grade.subitems.length} students from ${params.grade.text}`,
       };
     },
 

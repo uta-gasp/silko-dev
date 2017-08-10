@@ -5,7 +5,7 @@
       .modal-content
         article.message.is-danger
           .message-header
-            p Deleting the {{ object }}.
+            p Deleting {{ object }}.
             button.delete(@click="reject")
           .message-body
             .level

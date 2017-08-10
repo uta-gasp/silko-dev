@@ -1,12 +1,12 @@
 import Vue from 'vue';
 import jsdom from 'jsdom';
-import StudentSelectionBox from 'widgets/StudentSelectBox.vue';
+import ItemSelectionBox from 'widgets/ItemSelectionBox';
 
 const renderer = require( 'vue-server-renderer' ).createRenderer();
 
-describe( 'Test suite for StudentSelectionBox', () => {
+describe( 'Test suite for ItemSelectionBox', () => {
   it( 'Dummy testing...', () => {
-    const ClonedComponent = Vue.extend( StudentSelectionBox );
+    const ClonedComponent = Vue.extend( ItemSelectionBox );
     const NewComponent = new ClonedComponent( {
       data() {
         return {

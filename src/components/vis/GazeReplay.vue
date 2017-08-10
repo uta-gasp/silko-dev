@@ -5,6 +5,7 @@ import OptionsCreator from '@/vis/optionsCreator.js';
 import Painter from '@/vis/painter.js';
 import Metric from '@/vis/metric.js';
 import ReplayTrack from '@/vis/replayTrack.js';
+import Formatter from '@/vis/formatter.js';
 
 const LEGEND_LOCATION = {
   x: 2,
@@ -89,8 +90,24 @@ export default {
     createTracks() {
       ReplayTrack.resetColors();
 
+      const studentsWithMultipleSessions = {};
+
       this.data.records.forEach( record => {
-        this.tracks.push( new ReplayTrack( this.$refs.root, record.student.name, record.data.pages ) );
+        let id = record.student.name;
+        studentsWithMultipleSessions[ id ] = studentsWithMultipleSessions[ id ] !== undefined;
+      });
+
+      this.data.records.forEach( record => {
+        let name = record.student.name;
+        if ( studentsWithMultipleSessions[ name ] ) {
+          name = `${name} ${Formatter.sessionDate( record.session.date )}`;
+        }
+
+        this.tracks.push( new ReplayTrack(
+          this.$refs.root,
+          name,
+          record.data.pages
+        ) );
       } );
     },
 

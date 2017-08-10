@@ -21,7 +21,7 @@
         .level
           .level-left
             .level-item
-              button.button.is-primary(@click="accept") Select
+              button.button.is-primary(:disabled="!hasItemsSelected" @click="accept") Select
             .level-item
           .level-right
             .level-item
@@ -41,7 +41,7 @@ export default {
   },
 
   props: {
-    items: {     // [{ is, text, subitems: [{ id, text, selected=Boolean }] }]
+    items: {     // [{ id, text, subitems: [{ id, text, selected=Boolean }] }]
       type: Array,
       required: true,
     },
@@ -59,8 +59,13 @@ export default {
     },
   },
 
-  methods: {
+  computed: {
+    hasItemsSelected() {
+      return this.items.some( item => item.subitems.some( subitem => subitem.selected ) );
+    }
+  },
 
+  methods: {
     selectItem( item, e ) {
       this.currentItem = item;
     },

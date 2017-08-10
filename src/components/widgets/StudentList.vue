@@ -28,7 +28,7 @@
                 i.fa.fa-remove
 
     modal-editor-container(v-if="isEditing" title="Available students" @close="closeEditor")
-      student-select-box(:grades="schoolGrades" @accept="addNewStudents")
+      item-selection-box(:items="schoolGrades" item-name="grade" subitem-name="student" @accept="addNewStudents")
 </template>
 
 <script>
@@ -37,7 +37,7 @@ import dataUtils from '@/utils/data-utils.js';
 import stringification from '@/components/mixins/stringification.js';
 
 import ModalEditorContainer from '@/components/widgets/ModalEditorContainer';
-import StudentSelectBox from '@/components/widgets/StudentSelectBox';
+import ItemSelectionBox from '@/components/widgets/ItemSelectionBox';
 
 export default {
   name: 'student-list',
@@ -46,13 +46,14 @@ export default {
 
   components: {
     'modal-editor-container': ModalEditorContainer,
-    'student-select-box': StudentSelectBox,
+    'item-selection-box': ItemSelectionBox,
   },
 
   data() {
     return {
       parent: this.cls,
       students: [],
+      schoolStudents: null,
       tasks: [],
       schoolGrades: [],
 
@@ -117,6 +118,7 @@ export default {
             return `Cannot retrieve school's students.\n\n${err}`;
           }
 
+          this.schoolStudents = students;
           this.schoolGrades = this.makeGrades( students );
         } );
       } );
@@ -126,37 +128,39 @@ export default {
       const grades = [];
       students.forEach( student => {
         let grade = grades.find( item => {
-          return item.name === student.grade.toLowerCase();
+          return item.text === student.grade.toLowerCase();
         } );
 
         if ( !grade ) {
           grade = {
-            name: student.grade.toLowerCase(),
-            students: [],
+            id: Math.random(),
+            text: student.grade.toLowerCase(),
+            subitems: [],
           };
           grades.push( grade );
         }
 
         if ( !this.students.find( item => item.id === student.id ) ) {
-          grade.students.push( {
-            ref: student,
+          grade.subitems.push( {
+            id: student.id,
+            text: student.name,
             selected: false,
           } );
         }
       } );
 
       grades.forEach( grade => {
-        grade.students.sort();
+        grade.subitems.sort( (a, b) => a.text.toLowerCase() > b.text.toLowerCase() );
       } );
 
       return grades.sort( ( a, b ) => {
-        if ( a.name[0] <= '9' && b.name[0] > '9' ) {
+        if ( a.text[0] <= '9' && b.text[0] > '9' ) {
           return true;
         }
-        else if ( a.name[0] > '9' && b.name[0] <= '9' ) {
+        else if ( a.text[0] > '9' && b.text[0] <= '9' ) {
           return false;
         }
-        return a.name > b.name;
+        return a.text > b.text;
       } );
     },
 
@@ -166,8 +170,8 @@ export default {
     },
 
     addNewStudents( e ) {
-      if ( e.students ) {
-        this.parent.addStudents( e.students, err => {
+      if ( e.subitems ) {
+        this.parent.addStudents( e.subitems, err => {
           if ( err ) {
             return console.log( 'TODO display the error', err );
           }

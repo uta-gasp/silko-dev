@@ -35,30 +35,30 @@
             .panel-block(v-if="isStudent") Create visualizations from data of the tasks you completed
 
     footer.footer(v-if="!user")
-      div Designed to run in
       .columns
         .column
-          img.img.browser-logo(src="../../assets/img/firefox.png")
-          .browser-name Firefox 47+
+          div TAUCHI, COMS, University of Tampere
         .column
+          .browser-info Designed to run in
           img.img.browser-logo(src="../../assets/img/chrome.png")
           .browser-name Chrome 55+
+          img.img.browser-logo(src="../../assets/img/firefox.png")
+          .browser-name Firefox 47+
 
     modal-editor-container(v-if="schools" title="Registration" @close="closeSelectionBox")
       .has-text-centered
         div School rectors and teachers, please contact us directly.
         div Oleg Špakov @ University of Tampere
         div oleg.spakov@uta.fi
-      //- item-selection-box(:items="schools" :multiple="false" itemName="schools", subitemName="school" @accept="sendResistrationRequest")
 
-    modal-editor-container(v-if="isGettingEmail" title="Your email" @close="closeEmailBox")
+    modal-editor-container(v-if="isGettingEmail" title="Password reset" @close="closeEmailBox" @mounted="passwordResetAppeared")
       .field(v-if="!schoolToRegester")
         p.control
           span Send password reset notification to this email:
 
       .field
         p.control.has-icons-left.has-icons-right
-          input.input(type="email" placeholder="Email" v-model="email")
+          input.input(ref="email" type="email" placeholder="Email" v-model="email" @keyup.enter="sendPasswordResetRequest")
           span.icon.is-small.is-left
             i.fa.fa-envelope
           span.icon.is-small.is-right(v-if="!isEmailValid")
@@ -66,7 +66,7 @@
 
       p.control
         .has-text-centered
-          button.button.is-primary(@click="send") Send
+          button.button.is-primary(@click="sendPasswordResetRequest") Send
 
     modal-notification(type="success" :show="showSuccess")
       span {{ success }}
@@ -84,7 +84,7 @@ import login from '@/utils/login.js';
 
 import Login from '@/components/widgets/Login';
 import ModalEditorContainer from '@/components/widgets/ModalEditorContainer';
-import ItemSelectionBox from '@/components/widgets/ItemSelectionBox';
+// import ItemSelectionBox from '@/components/widgets/ItemSelectionBox';
 import ModalNotification from '@/components/widgets/ModalNotification';
 
 export default {
@@ -93,7 +93,7 @@ export default {
   components: {
     'login': Login,
     'modal-editor-container': ModalEditorContainer,
-    'item-selection-box': ItemSelectionBox,
+    // 'item-selection-box': ItemSelectionBox,
     'modal-notification': ModalNotification,
   },
 
@@ -177,7 +177,7 @@ export default {
       this.isGettingEmail = false;
     },
 
-    send( e ) {
+    sendPasswordResetRequest( e ) {
       // TODO: send email
 
       if ( this.schoolToRegester ) {
@@ -200,6 +200,10 @@ export default {
       }
 
       this.closeEmailBox();
+    },
+
+    passwordResetAppeared( e ) {
+      this.$refs.email.focus();
     },
   },
 
@@ -229,23 +233,44 @@ export default {
   }
 
   .extra-tools {
-    margin-top: 8em;
+    margin-top: 2em;
+  }
+
+  .browser-info {
+    display: inline-block;
+    line-height: 8px;
+    height: 32px;
+    vertical-align: middle;
+    margin-right: 2em;
   }
 
   .browser-name {
+    .browser-info;
+
     margin: 0;
-    padding: 0;
+    padding-left: 0.25em;
   }
 
   .browser-logo {
-    width: 64px;
-    height: 64px;
+    margin-left: 0.5em;
+    width: 32px;
+    height: 32px;
   }
 
   .footer {
-    margin-top: 1rem;
-    padding: 2rem 1rem;
+    opacity: 0.5;
+    position: fixed;
+    bottom: 0;
+    width: 100vw;
+
+    padding: 1rem 1rem;
     background-color: inherit;
     border-top: 2px solid #bbb;
+  }
+
+  @media (max-height: 474px) {
+    .footer {
+      position: inherit;
+    }
   }
 </style>

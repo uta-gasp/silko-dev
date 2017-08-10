@@ -25,7 +25,7 @@
               th Name
               th Tasks
               th Students
-              th.is-narrow
+              th.is-narrow Actions
           tbody
             tr(v-for="item in classes" :key="item.id")
               td.title.is-4 {{ item.name }}

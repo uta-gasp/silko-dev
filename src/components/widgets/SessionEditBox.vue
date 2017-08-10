@@ -9,7 +9,8 @@
             button.button.is-danger(@click="showDeleteWarning( session )")
               i.fa.fa-remove
 
-    .modal(:class="{ 'is-active': sessionToDelete }")
+    remove-warning(v-if="sessionToDelete" object="session" :name="toDeleteName" @close="removeWarningClosed")
+    //- .modal(:class="{ 'is-active': sessionToDelete }")
       .modal-background
       .modal-card
         header.modal-card-head
@@ -25,13 +26,20 @@
 </template>
 
 <script>
+import Formatter from '@/vis/formatter.js';
+
+import RemoveWarning from '@/components/widgets/RemoveWarning';
+
 export default {
   name: 'session-edit-box',
+
+  components: {
+    'remove-warning': RemoveWarning,
+  },
 
   data() {
     return {
       sessionToDelete: null,
-      _student: this.student || [],
     };
   },
 
@@ -42,28 +50,19 @@ export default {
     },
   },
 
+  computed: {
+    toDeleteName() {
+      return this.sessionToString( this.sessionToDelete );
+    },
+  },
+
   methods: {
-    formatTimeComponent( timeComponent ) {
-      let formattedTimeComponent = '' + timeComponent;
-      if ( formattedTimeComponent.length < 2 ) {
-        formattedTimeComponent = '0' + formattedTimeComponent;
-      }
-      return formattedTimeComponent;
-    },
-
-    formatDate( dateString ) {
-      const date = new Date( dateString );
-      const hours = this.formatTimeComponent( date.getHours() );
-      const minutes = this.formatTimeComponent( date.getMinutes() );
-      return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()} ${hours}:${minutes} `;
-    },
-
     sessionToString( session ) {
       if ( !session ) {
         return '';
       }
 
-      return `${session.task.name} at ${this.formatDate( session.ref.date )}`;
+      return `${session.task.name} at ${Formatter.sessionDate( session.ref.date )}`;
     },
 
     showDeleteWarning( session ) {
@@ -86,6 +85,15 @@ export default {
 
     cancel() {
       this.sessionToDelete = null;
+    },
+
+    removeWarningClosed( e ) {
+      if ( e.confirm ) {
+        this.deleteSession();
+      }
+      else {
+        this.cancel();
+      }
     },
   },
 };
