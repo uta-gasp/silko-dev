@@ -1,9 +1,9 @@
 <template lang="pug">
   #vis-plot(ref="root")
     canvas(ref="canvas")
-    vis-title {{ data.title }}
+    vis-title {{ title }}
     control-panel(
-      :feedback="feedback"
+      :feedback="defaultFeedback"
       :text-length="textLength"
       :initial-page-index="initialPageIndex"
       :options="options"
@@ -62,29 +62,30 @@ export default {
       currentPages: [],
       defaultSession: this.data.records[0].session,
       defaultPages: this.data.records[0].data.pages,
+      defaultFeedback: this.data.records[0].session.feedbacks,
 
       isPlayerPaused: false,
     };
   },
 
   props: {
-    data: {   // { name, title, records, props }
+    data: {   // vis/Data
       type: Object,
       required: true,
     },
   },
 
   computed: {
-    feedback() {
-      return this.data.records.length === 1 ? this.data.props : null;
-    },
-
     textLength() {
       return this.defaultPages.length;
     },
 
     initialPageIndex() {
       return this.defaultPages[0].isIntro ? 1 : 0;
+    },
+
+    title() {
+      return '';
     },
   },
 

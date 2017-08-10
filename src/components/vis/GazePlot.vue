@@ -64,11 +64,17 @@ export default {
     };
   },
 
+  computed: {
+    title() {
+      return `${this.record.student.name} reading "${this.record.task.name}"`;
+    },
+  },
+
   methods: {
     changePage() {
       if ( !this.painter ) {
         this.painter = new Painter( this.$refs.canvas, {
-          syllab: this.data.props.syllab,
+          syllab: this.defaultFeedback.syllabification,
         } );
         this.painter.setFont( this.record.session.font );
       }

@@ -108,7 +108,7 @@ export default {
   }
 
   .name {
-    height: 40px;
+    line-height: 36px;
   }
 
   .centered {

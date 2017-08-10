@@ -4,7 +4,7 @@
 
     .props(v-if="!!feedback")
       abbr.prop.speech(:class="{ off: !feedback.speech.enabled }" title="Speech output")
-      abbr.prop.syllab(:class="{ off: !feedback.syllab.enabled }" title="Syllabification") {{ feedback.syllab.threshold.value }}
+      abbr.prop.syllab(:class="{ off: !feedback.syllabification.enabled }" title="Syllabification") {{ feedback.syllabification.threshold.value }}
 
     .menu
       template(v-if="textLength")
@@ -41,7 +41,7 @@ export default {
   },
 
   props: {
-    feedback: {   // { syllab, speech }
+    feedback: {   // model/session/Feedbacks
       type: Object,
       default: null,
     },

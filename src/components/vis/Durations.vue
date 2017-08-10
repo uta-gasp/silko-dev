@@ -1,12 +1,12 @@
 <template lang="pug">
   #vis-durations
-    vis-title {{ data.title }}
+    vis-title {{ title }}
     .list
       .record(v-for="word in words")
         .word {{ word.text }}
         .duration {{ word.value }}
 
-    control-panel(:feedback="data.props" :text-length="textLength" :options="options"
+    control-panel(:feedback="defaultFeedback" :text-length="textLength" :options="options"
       @page-changed="setPage"
       @show-options="showOptions"
       @close="close"
@@ -45,6 +45,8 @@ export default {
       pageIndex: 0,
       isOptionsDisplayed: false,
 
+      defaultFeedback: this.data.records[0].session.feedbacks,
+
       words: [],
 
       // options representation for editor
@@ -61,7 +63,7 @@ export default {
   },
 
   props: {
-    data: {   // { name, title, records, props }
+    data: {   // vis/Data
       type: Object,
       required: true,
     },
@@ -70,6 +72,12 @@ export default {
   computed: {
     textLength() {
       return this.data.records[0].data.pages.length;
+    },
+
+    title() {
+      const r = this.data.records[0];
+      const student = this.data.params.student ? ` for ${this.data.params.student}` : '';
+      return `Word reading durations in "${r.task.name}"${student}`;
     },
   },
 
@@ -111,7 +119,7 @@ export default {
     },
 
     appendWord( words, word ) {
-      const hyphenRegExp = new RegExp( `${this.data.props.syllab.hyphen}`, 'g' );
+      const hyphenRegExp = new RegExp( `${this.defaultFeedback.syllabification.hyphen}`, 'g' );
 
       let id = word.id;
       if ( id === undefined ) {

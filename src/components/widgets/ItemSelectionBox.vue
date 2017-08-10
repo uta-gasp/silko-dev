@@ -108,7 +108,7 @@ export default {
 
       subitem.selected = !subitem.selected;
 
-      if ( subitem.selected ) {
+      if ( this.multiple && subitem.selected ) {
         this.selectMultipleSubitems( subitem, e );
       }
     },

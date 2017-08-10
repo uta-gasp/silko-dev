@@ -1,6 +1,6 @@
 <template lang="pug">
   #student-summary
-    vis-title {{ data.title }}
+    vis-title {{ title }}
     .container
       table
         thead
@@ -69,7 +69,7 @@ export default {
   },
 
   props: {
-    data: {   // { name, title, records, props }
+    data: {   // vis/Data
       type: Object,
       required: true,
     },
@@ -82,6 +82,11 @@ export default {
         up: this.sortedStatIndex < 0 && this.nameSortDir > 0,
         down: this.sortedStatIndex < 0 && this.nameSortDir < 0,
       };
+    },
+
+    title() {
+      const grade = this.data.params.grade;
+      return `${grade.studentCount} students from ${grade.name}`;
     },
   },
 

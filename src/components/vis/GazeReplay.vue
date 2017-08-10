@@ -55,6 +55,14 @@ export default {
     };
   },
 
+  computed: {
+    title() {
+      const r = this.data.records[0];
+      const student = this.data.params.student ? ` for ${this.data.params.student}` : '';
+      return `Gaze replay in "${r.task.name}"${student}`;
+    },
+  },
+
   methods: {
 
     restartPlayer( e ) {
@@ -70,7 +78,7 @@ export default {
     changePage() {
       if ( !this.painter ) {
         this.painter = new Painter( this.$refs.canvas, {
-          syllab: this.data.props.syllab,
+          syllab: this.defaultFeedback.syllabification,
         } );
       }
 

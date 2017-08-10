@@ -1,6 +1,6 @@
 <template lang="pug">
   #word-replay
-    vis-title {{ data.title }}
+    vis-title {{ title }}
     .list(ref="root")
       table(ref="table")
         thead
@@ -68,6 +68,7 @@ export default {
       isPlayerPaused: false,
 
       defaultText: this.data.records[0].data.pages.map( page => page.text ),
+      defaultFeedback: this.data.records[0].session.feedbacks,
 
       words: [],
       tracks: null,
@@ -87,7 +88,7 @@ export default {
   },
 
   props: {
-    data: {   // { name, title, records, props }
+    data: {   // vis/Data
       type: Object,
       required: true,
     },
@@ -96,6 +97,12 @@ export default {
   computed: {
     textLength() {
       return this.defaultText.length;
+    },
+
+    title() {
+      const r = this.data.records[0];
+      const student = this.data.params.student ? ` for ${this.data.params.student}` : '';
+      return `Word replay in "${r.task.name}"${student}`;
     },
   },
 
@@ -155,7 +162,7 @@ export default {
         this.createTracks();
       }
 
-      const hyphenRegExp = new RegExp( `${this.data.props.syllab.hyphen}`, 'g' );
+      const hyphenRegExp = new RegExp( `${this.defaultFeedback.syllabification.hyphen}`, 'g' );
 
       const words = this.defaultText[ this.pageIndex ].map( word => {
         return {
