@@ -1,9 +1,9 @@
 <template lang="pug">
   #classes.section
     temporal-notification(type="danger" :show="showError")
-      span The {{ notification.obj }} was not {{ notification.action }}: {{ errorMessage }}
+      span {{ errorMessage }}
     temporal-notification(type="success" :show="showSuccess")
-      span The {{ notification.obj }} was {{ notification.action }}.
+      span {{ successMessage }}
 
     nav.panel
       p.panel-heading Add class
@@ -47,6 +47,9 @@ import dataUtils from '@/utils/data-utils.js';
 
 import Teacher from '@/model/teacher.js';
 
+import ActionError from '@/components/mixins/actionError';
+import ActionSuccess from '@/components/mixins/actionSuccess';
+
 import TemporalNotification from '@/components/widgets/TemporalNotification';
 import TaskList from '@/components/widgets/TaskList';
 import StudentList from '@/components/widgets/StudentList';
@@ -62,6 +65,8 @@ export default {
     'remove-warning': RemoveWarning,
   },
 
+  mixins: [ ActionError, ActionSuccess ],
+
   data() {
     return {
       teacher: null,
@@ -69,15 +74,7 @@ export default {
       newName: '',
 
       isCreating: false,
-      errorMessage: '',
-      showError: 0,   // random value to trigger the notification
-      showSuccess: 0, // random value to trigger the notification
       refreshStudents: 0,
-
-      notification: {
-        action: '',
-        obj: '',
-      },
 
       classes: [],
       intros: [],
@@ -110,7 +107,7 @@ export default {
     loadClasses() {
       this.teacher.getClasses( ( err, classes ) => {
         if ( err ) {
-          return `Cannot retrieve classes.\n\n${err}`;
+          return this.setError( err, 'Failed to load classes' );
         }
 
         this.classes = classes.sort( dataUtils.byName );
@@ -120,7 +117,7 @@ export default {
     loadIntros() {
       this.teacher.getIntros( ( err, intros ) => {
         if ( err ) {
-          return `Cannot retrieve intros.\n\n${err}`;
+          return this.setError( err, 'Failed to load introductions' );
         }
 
         this.intros = intros.sort( dataUtils.byName );
@@ -133,25 +130,17 @@ export default {
       }
     },
 
-    setError( msg ) {
-      this.errorMessage = msg;
-      this.showError = Math.random();
-    },
-
     tryToCreate( e ) {
       if ( !this.canCreate ) {
         return;
       }
-
-      this.notification.action = 'created';
-      this.notification.obj = 'class';
 
       const exists = this.classes.some( cls => {
         return cls.name.toLowerCase() === this.newName.toLowerCase();
       } );
 
       if ( exists ) {
-        this.setError( 'A class of this name exists already' );
+        this.setError( 'A class of this name exists already', 'Failed to create new class' );
       }
       else {
         this.createClass( this.newName );
@@ -165,12 +154,13 @@ export default {
         this.isCreating = false;
 
         if ( err ) {
-          this.setError( err );
+          this.setError( err, 'Failed to create new class' );
         }
         else {
           this.loadClasses();
 
-          this.showSuccess = Math.random();
+          this.setSuccess( 'New class has been created' );
+
           this.newName = '';
         }
       } );
@@ -182,8 +172,10 @@ export default {
 
     removeWarningClosed( e ) {
       if ( e.confirm ) {
-        /* eslint-disable handle-callback-err */
         this.teacher.deleteClass( this.toDelete, err => {
+          if (err) {
+            this.setError( err, 'Failed to delete the class' );
+          }
           this.loadClasses();
         } );
       }
@@ -192,24 +184,20 @@ export default {
     },
 
     taskSaved( e ) {
-      this.notification.action = 'updated';
-      this.notification.obj = 'task';
       if ( e.err ) {
-        this.setError( e.err );
+        this.setError( e.err, 'Failed to save updates' );
       }
       else {
-        this.showSuccess = Math.random();
+        this.setSuccess( 'The task was updated' );
       }
     },
 
     taskCreated( e ) {
-      this.notification.action = 'created';
-      this.notification.obj = 'task';
       if ( e.err ) {
-        this.setError( e.err );
+        this.setError( e.err, 'Failed to create new task' );
       }
       else {
-        this.showSuccess = Math.random();
+        this.setSuccess( 'New task was created' );
         this.refreshStudents = Math.random();
       }
     },

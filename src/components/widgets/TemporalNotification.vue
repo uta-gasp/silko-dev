@@ -50,8 +50,8 @@ export default {
     getSlotItemText( item ) {
       let result = '';
 
-      if (item.elm) {
-        result += item.elm.textContent;
+      if (item.text) {
+        result += item.text;
       }
       if (item.children) {
         result += item.children.reduce( (acc, _item) => {
@@ -70,7 +70,7 @@ export default {
 
     log() {
       if (this.type === 'danger') {
-        console.error( 'TEMP_ERROR: ' + this.getSlotText() );
+        console.error( 'TEMP_ERROR: ', this.getSlotText() );
       }
       else if (this.type === 'success') {
         console.log( 'TEMP_SUCCESS:', this.getSlotText() );

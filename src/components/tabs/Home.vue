@@ -69,16 +69,19 @@
           button.button.is-primary(@click="sendPasswordResetRequest") Send
 
     temporal-notification(type="success" :show="showSuccess")
-      span {{ success }}
+      span {{ successMessage }}
 
-    temporal-notification(type="danger" :show="showFailure")
-      span {{ failure }}
+    temporal-notification(type="danger" :show="showError")
+      span {{ errorMessage }}
 
 </template>
 
 <script>
 import eventBus from '@/utils/event-bus.js';
 import login from '@/utils/login.js';
+
+import ActionError from '@/components/mixins/actionError';
+import ActionSuccess from '@/components/mixins/actionSuccess';
 
 import Login from '@/components/widgets/Login';
 import ModalContainer from '@/components/widgets/ModalContainer';
@@ -93,6 +96,8 @@ export default {
     'temporal-notification': TemporalNotification,
   },
 
+  mixins: [ ActionError, ActionSuccess ],
+
   data() {
     return {
       isLoginVisible: true,
@@ -103,12 +108,6 @@ export default {
 
       isGettingEmail: false,
       email: '',
-
-      showSuccess: 0,
-      success: '',
-
-      showFailure: 0,
-      failure: '',
     };
   },
 
@@ -177,19 +176,16 @@ export default {
       // TODO: send email
 
       if ( this.schoolToRegester ) {
-        this.success = `The registration request for "${this.email}" has been sent.`;
+        this.setSuccess( `The registration request for "${this.email}" has been sent.` );
         this.schoolToRegester = null;
-        this.showSuccess = Math.random();
       }
       else {
         login.resetPassword( this.email, err => {
           if ( err ) {
-            this.failure = `Cannot send the registration request for "${this.email}".`;
-            this.showFailure = Math.random();
+            this.setError( err, `Cannot send the password reset request to "${this.email}".` );
           }
           else {
-            this.success = `The password reset request has been sent to "${this.email}".`;
-            this.showSuccess = Math.random();
+            this.setSuccess( `The password reset request has been sent to "${this.email}".` );
           }
           this.email = '';
         } );

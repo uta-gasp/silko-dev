@@ -1,9 +1,9 @@
 <template lang="pug">
   #schools.section
-    temporal-notification(type="danger" :show="showCreationError")
-      span Failed to add a school: {{ creationError }}
-    temporal-notification(type="success" :show="showCreationSuccess")
-      span The school was added.
+    temporal-notification(type="danger" :show="showError")
+      span {{ errorMessage }}
+    temporal-notification(type="success" :show="showSuccess")
+      span {{ successMessage }}
 
     nav.panel
       p.panel-heading Add school
@@ -41,6 +41,9 @@ import dataUtils from '@/utils/data-utils.js';
 import Admin from '@/model/admin.js';
 import School from '@/model/school.js';
 
+import ActionError from '@/components/mixins/actionError';
+import ActionSuccess from '@/components/mixins/actionSuccess';
+
 import TemporalNotification from '@/components/widgets/TemporalNotification';
 
 export default {
@@ -50,15 +53,14 @@ export default {
     'temporal-notification': TemporalNotification,
   },
 
+  mixins: [ ActionError, ActionSuccess ],
+
   data() {
     return {
       newName: '',
       newEmail: '',
 
       isCreating: false,
-      creationError: '',
-      showCreationError: 0,   // random value to trigger the notification
-      showCreationSuccess: 0, // random value to trigger the notification
 
       schools: [],
     };
@@ -86,7 +88,7 @@ export default {
     loadSchools() {
       School.list( ( err, schools ) => {
         if ( err ) {
-          return `Cannot retrieve schools.\n\n${err}`;
+          return this.setError( err, 'Failed to load schools' );
         }
 
         this.schools = schools.sort( dataUtils.byName );
@@ -97,11 +99,6 @@ export default {
       if ( !Admin.isLogged ) {
         this.$router.replace( '/' );
       }
-    },
-
-    setCreationError( msg ) {
-      this.creationError = msg;
-      this.showCreationError = Math.random();
     },
 
     tryToCreate( e ) {
@@ -116,7 +113,7 @@ export default {
       } );
 
       if ( exists ) {
-        this.setCreationError( 'A school with this name or email exists already' );
+        this.setError( 'A school with this name or email exists already', 'Failed to add new school' );
       }
       else {
         this.createSchool();
@@ -129,14 +126,14 @@ export default {
         this.isCreating = false;
 
         if ( err ) {
-          this.setCreationError( err );
+          this.setError( err, 'Failed to add new school' );
         }
         else {
           this.newName = '';
           this.newEmail = '';
           this.loadSchools();
 
-          this.showCreationSuccess = Math.random();
+          this.setSuccess( 'New school was created' );
         }
       } );
     },

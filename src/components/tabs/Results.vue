@@ -96,6 +96,8 @@ import Task from '@/vis/data/task.js';
 import Class from '@/vis/data/class.js';
 import Params from '@/vis/data/params.js';
 
+import ActionError from '@/components/mixins/actionError';
+
 import TemporalNotification from '@/components/widgets/TemporalNotification';
 import ModalContainer from '@/components/widgets/ModalContainer';
 import SessionEditBox from '@/components/widgets/SessionEditBox';
@@ -131,6 +133,8 @@ export default {
     'students-summary': StudentsSummary,
   },
 
+  mixins: [ ActionError ],
+
   data() {
     return {
       teacher: null,
@@ -146,9 +150,6 @@ export default {
 
       classes: [],  // [ vis/data/Class ]
       students: [],  // [ vis/data/Student ]
-
-      showError: 0,
-      errorMessage: '',
 
       VISUALIZATIONS: {
         gazePlot: 'GazePlot',
@@ -173,9 +174,7 @@ export default {
       if ( this.teacher ) {
         this.loadClasses( err => {
           if ( err ) {
-            this.errorMessage = err;
-            this.showError = Math.random();
-            return;
+            return this.setError( err, 'Failed to load classes' );
           }
 
           this.isLoaded = true;
@@ -358,9 +357,7 @@ export default {
       const dataIDs = sessions.map( session => session.ref.data );
       Student.getData( dataIDs, ( err, data ) => {
         if ( err ) {
-          this.errorMessage = err;
-          this.showError = Math.random();
-          return;
+          return this.setError( err, 'Failed to load student data' );
         }
 
         const records = sessions.map( session => new Record( session, data ) );

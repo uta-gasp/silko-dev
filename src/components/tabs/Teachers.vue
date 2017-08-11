@@ -1,9 +1,9 @@
 <template lang="pug">
   #teachers.section
-    temporal-notification(type="danger" :show="showCreationError")
-      span Failed to add a teacher: {{ creationError }}
-    temporal-notification(type="success" :show="showCreationSuccess")
-      span The teacher was added.
+    temporal-notification(type="danger" :show="showError")
+      span {{ errorMessage }}
+    temporal-notification(type="success" :show="showSuccess")
+      span {{ successMessage }}
 
     nav.panel
       p.panel-heading Add teacher
@@ -50,6 +50,9 @@ import Admin from '@/model/admin.js';
 import School from '@/model/school.js';
 import Teacher from '@/model/teacher.js';
 
+import ActionError from '@/components/mixins/actionError';
+import ActionSuccess from '@/components/mixins/actionSuccess';
+
 import TemporalNotification from '@/components/widgets/TemporalNotification';
 
 export default {
@@ -58,6 +61,8 @@ export default {
   components: {
     'temporal-notification': TemporalNotification,
   },
+
+  mixins: [ ActionError, ActionSuccess ],
 
   data() {
     return {
@@ -68,9 +73,6 @@ export default {
       newSchool: '',
 
       isCreating: false,
-      creationError: '',
-      showCreationError: 0,   // random value to trigger the notification
-      showCreationSuccess: 0, // random value to trigger the notification
 
       schools: [],
       teachers: [],
@@ -132,7 +134,7 @@ export default {
     loadSchools() {
       return School.list( ( err, schools ) => {
         if ( err ) {
-          return `Cannot retrieve schools.\n\n${err}`;
+          return this.setError( err, 'Failed to load schools' );
         }
 
         this.schools = schools.sort( dataUtils.byName );
@@ -142,7 +144,7 @@ export default {
     loadTeachers() {
       const onDone = ( err, teachers ) => {
         if ( err ) {
-          return `Cannot retrieve teachers.\n\n${err}`;
+          return this.setError( err, 'Failed to load teachers' );
         }
 
         this.teachers = teachers.sort( ( a, b ) => {
@@ -168,11 +170,6 @@ export default {
       }
     },
 
-    setCreationError( msg ) {
-      this.creationError = msg;
-      this.showCreationError = Math.random();
-    },
-
     tryToCreate( e ) {
       if ( !this.canCreate ) {
         return;
@@ -183,7 +180,7 @@ export default {
       } );
 
       if ( exists ) {
-        this.setCreationError( 'A teacher with this email exists already' );
+        this.setError( 'A teacher with this email exists already', 'Failed to add a new teacher' );
       }
       else {
         this.createTeacher();
@@ -197,14 +194,14 @@ export default {
         this.isCreating = false;
 
         if ( err ) {
-          this.setCreationError( err );
+          this.setError( err, 'Failed to add a new teacher' );
         }
         else {
           this.newName = '';
           this.newEmail = '';
           this.loadTeachers();
 
-          this.showCreationSuccess = Math.random();
+          this.setSuccess( 'New teacher was added' );
         }
       };
 

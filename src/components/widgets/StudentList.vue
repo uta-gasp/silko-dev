@@ -29,24 +29,30 @@
 
     modal-container(v-if="isEditing" title="Available students" @close="closeEditor")
       item-selection-box(:items="schoolGrades" item-name="grade" subitem-name="student" @accept="addNewStudents")
+
+    temporal-notification(type="danger" :show="showError")
+      span {{ errorMessage }}
 </template>
 
 <script>
 import dataUtils from '@/utils/data-utils.js';
 
 import stringification from '@/components/mixins/stringification.js';
+import ActionError from '@/components/mixins/actionError';
 
 import ModalContainer from '@/components/widgets/ModalContainer';
 import ItemSelectionBox from '@/components/widgets/ItemSelectionBox';
+import TemporalNotification from '@/components/widgets/TemporalNotification';
 
 export default {
   name: 'student-list',
 
-  mixins: [ stringification ],
+  mixins: [ stringification, ActionError ],
 
   components: {
     'modal-container': ModalContainer,
     'item-selection-box': ItemSelectionBox,
+    'temporal-notification': TemporalNotification,
   },
 
   data() {
@@ -84,11 +90,10 @@ export default {
   },
 
   methods: {
-
     loadTasks() {
       this.parent.getTasks( ( err, tasks ) => {
         if ( err ) {
-          return `Cannot retrieve tasks.\n\n${err}`;
+          return this.setError( err, 'Failed to load tasks' );
         }
 
         this.tasks = tasks.sort( dataUtils.byName );
@@ -100,7 +105,7 @@ export default {
     loadStudents() {
       this.parent.getStudents( ( err, students ) => {
         if ( err ) {
-          return `Cannot retrieve students.\n\n${err}`;
+          return this.setError( err, 'Failed to load students' );
         }
 
         this.students = students.sort( dataUtils.byName );
@@ -110,12 +115,12 @@ export default {
     loadAvailableStudents() {
       this.teacher.getSchool( ( err, school ) => {
         if ( err ) {
-          return `Cannot retrieve the teacher's school.\n\n${err}`;
+          return this.setError( err, 'Failed to load teacher\'s school' );
         }
 
         school.getStudents( ( err, students ) => {
           if ( err ) {
-            return `Cannot retrieve school's students.\n\n${err}`;
+            return this.setError( err, 'Failed to load school students' );
           }
 
           this.schoolStudents = students;
@@ -173,7 +178,7 @@ export default {
       if ( e.subitems ) {
         this.parent.addStudents( e.subitems, err => {
           if ( err ) {
-            return console.log( 'TODO display the error', err );
+            return this.setError( err, 'Failed to add new student' );
           }
 
           this.loadStudents();
@@ -194,14 +199,17 @@ export default {
     setAssignment( student, e ) {
       student.setAssignment( this.parent.id, e.target.value, err => {
         if ( err ) {
-          console.log( 'TODO display error', err );
+          return this.setError( err, 'Failed to set the assignment to the student' );
         }
       } );
     },
 
     remove( student, e ) {
-      /* eslint-disable handle-callback-err */
       this.parent.removeStudent( student, err => {
+        if (err) {
+          this.setError( err, 'Failed to remove the student from the list' );
+        }
+
         this.loadStudents();
       } );
     },

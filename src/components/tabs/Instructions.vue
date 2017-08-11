@@ -1,9 +1,9 @@
 <template lang="pug">
   #instructions.section
-    temporal-notification(type="danger" :show="showCreationError")
-      span Failed to create an instruction: {{ creationError }}.
-    temporal-notification(type="success" :show="showCreationSuccess")
-      span The instruction was created.
+    temporal-notification(type="danger" :show="showError")
+      span {{ errorMessage }}
+    temporal-notification(type="success" :show="showSuccess")
+      span {{ successMessage }}
 
     nav.panel
       p.panel-heading Add instruction
@@ -53,6 +53,9 @@ import dataUtils from '@/utils/data-utils.js';
 
 import Teacher from '@/model/teacher.js';
 
+import ActionError from '@/components/mixins/actionError';
+import ActionSuccess from '@/components/mixins/actionSuccess';
+
 import TemporalNotification from '@/components/widgets/TemporalNotification';
 import ModalContainer from '@/components/widgets/ModalContainer';
 import IntroEditor from '@/components/widgets/IntroEditor';
@@ -68,6 +71,8 @@ export default {
     'remove-warning': RemoveWarning,
   },
 
+  mixins: [ ActionError, ActionSuccess ],
+
   data() {
     return {
       teacher: null,
@@ -75,9 +80,6 @@ export default {
       resetNew: 0, // random value to trigger the field reset in TextEditor
 
       isCreating: false,
-      creationError: '',
-      showCreationError: 0,   // random value to trigger the notification
-      showCreationSuccess: 0, // random value to trigger the notification
 
       intros: [],
 
@@ -87,7 +89,6 @@ export default {
   },
 
   computed: {
-
     toDeleteName() {
       return this.toDelete ? this.toDelete.name : '';
     },
@@ -105,7 +106,7 @@ export default {
     loadIntros() {
       this.teacher.getIntros( ( err, intros ) => {
         if ( err ) {
-          return `TODO Cannot retrieve intros.\n\n${err}`;
+          return this.setError( err, 'Failed to load introductions' );
         }
 
         this.intros = intros.sort( dataUtils.byName );
@@ -118,18 +119,13 @@ export default {
       }
     },
 
-    setCreationError( msg ) {
-      this.creationError = msg;
-      this.showCreationError = Math.random();
-    },
-
     tryToCreate( e ) {
       const exists = this.intros.some( intro => {
         return intro.name.toLowerCase() === e.name.toLowerCase();
       } );
 
       if ( exists ) {
-        this.setCreationError( 'An instructions of this name exists already' );
+        this.setError( 'An instructions of this name exists already', 'Failed to create new introduction' );
       }
       else {
         this.createIntro( e );
@@ -139,16 +135,15 @@ export default {
     createIntro( newIntro ) {
       this.isCreating = true;
 
-      this.teacher.createIntro( newIntro.name, newIntro.texts, ( err, id ) => {
+      this.teacher.createIntro( newIntro.name, newIntro.texts, err => {
         this.isCreating = false;
 
         if ( err ) {
-          this.setCreationError( err );
+          this.setError( err, 'Failed to create new introduction' );
         }
         else {
           this.loadIntros();
-
-          this.showCreationSuccess = Math.random();
+          this.setSuccess( 'New introduction was created' );
           this.resetNew = Math.random();
         }
       } );
@@ -164,6 +159,13 @@ export default {
 
     saveEdited( e ) {
       this.toEdit.updateTexts( e.texts, err => {
+        if (err) {
+          this.setError( err, 'Failed to save updates' );
+        }
+        else {
+          this.setSuccess( 'Updates were saved' );
+        }
+
         this.loadIntros();
       } );
 
@@ -176,8 +178,10 @@ export default {
 
     removeWarningClosed( e ) {
       if ( e.confirm ) {
-        /* eslint-disable handle-callback-err */
         this.teacher.deleteIntro( this.toDelete, err => {
+          if (err) {
+            this.setError( err, 'Failed to delete the introduction' );
+          }
           this.loadIntros();
         } );
       }

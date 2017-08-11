@@ -1,9 +1,9 @@
 <template lang="pug">
   #students.section
-    temporal-notification(type="danger" :show="showCreationError")
-      span Failed to add a student: {{ creationError }}
-    temporal-notification(type="success" :show="showCreationSuccess")
-      span The student was added.
+    temporal-notification(type="danger" :show="showError")
+      span {{ errorMessage }}
+    temporal-notification(type="success" :show="showSuccess")
+      span {{ successMessage }}
 
     nav.panel
       p.panel-heading Add student
@@ -56,10 +56,19 @@ import School from '@/model/school.js';
 import Student from '@/model/student.js';
 import Teacher from '@/model/teacher.js';
 
+import ActionError from '@/components/mixins/actionError';
+import ActionSuccess from '@/components/mixins/actionSuccess';
+
 import TemporalNotification from '@/components/widgets/TemporalNotification';
 
 export default {
   name: 'students',
+
+  components: {
+    'temporal-notification': TemporalNotification,
+  },
+
+  mixins: [ ActionError, ActionSuccess ],
 
   data() {
     return {
@@ -72,9 +81,6 @@ export default {
       newSchool: '',
 
       isCreating: false,
-      creationError: '',
-      showCreationError: 0,   // random value to trigger the notification
-      showCreationSuccess: 0, // random value to trigger the notification
 
       schools: [],
       students: [],
@@ -150,7 +156,7 @@ export default {
     loadSchools() {
       return School.list( ( err, schools ) => {
         if ( err ) {
-          return `Cannot retrieve schools.\n\n${err}`;
+          return this.setError( err, 'Failed to load schools' );
         }
 
         this.schools = schools.sort( dataUtils.byName );
@@ -160,7 +166,7 @@ export default {
     loadStudents() {
       const onDone = ( err, students ) => {
         if ( err ) {
-          return `Cannot retrieve students.\n\n${err}`;
+          return this.setError( err, 'Failed to load students' );
         }
 
         this.students = students.sort( ( a, b ) => {
@@ -182,7 +188,7 @@ export default {
       else if ( this.teacher ) {
         this.teacher.getSchool( ( err, school ) => {
           if ( err ) {
-            return `Cannot retrieve school.\n\n${err}`;
+            return this.setError( err, 'Failed to load teacher\'s school' );
           }
           school.getStudents( onDone );
         } );
@@ -198,11 +204,6 @@ export default {
       }
     },
 
-    setCreationError( msg ) {
-      this.creationError = msg;
-      this.showCreationError = Math.random();
-    },
-
     tryToCreateStudent( e ) {
       if ( !this.canCreateStudent ) {
         return;
@@ -213,7 +214,7 @@ export default {
       } );
 
       if ( exists ) {
-        this.setCreationError( 'A student with this email exists already' );
+        this.setError( 'A student with this email exists already', 'Failed to add new student' );
       }
       else {
         this.createStudent();
@@ -227,14 +228,14 @@ export default {
         this.isCreating = false;
 
         if ( err ) {
-          this.setCreationError( err );
+          this.setError( err, 'Failed to add new student' );
         }
         else {
           this.newName = '';
           this.newEmail = '';
           this.loadStudents();
 
-          this.showCreationSuccess = Math.random();
+          this.setSuccess( 'New student was added' );
         }
       };
 

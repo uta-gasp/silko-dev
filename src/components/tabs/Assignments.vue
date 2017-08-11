@@ -30,6 +30,8 @@ import eventBus from '@/utils/event-bus.js';
 
 import Student from '@/model/student.js';
 
+import ActionError from '@/components/mixins/actionError';
+
 import TemporalNotification from '@/components/widgets/TemporalNotification';
 
 export default {
@@ -39,14 +41,13 @@ export default {
     'temporal-notification': TemporalNotification,
   },
 
+  mixins: [ ActionError ],
+
   data() {
     return {
       student: null,
       assignments: [],  // {cls, task}
       assignment: '',
-
-      errorMessage: '',
-      showError: 0,
     };
   },
 
@@ -69,9 +70,7 @@ export default {
     loadAssignments() {
       this.student.loadAssignments( ( err, assignments ) => {
         if ( err ) {
-          this.errorMessage = err;
-          this.showError = Math.random();
-          return;
+          return this.setError( err, 'Failed to load assignments' );
         }
 
         this.assignments = assignments;

@@ -26,6 +26,8 @@
 <script>
 import login from '@/utils/login.js';
 
+import ActionError from '@/components/mixins/actionError';
+
 import TemporalNotification from '@/components/widgets/TemporalNotification';
 
 export default {
@@ -35,14 +37,14 @@ export default {
     'temporal-notification': TemporalNotification,
   },
 
+  mixins: [ ActionError ],
+
   data() {
     return {
       email: '',
       password: '',
 
       inProgress: false,
-      errorMessage: '',
-      showError: 0,  // random value to trigger the notification
     };
   },
 
@@ -57,12 +59,6 @@ export default {
   },
 
   methods: {
-
-    setError( msg ) {
-      this.errorMessage = msg;
-      this.showError = Math.random();
-    },
-
     login( e ) {
       this.inProgress = true;
 
@@ -70,7 +66,7 @@ export default {
         this.inProgress = false;
 
         if ( err ) {
-          return this.setError( err.message );
+          return this.setError( err, 'Failed to log in' );
         }
       } );
     },

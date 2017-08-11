@@ -24,13 +24,18 @@
       task-editor(:action="action" :task="toEdit" :intros="intros" @save="save")
 
     remove-warning(v-if="toDelete" object="task" :name="toDeleteName" @close="removeWarningClosed")
+
+    temporal-notification(type="danger" :show="showError")
+      span {{ errorMessage }}
 </template>
 
 <script>
 import dataUtils from '@/utils/data-utils.js';
 
 import stringification from '@/components/mixins/stringification.js';
+import ActionError from '@/components/mixins/actionError';
 
+import TemporalNotification from '@/components/widgets/TemporalNotification';
 import ModalContainer from '@/components/widgets/ModalContainer';
 import TaskEditor from '@/components/widgets/TaskEditor';
 import RemoveWarning from '@/components/widgets/RemoveWarning';
@@ -38,13 +43,14 @@ import RemoveWarning from '@/components/widgets/RemoveWarning';
 export default {
   name: 'task-list',
 
-  mixins: [ stringification ],
-
   components: {
+    'temporal-notification': TemporalNotification,
     'modal-container': ModalContainer,
     'task-editor': TaskEditor,
     'remove-warning': RemoveWarning,
   },
+
+  mixins: [ stringification, ActionError ],
 
   data() {
     return {
@@ -103,7 +109,7 @@ export default {
     loadTasks() {
       this.parent.getTasks( ( err, tasks ) => {
         if ( err ) {
-          return `Cannot retrieve tasks.\n\n${err}`;
+          return this.setError( err, 'Failed to load tasks' );
         }
 
         this.tasks = tasks.sort( dataUtils.byName );
@@ -157,9 +163,14 @@ export default {
       if ( e.confirm ) {
         const id = this.toDelete.id;
 
-        /* eslint-disable handle-callback-err */
         this.parent.deleteTask( this.toDelete, err => {
-          this.$emit( 'deleted', { task: id } );
+          if (err) {
+            return this.setError( err, 'Failed to delete the task' );
+          }
+          else {
+            this.$emit( 'deleted', { task: id } );
+          }
+
           this.loadTasks();
         } );
       }

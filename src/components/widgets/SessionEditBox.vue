@@ -10,19 +10,28 @@
               i.fa.fa-remove
 
     remove-warning(v-if="sessionToDelete" object="session" :name="toDeleteName" @close="removeWarningClosed")
+
+    temporal-notification(type="danger" :show="showError")
+      span {{ errorMessage }}
 </template>
 
 <script>
 import Formatter from '@/vis/formatter.js';
 
+import ActionError from '@/components/mixins/actionError';
+
+import TemporalNotification from '@/components/widgets/TemporalNotification';
 import RemoveWarning from '@/components/widgets/RemoveWarning';
 
 export default {
   name: 'session-edit-box',
 
   components: {
+    'temporal-notification': TemporalNotification,
     'remove-warning': RemoveWarning,
   },
+
+  mixins: [ ActionError ],
 
   data() {
     return {
@@ -60,7 +69,7 @@ export default {
       const sessionID = this.sessionToDelete.ref.id;
       this.student.ref.deleteSession( sessionID, err => {
         if ( err ) {
-          return console.log( 'TODO: handle error', err );
+          return this.setError( err, 'Failed to delete the session' );
         }
 
         this.student.sessions = this.student.sessions.filter( session => session.ref.id !== sessionID );
