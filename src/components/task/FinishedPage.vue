@@ -2,7 +2,7 @@
   #finished-page
     section.section
       .container
-        button.button.is-large.is-primary(:class="{ 'is-loading': saving }" :disabled="saving" @click="back") {{ texts.finished }}
+        button.button.is-large.is-primary(:class="{ 'is-loading': saving }" :disabled="saving" @click="back") {{ titleFinished }}
 </template>
 
 <script>
@@ -12,6 +12,12 @@ export default {
   props: {
     saving: Boolean,
     texts: Object,
+  },
+
+  computed: {
+    titleFinished() {
+      return this.texts.finished || "Thank you!";
+    },
   },
 
   methods: {

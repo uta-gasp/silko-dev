@@ -1,5 +1,5 @@
 <template lang="pug">
-  #creation-success
+  #temporal-notification
     transition(name="slide-fade")
       .modal.on-top.is-active(v-if="showState")
         .modal-content
@@ -11,7 +11,7 @@
 const MSG_SHOW_DURATION = 4000;
 
 export default {
-  name: 'creation-success',
+  name: 'temporal-notification',
 
   data() {
     return {
@@ -27,6 +27,8 @@ export default {
 
   watch: {
     show() {
+      this.log();
+
       this.showState = true;
       if ( this.timer ) {
         clearTimeout( this.timer );
@@ -44,6 +46,38 @@ export default {
     },
   },
 
+  methods: {
+    getSlotItemText( item ) {
+      let result = '';
+
+      if (item.elm) {
+        result += item.elm.textContent;
+      }
+      if (item.children) {
+        result += item.children.reduce( (acc, _item) => {
+          return acc + this.getSlotItemText( _item );
+        }, '' );
+      }
+
+      return result;
+    },
+
+    getSlotText() {
+      return this.$slots.default.reduce( (acc, slot) => {
+        return acc + this.getSlotItemText( slot );
+      }, '' );
+    },
+
+    log() {
+      if (this.type === 'danger') {
+        console.error( 'TEMP_ERROR: ' + this.getSlotText() );
+      }
+      else if (this.type === 'success') {
+        console.log( 'TEMP_SUCCESS:', this.getSlotText() );
+      }
+    },
+  },
+
   mounted() {
     this.showState = false;
   },
@@ -52,8 +86,8 @@ export default {
 
 <style lang="less" scoped>
 
-  #creation-success {
-    z-index: 30;
+  #temporal-notification {
+    z-index: 1000;
   }
 
   .modal.on-top {

@@ -10,19 +10,6 @@
               i.fa.fa-remove
 
     remove-warning(v-if="sessionToDelete" object="session" :name="toDeleteName" @close="removeWarningClosed")
-    //- .modal(:class="{ 'is-active': sessionToDelete }")
-      .modal-background
-      .modal-card
-        header.modal-card-head
-          p.modal-card-title Deleting session
-          button.delete(@click="cancel")
-        section.modal-card-body.is-paddingless
-          .notification.is-danger
-            .has-text-centered Delete the session "{{ sessionToString( sessionToDelete ) }}" ?
-        footer.modal-card-foot
-          .centered
-            a.button.is-danger(@click="deleteSession") Yes
-            a.button(@click="cancel") No
 </template>
 
 <script>
@@ -109,10 +96,5 @@ export default {
 
   .name {
     line-height: 36px;
-  }
-
-  .centered {
-    width: 100%;
-    margin: 0 auto
   }
 </style>

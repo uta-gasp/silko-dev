@@ -1,8 +1,8 @@
 <template lang="pug">
   #instructions.section
-    modal-notification(type="danger" :show="showCreationError")
+    temporal-notification(type="danger" :show="showCreationError")
       span Failed to create an instruction: {{ creationError }}.
-    modal-notification(type="success" :show="showCreationSuccess")
+    temporal-notification(type="success" :show="showCreationSuccess")
       span The instruction was created.
 
     nav.panel
@@ -36,7 +36,7 @@
                   button.button.is-danger(@click="remove( item )")
                     i.fa.fa-remove
 
-    modal-editor-container(v-if="toEdit" title="Instruction editor" @close="closeEditor")
+    modal-container(v-if="toEdit" title="Instruction editor" @close="closeEditor")
       intro-editor(
         action="Save"
         :name-editable="false"
@@ -53,8 +53,8 @@ import dataUtils from '@/utils/data-utils.js';
 
 import Teacher from '@/model/teacher.js';
 
-import ModalNotification from '@/components/widgets/ModalNotification';
-import ModalEditorContainer from '@/components/widgets/ModalEditorContainer';
+import TemporalNotification from '@/components/widgets/TemporalNotification';
+import ModalContainer from '@/components/widgets/ModalContainer';
 import IntroEditor from '@/components/widgets/IntroEditor';
 import RemoveWarning from '@/components/widgets/RemoveWarning';
 
@@ -62,8 +62,8 @@ export default {
   name: 'instructions',
 
   components: {
-    'modal-notification': ModalNotification,
-    'modal-editor-container': ModalEditorContainer,
+    'temporal-notification': TemporalNotification,
+    'modal-container': ModalContainer,
     'intro-editor': IntroEditor,
     'remove-warning': RemoveWarning,
   },

@@ -3,9 +3,9 @@
     task-text(ref="container")
     .is-bottom-right
       a.button.is-primary.is-large(v-show="hasNextPage" @click="next")
-        span {{ texts.next }}
+        span {{ titleNext }}
       a.button.is-primary.is-large(v-show="!hasNextPage" @click="finish")
-        span {{ texts.finish }}
+        span {{ titleFinish }}
 </template>
 
 <script>
@@ -43,6 +43,14 @@ export default {
   computed: {
     hasNextPage() {
       return this.textPresenter ? this.textPresenter.hasNextPage : false;
+    },
+
+    titleNext() {
+      return this.texts.next || "Next";
+    },
+
+    titleFinish() {
+      return this.texts.finish || "Finish";
     },
   },
 

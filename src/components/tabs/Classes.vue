@@ -1,8 +1,8 @@
 <template lang="pug">
   #classes.section
-    modal-notification(type="danger" :show="showError")
+    temporal-notification(type="danger" :show="showError")
       span The {{ notification.obj }} was not {{ notification.action }}: {{ errorMessage }}
-    modal-notification(type="success" :show="showSuccess")
+    temporal-notification(type="success" :show="showSuccess")
       span The {{ notification.obj }} was {{ notification.action }}.
 
     nav.panel
@@ -47,7 +47,7 @@ import dataUtils from '@/utils/data-utils.js';
 
 import Teacher from '@/model/teacher.js';
 
-import ModalNotification from '@/components/widgets/ModalNotification';
+import TemporalNotification from '@/components/widgets/TemporalNotification';
 import TaskList from '@/components/widgets/TaskList';
 import StudentList from '@/components/widgets/StudentList';
 import RemoveWarning from '@/components/widgets/RemoveWarning';
@@ -56,7 +56,7 @@ export default {
   name: 'classes',
 
   components: {
-    'modal-notification': ModalNotification,
+    'temporal-notification': TemporalNotification,
     'task-list': TaskList,
     'student-list': StudentList,
     'remove-warning': RemoveWarning,

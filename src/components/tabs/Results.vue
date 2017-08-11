@@ -49,19 +49,19 @@
                   td.is-narrow
                     button.button.is-primary(:disabled="!isLoaded" @click="selectSession( student, VISUALIZATIONS.wordReplay )") Word replay
 
-    modal-editor-container(
+    modal-container(
       v-if="gradeWithStudents"
       :title="gradeWithStudents[0].text"
       @close="closeStudentSelectionBox")
       item-selection-box(:items="gradeWithStudents" item-name="grade" subitem-name="student" @accept="continueDeferredWithStudents")
 
-    modal-editor-container(
+    modal-container(
       v-if="studentWithSessions"
       :title="studentWithSessions[0].text"
       @close="closeSessionSelectionBox")
       item-selection-box(:multiple="!isGazePlot" :items="studentWithSessions" item-name="student" subitem-name="session" @accept="continueDeferredWithSessions")
 
-    modal-editor-container(
+    modal-container(
       v-if="editingStudent"
       :title="`Sessions by ${editingStudent.ref.name}`"
       @close="closeSessionEditingBox")
@@ -77,6 +77,8 @@
 
     students-summary(v-if="isShowing( VISUALIZATIONS.studentsSummary )" :data="visualization" @close="closeVisualization")
 
+    temporal-notification(type="danger" :show="showError")
+      span {{ errorMessage }}
 </template>
 
 <script>
@@ -94,7 +96,8 @@ import Task from '@/vis/data/task.js';
 import Class from '@/vis/data/class.js';
 import Params from '@/vis/data/params.js';
 
-import ModalEditorContainer from '@/components/widgets/ModalEditorContainer';
+import TemporalNotification from '@/components/widgets/TemporalNotification';
+import ModalContainer from '@/components/widgets/ModalContainer';
 import SessionEditBox from '@/components/widgets/SessionEditBox';
 import ItemSelectionBox from '@/components/widgets/ItemSelectionBox';
 
@@ -103,7 +106,6 @@ import Durations from '@/components/vis/Durations';
 import GazeReplay from '@/components/vis/GazeReplay';
 import WordReplay from '@/components/vis/WordReplay';
 import StudentsSummary from '@/components/vis/StudentsSummary';
-
 
 class _VisualizationInitialData {
 
@@ -118,7 +120,8 @@ export default {
   name: 'results',
 
   components: {
-    'modal-editor-container': ModalEditorContainer,
+    'temporal-notification': TemporalNotification,
+    'modal-container': ModalContainer,
     'session-editing-box': SessionEditBox,
     'item-selection-box': ItemSelectionBox,
     'gaze-plot': GazePlot,
@@ -144,6 +147,9 @@ export default {
       classes: [],  // [ vis/data/Class ]
       students: [],  // [ vis/data/Student ]
 
+      showError: 0,
+      errorMessage: '',
+
       VISUALIZATIONS: {
         gazePlot: 'GazePlot',
         durations: 'Durations',
@@ -167,7 +173,9 @@ export default {
       if ( this.teacher ) {
         this.loadClasses( err => {
           if ( err ) {
-            return console.log( 'TODO handle error', err );
+            this.errorMessage = err;
+            this.showError = Math.random();
+            return;
           }
 
           this.isLoaded = true;
@@ -350,6 +358,8 @@ export default {
       const dataIDs = sessions.map( session => session.ref.data );
       Student.getData( dataIDs, ( err, data ) => {
         if ( err ) {
+          this.errorMessage = err;
+          this.showError = Math.random();
           return;
         }
 

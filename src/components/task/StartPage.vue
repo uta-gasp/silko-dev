@@ -5,8 +5,8 @@
         .content.is-large
           p(v-for="line in startInstruction") {{ line }}
 
-        button.button.is-large.is-primary(:disabled="!isCalibrated" @click="start") {{ texts.startRun }}
-        button.button.is-large(@click="cancel") {{ texts.startCancel }}
+        button.button.is-large.is-primary(:disabled="!isCalibrated" @click="start") {{ titleStart }}
+        button.button.is-large(@click="cancel") {{ titleCancel }}
 
     div.fullscreen(ref="fullscreen")
       task-page(
@@ -61,6 +61,14 @@ export default {
   computed: {
     startInstruction() {
       return this.texts.startInstruction ? this.texts.startInstruction.split( '\n' ) : '';
+    },
+
+    titleStart() {
+      return this.texts.startRun || "Start";
+    },
+
+    titleCancel() {
+      return this.texts.startCancel || "Cancel";
     },
   },
 

@@ -5,9 +5,9 @@
         .content.is-large
           p(v-for="line in calibInstruction") {{ line }}
 
-        button.button.is-large.is-primary(:disabled="!isConnected" @click="calibrate") {{ texts.calibStart }}
-        button.button.is-large(:disabled="!isCalibrated" @click="skip") {{ texts.calibSkip }}
-        button.button.is-large(@click="cancel") {{ texts.startCancel }}
+        button.button.is-large.is-primary(:disabled="!isConnected" @click="calibrate") {{ titleStart }}
+        button.button.is-large(:disabled="!isCalibrated" @click="skip") {{ titleSkip }}
+        button.button.is-large(@click="cancel") {{ titleCancel }}
 
       .container(v-show="!isETUDConnected")
         .message.is-danger.is-centered
@@ -47,6 +47,18 @@ export default {
   computed: {
     calibInstruction() {
       return this.texts.calibInstruction ? this.texts.calibInstruction.split( '\n' ) : '';
+    },
+
+    titleStart() {
+      return this.texts.calibStart || "Start";
+    },
+
+    titleSkip() {
+      return this.texts.calibSkip || "Skip";
+    },
+
+    titleCancel() {
+      return this.texts.startCancel || "Cancel";
     },
   },
 

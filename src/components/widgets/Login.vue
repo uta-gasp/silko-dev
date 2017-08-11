@@ -19,24 +19,20 @@
         .has-text-centered
           button.button.is-primary(:disabled="inProgress" @click="login") Log in
 
-    //- .error
-      temporal-error(:show="showError" :error="errorMessage")
-    modal-notification(type="danger" :show="showError")
+    temporal-notification(type="danger" :show="showError")
       span {{ errorMessage }}
 </template>
 
 <script>
 import login from '@/utils/login.js';
 
-import ModalNotification from '@/components/widgets/ModalNotification';
-// import TemporalError from '@/components/widgets/TemporalError';
+import TemporalNotification from '@/components/widgets/TemporalNotification';
 
 export default {
   name: 'login',
 
   components: {
-    // 'temporal-error': TemporalError,
-    'modal-notification': ModalNotification,
+    'temporal-notification': TemporalNotification,
   },
 
   data() {

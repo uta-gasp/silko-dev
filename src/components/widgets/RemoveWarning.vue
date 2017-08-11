@@ -14,6 +14,19 @@
               .level-item
                 button.button.is-danger(@click="confirm") OK
                 button.button(@click="reject") Cancel
+  //- #modal-error.modal(:class="{ 'is-active': !!text }")
+  //-   .modal-background
+  //-   .modal-card
+  //-     header.modal-card-head
+  //-       p.modal-card-title {{ title }}
+  //-       button.delete(@click="cancel")
+  //-     section.modal-card-body.is-paddingless
+  //-       .notification.is-danger
+  //-         .has-text-centered {{ text }}
+  //-     footer.modal-card-foot
+  //-       .centered
+  //-         a.button.is-danger(@click="deleteSession") Yes
+  //-         a.button(@click="cancel") No
 </template>
 
 <script>
@@ -50,4 +63,9 @@ export default {
     margin-left: 0.5em;
     min-width: 5em;
   }
+
+  // .centered {
+  //   width: 100%;
+  //   margin: 0 auto
+  // }
 </style>

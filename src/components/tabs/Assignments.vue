@@ -20,6 +20,9 @@
                   .content {{ assignment.task.name }}
                 .card-footer
                   a.card-footer-item(@click="start( assignment )") Start
+
+    temporal-notification(type="danger" :show="showError")
+      span {{ errorMessage }}
 </template>
 
 <script>
@@ -27,14 +30,23 @@ import eventBus from '@/utils/event-bus.js';
 
 import Student from '@/model/student.js';
 
+import TemporalNotification from '@/components/widgets/TemporalNotification';
+
 export default {
   name: 'assignments',
+
+  components: {
+    'temporal-notification': TemporalNotification,
+  },
 
   data() {
     return {
       student: null,
       assignments: [],  // {cls, task}
       assignment: '',
+
+      errorMessage: '',
+      showError: 0,
     };
   },
 
@@ -57,7 +69,9 @@ export default {
     loadAssignments() {
       this.student.loadAssignments( ( err, assignments ) => {
         if ( err ) {
-          return console.log( 'TODO loadAssignments', err );
+          this.errorMessage = err;
+          this.showError = Math.random();
+          return;
         }
 
         this.assignments = assignments;

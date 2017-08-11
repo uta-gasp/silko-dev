@@ -20,7 +20,7 @@
               button.button.is-danger(@click="remove( task )")
                 i.fa.fa-remove
 
-    modal-editor-container(v-if="isEditing" :title="taskEditorTitle" @close="closeEditor")
+    modal-container(v-if="isEditing" :title="taskEditorTitle" @close="closeEditor")
       task-editor(:action="action" :task="toEdit" :intros="intros" @save="save")
 
     remove-warning(v-if="toDelete" object="task" :name="toDeleteName" @close="removeWarningClosed")
@@ -31,7 +31,7 @@ import dataUtils from '@/utils/data-utils.js';
 
 import stringification from '@/components/mixins/stringification.js';
 
-import ModalEditorContainer from '@/components/widgets/ModalEditorContainer';
+import ModalContainer from '@/components/widgets/ModalContainer';
 import TaskEditor from '@/components/widgets/TaskEditor';
 import RemoveWarning from '@/components/widgets/RemoveWarning';
 
@@ -41,7 +41,7 @@ export default {
   mixins: [ stringification ],
 
   components: {
-    'modal-editor-container': ModalEditorContainer,
+    'modal-container': ModalContainer,
     'task-editor': TaskEditor,
     'remove-warning': RemoveWarning,
   },

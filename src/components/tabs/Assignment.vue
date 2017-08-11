@@ -65,6 +65,7 @@ export default {
       isDataSaved: false,
 
       errorText: null,
+
       keys: null,
       questionnaire: null,
       longGazedWords: [],
@@ -154,7 +155,7 @@ export default {
         }
       }
       else {
-        console.log( 'TODO data saved', e.err );
+        this.errorText = e.err;
       }
 
       this.isDataSaved = true;
@@ -175,14 +176,14 @@ export default {
       if ( this.questionnaire ) {
         this.student.addQuestionnaire( this.keys.data, this.questionnaire, err => {
           if ( err ) {
-            console.log( 'TODO questionnaire done', err );
+            this.errorText = err;
           }
         } );
       }
 
       this.student.taskDone( this.task.cls, this.keys.session, err => {
         if ( err ) {
-          console.log( 'TODO task done', err );
+          this.errorText = err;
         }
       } );
     },

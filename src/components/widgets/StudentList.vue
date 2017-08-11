@@ -27,7 +27,7 @@
               button.button.is-danger(@click="remove( student )")
                 i.fa.fa-remove
 
-    modal-editor-container(v-if="isEditing" title="Available students" @close="closeEditor")
+    modal-container(v-if="isEditing" title="Available students" @close="closeEditor")
       item-selection-box(:items="schoolGrades" item-name="grade" subitem-name="student" @accept="addNewStudents")
 </template>
 
@@ -36,7 +36,7 @@ import dataUtils from '@/utils/data-utils.js';
 
 import stringification from '@/components/mixins/stringification.js';
 
-import ModalEditorContainer from '@/components/widgets/ModalEditorContainer';
+import ModalContainer from '@/components/widgets/ModalContainer';
 import ItemSelectionBox from '@/components/widgets/ItemSelectionBox';
 
 export default {
@@ -45,7 +45,7 @@ export default {
   mixins: [ stringification ],
 
   components: {
-    'modal-editor-container': ModalEditorContainer,
+    'modal-container': ModalContainer,
     'item-selection-box': ItemSelectionBox,
   },
 

@@ -1,8 +1,8 @@
 <template lang="pug">
   #students.section
-    modal-notification(type="danger" :show="showCreationError")
+    temporal-notification(type="danger" :show="showCreationError")
       span Failed to add a student: {{ creationError }}
-    modal-notification(type="success" :show="showCreationSuccess")
+    temporal-notification(type="success" :show="showCreationSuccess")
       span The student was added.
 
     nav.panel
@@ -56,7 +56,7 @@ import School from '@/model/school.js';
 import Student from '@/model/student.js';
 import Teacher from '@/model/teacher.js';
 
-import ModalNotification from '@/components/widgets/ModalNotification';
+import TemporalNotification from '@/components/widgets/TemporalNotification';
 
 export default {
   name: 'students',
@@ -83,7 +83,7 @@ export default {
   },
 
   components: {
-    'modal-notification': ModalNotification,
+    'temporal-notification': TemporalNotification,
   },
 
   computed: {

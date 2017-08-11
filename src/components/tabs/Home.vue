@@ -45,13 +45,13 @@
           img.img.browser-logo(src="../../assets/img/firefox.png")
           .browser-name Firefox 47+
 
-    modal-editor-container(v-if="schools" title="Registration" @close="closeSelectionBox")
+    modal-container(v-if="schools" title="Registration" @close="closeSelectionBox")
       .has-text-centered
         div School rectors and teachers, please contact us directly.
         div Oleg Špakov @ University of Tampere
         div oleg.spakov@uta.fi
 
-    modal-editor-container(v-if="isGettingEmail" title="Password reset" @close="closeEmailBox" @mounted="passwordResetAppeared")
+    modal-container(v-if="isGettingEmail" title="Password reset" @close="closeEmailBox" @mounted="passwordResetAppeared")
       .field(v-if="!schoolToRegester")
         p.control
           span Send password reset notification to this email:
@@ -68,10 +68,10 @@
         .has-text-centered
           button.button.is-primary(@click="sendPasswordResetRequest") Send
 
-    modal-notification(type="success" :show="showSuccess")
+    temporal-notification(type="success" :show="showSuccess")
       span {{ success }}
 
-    modal-notification(type="danger" :show="showFailure")
+    temporal-notification(type="danger" :show="showFailure")
       span {{ failure }}
 
 </template>
@@ -80,21 +80,17 @@
 import eventBus from '@/utils/event-bus.js';
 import login from '@/utils/login.js';
 
-// import School from '@/model/school.js';
-
 import Login from '@/components/widgets/Login';
-import ModalEditorContainer from '@/components/widgets/ModalEditorContainer';
-// import ItemSelectionBox from '@/components/widgets/ItemSelectionBox';
-import ModalNotification from '@/components/widgets/ModalNotification';
+import ModalContainer from '@/components/widgets/ModalContainer';
+import TemporalNotification from '@/components/widgets/TemporalNotification';
 
 export default {
   name: 'home',
 
   components: {
     'login': Login,
-    'modal-editor-container': ModalEditorContainer,
-    // 'item-selection-box': ItemSelectionBox,
-    'modal-notification': ModalNotification,
+    'modal-container': ModalContainer,
+    'temporal-notification': TemporalNotification,
   },
 
   data() {
@@ -209,19 +205,13 @@ export default {
 
   created() {
     eventBus.$on( 'login', id => {
-      // this.isLoginVisible = false;
       this.user = login.user;
     } );
     eventBus.$on( 'logout', id => {
       this.user = null;
-      // this.isLoginVisible = true;
     } );
 
-    // this.isLoginVisible = !login.user;
     this.user = login.user;
-  },
-
-  mounted() {
   },
 };
 </script>
