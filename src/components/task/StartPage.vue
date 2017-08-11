@@ -64,11 +64,11 @@ export default {
     },
 
     titleStart() {
-      return this.texts.startRun || "Start";
+      return this.texts.startRun || 'Start';
     },
 
     titleCancel() {
-      return this.texts.startCancel || "Cancel";
+      return this.texts.startCancel || 'Cancel';
     },
   },
 

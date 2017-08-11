@@ -62,7 +62,7 @@ export default {
   computed: {
     hasItemsSelected() {
       return this.items.some( item => item.subitems.some( subitem => subitem.selected ) );
-    }
+    },
   },
 
   methods: {

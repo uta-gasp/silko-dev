@@ -50,15 +50,15 @@ export default {
     },
 
     titleStart() {
-      return this.texts.calibStart || "Start";
+      return this.texts.calibStart || 'Start';
     },
 
     titleSkip() {
-      return this.texts.calibSkip || "Skip";
+      return this.texts.calibSkip || 'Skip';
     },
 
     titleCancel() {
-      return this.texts.startCancel || "Cancel";
+      return this.texts.startCancel || 'Cancel';
     },
   },
 

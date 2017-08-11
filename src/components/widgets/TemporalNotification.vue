@@ -50,11 +50,11 @@ export default {
     getSlotItemText( item ) {
       let result = '';
 
-      if (item.text) {
+      if ( item.text ) {
         result += item.text;
       }
-      if (item.children) {
-        result += item.children.reduce( (acc, _item) => {
+      if ( item.children ) {
+        result += item.children.reduce( ( acc, _item ) => {
           return acc + this.getSlotItemText( _item );
         }, '' );
       }
@@ -63,16 +63,16 @@ export default {
     },
 
     getSlotText() {
-      return this.$slots.default.reduce( (acc, slot) => {
+      return this.$slots.default.reduce( ( acc, slot ) => {
         return acc + this.getSlotItemText( slot );
       }, '' );
     },
 
     log() {
-      if (this.type === 'danger') {
+      if ( this.type === 'danger' ) {
         console.error( 'TEMP_ERROR: ', this.getSlotText() );
       }
-      else if (this.type === 'success') {
+      else if ( this.type === 'success' ) {
         console.log( 'TEMP_SUCCESS:', this.getSlotText() );
       }
     },

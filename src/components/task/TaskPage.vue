@@ -46,11 +46,11 @@ export default {
     },
 
     titleNext() {
-      return this.texts.next || "Next";
+      return this.texts.next || 'Next';
     },
 
     titleFinish() {
-      return this.texts.finish || "Finish";
+      return this.texts.finish || 'Finish';
     },
   },
 

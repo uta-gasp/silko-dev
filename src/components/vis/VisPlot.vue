@@ -156,19 +156,6 @@ export default {
 
     text-align: center;
 
-    .wait {
-      position: fixed;
-      top: 8px;
-      left: 8px;
-      width: 100vw;
-      height: 100vh;
-      background: url("../../assets/img/wait.gif") no-repeat fixed center;
-
-      &.invisible {
-        display: none;
-      }
-    }
-
     canvas {
       position: relative;
       top: 0;

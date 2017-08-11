@@ -8,11 +8,12 @@ export default class Class {
   constructor( ref, tasks ) {
     this.ref = ref;     // model/Class
     this.tasks = tasks; // [ ./Task ]
-    this.students = []; // [ ./Student ]
+    this.students = null; // [ ./Student ]
   }
 
   loadStudents( cb ) {
     this.ref.getStudents( ( err, students ) => {
+      this.students = [];
       if ( err ) {
         return cb( err );
       }

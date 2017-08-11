@@ -16,7 +16,9 @@
     nav.panel
       p.panel-heading Instructions
       .panel-block.is-paddingless
-        .container(v-if="!intros.length")
+        .container(v-if="intros === null")
+          loading
+        .container(v-else-if="!intros.length")
           i No instructions exists yet
         table.table(v-else)
           thead
@@ -56,6 +58,7 @@ import Teacher from '@/model/teacher.js';
 import ActionError from '@/components/mixins/actionError';
 import ActionSuccess from '@/components/mixins/actionSuccess';
 
+import Loading from '@/components/widgets/Loading';
 import TemporalNotification from '@/components/widgets/TemporalNotification';
 import ModalContainer from '@/components/widgets/ModalContainer';
 import IntroEditor from '@/components/widgets/IntroEditor';
@@ -65,6 +68,7 @@ export default {
   name: 'instructions',
 
   components: {
+    'loading': Loading,
     'temporal-notification': TemporalNotification,
     'modal-container': ModalContainer,
     'intro-editor': IntroEditor,
@@ -81,7 +85,7 @@ export default {
 
       isCreating: false,
 
-      intros: [],
+      intros: null,
 
       toDelete: null,
       toEdit: null,
@@ -106,6 +110,7 @@ export default {
     loadIntros() {
       this.teacher.getIntros( ( err, intros ) => {
         if ( err ) {
+          this.intros = [];
           return this.setError( err, 'Failed to load introductions' );
         }
 
@@ -159,7 +164,7 @@ export default {
 
     saveEdited( e ) {
       this.toEdit.updateTexts( e.texts, err => {
-        if (err) {
+        if ( err ) {
           this.setError( err, 'Failed to save updates' );
         }
         else {
@@ -179,7 +184,7 @@ export default {
     removeWarningClosed( e ) {
       if ( e.confirm ) {
         this.teacher.deleteIntro( this.toDelete, err => {
-          if (err) {
+          if ( err ) {
             this.setError( err, 'Failed to delete the introduction' );
           }
           this.loadIntros();

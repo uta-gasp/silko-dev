@@ -8,7 +8,9 @@
           .level-item
             button.button.is-primary(@click="openNewTextBox") Add
     .panel-block.is-paddingless
-      table.table
+      .container(v-if="tasks === null")
+        loading
+      table.table(v-else)
         tbody
           tr(v-for="task in tasks" :key="parent.id+task.id")
             td
@@ -35,6 +37,7 @@ import dataUtils from '@/utils/data-utils.js';
 import stringification from '@/components/mixins/stringification.js';
 import ActionError from '@/components/mixins/actionError';
 
+import Loading from '@/components/widgets/Loading';
 import TemporalNotification from '@/components/widgets/TemporalNotification';
 import ModalContainer from '@/components/widgets/ModalContainer';
 import TaskEditor from '@/components/widgets/TaskEditor';
@@ -44,6 +47,7 @@ export default {
   name: 'task-list',
 
   components: {
+    'loading': Loading,
     'temporal-notification': TemporalNotification,
     'modal-container': ModalContainer,
     'task-editor': TaskEditor,
@@ -55,7 +59,7 @@ export default {
   data() {
     return {
       parent: this.cls,
-      tasks: [],
+      tasks: null,
 
       toEdit: null,
       isCreating: false,
@@ -109,6 +113,7 @@ export default {
     loadTasks() {
       this.parent.getTasks( ( err, tasks ) => {
         if ( err ) {
+          this.tasks = [];
           return this.setError( err, 'Failed to load tasks' );
         }
 
@@ -164,7 +169,7 @@ export default {
         const id = this.toDelete.id;
 
         this.parent.deleteTask( this.toDelete, err => {
-          if (err) {
+          if ( err ) {
             return this.setError( err, 'Failed to delete the task' );
           }
           else {

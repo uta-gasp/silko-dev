@@ -26,7 +26,9 @@
     nav.panel
       p.panel-heading Students
       .panel-block.is-paddingless
-        .container(v-if="!students.length")
+        .container(v-if="students === null")
+          loading
+        .container(v-else-if="!students.length")
           i No students exists yet
         table.table(v-else)
           thead
@@ -59,6 +61,7 @@ import Teacher from '@/model/teacher.js';
 import ActionError from '@/components/mixins/actionError';
 import ActionSuccess from '@/components/mixins/actionSuccess';
 
+import Loading from '@/components/widgets/Loading';
 import TemporalNotification from '@/components/widgets/TemporalNotification';
 
 export default {
@@ -66,6 +69,7 @@ export default {
 
   components: {
     'temporal-notification': TemporalNotification,
+    'loading': Loading,
   },
 
   mixins: [ ActionError, ActionSuccess ],
@@ -83,13 +87,9 @@ export default {
       isCreating: false,
 
       schools: [],
-      students: [],
+      students: null,
       classes: [],
     };
-  },
-
-  components: {
-    'temporal-notification': TemporalNotification,
   },
 
   computed: {
@@ -166,6 +166,7 @@ export default {
     loadStudents() {
       const onDone = ( err, students ) => {
         if ( err ) {
+          this.students = [];
           return this.setError( err, 'Failed to load students' );
         }
 

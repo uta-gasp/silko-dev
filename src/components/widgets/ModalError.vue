@@ -34,7 +34,7 @@ export default {
 
   watch: {
     text( value ) {
-      if (value) {
+      if ( value ) {
         console.error( 'MODAL_ERROR:', value );
       }
     },

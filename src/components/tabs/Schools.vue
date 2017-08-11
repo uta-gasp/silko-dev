@@ -19,7 +19,9 @@
     nav.panel
       p.panel-heading Schools
       .panel-block.is-paddingless
-        .container(v-if="!schools.length")
+        .container(v-if="schools === null")
+          loading
+        .container(v-else-if="!schools.length")
           i No school exists yet
         table.table(v-else)
           thead
@@ -44,12 +46,14 @@ import School from '@/model/school.js';
 import ActionError from '@/components/mixins/actionError';
 import ActionSuccess from '@/components/mixins/actionSuccess';
 
+import Loading from '@/components/widgets/Loading';
 import TemporalNotification from '@/components/widgets/TemporalNotification';
 
 export default {
   name: 'schools',
 
   components: {
+    'loading': Loading,
     'temporal-notification': TemporalNotification,
   },
 
@@ -62,7 +66,7 @@ export default {
 
       isCreating: false,
 
-      schools: [],
+      schools: null,
     };
   },
 
@@ -88,6 +92,7 @@ export default {
     loadSchools() {
       School.list( ( err, schools ) => {
         if ( err ) {
+          this.schools = [];
           return this.setError( err, 'Failed to load schools' );
         }
 
@@ -141,11 +146,12 @@ export default {
 
   filters: {
     count( obj ) {
-      let result = 0;
-      for ( let _ in obj ) {
-        result++;
-      }
-      return result;
+      return Object.keys( obj ).length;
+      // let result = 0;
+      // for ( let _ in obj ) {
+      //   result++;
+      // }
+      // return result;
     },
   },
 

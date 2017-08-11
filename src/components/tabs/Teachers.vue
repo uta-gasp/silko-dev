@@ -23,7 +23,9 @@
     nav.panel
       p.panel-heading Teachers
       .panel-block.is-paddingless
-        .container(v-if="!teachers.length")
+        .container(v-if="teachers === null")
+          loading
+        .container(v-else-if="!teachers.length")
           i No teachers exists yet
         table.table(v-else)
           thead
@@ -53,12 +55,14 @@ import Teacher from '@/model/teacher.js';
 import ActionError from '@/components/mixins/actionError';
 import ActionSuccess from '@/components/mixins/actionSuccess';
 
+import Loading from '@/components/widgets/Loading';
 import TemporalNotification from '@/components/widgets/TemporalNotification';
 
 export default {
   name: 'teachers',
 
   components: {
+    'loading': Loading,
     'temporal-notification': TemporalNotification,
   },
 
@@ -75,7 +79,7 @@ export default {
       isCreating: false,
 
       schools: [],
-      teachers: [],
+      teachers: null,
     };
   },
 
@@ -144,6 +148,7 @@ export default {
     loadTeachers() {
       const onDone = ( err, teachers ) => {
         if ( err ) {
+          this.teachers = [];
           return this.setError( err, 'Failed to load teachers' );
         }
 

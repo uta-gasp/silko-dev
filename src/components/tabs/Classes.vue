@@ -17,8 +17,8 @@
     nav.panel
       p.panel-heading Classes
       .panel-block.is-paddingless
-        .container(v-if="!classes.length")
-          i No classes exists yet
+        .container(v-if="classes === null")
+          loading
         table.table(v-else)
           thead
             tr
@@ -50,6 +50,7 @@ import Teacher from '@/model/teacher.js';
 import ActionError from '@/components/mixins/actionError';
 import ActionSuccess from '@/components/mixins/actionSuccess';
 
+import Loading from '@/components/widgets/Loading';
 import TemporalNotification from '@/components/widgets/TemporalNotification';
 import TaskList from '@/components/widgets/TaskList';
 import StudentList from '@/components/widgets/StudentList';
@@ -59,6 +60,7 @@ export default {
   name: 'classes',
 
   components: {
+    'loading': Loading,
     'temporal-notification': TemporalNotification,
     'task-list': TaskList,
     'student-list': StudentList,
@@ -76,7 +78,7 @@ export default {
       isCreating: false,
       refreshStudents: 0,
 
-      classes: [],
+      classes: null,
       intros: [],
 
       toDelete: null,
@@ -107,6 +109,7 @@ export default {
     loadClasses() {
       this.teacher.getClasses( ( err, classes ) => {
         if ( err ) {
+          this.classed = [];
           return this.setError( err, 'Failed to load classes' );
         }
 
@@ -173,7 +176,7 @@ export default {
     removeWarningClosed( e ) {
       if ( e.confirm ) {
         this.teacher.deleteClass( this.toDelete, err => {
-          if (err) {
+          if ( err ) {
             this.setError( err, 'Failed to delete the class' );
           }
           this.loadClasses();

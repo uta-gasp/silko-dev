@@ -1,6 +1,8 @@
 <template lang="pug">
   #results.section
-    .container(v-if="!classes.length")
+    .container(v-if="classes === null")
+      loading
+    .container(v-else-if="!classes.length")
       i No data was recorded yet
     nav.panel(v-for="cls in classes" :key="cls.ref.id")
       .panel-block.is-marginless.is-paddingless
@@ -25,7 +27,11 @@
                   td.is-narrow
                     button.button.is-primary(:disabled="!isLoaded" @click="selectTaskStudents( task, VISUALIZATIONS.wordReplay )") Word replay
 
-            table.table(v-if="cls.students.length")
+            .container(v-if="cls.students === null")
+              loading
+            .container(v-else-if="!cls.students.length")
+
+            table.table(v-else)
               thead
                 tr
                   th Students
@@ -98,6 +104,7 @@ import Params from '@/vis/data/params.js';
 
 import ActionError from '@/components/mixins/actionError';
 
+import Loading from '@/components/widgets/Loading';
 import TemporalNotification from '@/components/widgets/TemporalNotification';
 import ModalContainer from '@/components/widgets/ModalContainer';
 import SessionEditBox from '@/components/widgets/SessionEditBox';
@@ -122,6 +129,7 @@ export default {
   name: 'results',
 
   components: {
+    'loading': Loading,
     'temporal-notification': TemporalNotification,
     'modal-container': ModalContainer,
     'session-editing-box': SessionEditBox,
@@ -148,7 +156,7 @@ export default {
       studentWithSessions: null,
       visualization: null,    // vis/data/Data
 
-      classes: [],  // [ vis/data/Class ]
+      classes: null,  // [ vis/data/Class ]
       students: [],  // [ vis/data/Student ]
 
       VISUALIZATIONS: {
@@ -174,6 +182,7 @@ export default {
       if ( this.teacher ) {
         this.loadClasses( err => {
           if ( err ) {
+            this.classes = [];
             return this.setError( err, 'Failed to load classes' );
           }
 

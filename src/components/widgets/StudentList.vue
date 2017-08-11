@@ -8,7 +8,9 @@
           .level-item
             button.button.is-primary(@click="openEditor") Add
     .panel-block.is-paddingless
-      table.table
+      .container(v-if="students === null")
+        loading
+      table.table(v-else)
         thead
           tr.is-subheader
             th Name
@@ -40,6 +42,7 @@ import dataUtils from '@/utils/data-utils.js';
 import stringification from '@/components/mixins/stringification.js';
 import ActionError from '@/components/mixins/actionError';
 
+import Loading from '@/components/widgets/Loading';
 import ModalContainer from '@/components/widgets/ModalContainer';
 import ItemSelectionBox from '@/components/widgets/ItemSelectionBox';
 import TemporalNotification from '@/components/widgets/TemporalNotification';
@@ -50,6 +53,7 @@ export default {
   mixins: [ stringification, ActionError ],
 
   components: {
+    'loading': Loading,
     'modal-container': ModalContainer,
     'item-selection-box': ItemSelectionBox,
     'temporal-notification': TemporalNotification,
@@ -58,7 +62,7 @@ export default {
   data() {
     return {
       parent: this.cls,
-      students: [],
+      students: null,
       schoolStudents: null,
       tasks: [],
       schoolGrades: [],
@@ -105,6 +109,7 @@ export default {
     loadStudents() {
       this.parent.getStudents( ( err, students ) => {
         if ( err ) {
+          this.students = [];
           return this.setError( err, 'Failed to load students' );
         }
 
@@ -155,7 +160,7 @@ export default {
       } );
 
       grades.forEach( grade => {
-        grade.subitems.sort( (a, b) => a.text.toLowerCase() > b.text.toLowerCase() );
+        grade.subitems.sort( ( a, b ) => a.text.toLowerCase() > b.text.toLowerCase() );
       } );
 
       return grades.sort( ( a, b ) => {
@@ -206,7 +211,7 @@ export default {
 
     remove( student, e ) {
       this.parent.removeStudent( student, err => {
-        if (err) {
+        if ( err ) {
           this.setError( err, 'Failed to remove the student from the list' );
         }
 

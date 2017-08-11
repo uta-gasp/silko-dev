@@ -103,7 +103,7 @@ export default {
       this.data.records.forEach( record => {
         let id = record.student.name;
         studentsWithMultipleSessions[ id ] = studentsWithMultipleSessions[ id ] !== undefined;
-      });
+      } );
 
       this.data.records.forEach( record => {
         let name = record.student.name;

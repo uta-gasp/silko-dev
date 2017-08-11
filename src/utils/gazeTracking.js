@@ -26,7 +26,7 @@ for ( let name in callbacks ) {
   };
 }
 
-let device = '';
+// let device = '';
 let lastState = {};
 
 class GazeTracking {
@@ -60,12 +60,12 @@ class GazeTracking {
     }, {
       state: state => {
         lastState = state;
-        if ( state.device ) {
-          device = state.device;
-        }
-        else if ( !state.isConnected ) {
-          device = '';
-        }
+        // if ( state.device ) {
+        //   device = state.device;
+        // }
+        // else if ( !state.isConnected ) {
+        //   device = '';
+        // }
 
         if ( state.isTracking ) {
           if ( callbacks.started ) {
