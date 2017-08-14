@@ -1,4 +1,4 @@
-export default class params {
+export default class Params {
 
   constructor( args ) {
     args = args || {};

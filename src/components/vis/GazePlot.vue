@@ -1,4 +1,6 @@
 <script>
+import dataUtils from '@/utils/data-utils.js';
+
 import VisPlot from '@/components/vis/VisPlot';
 
 import OptionsCreator from '@/vis/optionsCreator.js';
@@ -66,7 +68,7 @@ export default {
 
   computed: {
     title() {
-      return `${this.record.student.name} reading "${this.record.task.name}"`;
+      return `${this.record.student.name} reading "${this.record.task.name}" at ${dataUtils.sessionDate(this.record.session.date)}`;
     },
   },
 

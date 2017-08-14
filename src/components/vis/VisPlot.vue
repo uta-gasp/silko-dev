@@ -4,6 +4,7 @@
     vis-title {{ title }}
     control-panel(
       :feedback="defaultFeedback"
+      :questionnaire="data.records.length === 1 ? defaultQuestionnaire : null"
       :text-length="textLength"
       :initial-page-index="initialPageIndex"
       :options="options"
@@ -63,6 +64,7 @@ export default {
       defaultSession: this.data.records[0].session,
       defaultPages: this.data.records[0].data.pages,
       defaultFeedback: this.data.records[0].session.feedbacks,
+      defaultQuestionnaire: this.data.records[0].data.questionnaire,
 
       isPlayerPaused: false,
     };

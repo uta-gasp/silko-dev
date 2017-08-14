@@ -2,9 +2,12 @@
   #control-panel
     player.player(v-if="showPlayer" :is-paused="isPlayerPaused" @restart="restartPlayer" @toggle="togglePlayer")
 
-    .props(v-if="!!feedback")
+    .props(v-if="feedback")
       abbr.prop.speech(:class="{ off: !feedback.speech.enabled }" title="Speech output")
       abbr.prop.syllab(:class="{ off: !feedback.syllabification.enabled }" title="Syllabification") {{ feedback.syllabification.threshold.value }}
+
+    .props(v-if="questionnaire && questionnaire.length")
+      abbr.prop.questionnaire(title="Questionnaire corectness") {{ correctAnswers }}
 
     .menu
       template(v-if="textLength")
@@ -46,6 +49,11 @@ export default {
       default: null,
     },
 
+    questionnaire: {  // [ model/session/Question ]
+      type: Array,
+      default: null,
+    },
+
     initialPageIndex: {
       type: Number,
       default: 0,
@@ -76,6 +84,18 @@ export default {
     dispPage() {
       return !this.pageIndex ? 'int' : `${this.pageIndex}/${this.textLength - 1}`;
     },
+
+    correctAnswers() {
+      if (!this.questionnaire || !this.questionnaire.length) {
+        return '-';
+      }
+
+      const correct = this.questionnaire.filter( question => {
+        console.log(question.answer.isCorrect)
+        return question.answer.isCorrect;
+      } ).length / this.questionnaire.length * 100;
+      return correct.toFixed( 0 ) + '%';
+    }
   },
 
   methods: {
@@ -172,6 +192,11 @@ export default {
             background-image: url("../../assets/img/syllab-no.png");
             background-position: center center;
           }
+        }
+
+        &.questionnaire {
+          background-image: url("../../assets/img/quest.png");
+          background-position: center bottom;
         }
       }
     }
