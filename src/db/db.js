@@ -295,6 +295,19 @@ class DB {
     return ref.remove().then( () => cb() ).catch( err => cb( err ) );
   }
 
+  deleteUser( id ) {
+    const query = this.fb.child( 'users' ).orderByChild( 'id' ).equalTo( id );
+    return query.once( 'value', snapshot => {
+      if ( snapshot.exists() ) {
+        snapshot.forEach( user => {
+          user.ref.remove();
+        } );
+      }
+    }, err => {
+      console.log( 'TODO handle', err );
+    } );
+  }
+
   _onUserChanged( user ) {
     if ( user ) {
       // switch user back if needed

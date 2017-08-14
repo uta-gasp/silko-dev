@@ -156,20 +156,11 @@ export default class Student {
         }
 
         const promises = [];
-        const errs = [];
-        promises.push( db.deleteItems( Data, [ session.data ], err => {
-          if ( err ) {
-            errs.push( err );
-          }
-        } ) );
-        promises.push( db.deleteItems( Session, [ id ], err => {
-          if ( err ) {
-            errs.push( err );
-          }
-        } ) );
+        promises.push( db.deleteItems( Data, [ session.data ] ) );
+        promises.push( db.deleteItems( Session, [ id ] ) );
 
         Promise.all( promises ).then( () => {
-          cb( errs.length > 1 ? 'The session removed from the list, but not from the database' : errs[0] );
+          cb( null );
         } );
       } );
     } );

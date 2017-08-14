@@ -2,6 +2,8 @@ import Recordable from './commons/recordable.js';
 
 import Teacher from './teacher.js';
 import Student from './student.js';
+import Session from './session.js';
+import Data from './data.js';
 
 import db from '@/db/db.js';
 
@@ -100,6 +102,38 @@ export default class School {
       }
 
       cb( null, students );
+    } );
+  }
+
+  deleteStudent( student, cb ) {
+    return db.delete( student, err => {
+      if ( err ) {
+        return cb( err );
+      }
+
+      db.deleteUser( student.id );
+
+      const sessionPromises = [];
+      const dataIDs = [];
+      Object.keys( student.sessions ).forEach( id => {
+        sessionPromises.push( db.get( Session, id, ( err, session ) => {
+          if ( !err ) {
+            dataIDs.push( session.data );
+          }
+        } ) );
+      } );
+
+      Promise.all( sessionPromises ).then( () => {
+        db.deleteItems( Session, student.sessions );
+
+        if ( !dataIDs.length ) {
+          return cb( null );
+        }
+
+        db.deleteItems( Data, dataIDs ).then( () => {
+          cb( null );
+        } );
+      } );
     } );
   }
 

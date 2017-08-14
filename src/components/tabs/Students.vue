@@ -37,6 +37,8 @@
               th(v-if="isAdmin") School
               th Grade
               th(v-if="!isAdmin") Classes
+              th(v-if="isAdmin")
+                .is-pulled-right Action
           tbody
             tr(v-for="student in students")
               td {{ student.name }}
@@ -47,6 +49,11 @@
               td {{ student.grade }}
               td(v-if="!isAdmin")
                 span.ellipsis {{ getListOfStudentClasses( student ) }}
+              td(v-if="isAdmin").is-narrow
+                button.button.is-danger(@click="remove( student )")
+                  i.fa.fa-remove
+
+    remove-warning(v-if="toDelete" object="student" :name="toDeleteName" @close="removeWarningClosed")
 </template>
 
 <script>
@@ -63,13 +70,15 @@ import ActionSuccess from '@/components/mixins/actionSuccess';
 
 import Loading from '@/components/widgets/Loading';
 import TemporalNotification from '@/components/widgets/TemporalNotification';
+import RemoveWarning from '@/components/widgets/RemoveWarning';
 
 export default {
   name: 'students',
 
   components: {
-    'temporal-notification': TemporalNotification,
     'loading': Loading,
+    'temporal-notification': TemporalNotification,
+    'remove-warning': RemoveWarning,
   },
 
   mixins: [ ActionError, ActionSuccess ],
@@ -85,6 +94,7 @@ export default {
       newSchool: '',
 
       isCreating: false,
+      toDelete: null,
 
       schools: [],
       students: null,
@@ -132,6 +142,10 @@ export default {
           text: school.name,
         };
       } );
+    },
+
+    toDeleteName() {
+      return this.toDelete ? this.toDelete.name : '';
     },
   },
 
@@ -267,6 +281,35 @@ export default {
         classes.push( student.classes[ id ] );
       }
       return classes.join( ', ' );
+    },
+
+    remove( item ) {
+      this.toDelete = item;
+    },
+
+    removeWarningClosed( e ) {
+      if ( e.confirm ) {
+        const student = this.toDelete;
+
+        School.get( student.school, ( err, school ) => {
+          if ( err ) {
+            return this.setError( err, 'Failed to access the student school' );
+          }
+
+          school.deleteStudent( student, err => {
+            if ( err ) {
+              this.setError( err, 'Failed to remove the student from the database' );
+            }
+            else {
+              this.setSuccess( 'The student was removed' );
+            }
+
+            this.init();
+          } );
+        } );
+      }
+
+      this.toDelete = null;
     },
   },
 
