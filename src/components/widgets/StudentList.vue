@@ -39,7 +39,6 @@
 <script>
 import dataUtils from '@/utils/data-utils.js';
 
-import stringification from '@/components/mixins/stringification.js';
 import ActionError from '@/components/mixins/actionError';
 
 import Loading from '@/components/widgets/Loading';
@@ -50,7 +49,7 @@ import TemporalNotification from '@/components/widgets/TemporalNotification';
 export default {
   name: 'student-list',
 
-  mixins: [ stringification, ActionError ],
+  mixins: [ ActionError ],
 
   components: {
     'loading': Loading,
@@ -172,6 +171,10 @@ export default {
         }
         return a.text > b.text;
       } );
+    },
+
+    displayCount( arr, name ) {
+      return dataUtils.displayCount( arr, name );
     },
 
     openEditor( e ) {

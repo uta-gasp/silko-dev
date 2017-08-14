@@ -1,9 +1,11 @@
 <template lang="pug">
   #assignments.section
     nav.panel
-      p.panel-heading Assignments
+      p.panel-heading Waiting to complete
       .panel-block
-        .container(v-if="!hasAssignment")
+        .container(v-if="assignments === null")
+          loading
+        .container(v-else-if="!assignments.length")
           i No assignments at this moment
         .tile.is-ancestor(v-else)
           .tile.is-parent(v-for="assignment in assignments")
@@ -21,23 +23,45 @@
                 .card-footer
                   a.card-footer-item(@click="start( assignment )") Start
 
+    nav.panel
+      p.panel-heading Completed
+      .panel-block
+        .container(v-if="sessions === null")
+          loading
+        .container(v-else-if="!sessions.length")
+          i No completed assignments yet
+        table.table(v-else)
+          thead
+            tr
+              th Class
+              th Task
+              th Date
+          tbody
+            tr(v-for="session in sessions")
+              td {{ session.cls.name }}
+              td {{ session.task.name }}
+              td {{ session.session.date | prettifyDate }}
+
     temporal-notification(type="danger" :show="showError")
       span {{ errorMessage }}
 </template>
 
 <script>
 import eventBus from '@/utils/event-bus.js';
+import dataUtils from '@/utils/data-utils.js';
 
 import Student from '@/model/student.js';
 
 import ActionError from '@/components/mixins/actionError';
 
+import Loading from '@/components/widgets/Loading';
 import TemporalNotification from '@/components/widgets/TemporalNotification';
 
 export default {
   name: 'assignments',
 
   components: {
+    'loading': Loading,
     'temporal-notification': TemporalNotification,
   },
 
@@ -46,34 +70,46 @@ export default {
   data() {
     return {
       student: null,
-      assignments: [],  // {cls, task}
+      assignments: null,  // {cls, task}
+      sessions: null,     // {cls, task, session}
       assignment: '',
     };
   },
 
-  computed: {
-
-    hasAssignment() {
-      return !!this.assignments.length;
+  filters: {
+    prettifyDate( value ) {
+      return dataUtils.sessionDate( value );
     },
   },
 
   methods: {
-
     init() {
       this.student = Student.instance;
       if ( this.student ) {
         this.loadAssignments();
+        this.loadSessions();
       }
     },
 
     loadAssignments() {
       this.student.loadAssignments( ( err, assignments ) => {
+        this.assignments = [];
         if ( err ) {
           return this.setError( err, 'Failed to load assignments' );
         }
 
         this.assignments = assignments;
+      } );
+    },
+
+    loadSessions() {
+      this.student.loadSessions( ( err, sessions ) => {
+        this.sessions = [];
+        if ( err ) {
+          return this.setError( err, 'Failed to load sessions' );
+        }
+
+        this.sessions = sessions;
       } );
     },
 

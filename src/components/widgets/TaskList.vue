@@ -34,7 +34,6 @@
 <script>
 import dataUtils from '@/utils/data-utils.js';
 
-import stringification from '@/components/mixins/stringification.js';
 import ActionError from '@/components/mixins/actionError';
 
 import Loading from '@/components/widgets/Loading';
@@ -54,7 +53,7 @@ export default {
     'remove-warning': RemoveWarning,
   },
 
-  mixins: [ stringification, ActionError ],
+  mixins: [ ActionError ],
 
   data() {
     return {
@@ -119,6 +118,10 @@ export default {
 
         this.tasks = tasks.sort( dataUtils.byName );
       } );
+    },
+
+    displayCount( arr, name ) {
+      return dataUtils.displayCount( arr, name );
     },
 
     canCreate( newTask ) {

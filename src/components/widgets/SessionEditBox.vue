@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import Formatter from '@/vis/formatter.js';
+import dataUtils from '@/utils/data-utils.js';
 
 import ActionError from '@/components/mixins/actionError';
 
@@ -58,7 +58,7 @@ export default {
         return '';
       }
 
-      return `${session.task.name} at ${Formatter.sessionDate( session.ref.date )}`;
+      return `${session.task.name} at ${dataUtils.sessionDate( session.ref.date )}`;
     },
 
     showDeleteWarning( session ) {

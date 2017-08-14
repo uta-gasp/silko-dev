@@ -106,6 +106,54 @@ export default class Student {
     } );
   }
 
+  loadSessions( cb ) {
+    const sessionIDs = [];
+    for ( let id in this.sessions ) {
+      sessionIDs.push( id );
+    }
+
+    return db.getFromIDs( Session, sessionIDs, ( err, sessions ) => {
+      if ( err ) {
+        return cb( err );
+      }
+
+      const result = new Map();
+      sessions.forEach( session => {
+        result.set( session, {
+          cls: {},
+          task: {},
+          session: null,
+        } );
+      } );
+
+      const promises = [];
+      sessions.forEach( session => {
+        promises.push( db.get( Class, session.cls, ( err, cls ) => {
+          if ( err ) {
+            return console.log( 'TODO db.get Class', err );
+          }
+          result.get( session ).cls = cls;
+        } ) );
+        promises.push( db.get( Task, session.task, ( err, task ) => {
+          if ( err ) {
+            return console.log( 'TODO db.get Task', err );
+          }
+          result.get( session ).task = task;
+        } ) );
+      } );
+
+      Promise.all( promises ).then( values => {
+        const arr = [];
+        result.forEach( (obj, session) => {
+          obj.session = session;
+          arr.push( obj );
+        } );
+
+        cb( null, arr );
+      } );
+    } );
+  }
+
   loadTask( task, cb ) {
     return db.get( Task, task, cb );
   }

@@ -1,11 +1,12 @@
 <script>
-import VisPlot from '@/components/vis/VisPlot';
+import dataUtils from '@/utils/data-utils.js';
 
 import OptionsCreator from '@/vis/optionsCreator.js';
 import Painter from '@/vis/painter.js';
 import Metric from '@/vis/metric.js';
 import ReplayTrack from '@/vis/replayTrack.js';
-import Formatter from '@/vis/formatter.js';
+
+import VisPlot from '@/components/vis/VisPlot';
 
 const LEGEND_LOCATION = {
   x: 2,
@@ -108,7 +109,7 @@ export default {
       this.data.records.forEach( record => {
         let name = record.student.name;
         if ( studentsWithMultipleSessions[ name ] ) {
-          name = `${name} ${Formatter.sessionDate( record.session.date )}`;
+          name = `${name} ${dataUtils.sessionDate( record.session.date )}`;
         }
 
         this.tracks.push( new ReplayTrack(

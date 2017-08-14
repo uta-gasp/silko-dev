@@ -94,8 +94,6 @@ import dataUtils from '@/utils/data-utils.js';
 import Teacher from '@/model/teacher.js';
 import Student from '@/model/student.js';
 
-import Formatter from '@/vis/formatter.js';
-
 import Data from '@/vis/data/data.js';
 import Record from '@/vis/data/record.js';
 import Task from '@/vis/data/task.js';
@@ -312,7 +310,7 @@ export default {
       student.sessions.forEach( session => {
         studentWithSessions.subitems.push( {
           id: session.ref.id,
-          text: `${session.task.name} at ${Formatter.sessionDate( session.ref.date )}`,
+          text: `${session.task.name} at ${dataUtils.sessionDate( session.ref.date )}`,
           selected: false,
         } );
       } );
