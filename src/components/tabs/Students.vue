@@ -272,7 +272,14 @@ export default {
     },
 
     moveStudent( student, e ) {
-      Admin.moveStudent( student, e.target.value, this.schools );
+      Admin.moveStudent( student, e.target.value, this.schools, err => {
+        if ( err ) {
+          this.setError( err, 'Failed to move the student to another school' );
+        }
+        else {
+          this.setSuccess( 'The student was moved to another school' );
+        }
+      } );
     },
 
     getListOfStudentClasses( student ) {

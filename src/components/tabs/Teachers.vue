@@ -225,7 +225,14 @@ export default {
     },
 
     moveTeacher( teacher, e ) {
-      Admin.moveTeacher( teacher, e.target.value, this.schools );
+      Admin.moveTeacher( teacher, e.target.value, this.schools, err => {
+        if ( err ) {
+          this.setError( err, 'Failed to move the teacher to another school' );
+        }
+        else {
+          this.setSuccess( 'The teacher was moved to another school' );
+        }
+      } );
     },
 
     getListOfTeacherClasses( teacher ) {

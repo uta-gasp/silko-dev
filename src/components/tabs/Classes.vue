@@ -32,7 +32,7 @@
               td
                 task-list(:cls="item" :intros="intros" @saved="taskSaved" @created="taskCreated" @deleted="taskDeleted")
               td
-                student-list(:cls="item" :teacher="teacher" :refresh="refreshStudents" @added="studentAdded" @removed="studentRemoved")
+                student-list(:cls="item" :teacher="teacher" :refresh="refreshStudents")
               td.is-narrow
                 .is-pulled-right
                   button.button.is-danger(@click="removeClass( item )")
@@ -179,6 +179,10 @@ export default {
           if ( err ) {
             this.setError( err, 'Failed to delete the class' );
           }
+          else {
+            this.setSuccess( 'The class was deleted' );
+          }
+
           this.loadClasses();
         } );
       }
@@ -207,14 +211,6 @@ export default {
 
     taskDeleted( e ) {
       this.refreshStudents = Math.random();
-    },
-
-    studentAdded( e ) {
-
-    },
-
-    studentRemoved( e ) {
-
     },
   },
 

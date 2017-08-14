@@ -3,7 +3,7 @@
     transition(name="slide-fade")
       .modal.on-top.is-active(v-if="showState")
         .modal-content
-          .notification(:class="notificationClass")
+          .notification(:class="notificationClass").has-text-centered.is-rounded
             slot
 </template>
 
@@ -93,6 +93,10 @@ export default {
   .modal.on-top {
     top: 50px;
     bottom: inherit;
+  }
+
+  .is-rounded {
+    border-radius: 12px;
   }
 
   .slide-fade-enter-active {

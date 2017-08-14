@@ -187,6 +187,10 @@ export default {
           if ( err ) {
             this.setError( err, 'Failed to delete the introduction' );
           }
+          else {
+            this.setSuccess( 'The introduction was deleted' );
+          }
+
           this.loadIntros();
         } );
       }

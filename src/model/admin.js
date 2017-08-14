@@ -23,22 +23,22 @@ export default class Admin {
     } );
   }
 
-  static moveStudent( student, newSchoolID, schools ) {
-    Admin.move( student, newSchoolID, schools, 'students' );
+  static moveStudent( student, newSchoolID, schools, cb ) {
+    Admin.move( student, newSchoolID, schools, 'students', cb );
   }
 
-  static moveTeacher( teacher, newSchoolID, schools ) {
-    Admin.move( teacher, newSchoolID, schools, 'teachers' );
+  static moveTeacher( teacher, newSchoolID, schools, cb ) {
+    Admin.move( teacher, newSchoolID, schools, 'teachers', cb );
   }
 
-  static move( user, newSchoolID, schools, list ) {
+  static move( user, newSchoolID, schools, list, cb ) {
     const prevSchoolID = user.school;
     user.school = newSchoolID;
 
     db.updateField( user, 'school', newSchoolID, err => {
       if ( err ) {
         user.school = prevSchoolID;
-        return console.error( err ); // TODO handle error
+        return cb( err );
       }
 
       const prevSchool = schools.find( school => school.id === prevSchoolID );
@@ -49,13 +49,15 @@ export default class Admin {
 
       db.updateField( newSchool, `${list}/${user.id}`, user.name, err => {
         if ( err ) {
-          return console.error( err ); // TODO handle error
+          return cb( err );
         }
 
         db.deleteField( prevSchool, `${list}/${user.id}`, err => {
           if ( err ) {
-            return console.error( err ); // TODO handle error
+            return cb( err );
           }
+
+          cb( null );
         } );
       } );
     } );

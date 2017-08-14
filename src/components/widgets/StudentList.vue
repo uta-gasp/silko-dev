@@ -15,7 +15,7 @@
           tr.is-subheader
             th Name
             th.is-narrow
-              .has-text-centered Assignment
+              .has-text-centered Task
             th.is-narrow
         tbody
           tr(v-for="student in students" :key="parent.id+student.id")
@@ -34,12 +34,15 @@
 
     temporal-notification(type="danger" :show="showError")
       span {{ errorMessage }}
+    temporal-notification(type="success" :show="showSuccess")
+      span {{ successMessage }}
 </template>
 
 <script>
 import dataUtils from '@/utils/data-utils.js';
 
 import ActionError from '@/components/mixins/actionError';
+import ActionSuccess from '@/components/mixins/actionSuccess';
 
 import Loading from '@/components/widgets/Loading';
 import ModalContainer from '@/components/widgets/ModalContainer';
@@ -49,7 +52,7 @@ import TemporalNotification from '@/components/widgets/TemporalNotification';
 export default {
   name: 'student-list',
 
-  mixins: [ ActionError ],
+  mixins: [ ActionError, ActionSuccess ],
 
   components: {
     'loading': Loading,
@@ -186,7 +189,10 @@ export default {
       if ( e.subitems ) {
         this.parent.addStudents( e.subitems, err => {
           if ( err ) {
-            return this.setError( err, 'Failed to add new student' );
+            this.setError( err, 'Failed to add new student' );
+          }
+          else {
+            this.setSuccess( 'Students were added' );
           }
 
           this.loadStudents();
@@ -207,7 +213,10 @@ export default {
     setAssignment( student, e ) {
       student.setAssignment( this.parent.id, e.target.value, err => {
         if ( err ) {
-          return this.setError( err, 'Failed to set the assignment to the student' );
+          this.setError( err, 'Failed to set the task to the student' );
+        }
+        else {
+          this.setSuccess( `The task was ${!e.target.value ? 'removed' : 'set'}` );
         }
       } );
     },
@@ -216,6 +225,9 @@ export default {
       this.parent.removeStudent( student, err => {
         if ( err ) {
           this.setError( err, 'Failed to remove the student from the list' );
+        }
+        else {
+          this.setSuccess( 'The student was removed' );
         }
 
         this.loadStudents();

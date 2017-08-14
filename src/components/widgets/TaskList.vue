@@ -35,6 +35,7 @@
 import dataUtils from '@/utils/data-utils.js';
 
 import ActionError from '@/components/mixins/actionError';
+import ActionSuccess from '@/components/mixins/actionSuccess';
 
 import Loading from '@/components/widgets/Loading';
 import TemporalNotification from '@/components/widgets/TemporalNotification';
@@ -53,7 +54,7 @@ export default {
     'remove-warning': RemoveWarning,
   },
 
-  mixins: [ ActionError ],
+  mixins: [ ActionError, ActionSuccess ],
 
   data() {
     return {
@@ -176,6 +177,7 @@ export default {
             return this.setError( err, 'Failed to delete the task' );
           }
           else {
+            this.setSuccess( 'The task was deleted' );
             this.$emit( 'deleted', { task: id } );
           }
 
