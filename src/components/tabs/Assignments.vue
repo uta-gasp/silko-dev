@@ -1,12 +1,15 @@
 <template lang="pug">
   #assignments.section
-    nav.panel
-      p.panel-heading Waiting to complete
+    article.message.is-danger(v-if="student && student.deleted")
+      .message-body This student account was removed from all schools and is considered as frozen. No tasks will be assigned to this account in future.
+
+    nav.panel(v-else)
+      p.panel-heading Tasks waiting to complete
       .panel-block
         .container(v-if="assignments === null")
           loading
         .container(v-else-if="!assignments.length")
-          i No assignments at this moment
+          i No assigned tasks yet
         .tile.is-ancestor(v-else)
           .tile.is-parent(v-for="assignment in assignments")
             .tile.is-child
@@ -24,12 +27,12 @@
                   a.card-footer-item(@click="start( assignment )") Start
 
     nav.panel
-      p.panel-heading Completed
+      p.panel-heading Completed tasks
       .panel-block
         .container(v-if="sessions === null")
           loading
         .container(v-else-if="!sessions.length")
-          i No completed assignments yet
+          i No completed tasks yet
         table.table(v-else)
           thead
             tr

@@ -40,7 +40,7 @@
               th(v-if="isAdmin")
                 .is-pulled-right Action
           tbody
-            tr(v-for="student in students")
+            tr(v-for="student in students" v-if="!student.deleted")
               td {{ student.name }}
               td(v-if="isAdmin")
                 span.select

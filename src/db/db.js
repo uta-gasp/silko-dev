@@ -217,7 +217,7 @@ class DB {
       const ref = this.fb.child( `${cls.db}/${id}` );
       promises.push( ref.once( 'value', snapshot => {
         if ( !snapshot.exists() ) {
-          return  errors.push( `${cls.db}/${id}` );
+          return errors.push( `${cls.db}/${id}` );
         }
 
         results.push( cls.from( snapshot ) );

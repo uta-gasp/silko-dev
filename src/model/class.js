@@ -19,6 +19,14 @@ export default class Class {
     return 'classes';
   }
 
+  static list( cb ) {
+    return db.getAll( Class, cb );
+  }
+
+  static get( id, cb ) {
+    return db.get( Class, id, cb );
+  }
+
   createTask( task, type, cb ) {
     task.syllab.exceptions = Task.textToSyllabs( task.syllabExceptions );
 

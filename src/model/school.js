@@ -4,6 +4,7 @@ import Teacher from './teacher.js';
 import Student from './student.js';
 import Session from './session.js';
 import Data from './data.js';
+import Class from './class.js';
 
 import db from '@/db/db.js';
 
@@ -106,67 +107,72 @@ export default class School {
   }
 
   deleteStudent( student, cb ) {
-    return db.delete( student, err => {
+    delete this.students[ student.id ];
+
+    return db.updateField( this, 'students', this.students, err => {
       if ( err ) {
         return cb( err );
       }
 
-      db.deleteUser( student.id );
+      db.updateField( student, 'deleted', true );  // TODO ignore errors?
 
-      const sessionPromises = [];
-      const dataIDs = [];
-      Object.keys( student.sessions ).forEach( id => {
-        sessionPromises.push( db.get( Session, id, ( err, session ) => {
-          if ( !err ) {
-            dataIDs.push( session.data );
-          }
-        } ) );
-      } );
+      if (student.assignments) {
+        student.assignments = {};
+        db.updateField( student, 'assignments', {} );  // TODO ignore errors?
+      }
 
-      Promise.all( sessionPromises ).then( () => {
-        db.deleteItems( Session, student.sessions );
-
-        if ( !dataIDs.length ) {
-          return cb( null );
-        }
-
-        db.deleteItems( Data, dataIDs ).then( () => {
-          cb( null );
+      if (student.classes) {
+        const promises = [];
+        Object.keys( student.classes ).map( id => {
+          promises.push( Class.get( id, (err, cls) => {
+            delete cls.students[ student.id ];
+            db.updateField( cls, 'students', cls.students );  // TODO ignore errors?
+          } ) );
         } );
-      } );
-    } );
+
+        student.classes = {};
+        db.updateField( student, 'classes', {} );  // TODO ignore errors?
+
+        Promise.all( promises ).then( () => {
+          cb( null );
+        } ).catch( err => {
+          cb( err );
+        });
+      }
+  } );
+
+    // Removes the student from /students, /users, all student sessions and related session data
+
+    // return db.delete( student, err => {
+    //   if ( err ) {
+    //     return cb( err );
+    //   }
+
+    //   db.deleteUser( student.id );
+
+    //   const sessionPromises = [];
+    //   const dataIDs = [];
+    //   Object.keys( student.sessions ).forEach( id => {
+    //     sessionPromises.push( db.get( Session, id, ( err, session ) => {
+    //       if ( !err ) {
+    //         dataIDs.push( session.data );
+    //       }
+    //     } ) );
+    //   } );
+
+    //   Promise.all( sessionPromises ).then( () => {
+    //     db.deleteItems( Session, student.sessions );
+
+    //     if ( !dataIDs.length ) {
+    //       return cb( null );
+    //     }
+
+    //     db.deleteItems( Data, dataIDs ).then( () => {
+    //       cb( null );
+    //     } );
+    //   } );
+    // } );
   }
-
-  // passTeachersTo( teachers, school, cb ) {
-  //     this.teachers = this.teachers.filter( teacher => {
-  //         return teachers.indexOf( teacher ) < 0;
-  //     });
-
-  //     let _err;
-
-  //     db.updateField( this, 'teachers', this.teachers, err => {
-  //         if (err) {
-  //             return _err = err;
-  //         }
-
-  //         db.get( School, school, (err, anotherSchool) => {
-  //             if (err) {
-  //                 return _err = err;
-  //             }
-
-  //             const anotherSchoolTeachers = anotherSchool.teachers.concat( teachers );
-  //             db.updateField( anotherSchool, 'teachers', anotherSchoolTeachers, err => {
-  //                 _err = err;
-
-  //                 teachers.forEach( teacher => {
-  //                     db.update( `/${Teacher.db}/${teacher}/school`, school );
-  //                 });
-  //             });
-  //         });
-  //     });
-
-  //     cb( _err );
-  // }
 
 }
 
