@@ -277,7 +277,7 @@ export default {
       this.deferredVisualization = new _VisualizationInitialData( visualizationName, sessions );
 
       const grade = {
-        text: `Students of "${cls.ref.name}"`,
+        text: `students of "${cls.ref.name}"`,
         subitems: [],
       };
 

@@ -18,7 +18,7 @@
               ul
                 li ETU-Driver service is not running
                 li ETU-Driver service is running, but its WebSocket server is not enabled
-            button.button.is-large.is-primary(@click="reload") Reload
+            //- button.button.is-large.is-primary(@click="reload") Reload
 
       .is-bottom-right
         a.button(:disabled="!isETUDConnected" @click="showETUDOptions")

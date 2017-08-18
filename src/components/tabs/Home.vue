@@ -35,15 +35,16 @@
             .panel-block(v-if="isStudent") Create visualizations from data of the tasks you completed
 
     footer.footer(v-if="!user")
-      .columns
+      .columns.is-32
         .column
           div TAUCHI, COMS, University of Tampere
+        .column.is-narrow
+          a.manual(href="https://uta-gasp.gitbooks.io/silko/") Manual
         .column
-          .browser-info Designed to run in
-          img.img.browser-logo(src="../../assets/img/chrome.png")
-          .browser-name Chrome 55+
-          img.img.browser-logo(src="../../assets/img/firefox.png")
-          .browser-name Firefox 47+
+          .browser-info Tested in
+          .is-inline-block
+            .browser-name.chrome Chrome 55+
+            .browser-name.firefox Firefox 47+
 
     modal-container(v-if="schools" title="Registration" @close="closeSelectionBox")
       .has-text-centered
@@ -222,25 +223,36 @@ export default {
     margin-top: 2em;
   }
 
+  .is-32 {
+    line-height: 32px;
+    vertical-align: middle;
+  }
+
   .browser-info {
     display: inline-block;
-    line-height: 8px;
-    height: 32px;
-    vertical-align: middle;
-    margin-right: 2em;
+    margin-right: 1em;
   }
 
   .browser-name {
-    .browser-info;
+    display: inline-block;
+    padding-left: 2em;
+    margin-right: 1em;
 
-    margin: 0;
-    padding-left: 0.25em;
+    &.chrome {
+      background: url("../../assets/img/chrome.png") no-repeat scroll left center;
+      background-size: contain;
+    }
+
+    &.firefox {
+      background: url("../../assets/img/firefox.png") no-repeat scroll left center;
+      background-size: contain;
+    }
   }
 
   .browser-logo {
     margin-left: 0.5em;
-    width: 32px;
-    height: 32px;
+    width: 16px;
+    height: 16px;
   }
 
   .footer {

@@ -141,8 +141,10 @@ export default {
   }
 
   .tip-header {
-    border-bottom: 1px dashed #444;
+    // border-bottom: 1px dashed #444;
     font-size: 0.9em;
+    margin-right: 0.5em;
+    text-decoration: black dotted;
   }
 
   .is-tip {

@@ -12,7 +12,7 @@
         loading
       table.table(v-else)
         thead
-          tr.is-subheader
+          tr.is-subheader(v-if="students && students.length")
             th Name
             th.is-narrow
               .has-text-centered Task

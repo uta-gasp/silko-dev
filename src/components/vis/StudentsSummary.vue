@@ -60,9 +60,9 @@ export default {
         { name: 'Sessions', sortDir: 0 },
         { name: 'Reading time', sortDir: 0 },
         { name: 'WPM', sortDir: 0 },
-        { name: 'Seconds per word', sortDir: 0 },
+        { name: 'SPW', sortDir: 0 },
         { name: 'Fixation, ms', sortDir: 0 },
-        { name: 'Hyphenations', sortDir: 0 },
+        { name: 'Syllabifications', sortDir: 0 },
         { name: 'Regressions', sortDir: 0 },
       ],
     };
@@ -86,7 +86,7 @@ export default {
 
     title() {
       const grade = this.data.params.grade;
-      return `${grade.studentCount} students from ${grade.name}`;
+      return `${grade.studentCount} ${grade.name}`;
     },
   },
 

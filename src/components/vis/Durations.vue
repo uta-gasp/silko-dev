@@ -23,12 +23,12 @@ import Options from '@/components/vis/Options';
 import VisTitle from '@/components/vis/VisTitle';
 
 const UNITS = {
-  MS: 'ms',
-  PERCENTAGE: '%',
+  SECONDS: 'seconds',
+  PERCENTAGE: 'percentage',
 };
 
 const UI = {
-  units: UNITS.MS,
+  units: UNITS.SECONDS,
 };
 
 export default {
@@ -110,7 +110,6 @@ export default {
       this.data.records.forEach( record => {
         record.data.pages[ this.pageIndex ].words.forEach( word => {
           totalDuration += this.appendWord( words, word );
-          ;
         } );
       } );
 
@@ -128,7 +127,7 @@ export default {
 
       let w = words.get( id );
       if ( !w ) {
-        w = Object.assign( {}, word );
+        w = Object.assign( {}, word, { focusing: { duration: word.focusing.duration } } );
         w.text = w.text.replace( hyphenRegExp, '' );
         words.set( id, w );
       }
@@ -144,7 +143,7 @@ export default {
 
       words.forEach( word => {
         let value = word.focusing.duration;
-        if ( UI.units === UNITS.MS ) {
+        if ( UI.units === UNITS.SECONDS ) {
           value = ( Math.round( value ) / 1000 ).toFixed( 2 );
         }
         else if ( UI.units === UNITS.PERCENTAGE ) {
