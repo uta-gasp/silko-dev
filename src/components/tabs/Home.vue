@@ -41,7 +41,7 @@
         .column.is-narrow
           a.manual(href="https://uta-gasp.gitbooks.io/silko/") Manual
         .column
-          .browser-info Tested in
+          .browser-info Tested with
           .is-inline-block
             .browser-name.chrome Chrome 55+
             .browser-name.firefox Firefox 47+

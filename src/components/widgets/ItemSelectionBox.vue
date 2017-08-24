@@ -7,14 +7,23 @@
     .subitems
       .has-text-centered(v-if="!isItemSelected()")
         i Select a {{ itemName }}
-      div(v-for="item in items" v-if="isItemSelected( item )")
-        .card.subitem(
-          :class="{ 'is-selected' : subitem.selected }"
-          v-if="hasSubitems( item )"
-          v-for="subitem in item.subitems"
-          :key="subitem.id")
-          .card-content.title.is-6(@click="selectSubitem( subitem, $event )") {{ subitem.text }}
-        .has-text-centered(v-if="!hasSubitems( item )")
+      div(v-if="currentItem")
+        //- .card.subitem(
+        //-   :class="{ 'is-selected' : subitem.selected }"
+        //-   v-if="hasSubitems( currentItem )"
+        //-   v-for="subitem in currentItem.subitems"
+        //-   :key="subitem.id")
+        //-   .card-content.title.is-6(@click="selectSubitem( subitem, $event )") {{ subitem.text }}
+        article.message.is-primary.group(v-for="(group, name) in groupedSubitems" v-if="group.length")
+          .message-header
+            p {{ name === '_' ? '' : name }}
+          .card.subitem(
+            :class="{ 'is-selected' : subitem.selected }"
+            v-if="hasSubitems( currentItem )"
+            v-for="(subitem, index) in group"
+            :key="subitem.id")
+            .card-content.title.is-6(@click="selectSubitem( subitem, index, $event )") {{ subitem.text }}
+        .has-text-centered(v-if="!hasSubitems( currentItem )")
           i No available {{ subitemName }}
     .field
       p.control
@@ -25,7 +34,7 @@
             .level-item
           .level-right
             .level-item
-              button.button(v-if="multiple" :disabled="!hasSubitems()" @click="selectAllSubitems") Select all
+              button.button(v-if="multiple && !singleGroup" :disabled="!hasSubitems()" @click="selectAllSubitems") Select all
             .level-item
               button.button(v-if="multiple" :disabled="!hasSubitems()" @click="removeAllSubitems") Remove all selections
 </template>
@@ -37,15 +46,21 @@ export default {
   data() {
     return {
       currentItem: null,
+      lastSelectionIndex: -1,
+      lastSelectionGroup: '',
     };
   },
 
   props: {
-    items: {     // [{ id, text, subitems: [{ id, text, selected=Boolean }] }]
+    items: {     // [{ id, text, subitems: [ /utils/SelectionBoxItem ] }]
       type: Array,
       required: true,
     },
     multiple: {
+      type: Boolean,
+      default: true,
+    },
+    singleGroup: {
       type: Boolean,
       default: true,
     },
@@ -62,6 +77,29 @@ export default {
   computed: {
     hasItemsSelected() {
       return this.items.some( item => item.subitems.some( subitem => subitem.selected ) );
+    },
+
+    groupedSubitems() {
+      if (!this.currentItem) {
+        return null;
+      }
+
+      const groups = { '_': [] };
+
+      this.currentItem.subitems.forEach( subitem => {
+        if ( !subitem.group ) {
+          groups[ '_' ].push( subitem );
+        }
+        else if ( !groups[ subitem.group ] ) {
+          groups[ subitem.group ] = [ subitem ];
+        }
+        else {
+          groups[ subitem.group ].push( subitem );
+        }
+
+      });
+
+      return groups;
     },
   },
 
@@ -86,18 +124,21 @@ export default {
     selectMultipleSubitems( subitem, event ) {
       if ( event.shiftKey ) {
         const index = this.currentItem.subitems.indexOf( subitem );
-        for ( let i = index - 1; i >= 0; i-- ) {
-          const subitem = this.currentItem.subitems[i];
-          if ( subitem.selected ) {
+        const delta = this.lastSelectionIndex < index ? -1 : 1;
+        const edge = this.lastSelectionIndex < index ? -1 : this.currentItem.subitems.length;
+
+        for ( let i = index + delta; i !== edge; i += delta ) {
+          const si = this.currentItem.subitems[i];
+          if ( si.selected ) {
             break;
           }
 
-          subitem.selected = true;
+          si.selected = this.singleGroup ? si.group === subitem.group : true;
         }
       }
     },
 
-    selectSubitem( subitem, e ) {
+    selectSubitem( subitem, index, e ) {
       if ( !this.multiple ) {
         this.items.forEach( item => {
           item.subitems.forEach( subitem => {
@@ -109,8 +150,24 @@ export default {
       subitem.selected = !subitem.selected;
 
       if ( this.multiple && subitem.selected ) {
+        if (this.singleGroup && this.currentItem) {
+          const group = subitem.group;
+          this.currentItem.subitems.forEach( subitem => {
+            if (subitem.group !== group) {
+              subitem.selected = false;
+            }
+          } );
+
+          if (this.lastSelectionGroup !== subitem.group) {
+            this.lastSelectionIndex = -1;
+          }
+        }
+
         this.selectMultipleSubitems( subitem, e );
       }
+
+      this.lastSelectionIndex = index;
+      this.lastSelectionGroup = subitem.group;
     },
 
     selectAllSubitems( e ) {
@@ -190,5 +247,9 @@ export default {
 
   .level:not(:last-child) {
     margin-bottom: 0;
+  }
+
+  .group {
+    margin-bottom: 0.5em;
   }
 </style>

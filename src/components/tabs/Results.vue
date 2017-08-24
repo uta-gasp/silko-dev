@@ -59,13 +59,23 @@
       v-if="gradeWithStudents"
       :title="gradeWithStudents[0].text"
       @close="closeStudentSelectionBox")
-      item-selection-box(:items="gradeWithStudents" item-name="grade" subitem-name="student" @accept="continueDeferredWithStudents")
+      item-selection-box(
+        :items="gradeWithStudents"
+        item-name="grade"
+        subitem-name="student"
+        @accept="continueDeferredWithStudents")
 
     modal-container(
       v-if="studentWithSessions"
       :title="studentWithSessions[0].text"
       @close="closeSessionSelectionBox")
-      item-selection-box(:multiple="!isGazePlot" :items="studentWithSessions" item-name="student" subitem-name="session" @accept="continueDeferredWithSessions")
+      item-selection-box(
+        :multiple="!isGazePlot"
+        :single-group="!isGazePlot"
+        :items="studentWithSessions"
+        item-name="student"
+        subitem-name="session"
+        @accept="continueDeferredWithSessions")
 
     modal-container(
       v-if="editingStudent"
@@ -90,6 +100,8 @@
 <script>
 import eventBus from '@/utils/event-bus.js';
 import dataUtils from '@/utils/data-utils.js';
+
+import SelectionBoxItem from '@/utils/selectionBoxItem.js';
 
 import Teacher from '@/model/teacher.js';
 import Student from '@/model/student.js';
@@ -258,11 +270,11 @@ export default {
       };
 
       task.students.forEach( student => {
-        grade.subitems.push( {
+        grade.subitems.push( new SelectionBoxItem( {
           id: student.ref.id,
           text: student.ref.name,
           selected: true,
-        } );
+        } ) );
       } );
 
       this.gradeWithStudents = [ grade ];
@@ -282,11 +294,11 @@ export default {
       };
 
       cls.students.forEach( student => {
-        grade.subitems.push( {
+        grade.subitems.push( new SelectionBoxItem( {
           id: student.ref.id,
           text: student.ref.name,
           selected: true,
-        } );
+        } ) );
       } );
 
       this.gradeWithStudents = [ grade ];
@@ -308,11 +320,12 @@ export default {
       };
 
       student.sessions.forEach( session => {
-        studentWithSessions.subitems.push( {
+        studentWithSessions.subitems.push( new SelectionBoxItem( {
           id: session.ref.id,
-          text: `${session.task.name} at ${dataUtils.sessionDate( session.ref.date )}`,
+          text: `${dataUtils.sessionDate( session.ref.date )}`,
           selected: false,
-        } );
+          group: session.task.name,
+        } ) );
       } );
 
       this.studentWithSessions = [ studentWithSessions ];
