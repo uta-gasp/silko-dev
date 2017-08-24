@@ -14,15 +14,16 @@
         //-   v-for="subitem in currentItem.subitems"
         //-   :key="subitem.id")
         //-   .card-content.title.is-6(@click="selectSubitem( subitem, $event )") {{ subitem.text }}
-        article.message.is-primary.group(v-for="(group, name) in groupedSubitems" v-if="group.length")
-          .message-header
-            p {{ name === '_' ? '' : name }}
-          .card.subitem(
-            :class="{ 'is-selected' : subitem.selected }"
-            v-if="hasSubitems( currentItem )"
-            v-for="(subitem, index) in group"
-            :key="subitem.id")
-            .card-content.title.is-6(@click="selectSubitem( subitem, index, $event )") {{ subitem.text }}
+        article.message.is-primary.group(v-for="(group, name) in groups" v-if="group.items.length")
+          .message-header(v-if="name !== '_'" @click="toggleItemsVisibility( group )")
+            p {{ name }}
+          .message-body.is-paddingless
+            .card.subitem(
+              v-show="isGroupVisible( group )"
+              :class="{ 'is-selected' : subitem.selected }"
+              v-for="(subitem, index) in group.items"
+              :key="subitem.id")
+              .card-content.title.is-6(@click="selectSubitem( subitem, index, $event )") {{ subitem.text }}
         .has-text-centered(v-if="!hasSubitems( currentItem )")
           i No available {{ subitemName }}
     .field
@@ -46,6 +47,8 @@ export default {
   data() {
     return {
       currentItem: null,
+      groups: null,
+
       lastSelectionIndex: -1,
       lastSelectionGroup: '',
     };
@@ -78,34 +81,34 @@ export default {
     hasItemsSelected() {
       return this.items.some( item => item.subitems.some( subitem => subitem.selected ) );
     },
+  },
 
+  methods: {
     groupedSubitems() {
       if (!this.currentItem) {
         return null;
       }
 
-      const groups = { '_': [] };
+      const groups = { '_': { items: [], hidden: false } };
 
       this.currentItem.subitems.forEach( subitem => {
         if ( !subitem.group ) {
-          groups[ '_' ].push( subitem );
+          groups[ '_' ].items.push( subitem );
         }
         else if ( !groups[ subitem.group ] ) {
-          groups[ subitem.group ] = [ subitem ];
+          groups[ subitem.group ] = { items: [ subitem ], hidden: false };
         }
         else {
-          groups[ subitem.group ].push( subitem );
+          groups[ subitem.group ].items.push( subitem );
         }
-
       });
 
       return groups;
     },
-  },
 
-  methods: {
     selectItem( item, e ) {
       this.currentItem = item;
+      this.groups = this.groupedSubitems();
     },
 
     isItemSelected( item ) {
@@ -119,6 +122,15 @@ export default {
     hasSubitems( item ) {
       item = item || this.currentItem;
       return item && item.subitems ? !!item.subitems.length : false;
+    },
+
+    isGroupVisible( group ) {
+      return !group.hidden;
+    },
+
+    toggleItemsVisibility( group, e ) {
+      console.log( group.hidden, '>', !group.hidden );
+      group.hidden = !group.hidden;
     },
 
     selectMultipleSubitems( subitem, event ) {
@@ -251,5 +263,19 @@ export default {
 
   .group {
     margin-bottom: 0.5em;
+  }
+
+  .message {
+    background-color: transparent;
+  }
+
+  .message-header {
+    cursor: pointer;
+  }
+
+  .message-header + .message-body {
+    margin-left: 1em;
+    border-left: none;
+    border-bottom: none;
   }
 </style>
