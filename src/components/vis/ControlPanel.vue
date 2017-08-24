@@ -4,7 +4,8 @@
 
     .props(v-if="feedback")
       abbr.prop.speech(:class="{ off: !feedback.speech.enabled }" title="Speech output")
-      abbr.prop.syllab(:class="{ off: !feedback.syllabification.enabled }" title="Syllabification") {{ feedback.syllabification.threshold.value }}
+      abbr.prop.syllab(:class="{ off: !feedback.syllabification.enabled }" title="Syllabification")
+        span(v-if="feedback.syllabification.enabled") {{ feedback.syllabification.threshold.value }}
 
     .props(v-if="questionnaire && questionnaire.length")
       abbr.prop.questionnaire(title="Questionnaire corectness") {{ correctAnswers }}
@@ -82,20 +83,24 @@ export default {
 
   computed: {
     dispPage() {
-      return !this.pageIndex ? 'int' : `${this.pageIndex}/${this.textLength - 1}`;
+      const hasIntroPage = this.initialPageIndex > 0;
+      const introPageIndex = hasIntroPage ? 0 : -1;
+      const textPageCount = hasIntroPage ? this.textLength - 1 : this.textLength;
+      const delta = hasIntroPage ? 0 : 1;
+      return this.pageIndex === introPageIndex ? 'int' : `${this.pageIndex + delta}/${textPageCount}`;
     },
 
     correctAnswers() {
-      if (!this.questionnaire || !this.questionnaire.length) {
+      if ( !this.questionnaire || !this.questionnaire.length ) {
         return '-';
       }
 
       const correct = this.questionnaire.filter( question => {
-        console.log(question.answer.isCorrect)
+        console.log( question.answer.isCorrect );
         return question.answer.isCorrect;
       } ).length / this.questionnaire.length * 100;
       return correct.toFixed( 0 ) + '%';
-    }
+    },
   },
 
   methods: {

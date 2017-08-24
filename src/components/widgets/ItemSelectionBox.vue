@@ -85,7 +85,7 @@ export default {
 
   methods: {
     groupedSubitems() {
-      if (!this.currentItem) {
+      if ( !this.currentItem ) {
         return null;
       }
 
@@ -101,7 +101,7 @@ export default {
         else {
           groups[ subitem.group ].items.push( subitem );
         }
-      });
+      } );
 
       return groups;
     },
@@ -129,7 +129,6 @@ export default {
     },
 
     toggleItemsVisibility( group, e ) {
-      console.log( group.hidden, '>', !group.hidden );
       group.hidden = !group.hidden;
     },
 
@@ -162,15 +161,15 @@ export default {
       subitem.selected = !subitem.selected;
 
       if ( this.multiple && subitem.selected ) {
-        if (this.singleGroup && this.currentItem) {
+        if ( this.singleGroup && this.currentItem ) {
           const group = subitem.group;
           this.currentItem.subitems.forEach( subitem => {
-            if (subitem.group !== group) {
+            if ( subitem.group !== group ) {
               subitem.selected = false;
             }
           } );
 
-          if (this.lastSelectionGroup !== subitem.group) {
+          if ( this.lastSelectionGroup !== subitem.group ) {
             this.lastSelectionIndex = -1;
           }
         }

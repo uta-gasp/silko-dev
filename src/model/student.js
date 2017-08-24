@@ -144,7 +144,7 @@ export default class Student {
 
       Promise.all( promises ).then( values => {
         const arr = [];
-        result.forEach( (obj, session) => {
+        result.forEach( ( obj, session ) => {
           obj.session = session;
           arr.push( obj );
         } );

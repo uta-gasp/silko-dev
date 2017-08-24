@@ -23,15 +23,13 @@ const STYLE_NAMES = [   // must correspond to the styles in TaskText.vue
 export default class TextPresenter {
 
   constructor( task, firstPage, container, syllabifier ) {
-    // this.task = task;
-    // this.firstPage = firstPage;
     this.container = container;
     this.syllabifier = syllabifier;
 
     this.pages = task.pages;
-    this.hasInstructionPage = !!firstPage;
+    this.hasInstructionPage = !!( firstPage && firstPage.length );
 
-    if ( firstPage ) {
+    if ( this.hasInstructionPage ) {
       this.pages.unshift( firstPage );
     }
 

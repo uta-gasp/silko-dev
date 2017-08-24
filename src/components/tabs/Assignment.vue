@@ -7,7 +7,6 @@
     start-page(
       :texts="introTexts"
       :task="task"
-      :intro="intro.firstPage"
       :student="student"
       v-if="intro"
       v-show="state === STATES.start"
@@ -106,8 +105,6 @@ export default {
             }
 
             this.intro = intro;
-
-            // this.$refs.fullscreen.mozRequestFullScreen();
           } );
         } );
       }

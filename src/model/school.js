@@ -2,8 +2,8 @@ import Recordable from './commons/recordable.js';
 
 import Teacher from './teacher.js';
 import Student from './student.js';
-import Session from './session.js';
-import Data from './data.js';
+// import Session from './session.js';
+// import Data from './data.js';
 import Class from './class.js';
 
 import db from '@/db/db.js';
@@ -116,15 +116,15 @@ export default class School {
 
       db.updateField( student, 'deleted', true );  // TODO ignore errors?
 
-      if (student.assignments) {
+      if ( student.assignments ) {
         student.assignments = {};
         db.updateField( student, 'assignments', {} );  // TODO ignore errors?
       }
 
-      if (student.classes) {
+      if ( student.classes ) {
         const promises = [];
         Object.keys( student.classes ).map( id => {
-          promises.push( Class.get( id, (err, cls) => {
+          promises.push( Class.get( id, ( err, cls ) => {
             delete cls.students[ student.id ];
             db.updateField( cls, 'students', cls.students );  // TODO ignore errors?
           } ) );
@@ -137,9 +137,9 @@ export default class School {
           cb( null );
         } ).catch( err => {
           cb( err );
-        });
+        } );
       }
-  } );
+    } );
 
     // Removes the student from /students, /users, all student sessions and related session data
 

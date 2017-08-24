@@ -58,7 +58,7 @@ export default {
 
     next( e ) {
       let wordReadingDuration;
-      if ( this.textPresenter.page === 0 && this.texts.firstPage ) {
+      if ( this.textPresenter.page === 0 && this.texts.firstPage && this.texts.firstPage.length ) {
         wordReadingDuration = this.collector.wordReadingDuration;
       }
 

@@ -68,7 +68,7 @@ export default {
 
   computed: {
     title() {
-      return `${this.record.student.name} reading "${this.record.task.name}" at ${dataUtils.sessionDate(this.record.session.date)}`;
+      return `${this.record.student.name} reading "${this.record.task.name}" at ${dataUtils.sessionDate( this.record.session.date )}`;
     },
   },
 
