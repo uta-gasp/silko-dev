@@ -165,14 +165,10 @@ export default {
 </script>
 
 <style lang="less" scoped>
+  @import "../../styles/visualization.less";
+
   #vis-durations {
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 100;
-    background-color: white;
+    .visualization();
 
     .list {
       margin: 48px auto 0;

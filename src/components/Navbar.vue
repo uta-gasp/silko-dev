@@ -87,6 +87,10 @@ export default {
 </script>
 
 <style lang="less" scoped>
+  .nav {
+    z-index: 2;
+  }
+
   .nav-item > i {
     margin-right: 8px;
   }
