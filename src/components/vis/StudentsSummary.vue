@@ -305,8 +305,8 @@ export default {
     .container {
       position: fixed;
       left: 0;
-      top: 48px;
       right: 0;
+      top: 52px;
       bottom: 8px;
       max-width: 100vw;
 

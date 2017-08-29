@@ -80,11 +80,12 @@
       "^.+\\.js$": "<rootDir>/node_modules/babel-jest",
       ".*\\.(vue)$": "<rootDir>/node_modules/jest-vue-preprocessor"
     },
-    "testMatch": [
-      "**/__tests__/**/*.test.js"
-    ],
-    "modulePaths": [
-      "<rootDir>/src/components"
+    "testPathIgnorePatterns": [
+      "<rootDir>/node_modules/",
+      "<rootDir>/test/",
+      "<rootDir>/dist/",
+      "<rootDir>/build/",
+      "<rootDir>/config/"
     ]
   }
 }

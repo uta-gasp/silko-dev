@@ -115,11 +115,14 @@ export default class DataCollector {
     this.pages.add();
   }
 
-  get longGazedWords() {
+  longGazedWords( threshold ) {
     const result = [];
+    const re = /\b([\w$%&]+\S*\b)/;
     this.pages.items.forEach( page => {
-      page.data.syllabifications.forEach( syllabification => {
-        result.push( syllabification.text );
+      page.words.forEach( word => {
+        if (word.focusing.duration >= threshold) {
+          result.push( re.exec( word.text )[0] );
+        }
       } );
     } );
 

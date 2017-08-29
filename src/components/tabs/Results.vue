@@ -17,6 +17,7 @@
                   th
                   th
                   th
+                  th
               tbody
                 tr(v-for="task in cls.tasks" :key="task.id")
                   td {{ task.name }}
@@ -26,6 +27,8 @@
                     button.button.is-primary(:disabled="!isLoaded" @click="selectTaskStudents( task, VISUALIZATIONS.gazeReplay )") Gaze replay
                   td.is-narrow
                     button.button.is-primary(:disabled="!isLoaded" @click="selectTaskStudents( task, VISUALIZATIONS.wordReplay )") Word replay
+                  td.is-narrow
+                    button.button.is-primary(:disabled="!isLoaded" @click="selectTaskStudents( task, VISUALIZATIONS.questionnaireResults )") Questionnaire
 
             .container(v-if="cls.students === null")
               loading
@@ -91,6 +94,8 @@
 
     word-replay(v-if="isShowing( VISUALIZATIONS.wordReplay )" :data="visualization" @close="closeVisualization")
 
+    questionnaire-results(v-if="isShowing( VISUALIZATIONS.questionnaireResults )" :data="visualization" @close="closeVisualization")
+
     students-summary(v-if="isShowing( VISUALIZATIONS.studentsSummary )" :data="visualization" @close="closeVisualization")
 
     temporal-notification(type="danger" :show="showError")
@@ -125,6 +130,7 @@ import Durations from '@/components/vis/Durations';
 import GazeReplay from '@/components/vis/GazeReplay';
 import WordReplay from '@/components/vis/WordReplay';
 import StudentsSummary from '@/components/vis/StudentsSummary';
+import QuestionnaireResults from '@/components/vis/QuestionnaireResults';
 
 class _VisualizationInitialData {
 
@@ -149,6 +155,7 @@ export default {
     'gaze-replay': GazeReplay,
     'word-replay': WordReplay,
     'students-summary': StudentsSummary,
+    'questionnaire-results': QuestionnaireResults,
   },
 
   mixins: [ ActionError ],
@@ -175,6 +182,7 @@ export default {
         gazeReplay: 'GazeReplay',
         wordReplay: 'WordReplay',
         studentsSummary: 'StudentsSummary',
+        questionnaireResults: 'QuestionnaireResults',
       },
     };
   },

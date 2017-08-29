@@ -59,12 +59,7 @@ export default {
       type: '',
       word: '',
       question: '',
-      answers: [
-        { text: '', isCorrect: true },
-        { text: '', isCorrect: false },
-        { text: '', isCorrect: false },
-        { text: '', isCorrect: false },
-      ],
+      answers: [],
 
       questions: this.task ? Array.from( this.task.questionnaire ) : [],
 
@@ -104,6 +99,10 @@ export default {
       return question.answers.map( answer => answer.text ).join( ', ' );
     },
 
+    getEmptyAnswers() {
+      return ['','','',''].map( (_, index) => ({ text: '', isCorrect: index === 0 }) );
+    },
+
     add( e ) {
       this.questions.push( new Question(
         this.type.name,
@@ -111,6 +110,10 @@ export default {
         this.question,
         this.answers,
       ) );
+
+      this.word = '';
+      this.question = '';
+      this.answers = this.getEmptyAnswers();
     },
 
     remove( question ) {
@@ -118,7 +121,6 @@ export default {
     },
 
     selectCorrect( answer ) {
-      console.log( 'reverse' );
       this.answers.forEach( answer => { answer.isCorrect = false; } );
       answer.isCorrect = true;
     },
@@ -126,6 +128,7 @@ export default {
 
   created() {
     this.type = this.types.text;
+    this.answers = this.getEmptyAnswers();
   },
 };
 </script>

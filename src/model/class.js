@@ -11,8 +11,8 @@ export default class Class {
     this.id = id;
     this.name = name;
     this.owner = owner;
-    this.tasks = {};
-    this.students = {};     // arrays of ids of Student
+    this.tasks = {};        // id: name
+    this.students = {};     // id: name
   }
 
   static get db() {

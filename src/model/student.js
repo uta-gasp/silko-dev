@@ -191,7 +191,7 @@ export default class Student {
       return cb( new Error( 'Session does not exist' ) );
     }
 
-    delete this.sessions;
+    delete this.sessions[ id ];
 
     db.deleteField( this, `sessions/${id}`, err => {
       if ( err ) {

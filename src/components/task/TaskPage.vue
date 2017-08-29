@@ -70,7 +70,7 @@ export default {
     },
 
     finish( e ) {
-      this.$emit( 'finished', { longGazedWords: this.collector.longGazedWords } );
+      this.$emit( 'finished', { longGazedWords: this.collector.longGazedWords( this.task.syllab.threshold.value ) } );
       this.collector.stop( ( err, keys ) => {
         this.$emit( 'saved', { err, keys } );
       } );

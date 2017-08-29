@@ -19,7 +19,7 @@
                   .card-header-icon
                     span.icon(v-if="assignment.task.syllab.language" title="Syllabification")
                       i.fa.fa-ellipsis-h
-                    span.icon(v-if="assignment.task.speech" title="Voice")
+                    span.icon(v-if="assignment.task.speech.language" title="Voice")
                       i.fa.fa-headphones
                 .card-content
                   .content {{ assignment.task.name }}
