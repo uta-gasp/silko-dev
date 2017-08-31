@@ -64,7 +64,6 @@ export default {
 
     syllabifyAll( e ) {
       this.textPresenter.words.forEach( ( text, el ) => {
-        // console.log('--', text)
         this.feedbackProvider.syllabifier.syllabifyElementText( el, text );
       } );
     },

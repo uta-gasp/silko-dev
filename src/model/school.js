@@ -109,16 +109,19 @@ export default class School {
   deleteStudent( student, cb ) {
     delete this.students[ student.id ];
 
+    // TODO is just logging error enough?
+    const errorHandler = err => { console.log( '@/model/school.js/.deleteStudent db.updateField', err ); };
+
     return db.updateField( this, 'students', this.students, err => {
       if ( err ) {
         return cb( err );
       }
 
-      db.updateField( student, 'deleted', true );  // TODO ignore errors?
+      db.updateField( student, 'deleted', true, errorHandler );
 
       if ( student.assignments ) {
         student.assignments = {};
-        db.updateField( student, 'assignments', {} );  // TODO ignore errors?
+        db.updateField( student, 'assignments', {}, errorHandler );
       }
 
       if ( student.classes ) {
@@ -126,12 +129,12 @@ export default class School {
         Object.keys( student.classes ).map( id => {
           promises.push( Class.get( id, ( err, cls ) => {
             delete cls.students[ student.id ];
-            db.updateField( cls, 'students', cls.students );  // TODO ignore errors?
+            db.updateField( cls, 'students', cls.students, errorHandler );
           } ) );
         } );
 
         student.classes = {};
-        db.updateField( student, 'classes', {} );  // TODO ignore errors?
+        db.updateField( student, 'classes', {}, errorHandler );
 
         Promise.all( promises ).then( () => {
           cb( null );

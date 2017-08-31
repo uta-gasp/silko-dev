@@ -120,7 +120,7 @@ export default class DataCollector {
     const re = /\b([\w$%&]+\S*\b)/;
     this.pages.items.forEach( page => {
       page.words.forEach( word => {
-        if (word.focusing.duration >= threshold) {
+        if ( word.focusing.duration >= threshold ) {
           result.push( re.exec( word.text )[0] );
         }
       } );

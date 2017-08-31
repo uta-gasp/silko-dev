@@ -35,6 +35,10 @@ export default class Task {
     return 'tasks';
   }
 
+  static get( id, cb ) {
+    return db.get( Task, id, cb );
+  }
+
   static get wordSyllabSeparator() {
     return '=';
   }

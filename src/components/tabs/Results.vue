@@ -28,7 +28,8 @@
                   td.is-narrow
                     button.button.is-primary(:disabled="!isLoaded" @click="selectTaskStudents( task, VISUALIZATIONS.wordReplay )") Word replay
                   td.is-narrow
-                    button.button.is-primary(:disabled="!isLoaded" @click="selectTaskStudents( task, VISUALIZATIONS.questionnaireResults )") Questionnaire
+                    span(v-if="task.hasQuestionnaire")
+                      button.button.is-primary(:disabled="!isLoaded" @click="selectTaskStudents( task, VISUALIZATIONS.questionnaireResults )") Questionnaire
 
             .container(v-if="cls.students === null")
               loading

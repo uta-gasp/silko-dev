@@ -64,7 +64,7 @@ export default class Student {
     const onDone = err => {
       if ( err ) {
         this.assignments[ cls ] = prevAssignment;
-        return console.log( 'Stiudent.setAssignment', err );
+        return console.log( '@/model/student.js/.setAssignment', err );
       }
 
       cb( err );
@@ -94,7 +94,7 @@ export default class Student {
       tasks.forEach( task => {
         promises.push( db.get( Class, task.cls, ( err, cls ) => {
           if ( err ) {
-            return console.log( 'TODO db.get Class', err );
+            return console.log( '@/model/student.js/.loadAssignments db.get Class', err ); // TODO is just logging error enough?
           }
           result.push( { cls, task } );
         } ) );
@@ -130,13 +130,13 @@ export default class Student {
       sessions.forEach( session => {
         promises.push( db.get( Class, session.cls, ( err, cls ) => {
           if ( err ) {
-            return console.log( 'TODO db.get Class', err );
+            return console.log( '@/model/student.js/.loadSessions db.get Class', err ); // TODO is just logging error enough?
           }
           result.get( session ).cls = cls;
         } ) );
         promises.push( db.get( Task, session.task, ( err, task ) => {
           if ( err ) {
-            return console.log( 'TODO db.get Task', err );
+            return console.log( '@/model/student.js/.loadSessions db.get Task', err ); // TODO is just logging error enough?
           }
           result.get( session ).task = task;
         } ) );

@@ -96,7 +96,6 @@ export default {
       }
 
       const correct = this.questionnaire.filter( question => {
-        console.log( question.answer.isCorrect );
         return question.answer.isCorrect;
       } ).length / this.questionnaire.length * 100;
       return correct.toFixed( 0 ) + '%';

@@ -25,7 +25,7 @@ class DB {
       firebase.apps[0].delete().then( () => {
         this._init( firebase.initializeApp( config ) );
       } ).catch( err => {
-        console.log( 'DB', err );
+        console.log( '@/db/db.js/.ctor firebase.App.delete', err );
       } );
     }
   }
@@ -304,7 +304,7 @@ class DB {
         } );
       }
     }, err => {
-      console.log( 'TODO handle', err );
+      console.log( '@/db/db.js/.deleteUser firebase.Query.once', err );  // TODO is just logging error enough?
     } );
   }
 
@@ -316,7 +316,7 @@ class DB {
         return setTimeout( () => {
           this.auth.signInWithEmailAndPassword( this.user.email, this.currentPassword ).catch( err => {
             if ( err ) {
-              console.dir( 'TODO handle error', err );
+              console.log( '@/db/db.js/._onUserChanged firebase.Auth.signInWithEmailAndPassword', err );  // TODO is just logging error enough?
             }
             this.logOut();
           } );

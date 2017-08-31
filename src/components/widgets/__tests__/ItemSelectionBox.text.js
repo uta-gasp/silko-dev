@@ -14,7 +14,7 @@ describe( 'Test suite for ItemSelectionBox', () => {
       },
     } ).$mount();
 
-    console.dir(NewComponent);
+    console.dir( NewComponent );
     renderer.renderToString( NewComponent, ( err, str ) => {
       const dom = new jsdom.JSDOM( str );
       const selectButton = dom.window.document.querySelector( '.level-left button' );

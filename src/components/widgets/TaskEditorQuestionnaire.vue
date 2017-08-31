@@ -100,7 +100,7 @@ export default {
     },
 
     getEmptyAnswers() {
-      return ['','','',''].map( (_, index) => ({ text: '', isCorrect: index === 0 }) );
+      return ['', '', '', ''].map( ( _, index ) => ( { text: '', isCorrect: index === 0 } ) );
     },
 
     add( e ) {

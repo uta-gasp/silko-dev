@@ -75,11 +75,11 @@ export default {
 
   filters: {
     name( id ) {
-      return id.split(',')[0];
+      return id.split( ',' )[0];
     },
 
     date( id ) {
-      return id.split(',')[1];
+      return id.split( ',' )[1];
     },
   },
 
@@ -89,11 +89,11 @@ export default {
     },
 
     getAnswerClass( answers, question ) {
-      if (answers[ question ] ) {
+      if ( answers[ question ] ) {
         const isCorrect = answers[ question ].isCorrect;
         return {
           isCorrect: isCorrect,
-          isIncorrect: !isCorrect
+          isIncorrect: !isCorrect,
         };
       }
       else {
@@ -102,7 +102,7 @@ export default {
     },
 
     getAnswerText( answers, question ) {
-      if (answers[ question ] ) {
+      if ( answers[ question ] ) {
         return answers[ question ].text;
       }
       else {
@@ -113,8 +113,8 @@ export default {
     getTotal( answers ) {
       let correct = 0;
       let total = 0;
-      for (let question in answers) {
-        if (!answers[ question ]) {
+      for ( let question in answers ) {
+        if ( !answers[ question ] ) {
           return;
         }
 
@@ -122,7 +122,7 @@ export default {
         correct += answers[ question ].isCorrect ? 1 : 0;
       }
 
-      return (correct / total * 100).toFixed( 1 );
+      return ( correct / total * 100 ).toFixed( 1 );
     },
 
     getRecordName( record ) {
@@ -134,7 +134,7 @@ export default {
       const _questions = new Set();
 
       this.data.records.forEach( record => {
-        if (!record.data.questionnaire) {
+        if ( !record.data.questionnaire ) {
           return;
         }
 
@@ -144,13 +144,13 @@ export default {
         record.data.questionnaire.forEach( question => {
           _questions.add( question.question );
           answers[ question.question ] = question.answer;
-        });
+        } );
 
         sessions[ id ] = answers;
-      });
+      } );
 
       const questions = [];
-      for (let q of _questions) {
+      for ( let q of _questions ) {
         questions.push( q );
       }
 
@@ -255,4 +255,3 @@ export default {
     }
   }
 </style>
-
