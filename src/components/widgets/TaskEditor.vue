@@ -87,6 +87,10 @@ export default {
       required: true,
       default: () => { return {}; },
     },
+    source: {
+      type: Object,
+      default: null,
+    },
     intros: {
       type: Array,
       required: true,
@@ -180,6 +184,9 @@ export default {
 
   created() {
     this.currentTab = this.tabs.text;
+    if (!this.task && this.source) {
+      this.task = this.source;
+    }
   },
 };
 </script>

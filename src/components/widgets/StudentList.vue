@@ -26,7 +26,7 @@
                   option(value="") none
                   option(v-for="task in tasks" :value="task.id" :key="parent.id+student.id+task.id") {{ task.name }}
             td.is-narrow
-              button.button.is-danger(@click="remove( student )")
+              button.button.is-danger(title="Remove the student from this class" @click="remove( student )")
                 i.fa.fa-remove
 
     modal-container(v-if="isEditing" title="Available students" @close="closeEditor")

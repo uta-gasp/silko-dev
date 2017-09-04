@@ -35,7 +35,7 @@
                 student-list(:cls="item" :teacher="teacher" :refresh="refreshStudents")
               td.is-narrow
                 .is-pulled-right
-                  button.button.is-danger(@click="removeClass( item )")
+                  button.button.is-danger(title="Delete the class" @click="removeClass( item )")
                     i.fa.fa-remove
 
     remove-warning(v-if="toDelete" object="class" :name="toDeleteName" @close="removeWarningClosed")

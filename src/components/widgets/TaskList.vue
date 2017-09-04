@@ -6,7 +6,7 @@
           .level-item {{ displayCount( tasks, 'task' ) }}
         .level-right
           .level-item
-            button.button.is-primary(@click="openNewTextBox") Add
+            button.button.is-primary(@click="openNewTextBox") Create new
     .panel-block.is-paddingless
       .container(v-if="tasks === null")
         loading
@@ -17,13 +17,15 @@
               span.is-inline-block {{ task.name }}
               span.is-inline-block(v-if="!!task.pages") &nbsp;({{ task.pages.length }} pages)
             td.is-narrow
-              button.button.is-light(@click="edit( task )")
+              button.button.is-light(title="Edit the task" @click="edit( task )")
                 i.fa.fa-edit
-              button.button.is-danger(@click="remove( task )")
+              button.button.is-light(title="Create a new task from the existing" @click="copy( task )")
+                i.fa.fa-copy
+              button.button.is-danger(title="Delete the task" @click="remove( task )")
                 i.fa.fa-remove
 
     modal-container(v-if="isEditing" :title="taskEditorTitle" @close="closeEditor")
-      task-editor(:action="action" :task="toEdit" :intros="intros" @save="save")
+      task-editor(:action="action" :task="toEdit" :source="toCopy" :intros="intros" @save="save")
 
     remove-warning(v-if="toDelete" object="task" :name="toDeleteName" @close="removeWarningClosed")
 
@@ -62,6 +64,7 @@ export default {
       tasks: null,
 
       toEdit: null,
+      toCopy: null,
       isCreating: false,
       toDelete: null,
     };
@@ -89,7 +92,7 @@ export default {
     },
 
     action() {
-      if ( this.isCreating ) {
+      if ( this.isCreating) {
         return 'Create';
       }
       else if ( this.toEdit ) {
@@ -133,6 +136,11 @@ export default {
       this.toEdit = task;
     },
 
+    copy( task, e ) {
+      this.toCopy = task;
+      this.isCreating = true;
+    },
+
     save( e ) {
       const task = e;
       if ( this.toEdit ) {
@@ -161,6 +169,7 @@ export default {
 
     closeEditor( e ) {
       this.toEdit = null;
+      this.toCopy = null;
       this.isCreating = false;
     },
 
