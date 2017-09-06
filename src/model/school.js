@@ -110,7 +110,7 @@ export default class School {
     delete this.students[ student.id ];
 
     // TODO is just logging error enough?
-    const errorHandler = err => { console.log( '@/model/school.js/.deleteStudent db.updateField', err ); };
+    const errorHandler = err => { if ( err ) console.log( '@/model/school.js/.deleteStudent db.updateField', err ); };
 
     return db.updateField( this, 'students', this.students, err => {
       if ( err ) {
@@ -128,6 +128,10 @@ export default class School {
         const promises = [];
         Object.keys( student.classes ).map( id => {
           promises.push( Class.get( id, ( err, cls ) => {
+            if ( err ) {
+              return;
+            }
+
             delete cls.students[ student.id ];
             db.updateField( cls, 'students', cls.students, errorHandler );
           } ) );

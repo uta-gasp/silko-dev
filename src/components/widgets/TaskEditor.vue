@@ -7,16 +7,16 @@
 
     .field
       task-editor-text(v-show="currentTab === tabs.text"
-        :task="task"
+        :task="ref"
         :intros="intros"
         @input="setTextInput")
 
       task-editor-feedback(v-show="currentTab === tabs.feedback"
-        :task="task"
+        :task="ref"
         @input="setFeedbackInput")
 
       task-editor-questionnaire(v-show="currentTab === tabs.questionnaire"
-        :task="task"
+        :task="ref"
         @input="setQuestionnaireInput")
 
     p.control.bottom-panel
@@ -51,15 +51,17 @@ export default {
 
   data() {
     return {
-      name: this.task ? this.task.name : '',
-      text: this.task ? Task.pagesToText( this.task.pages ) : '',
-      intro: this.task ? this.task.intro : '',
+      ref: this.task || this.source,
 
-      syllab: this.task ? this.task.syllab : Task.defaultSyllab,
-      speech: this.task ? this.task.speech : Task.defaultSpeech,
-      syllabExceptions: this.task ? Task.syllabsToText( this.task.syllab.exceptions ) : '',
+      name: '',
+      text: '',
+      intro: '',
 
-      questionnaire: this.task ? this.task.questionnaire : [],
+      syllab: Task.defaultSyllab,
+      speech: Task.defaultSpeech,
+      syllabExceptions: '',
+
+      questionnaire: [],
 
       inPreview: false,
 
@@ -85,7 +87,7 @@ export default {
     },
     task: {
       required: true,
-      default: () => { return {}; },
+      default: null,
     },
     source: {
       type: Object,
@@ -99,10 +101,6 @@ export default {
   },
 
   computed: {
-
-    isNewTask() {
-      return !this.task;
-    },
 
     isNameValid() {
       return this.name.length > 1;
@@ -133,6 +131,20 @@ export default {
   },
 
   methods: {
+
+    init() {
+      if ( this.ref ) {
+        this.name = this.ref.name;
+        this.text = Task.pagesToText( this.ref.pages );
+        this.intro = this.ref.intro;
+
+        this.syllab = this.ref.syllab;
+        this.speech = this.ref.speech;
+        this.syllabExceptions = Task.syllabsToText( this.ref.syllab.exceptions );
+
+        this.questionnaire = this.ref.questionnaire;
+      }
+    },
 
     isCurrentTab( tab ) {
       return tab === this.currentTab;
@@ -184,9 +196,10 @@ export default {
 
   created() {
     this.currentTab = this.tabs.text;
-    if (!this.task && this.source) {
-      this.task = this.source;
-    }
+  },
+
+  mounted() {
+    this.init();
   },
 };
 </script>

@@ -34,6 +34,10 @@ export default class Syllabifier {
     };
   }
 
+  static get LANGS() {
+    return Object.keys( rules );
+  }
+
   static getPrefixAndSuffix( word, hyphen ) {
     const chars = Array.from( word );
     const prefix = [];

@@ -6,7 +6,7 @@
         .select
           select(v-model="language")
             option(value="" selected) none
-            option(value="Finnish") Finnish
+            option(v-for="lang in languages" :value="lang") {{ lang }}
         slot(name="first")
       .field.is-horizontal
         .select
@@ -47,6 +47,10 @@ export default {
     },
     header: {
       type: String,
+      required: true,
+    },
+    languages: {
+      type: Array,
       required: true,
     },
   },

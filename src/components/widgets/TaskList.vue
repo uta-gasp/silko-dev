@@ -92,7 +92,7 @@ export default {
     },
 
     action() {
-      if ( this.isCreating) {
+      if ( this.isCreating ) {
         return 'Create';
       }
       else if ( this.toEdit ) {

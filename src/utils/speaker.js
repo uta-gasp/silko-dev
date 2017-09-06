@@ -15,6 +15,10 @@ export default class Speaker {
     this.voice = voices[ this.options.language ];
   }
 
+  static get LANGS() {
+    return Object.keys( voices );
+  }
+
   get enabled() {
     return !!this.voice;
   }
@@ -74,5 +78,8 @@ export default class Speaker {
 const voices = {
   Finnish( word ) {
     responsiveVoice.speak( word, 'Finnish Female' );
+  },
+  English( word ) {
+    responsiveVoice.speak( word, 'US English Female' );
   },
 };

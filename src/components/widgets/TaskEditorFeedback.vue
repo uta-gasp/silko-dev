@@ -3,11 +3,11 @@
     p.control
       .columns.is-paddingless.is-marginless
         .column.is-paddingless.is-marginless.is-narrow
-          feedback-editor(header="Speech" v-model="speech")
+          feedback-editor(header="Speech" v-model="speech" :languages="speechLangs")
             .field
               .field.is-horizontal
                 bulma-checkbox(v-model="speechAdjustForWordLength" label="word-length dependent" :disabled="!speech.language")
-          feedback-editor(header="Syllabification" v-model="syllab")
+          feedback-editor(header="Syllabification" v-model="syllab" :languages="syllabLangs")
             .field
               .field.is-horizontal
                 span.select()
@@ -30,6 +30,7 @@
 import Task from '@/model/task.js';
 
 import Syllabifier from '@/utils/syllabifier.js';
+import Speaker from '@/utils/speaker.js';
 
 import FeedbackEditor from '@/components/widgets/feedbackEditor';
 import BulmaCheckbox from '@/components/widgets/bulmaCheckbox';
@@ -46,6 +47,7 @@ export default {
     return {
       speech: this.task ? this.task.speech : Task.defaultSpeech,
       speechAdjustForWordLength: this.task ? this.task.speech.threshold.adjustForWordLength : Task.defaultSpeech.threshold.adjustForWordLength,
+      speechLangs: Speaker.LANGS,
 
       syllab: this.task ? this.task.syllab : Task.defaultSyllab,
       syllabExceptions: this.task ? Task.syllabsToText( this.task.syllab.exceptions ) : '',
@@ -54,6 +56,7 @@ export default {
       syllabAdjustForWordLength: this.task ? this.task.syllab.threshold.adjustForWordLength : Task.defaultSyllab.threshold.adjustForWordLength,
 
       syllabModes: Object.keys( Syllabifier.MODES ),
+      syllabLangs: Syllabifier.LANGS,
     };
   },
 
