@@ -71,14 +71,14 @@ export default {
   .line {
     display: block;
 
-    // custom styles to support by TextPresenter
+    // custom styles to be supported by TextPresenter
 
-    .lighter {
-      color: lighten(#775, 25%);
+    .light {
+      color: lighten(#775, 25%) !important;
     }
 
-    .darker {
-      color: darken(#775, 25%);
+    .dark {
+      color: darken(#775, 25%) !important;
     }
   }
 

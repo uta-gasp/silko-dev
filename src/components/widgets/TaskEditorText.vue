@@ -41,9 +41,9 @@
               span
               a(href="https://www.w3schools.com/colors/colors_rgb.asp") #22aaff
               span
-              abbr(title="25% lighter than the normal text") lighter
+              abbr(title="25% lighter than the normal text") light
               span
-              abbr(title="25% darker than the normal text") darker
+              abbr(title="25% darker than the normal text") dark
             span.explanation font color
           p.panel-block
             code 22pt
@@ -52,7 +52,7 @@
             code italic regular
             span.explanation font style
           p.panel-block
-            code bold bolder normal lighter light
+            code normal bold bolder lighter
             span.explanation font weight
           p.panel-block
             h4.heading.is-4.is-inline.has-text-centered Example

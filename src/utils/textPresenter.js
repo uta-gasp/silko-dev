@@ -1,21 +1,20 @@
 const RE_WORD = /(\S+)(\|)([\w,#]+)\b/g;
 const RE_LINE = /^(.+)(\s\|)([\w,#]+)$/gm;
 const CLASS_NAMES = [   // must correspond to the styles in TaskText.vue
-  'lighter',
-  'darker',
+  'light',
+  'dark',
 ];
-const WEIGHT_NAMES = [   // must correspond to the styles in TaskText.vue
+const WEIGHT_NAMES = [
   'bold',
-  'b',
+  'b',        // shortcuts always follow the full name
   'bolder',
   'normal',
   'n',
   'lighter',
-  'l',
 ];
-const STYLE_NAMES = [   // must correspond to the styles in TaskText.vue
-  'regular',
-  'r',
+const STYLE_NAMES = [
+  'regular=normal',
+  'r',        // shortcuts always follow the full name
   'italic',
   'i',
 ];
@@ -120,7 +119,7 @@ export default class TextPresenter {
       return applyStyle( ...arguments, true );
     }
 
-    function applyStyle( match, p1, p2, p3, offset, string, space ) {
+    function applyStyle( match, p1, p2, p3, offset, string, addSpace ) {
       const text = p1;
       const styles = p3;
 
@@ -134,17 +133,26 @@ export default class TextPresenter {
           classes.push( style );
         }
         else if ( WEIGHT_NAMES.includes( style ) || ( isNumber && styleAsNumber % 100 ) === 0 ) {
-          css.push( 'font-weight:' + style );
+          if ( style.length === 1) {  // handle shortcuts
+            style = WEIGHT_NAMES[ WEIGHT_NAMES.indexOf( style ) - 1 ];
+          }
+          css.push( 'font-weight:' + style + ' !important' );
         }
         else if ( STYLE_NAMES.includes( style ) ) {
-          css.push( 'font-style:' + style );
+          if ( style.length === 1 ) {  // handle shortcuts
+            style = STYLE_NAMES[ STYLE_NAMES.indexOf( style ) - 1 ];
+          }
+          if ( style.indexOf( '=' ) >= 0 ) {
+            style = style.split( '=' )[1];
+          }
+          css.push( 'font-style:' + style + ' !important' );
         }
         else {
           css.push( ( isNumber ? 'font-size:' : 'color:' ) + style );
         }
       } );
 
-      const s = space ? ' ' : '';
+      const s = addSpace ? ' ' : '';
       return `<span class="${classes.join( ' ' )}" style="${css.join( ';' )}">${s}${text}</span>${s}`;
     }
 
