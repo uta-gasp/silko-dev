@@ -21,7 +21,7 @@ export default class Syllabifier {
 
     this.exceptions = {};
     for ( let word in this.options.exceptions ) {
-      this.exceptions[ word.toLowerCase() ] = this.options.exceptions[ word ].replace( ' ', this.hyphen ).toLowerCase();
+      this.exceptions[ word.toLowerCase() ] = this.options.exceptions[ word ].replace( / /g, this.hyphen ).toLowerCase();
     }
 
     logger.info( 'created', options );
@@ -166,6 +166,7 @@ export default class Syllabifier {
     let result;
     const exception = Object.keys( this.exceptions ).find( exception => this._isException( word, exception ) );
     if ( exception ) {
+      logger.info( 'is exception' );
       result = this._formatException( word, exception, this.exceptions[ exception ], hyphen );
     }
     else {
@@ -202,11 +203,13 @@ export default class Syllabifier {
   }
 
   _formatException( word, exception, syllabified, hyphen ) {
+    logger.info( 'params:', word, exception, syllabified, hyphen );
     const start = word.toLowerCase().indexOf( exception );
     const length = exception.length;
     const prefix = word.substr( 0, start );
     const postfix = word.substr( start + length );
     const chars = Array.from( syllabified );
+    logger.info( 'info:', start, length, prefix, postfix );
 
     for ( let i = start, j = 0; i < start + length; i++ ) {
       let c = word.charAt( i );
