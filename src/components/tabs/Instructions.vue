@@ -30,7 +30,7 @@
           tbody
             tr(v-for="item in intros")
               td {{ item.name }}
-              td.keep-lines {{ item.firstPageAsText() }}
+              td.keep-lines {{ item.textsSummary() }}
               td
                 .is-pulled-right.is-flex
                   button.button.is-light(@click="edit( item )")
@@ -219,5 +219,8 @@ export default {
 <style lang="less" scoped>
   .keep-lines {
     white-space: pre-line;
+    // text-overflow: ellipsis;
+    // overflow-x: hidden;
+    // display: grid;
   }
 </style>
