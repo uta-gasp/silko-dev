@@ -81,18 +81,19 @@
         .notification.is-danger
           h3.title.is-3 Communication with gaze tracker is blocked by the browser
           .subtitle Please enable the communication and reload the page
-          ul.unblock-ws-instruction
-            li.step Navigate to "
+          ul.unblock-ws-instruction(v-if="isFirefox")
+            li.step - Navigate to "
               span.code about:config
               | " page. Agree to be careful if the browsers asks you to be so.
-            li.step Type "
+            li.step - Type "
               span.code network.websocket.allowInsecureFromHTTPS
               | " in the search box.
-            li.step If the value of this parameter is "
+            li.step - If the value of this parameter is "
               span.code false
               | ", then double-click on it to change it to "
               span.code true
               | ".
+          .unblock-ws-instruction(v-else) (search "how to enable websocket over https" for you browser)
 </template>
 
 <script>
@@ -120,7 +121,7 @@ export default {
 
   data() {
     return {
-      showWsSecurityError: !gazeTracking.wsOk,
+      showWsSecurityError: !gazeTracking.wsOK,
 
       isLoginVisible: true,
       user: null,
@@ -148,6 +149,11 @@ export default {
 
     isEmailValid() {
       return !this.email || /(.{2,})@(\w{2,}\.\w{2,})/.test( this.email );
+    },
+
+    isFirefox() {
+      const ua = (window.navigator && window.navigator.userAgent) || '';
+      return ua.indexOf( 'Mozilla' ) >= 0;
     },
   },
 

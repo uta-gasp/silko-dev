@@ -4485,7 +4485,7 @@
         GazeTargets.updateTargets();
 
         // initialize ETUDriver
-        root.GazeTargets.ETUDriver.init(settings.etudriver, {
+        return root.GazeTargets.ETUDriver.init(settings.etudriver, {
                 data: onDataReceived,
                 state: onStateChanged
             },
