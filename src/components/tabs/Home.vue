@@ -75,11 +75,30 @@
     temporal-notification(type="danger" :show="showError")
       span {{ errorMessage }}
 
+    #ws-security-error.modal(:class="{ 'is-active': isStudent && showWsSecurityError }")
+      .modal-background
+      .modal-content
+        .notification.is-danger
+          h3.title.is-3 Communication with gaze tracker is blocked by the browser
+          .subtitle Please enable the communication and reload the page
+          ul.unblock-ws-instruction
+            li.step Navigate to "
+              span.code about:config
+              | " page. Agree to be careful if the browsers asks you to be so.
+            li.step Type "
+              span.code network.websocket.allowInsecureFromHTTPS
+              | " in the search box.
+            li.step If the value of this parameter is "
+              span.code false
+              | ", then double-click on it to change it to "
+              span.code true
+              | ".
 </template>
 
 <script>
 import eventBus from '@/utils/event-bus.js';
 import login from '@/utils/login.js';
+import gazeTracking from '@/utils/gazeTracking.js';
 
 import ActionError from '@/components/mixins/actionError';
 import ActionSuccess from '@/components/mixins/actionSuccess';
@@ -101,6 +120,8 @@ export default {
 
   data() {
     return {
+      showWsSecurityError: true, //!gazeTracking.wsOk,
+
       isLoginVisible: true,
       user: null,
 
@@ -269,6 +290,22 @@ export default {
   @media (max-height: 474px) {
     .footer {
       position: inherit;
+    }
+  }
+
+  .subtitle {
+    padding-top: 1em;
+  }
+
+  .unblock-ws-instruction {
+    .step {
+      padding: 0.5em 0;
+      text-align: left;
+    }
+
+    .code {
+      color: #ff4;
+      font-family: Consolas, Courier, monospace;
     }
   }
 </style>

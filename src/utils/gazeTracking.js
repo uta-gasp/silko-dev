@@ -34,7 +34,7 @@ class GazeTracking {
   constructor() {
     this.serviceCheckTimer = null;
 
-    window.GazeTargets.init( {
+    this.wsOK = window.GazeTargets.init( {
       etudPanel: {
         show: false,
       },
@@ -156,7 +156,7 @@ class GazeTracking {
     this.serviceCheckTimer = setTimeout( () => {
       this.serviceCheckTimer = null;
       if ( !lastState.isServiceRunning ) {
-        window.GazeTargets.reconnect();
+        this.wsOK = window.GazeTargets.reconnect();
       }
     }, RECONNECT_INTERVAL );
   }

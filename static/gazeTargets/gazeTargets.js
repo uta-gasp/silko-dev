@@ -2307,7 +2307,7 @@
 
             panel.setLabel(stateLabel.connecting);
 
-            this.connect();
+            return this.connect();
         },
 
         connect: function () {
@@ -2315,11 +2315,18 @@
 
             var protocol = 'ws'; //location.protocol.indexOf("https" >= 0) ? 'wss' : 'ws';
             var wsURI = protocol + '://localhost:' + settings.port + '/';
-            websocket = new WebSocket(wsURI);
-            websocket.onopen    = onWebSocketOpen;
-            websocket.onclose   = onWebSocketClose;
-            websocket.onmessage = onWebSocketMessage;
-            websocket.onerror   = onWebSocketError;
+            try {
+                websocket = new WebSocket(wsURI);
+                websocket.onopen    = onWebSocketOpen;
+                websocket.onclose   = onWebSocketClose;
+                websocket.onmessage = onWebSocketMessage;
+                websocket.onerror   = onWebSocketError;
+            }
+            catch (e) {
+                // no ection is needed
+            }
+
+            return !!websocket;
         },
 
         // Shows ETU-Driver options dialog
@@ -4595,7 +4602,7 @@
     };
 
     GazeTargets.reconnect = function () {
-        root.GazeTargets.ETUDriver.connect();
+        return root.GazeTargets.ETUDriver.connect();
     };
 
     // Internal
