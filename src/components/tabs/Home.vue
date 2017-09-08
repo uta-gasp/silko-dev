@@ -120,7 +120,7 @@ export default {
 
   data() {
     return {
-      showWsSecurityError: true, //!gazeTracking.wsOk,
+      showWsSecurityError: !gazeTracking.wsOk,
 
       isLoginVisible: true,
       user: null,
