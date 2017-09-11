@@ -1,29 +1,28 @@
 <template lang="pug">
   #task-editor-feedback
-    p.control
-      .columns.is-paddingless.is-marginless
-        .column.is-paddingless.is-marginless.is-narrow
-          feedback-editor(header="Speech" v-model="speech" :languages="speechLangs")
-            .field
-              .field.is-horizontal
-                bulma-checkbox(v-model="speechAdjustForWordLength" label="word-length dependent" :disabled="!speech.language")
-          feedback-editor(header="Syllabification" v-model="syllab" :languages="syllabLangs")
-            .field
-              .field.is-horizontal
-                span.select()
-                  select(v-model="syllabMode" :disabled="!syllab.language")
-                    option(v-for="mode in syllabModes" :value="mode") {{ mode }}
-              .field.is-horizontal
-                bulma-checkbox(v-model="syllabTemporary" label="temporary" :disabled="!syllab.language")
-              .field.is-horizontal
-                bulma-checkbox(v-model="syllabAdjustForWordLength" label="word-length dependent" :disabled="!syllab.language")
-        .column.is-paddingless.is-marginless
-          .columns.is-paddingless.is-marginless
-            .column.is-paddingless.is-marginless.is-narrow
-              label.label Exceptions
-            .column.has-text-right.is-paddingless.is-marginless
-              i.instruction Example: maailma=maa il ma
-          textarea.textarea.exceptions(:disabled="!syllab.language" placeholder="Syllabifications" v-model="syllabExceptions")
+    .columns.is-paddingless.is-marginless
+      .column.is-paddingless.is-marginless.is-narrow
+        feedback-editor(header="Speech" v-model="speech" :languages="speechLangs")
+          .field
+            .field.is-horizontal
+              bulma-checkbox(v-model="speechAdjustForWordLength" label="word-length dependent" :disabled="!speech.language")
+        feedback-editor(header="Syllabification" v-model="syllab" :languages="syllabLangs")
+          .field
+            .field.is-horizontal
+              span.select()
+                select(v-model="syllabMode" :disabled="!syllab.language")
+                  option(v-for="mode in syllabModes" :value="mode") {{ mode }}
+            .field.is-horizontal
+              bulma-checkbox(v-model="syllabTemporary" label="temporary" :disabled="!syllab.language")
+            .field.is-horizontal
+              bulma-checkbox(v-model="syllabAdjustForWordLength" label="word-length dependent" :disabled="!syllab.language")
+      .column.is-paddingless.is-marginless
+        .columns.is-paddingless.is-marginless
+          .column.is-paddingless.is-marginless.is-narrow
+            label.label Exceptions
+          .column.has-text-right.is-paddingless.is-marginless
+            i.instruction Example: maailma=maa il ma
+        textarea.textarea.exceptions(:disabled="!syllab.language" placeholder="Syllabifications" v-model="syllabExceptions")
 </template>
 
 <script>

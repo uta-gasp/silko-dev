@@ -93,6 +93,10 @@ export default {
     font-size: 1rem;
   }
 
+  .control {
+    margin-top: 0;
+  }
+
   .control-line {
     display: inline-block;
     margin: 0 0.2em;

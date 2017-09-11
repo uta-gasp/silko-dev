@@ -118,7 +118,7 @@ export default {
 
     isNewEmailValid() {
       // allow plain IDs, not emails
-      if ( this.newEmail.indexOf( '@') > 0 ) {
+      if ( this.newEmail.indexOf( '@' ) > 0 ) {
         return /(.{2,})@(\w{2,}\.\w{2,})/.test( this.newEmail.trim() );
       }
       else {

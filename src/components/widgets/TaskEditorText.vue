@@ -52,7 +52,7 @@
             code italic regular
             span.explanation font style
           p.panel-block
-            code normal bold bolder lighter
+            code normal bold
             span.explanation font weight
           p.panel-block
             h4.heading.is-4.is-inline.has-text-centered Example
@@ -76,9 +76,9 @@ export default {
 
   data() {
     return {
-      name: this.task ? this.task.name : '',
-      intro: this.task ? this.task.intro : '',
-      text: this.task ? Task.pagesToText( this.task.pages ) : '',
+      name: this.task && this.task.name ? this.task.name : '',
+      intro: this.task && this.task.intro ? this.task.intro : '',
+      text: this.task && this.task.pages ? Task.pagesToText( this.task.pages ) : '',
     };
   },
 
@@ -96,7 +96,7 @@ export default {
   computed: {
 
     isNewTask() {
-      return !this.task;
+      return !( this.task && this.task.name );
     },
 
     currentModel() {

@@ -61,7 +61,7 @@ export default {
       question: '',
       answers: [],
 
-      questions: this.task ? Array.from( this.task.questionnaire ) : [],
+      questions: this.task && this.task.questionnaire ? Array.from( this.task.questionnaire ) : [],
 
       types: Question.types,
     };

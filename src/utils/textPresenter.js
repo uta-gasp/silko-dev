@@ -133,7 +133,7 @@ export default class TextPresenter {
           classes.push( style );
         }
         else if ( WEIGHT_NAMES.includes( style ) || ( isNumber && styleAsNumber % 100 ) === 0 ) {
-          if ( style.length === 1) {  // handle shortcuts
+          if ( style.length === 1 ) {  // handle shortcuts
             style = WEIGHT_NAMES[ WEIGHT_NAMES.indexOf( style ) - 1 ];
           }
           css.push( 'font-weight:' + style + ' !important' );

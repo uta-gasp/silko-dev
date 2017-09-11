@@ -61,7 +61,7 @@ class DB {
       cb( new Error( 'Not connected to the database' ) );
     }
 
-    if (email.indexOf( '@' ) < 0 ) {
+    if ( email.indexOf( '@' ) < 0 ) {
       email += this.FAKE_EMAIL_DOMAIN;
     }
 

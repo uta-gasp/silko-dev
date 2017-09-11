@@ -21,7 +21,8 @@
 
     p.control.bottom-panel
       button.button.is-primary(:disabled="!canSave" @click="save") {{ action }}
-      button.button.is-primary.is-sticked-right(@click="preview") Preview
+      button.button.is-primary(v-show="currentTab === tabs.feedback" @click="setDefaultFeedback") Set as default
+      button.button.is-primary(@click="preview") Preview
 
     .fullscreen(ref="fullscreen")
       task-preview(v-if="inPreview" :task="currentTask" @close="closePreview")
@@ -37,6 +38,8 @@ import TaskEditorText from '@/components/widgets/taskEditorText';
 import TaskEditorFeedback from '@/components/widgets/taskEditorFeedback';
 import TaskEditorQuestionnaire from '@/components/widgets/taskEditorQuestionnaire';
 
+const TASK_DEFAULTS = 'task-defaults';
+
 export default {
   name: 'task-editor',
 
@@ -51,7 +54,7 @@ export default {
 
   data() {
     return {
-      ref: this.task || this.source,
+      ref: this.task || this.source || JSON.parse( window.localStorage.getItem( TASK_DEFAULTS ) ),
 
       name: '',
       text: '',
@@ -134,15 +137,29 @@ export default {
 
     init() {
       if ( this.ref ) {
-        this.name = this.ref.name;
-        this.text = Task.pagesToText( this.ref.pages );
-        this.intro = this.ref.intro;
+        if ( this.ref.name ) {
+          this.name = this.ref.name;
+        }
+        if ( this.ref.pages ) {
+          this.text = Task.pagesToText( this.ref.pages );
+        }
+        if ( this.ref.intro ) {
+          this.intro = this.ref.intro;
+        }
 
-        this.syllab = this.ref.syllab;
-        this.speech = this.ref.speech;
-        this.syllabExceptions = Task.syllabsToText( this.ref.syllab.exceptions );
+        if ( this.ref.syllab ) {
+          this.syllab = this.ref.syllab;
+        }
+        if ( this.ref.speech ) {
+          this.speech = this.ref.speech;
+        }
+        if ( this.ref.syllab.exceptions ) {
+          this.syllabExceptions = Task.syllabsToText( this.ref.syllab.exceptions );
+        }
 
-        this.questionnaire = this.ref.questionnaire;
+        if ( this.ref.questionnaire ) {
+          this.questionnaire = this.ref.questionnaire;
+        }
       }
     },
 
@@ -174,6 +191,14 @@ export default {
       this.syllab = e.syllab;
       this.speech = e.speech;
       this.syllabExceptions = e.syllabExceptions;
+    },
+
+    setDefaultFeedback( e ) {
+      const defaults = JSON.stringify( {
+        syllab: this.syllab,
+        speech: this.speech,
+      } );
+      window.localStorage.setItem( TASK_DEFAULTS, defaults );
     },
 
     setQuestionnaireInput( e ) {
@@ -220,14 +245,12 @@ export default {
   }
 
   .bottom-panel {
+    display: flex;
+    justify-content: space-between;
+
     position: absolute;
     bottom: 1.25em;
     left: 1.5em;
     right: 1.5em;
-
-    .is-sticked-right {
-      position: absolute;
-      right: 0;
-    }
   }
 </style>

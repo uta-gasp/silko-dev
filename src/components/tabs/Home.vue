@@ -152,7 +152,7 @@ export default {
     },
 
     isFirefox() {
-      const ua = (window.navigator && window.navigator.userAgent) || '';
+      const ua = ( window.navigator && window.navigator.userAgent ) || '';
       return ua.indexOf( 'Mozilla' ) >= 0;
     },
   },
