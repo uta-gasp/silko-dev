@@ -41,7 +41,6 @@
     modal-container(v-if="toEdit" title="Instruction editor" @close="closeEditor")
       intro-editor(
         action="Save"
-        :name-editable="false"
         :show-labels="true"
         :intro="toEdit"
         @save="saveEdited")
@@ -163,7 +162,7 @@ export default {
     },
 
     saveEdited( e ) {
-      this.toEdit.updateTexts( e.texts, err => {
+      this.toEdit.update( e.name, e.texts, err => {
         if ( err ) {
           this.setError( err, 'Failed to save updates' );
         }

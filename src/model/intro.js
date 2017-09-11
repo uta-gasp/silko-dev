@@ -92,7 +92,9 @@ export default class Intro {
     return this.firstPage ? this.firstPage.join( '\n' ) : '';
   }
 
-  updateTexts( texts, cb ) {
+  update( name, texts, cb ) {
+    this.name = name;
+
     const fields = Intro.validateTexts( texts );
     this.calibInstruction = fields.calibInstruction;
     this.calibStart = fields.calibStart;
@@ -104,6 +106,8 @@ export default class Intro {
     this.next = fields.next;
     this.finish = fields.finish;
     this.finished = fields.finished;
+
+    fields.name = name;
 
     db.updateFields( this, fields, cb );
   }
