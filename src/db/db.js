@@ -30,6 +30,10 @@ class DB {
     }
   }
 
+  get FAKE_EMAIL_DOMAIN() {
+    return '@fake.com';
+  }
+
   _init( app ) {
     this.fb = firebase.database( app ).ref();
 
@@ -55,6 +59,10 @@ class DB {
   logIn( email, password, cb ) {
     if ( !this.fb ) {
       cb( new Error( 'Not connected to the database' ) );
+    }
+
+    if (email.indexOf( '@' ) < 0 ) {
+      email += this.FAKE_EMAIL_DOMAIN;
     }
 
     this.auth.signInWithEmailAndPassword( email, password ).then( user => {
@@ -99,14 +107,18 @@ class DB {
       // 2. Send password reset email
       // 3. log in back to the current user
       this.ignoreUserSwitch = true;
-      this.auth.createUserWithEmailAndPassword( obj.email, 'gdfvgdfv' ).then( user => {
+
+      const password = obj.password || 'gdfvgdfv';
+      delete obj.password;
+
+      this.auth.createUserWithEmailAndPassword( obj.email, password ).then( user => {
         // user.sendEmailVerification();
 
-        setTimeout( () => {
-          if ( obj.email.indexOf( '@fake.' ) < 0 ) {    // TODO: remove this
+        if ( obj.email.indexOf( '@' ) > 0 && obj.email.indexOf( this.FAKE_EMAIL_DOMAIN ) < 0 ) {
+          setTimeout( () => {
             this.auth.sendPasswordResetEmail( obj.email );
-          }
-        }, 1000 );
+          }, 1000 );
+        }
 
         const ref = this.fb.child( cls.db ).push( obj );
 

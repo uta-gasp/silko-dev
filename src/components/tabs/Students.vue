@@ -12,7 +12,9 @@
           p.control
             input.input(type="text" placeholder="Name" v-model="newName")
           p.control
-            input.input(type="email" placeholder="Email" v-model="newEmail")
+            input.input(type="email" placeholder="Email or ID" v-model="newEmail")
+          p.control(v-show="!isRealEmail")
+            input.input(type="text" placeholder="Password" v-model="newPassword")
           p.control
             input.input(type="text" placeholder="Grade" v-model="newGrade")
           p.control(v-if="isAdmin")
@@ -59,6 +61,7 @@
 <script>
 import eventBus from '@/utils/event-bus.js';
 import dataUtils from '@/utils/data-utils.js';
+import login from '@/utils/login.js';
 
 import Admin from '@/model/admin.js';
 import School from '@/model/school.js';
@@ -90,6 +93,7 @@ export default {
 
       newName: '',
       newEmail: '',
+      newPassword: '',
       newGrade: '',
       newSchool: '',
 
@@ -113,7 +117,17 @@ export default {
     },
 
     isNewEmailValid() {
-      return /(.{2,})@(\w{2,}\.\w{2,})/.test( this.newEmail.trim() );
+      // allow plain IDs, not emails
+      if ( this.newEmail.indexOf( '@') > 0 ) {
+        return /(.{2,})@(\w{2,}\.\w{2,})/.test( this.newEmail.trim() );
+      }
+      else {
+        return this.newEmail.length > 4;
+      }
+    },
+
+    isNewPasswordValid() {
+      return this.newPassword.length >= 6 || this.isRealEmail;
     },
 
     isNewGradeValid() {
@@ -124,10 +138,15 @@ export default {
       return !Admin.isLogged || this.newSchool;
     },
 
+    isRealEmail() {
+      return this.newEmail.indexOf( '@' ) > 0 && this.newEmail.indexOf( login.DEFAULT_EMAIL_DOMAIN ) < 0;
+    },
+
     canCreateStudent() {
       return !this.isCreating &&
           this.isNewNameValid &&
           this.isNewEmailValid &&
+          this.isNewPasswordValid &&
           this.isNewGradeValid &&
           this.isSchoolValid;
     },
@@ -224,19 +243,24 @@ export default {
         return;
       }
 
+      let email = this.newEmail.trim();
+      if ( email.indexOf( '@' ) < 0 ) {
+        email += login.DEFAULT_EMAIL_DOMAIN;
+      }
+
       const exists = this.students.some( student => {
-        return student.email.toLowerCase() === this.newEmail.toLowerCase().trim();
+        return student.email.toLowerCase() === email.toLowerCase();
       } );
 
       if ( exists ) {
-        this.setError( 'A student with this email exists already', 'Failed to add new student' );
+        this.setError( 'A student with this email or ID exists already', 'Failed to add new student' );
       }
       else {
-        this.createStudent();
+        this.createStudent( email );
       }
     },
 
-    createStudent() {
+    createStudent( email ) {
       this.isCreating = true;
 
       const onFinished = ( err, id ) => {
@@ -248,17 +272,27 @@ export default {
         else {
           this.newName = '';
           this.newEmail = '';
+          this.newPassword = '';
+          this.newGrade = '';
           this.loadStudents();
 
           this.setSuccess( 'New student was added' );
         }
       };
 
+      const password = this.isRealEmail ? null : this.newPassword;
+      const studentObject = {
+        name: this.newName.trim(),
+        email,
+        password,
+        grade: this.newGrade.trim(),
+      };
+
       if ( this.school ) {
-        this.school.createStudent( this.newName.trim(), this.newEmail.trim(), this.newGrade.trim(), onFinished );
+        this.school.createStudent( studentObject, onFinished );
       }
       else if ( this.teacher ) {
-        this.teacher.createStudent( this.newName.trim(), this.newEmail.trim(), this.newGrade.trim(), onFinished );
+        this.teacher.createStudent( studentObject, onFinished );
       }
       else {  // admin
         School.get( this.newSchool, ( err, school ) => {
@@ -266,7 +300,7 @@ export default {
             return onFinished( err );
           }
 
-          school.createStudent( this.newName.trim(), this.newEmail.trim(), this.newGrade.trim(), onFinished );
+          school.createStudent( studentObject, onFinished );
         } );
       }
     },

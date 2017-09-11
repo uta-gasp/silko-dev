@@ -50,7 +50,12 @@ export default {
 
   computed: {
     isEmailValid() {
-      return !this.email || /(.{2,})@(\w{2,}\.\w{2,})/.test( this.email );
+      if ( this.email.indexOf( '@' ) < 0 ) {
+        return this.email.length > 4;
+      }
+      else {
+        return !this.email || /(.{2,})@(\w{2,}\.\w{2,})/.test( this.email );
+      }
     },
 
     isPasswordValid() {

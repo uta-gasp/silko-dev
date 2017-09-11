@@ -71,10 +71,11 @@ export default class School {
     } );
   }
 
-  createStudent( name, email, grade, cb ) {
+  createStudent( {name, email, password, grade}, cb ) {
     db.add( Student, {
       name: name,
       email: email,
+      password: password,
       grade: grade,
       school: this.id,
       classes: {},

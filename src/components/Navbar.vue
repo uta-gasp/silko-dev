@@ -27,7 +27,7 @@
         span Assignments
     .nav-right(v-if="user")
       .user-block.is-small
-        span.user {{ user.name }}
+        //- span.user {{ user.name }}
         span.user {{ user.ref.name }}
       span.nav-item
         a.button(v-on:click="logOut()") Logout
@@ -101,6 +101,8 @@ export default {
   }
 
   .user {
+    display: inline-block;
+    margin: auto 0;
   }
 
   .logo {

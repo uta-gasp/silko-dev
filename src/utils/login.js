@@ -18,6 +18,10 @@ class Login {
     return db.user;
   }
 
+  get DEFAULT_EMAIL_DOMAIN() {
+    return db.FAKE_EMAIL_DOMAIN;
+  }
+
 }
 
 const login = new Login();

@@ -39,10 +39,11 @@ export default class Teacher {
     return db.get( School, this.school, cb );
   }
 
-  createStudent( name, email, grade, cb ) {
+  createStudent( {name, email, password, grade}, cb ) {
     db.add( Student, {
       name: name,
       email: email,
+      password: password,
       grade: grade,
       school: this.school,
       classes: {},
