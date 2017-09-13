@@ -25,6 +25,25 @@ export default class OptionsCreator {
     return result;
   }
 
+  static createDefaults( source, subKeys ) {
+    const result = {};
+    for (let key in source) {
+      let targetKey = key[0] === '_' ? key.substr( 1 ) : key;
+      if (subKeys && !subKeys.includes( targetKey ) ) {
+        continue;
+      }
+
+      if ( typeof source[ key ] === 'object') {
+        copyPlaneKeys( result, source, key );
+      }
+      else {
+        result[ targetKey ] = source[ key ];
+      }
+    }
+
+    return result;
+  }
+
 }
 
 function createOptionReference( id, receiver ) {
@@ -48,3 +67,17 @@ function createOptionReference( id, receiver ) {
     }
   };
 };
+
+function copyPlaneKeys( result, source, id ) {
+  const ref = source[ id ];
+  for (let key in ref) {
+    if ( ref[ key ] === 'object') {
+      copyPlaneKeys( result, ref, id + '.' + key );
+    }
+    else {
+      let targetKey = key[0] === '_' ? key.substr( 1 ) : key;
+      let targetID = id[0] === '_' ? id.substr( 1 ) : id;
+      result[ targetID + '.' + targetKey ] = ref[ key ];
+    }
+  }
+}

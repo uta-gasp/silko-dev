@@ -4,7 +4,7 @@
       .message-body This student account was removed from all schools and is considered as frozen. No tasks will be assigned to this account in future.
 
     nav.panel(v-else)
-      p.panel-heading Tasks waiting to complete
+      p.panel-heading Tasks waiting to be completed
       .panel-block
         .container(v-if="assignments === null")
           loading
@@ -38,11 +38,13 @@
             tr
               th Class
               th Task
+              th WPM
               th Date
           tbody
             tr(v-for="session in sessions")
               td {{ session.cls.name }}
               td {{ session.task.name }}
+              td
               td {{ session.session.date | prettifyDate }}
 
     temporal-notification(type="danger" :show="showError")

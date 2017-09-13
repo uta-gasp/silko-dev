@@ -6,12 +6,20 @@
         .word {{ word.text }}
         .duration {{ word.value }}
 
-    control-panel(:feedback="defaultFeedback" :text-length="textLength" :options="options"
+    control-panel(
+      :feedback="defaultFeedback"
+      :text-length="textLength"
+      :options="options"
       @page-changed="setPage"
       @show-options="showOptions"
       @close="close"
     )
-    options(v-show="isOptionsDisplayed" :values="options" @close="closeOptions" @apply="applyOptions")
+
+    options(
+      v-show="isOptionsDisplayed"
+      :values="options"
+      @close="closeOptions"
+      @apply="applyOptions")
 
 </template>
 
@@ -57,6 +65,7 @@ export default {
           options: OptionsCreator.createOptions( {
             units: { type: Array, items: Object.values( UNITS ), label: 'Units' },
           }, UI ),
+          defaults: OptionsCreator.createDefaults( UI ),
         },
       },
     };

@@ -5,17 +5,19 @@ export default class Regressions {
   static compute( mappedFixations ) {
     let regressionCount = 0;
     let lastWordID = -1;
+    let lastWordLine = -1;
     let isPrevFixProgressive = true;
 
     mappedFixations.forEach( fix => {
       if ( !fix.word ) {
         lastWordID = -1;
+        lastWordLine = -1;
         isPrevFixProgressive = true;
         return;
       }
 
       const direction = fix.word.id - lastWordID;
-      if ( direction < 0 ) {
+      if ( direction < 0 && lastWordLine === fix.line ) {
         fix.isRegression = true;
         if ( isPrevFixProgressive ) {
           regressionCount++;
@@ -27,6 +29,7 @@ export default class Regressions {
       }
 
       lastWordID = fix.word.id;
+      lastWordLine = fix.line;
     } );
 
     return regressionCount;

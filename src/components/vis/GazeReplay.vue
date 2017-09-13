@@ -48,6 +48,7 @@ export default {
             'syllab.background': { type: '#', label: 'Syllabification background' },
             'syllab.wordColor': { type: '#', label: 'Syllabification word color' },
           }, UI ),
+          defaults: OptionsCreator.createDefaults( UI ),
         },
       },
 

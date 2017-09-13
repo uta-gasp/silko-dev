@@ -63,7 +63,28 @@ export default {
 
     reset( e ) {
       window.localStorage.removeItem( ID );
-      window.location.reload();
+
+      for ( let visID in this.values ) {
+        const vis = this.values[ visID ];
+        this.clone( vis.defaults, vis.options );
+      }
+
+      this.$emit( 'apply' );
+
+      const container = this.$refs.container;
+      container.innerHTML = '';
+      this.bind();
+    },
+
+    clone( from, to ) {
+      for ( let key in from ) {
+        if ( typeof from[ key ] === 'object' ) {
+          this.clone( from[ key ] , to[ key ] );
+        }
+        else {
+          to[ key ].ref( from[ key ] );
+        }
+      }
     },
 
     loadSettings() {

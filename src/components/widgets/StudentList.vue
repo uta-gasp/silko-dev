@@ -166,13 +166,26 @@ export default {
       } );
 
       return grades.sort( ( a, b ) => {
-        if ( a.text[0] <= '9' && b.text[0] > '9' ) {
-          return true;
+        const gradeA = Number.parseInt( a.text, 10 );
+        const gradeB = Number.parseInt( b.text, 10 );
+        if ( !Number.isNaN( gradeA ) && !Number.isNaN( gradeB ) ) {
+          if (gradeA === gradeB) {
+            return a.text > b.text;
+          }
+          else {
+            return gradeA > gradeB;
+          }
         }
-        else if ( a.text[0] > '9' && b.text[0] <= '9' ) {
-          return false;
+        else {
+          return a.text > b.text;
         }
-        return a.text > b.text;
+        // if ( a.text[0] <= '9' && b.text[0] > '9' ) {
+        //   return true;
+        // }
+        // else if ( a.text[0] > '9' && b.text[0] <= '9' ) {
+        //   return false;
+        // }
+        // return a.text > b.text;
       } );
     },
 

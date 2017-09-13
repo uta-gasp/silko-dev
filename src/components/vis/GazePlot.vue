@@ -14,13 +14,13 @@ const UI = {
   saccadeColor: '#08F',
   regressionColor: '#000',
 
-  showIDs: false,
+  // showIDs: false,
   showConnections: true,
   showSaccades: true,
   showFixations: true,
 
-  fixationNumberSize: 16,
-  fixationNumberColor: '#FF0',
+  // fixationNumberSize: 16,
+  // fixationNumberColor: '#FF0',
 
   syllab: {
     background: '#fce',
@@ -48,17 +48,18 @@ export default {
             saccadeColor: { type: '#', label: 'Saccade color' },
             regressionColor: { type: '#', label: 'Regressive saccade color' },
 
-            showIDs: { type: Boolean, label: 'Show IDs' },
+            // showIDs: { type: Boolean, label: 'Show IDs' },
             showConnections: { type: Boolean, label: 'Show word-fixation connections' },
             showSaccades: { type: Boolean, label: 'Show saccades' },
             showFixations: { type: Boolean, label: 'Show fixations' },
 
-            fixationNumberSize: { type: Number, step: 1, label: 'ID font size' },
-            fixationNumberColor: { type: '#', label: 'ID color' },
+            // fixationNumberSize: { type: Number, step: 1, label: 'ID font size' },
+            // fixationNumberColor: { type: '#', label: 'ID color' },
 
             'syllab.background': { type: '#', label: 'Syllabification background' },
             'syllab.wordColor': { type: '#', label: 'Syllabification word color' },
           }, UI ),
+          defaults: OptionsCreator.createDefaults( UI ),
         },
       },
 

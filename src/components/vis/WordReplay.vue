@@ -81,6 +81,7 @@ export default {
           options: OptionsCreator.createOptions( {
             levelDuration: { type: Number, step: 50, label: 'Level duration, ms' },
           }, UI ),
+          defaults: OptionsCreator.createDefaults( UI ),
         },
         _sgwm: sgwmController.createOptions(),
       },

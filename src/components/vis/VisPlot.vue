@@ -102,6 +102,7 @@ export default {
           wordRectColor: { type: '#', label: 'Word frame color' },
           drawWordFrame: { type: Boolean, label: 'Draw word frame' },
         }, COMMON_UI ),
+        defaults: OptionsCreator.createDefaults( COMMON_UI ),
       };
     },
 
