@@ -22,6 +22,7 @@
 
 <script>
 import Colors from '@/vis/colors.js';
+import OptionsCreator from '@/vis/optionsCreator.js';
 
 const ID = 'silko';
 
@@ -64,27 +65,13 @@ export default {
     reset( e ) {
       window.localStorage.removeItem( ID );
 
-      for ( let visID in this.values ) {
-        const vis = this.values[ visID ];
-        this.clone( vis.defaults, vis.options );
-      }
+      OptionsCreator.restoreDefaults( this.values );
 
       this.$emit( 'apply' );
 
       const container = this.$refs.container;
       container.innerHTML = '';
       this.bind();
-    },
-
-    clone( from, to ) {
-      for ( let key in from ) {
-        if ( typeof from[ key ] === 'object' ) {
-          this.clone( from[ key ] , to[ key ] );
-        }
-        else {
-          to[ key ].ref( from[ key ] );
-        }
-      }
     },
 
     loadSettings() {

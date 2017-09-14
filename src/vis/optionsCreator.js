@@ -11,8 +11,12 @@ export default class OptionsCreator {
         return {
           title: item.title,
           options: OptionsCreator.createOptions( item.options, receiver ),
+          defaults: item.defaults,
         };
       } );
+      // result = options.map( item => Object.assign( {}, item,
+      //     { options: OptionsCreator.createOptions( item.options, receiver ) }
+      // ) );
     }
     else {
       for ( let id in options ) {
@@ -25,7 +29,7 @@ export default class OptionsCreator {
     return result;
   }
 
-  static createDefaults( source, subKeys ) {
+  static createDefaults( source, subKeys, header ) {
     const result = {};
     for (let key in source) {
       let targetKey = key[0] === '_' ? key.substr( 1 ) : key;
@@ -34,14 +38,29 @@ export default class OptionsCreator {
       }
 
       if ( typeof source[ key ] === 'object') {
-        copyPlaneKeys( result, source, key );
+        copyPlaneKeys( result, source, key, header );
       }
       else {
+        if (header) {
+          targetKey = header + '.' + targetKey;
+        }
         result[ targetKey ] = source[ key ];
       }
     }
 
     return result;
+  }
+
+  static restoreDefaults( chapters ) {
+    for ( let id in chapters ) {
+      const chapter = chapters[ id ];
+      if (chapter.defaults) {
+        clone( chapter.defaults, chapter.options );
+      }
+      else if (Array.isArray( chapter.options )) {
+        OptionsCreator.restoreDefaults( chapter.options );
+      }
+    }
   }
 
 }
@@ -68,16 +87,30 @@ function createOptionReference( id, receiver ) {
   };
 };
 
-function copyPlaneKeys( result, source, id ) {
+function copyPlaneKeys( result, source, id, header ) {
   const ref = source[ id ];
   for (let key in ref) {
     if ( ref[ key ] === 'object') {
-      copyPlaneKeys( result, ref, id + '.' + key );
+      copyPlaneKeys( result, ref, id + '.' + key, header );
     }
     else {
       let targetKey = key[0] === '_' ? key.substr( 1 ) : key;
       let targetID = id[0] === '_' ? id.substr( 1 ) : id;
+      if (header) {
+        targetID = header + '.' + targetID;
+      }
       result[ targetID + '.' + targetKey ] = ref[ key ];
+    }
+  }
+}
+
+function clone( from, to ) {
+  for ( let key in from ) {
+    if ( typeof from[ key ] === 'object' ) {
+      clone( from[ key ], to[ key ] );
+    }
+    else {
+      to[ key ].ref( from[ key ] );
     }
   }
 }

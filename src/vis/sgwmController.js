@@ -77,17 +77,18 @@ export default class sgwm {
             'FixationProcessorSettings.duration.mergingDistanceThreshold': { type: Number, label: '\tmerging distance, px' },
             'FixationProcessorSettings.duration.removingDurationThreshold': { type: Number, label: '\tmin duration, ms' },
           } ),
-          defaults: OptionsCreator.createDefaults( _SGWM.FixationProcessorSettings, [ 'location', 'duration' ] ),
+          defaults: OptionsCreator.createDefaults( _SGWM.FixationProcessorSettings, [ 'location', 'duration' ], 'FixationProcessorSettings' ),
         },
         {
           title: 'Splitter',
           options: OptionsCreator.createOptions( {
             'SplitToProgressionsSettings.bounds.left': { type: Number, step: 0.1, label: 'Left margin, chars' },
             'SplitToProgressionsSettings.bounds.right': { type: Number, step: 0.1, label: 'Right margin, chars' },
+            'SplitToProgressionsSettings.bounds.verticalChar': { type: Number, step: 0.1, label: 'Vertical margin, chars' },
             'SplitToProgressionsSettings.bounds.verticalLine': { type: Number, step: 0.1, label: 'Vertical margin, lines' },
             'SplitToProgressionsSettings.angle': { type: Number, step: 0.1, label: 'Max incline, rad' },
           } ),
-          defaults: OptionsCreator.createDefaults( _SGWM.SplitToProgressionsSettings, [ 'bounds', 'angle' ] ),
+          defaults: OptionsCreator.createDefaults( _SGWM.SplitToProgressionsSettings, [ 'bounds', 'angle' ], 'SplitToProgressionsSettings' ),
         },
         {
           title: 'Merger',
@@ -98,12 +99,13 @@ export default class sgwm {
             'ProgressionMergerSettings.removeSingleFixationLines': { type: Boolean, label: 'Remove unmerged single fixations' },
             'ProgressionMergerSettings.correctForEmptyLines': { type: Boolean, label: 'Account for empty lines' },
             'ProgressionMergerSettings.currentLineSupportInCorrection': { type: Number, step: 0.05, label: '\tsupport current line by' },
-            // 'ProgressionMergerSettings.emptyLineDetectorFactor': { type: Number, step: 0.05, label: '\tempty line factor, lines' },
+            'ProgressionMergerSettings.emptyLineDetectorFactor': { type: Number, step: 0.05, label: '\tempty line factor, lines' },
             'ProgressionMergerSettings.intelligentFirstLineMapping': { type: Boolean, label: 'Intelligent first reading line search' },
           } ),
-          defaults: OptionsCreator.createDefaults( _SGWM.ProgressionMergerSettings, [ 'minLongSetLength', 'fitThreshold',
-            'maxLinearGradient', 'removeSingleFixationLines', 'correctForEmptyLines', 'currentLineSupportInCorrection',
-            'intelligentFirstLineMapping' ] ),
+          defaults: OptionsCreator.createDefaults( _SGWM.ProgressionMergerSettings, [
+            'minLongSetLength', 'fitThreshold', 'maxLinearGradient', 'removeSingleFixationLines',
+            'correctForEmptyLines', 'currentLineSupportInCorrection', 'emptyLineDetectorFactor',
+            'intelligentFirstLineMapping' ], 'ProgressionMergerSettings' ),
         },
         {
           title: 'Word mapper',
@@ -116,9 +118,10 @@ export default class sgwm {
             'WordMapperSettings.effectiveLengthFactor': { type: Number, step: 0.1, label: '\tlimit to' },
             'WordMapperSettings.ignoreTransitions': { type: Boolean, label: 'Ignore transitions' },
           } ),
-          defaults: OptionsCreator.createDefaults( _SGWM.WordMapperSettings, [ 'wordCharSkipStart',
-            'wordCharSkipEnd', 'scalingDiffLimit', 'rescaleFixationX', 'partialLengthMaxWordLength',
-            'effectiveLengthFactor', 'ignoreTransitions' ] ),
+          defaults: OptionsCreator.createDefaults( _SGWM.WordMapperSettings, [
+            'wordCharSkipStart', 'wordCharSkipEnd', 'scalingDiffLimit',
+            'rescaleFixationX', 'partialLengthMaxWordLength',
+            'effectiveLengthFactor', 'ignoreTransitions' ], 'WordMapperSettings' ),
         },
       ], _SGWM ),
     };
