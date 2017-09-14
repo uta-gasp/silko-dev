@@ -1,9 +1,9 @@
 import Syllabifier from '@/utils/syllabifier.js';
 
-// import Metric from '@/vis/metric.js';
+import Metric from '@/vis/metric.js';
 import Colors from '@/vis/colors.js';
 
-const WORD_HIGHLIGHT_COLOR = '#606';
+const WORD_HIGHLIGHT_COLOR = '#A06';
 
 const LINE_COLOR_A = 0.5;
 const LINE_COLORS = [
@@ -44,11 +44,11 @@ export default class Painter {
   }
 
   drawWords( words, settings ) {
-    // const metricRange = Metric.compute( words, settings.colorMetric );
+    const metricRange = Metric.computeRange( words, settings.colorMetric );
 
     words.forEach( word => {
       const wordSettings = Object.assign( {
-        alpha: 0,    // Metric.getAlpha( word, settings.colorMetric, metricRange )
+        alpha: Metric.getAlpha( word, settings.colorMetric, metricRange )
       }, settings );
 
       this._drawWord( word, wordSettings );

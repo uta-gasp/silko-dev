@@ -1,76 +1,83 @@
 function mapDurationToAlpha( word, maxDuration ) {
   let result = 0;
-  if ( word.duration > DURATION_TRANSPARENT ) {
-    result = ( word.duration - DURATION_TRANSPARENT ) / ( maxDuration - DURATION_TRANSPARENT );
+  if ( word.focusing && word.focusing.duration > DURATION_TRANSPARENT ) {
+    result = ( word.focusing.duration - DURATION_TRANSPARENT ) / ( maxDuration - DURATION_TRANSPARENT );
   }
   return result;
 }
 
 function mapCharSpeedTAlpha( word, maxCharSpeed ) {
   let result = 0;
-  if ( word.charSpeed > 0 ) {
-    result = 1 - word.charSpeed / maxCharSpeed;
+  if ( word.reading && word.reading.charSpeed > 0 ) {
+    result = 1 - word.reading.charSpeed / maxCharSpeed;
   }
   return result;
 }
 
-function mapSyllableSpeedToAlpha( word, maxSyllableSpeed ) {
+function mapFocusCountToAlpha( word, mapFocusCount ) {
   let result = 0;
-  if ( word.syllableSpeed > 0 ) {
-    result = 1 - word.syllableSpeed / maxSyllableSpeed;
+  if ( word.focusing && word.focusing.count > 0 ) {
+    result = 1 - word.focusing.count / mapFocusCount;
   }
   return result;
 }
 
-const alphaComputers = [
-  () => 0,      // for NONE
-  mapDurationToAlpha,
-  mapCharSpeedTAlpha,
-  mapSyllableSpeedToAlpha,
-];
+// function mapSyllableSpeedToAlpha( word, maxSyllableSpeed ) {
+//   let result = 0;
+//   if ( word.reading && word.reading.syllableSpeed > 0 ) {
+//     result = 1 - word.reading.syllableSpeed / maxSyllableSpeed;
+//   }
+//   return result;
+// }
 
 const DURATION_TRANSPARENT = 100;
 
 const Type = {
-  NONE: 0,
-  DURATION: 1,
-  CHAR_SPEED: 2,
-  SYLL_SPEED: 3,
+  NONE: 'none',
+  DURATION: 'duration',
+  CHAR_SPEED: 'char speed',
+  FOCUS_COUNT: 'focus count',
+  // SYLL_SPEED: 'syllable speed',
 };
+
+const alphaComputers = new Map();
+alphaComputers.set( Type.NONE, () => 0 );
+alphaComputers.set( Type.DURATION, mapDurationToAlpha );
+alphaComputers.set( Type.CHAR_SPEED, mapCharSpeedTAlpha );
+alphaComputers.set( Type.FOCUS_COUNT, mapFocusCountToAlpha );
+// alphaComputers.set( Type.SYLL_SPEED, mapSyllableSpeedToAlpha );
 
 export default class Metric {
 
-  static compute( words, metricType ) {
+  static computeRange( words, metricType ) {
     let maxRange = 0;
 
-    words.forEach( word => {
-      if ( word.fixations ) {
-        const params = word.fixations.reduce( ( sum, fix ) => {
-          sum.duration += fix.duration;
-          sum.regressionCount += fix.isRegression ? 1 : 0;
-          return sum;
-        }, {
-          duration: 0,
-          regressionCount: 0,
-        } );
+    if (metricType === Metric.Type.NONE ) {
+      return maxRange;
+    }
 
+    words.forEach( word => {
+      if ( word.focusing ) {
         // const wordText = syllabifier.unprepare( word.text );
-        word.duration = params.duration;
-        word.regressionCount = params.regressionCount;
-        word.charSpeed = 0; // 1000 * wordText.length / word.duration;
-        word.syllableSpeed = 0; // 1000 * syllabifier.syllables( wordText ).length / word.duration;
+        word.reading = {
+          charSpeed: 1000 * word.text.length / word.focusing.duration,
+          syllableSpeed: 1000 * word.text.length / 2.5 / word.focusing.duration,
+        };
 
         let metricValue = 0;
         switch ( metricType ) {
         case Metric.Type.DURATION:
-          metricValue = word.duration;
+          metricValue = word.focusing.duration;
           break;
         case Metric.Type.CHAR_SPEED:
-          metricValue = word.charSpeed;
+          metricValue = word.reading.charSpeed;
           break;
-        case Metric.Type.SYLL_SPEED:
-          metricValue = word.syllableSpeed;
+        case Metric.Type.FOCUS_COUNT:
+          metricValue = word.focusing.count;
           break;
+        // case Metric.Type.SYLL_SPEED:
+        //   metricValue = word.reading.syllableSpeed;
+        //   break;
         }
 
         if ( maxRange < metricValue ) {
@@ -83,11 +90,19 @@ export default class Metric {
   }
 
   static getAlpha( word, metricType, metricRange ) {
-    return alphaComputers[ metricType ]( word, metricRange );
+    return alphaComputers.get( metricType )( word, metricRange );
   }
 
   static get Type() {
     return Type;
+  }
+
+  static get Types() {
+    const result = [];
+    for (let key in Type) {
+      result.push( Type[ key ] );
+    }
+    return result;
   }
 
 };

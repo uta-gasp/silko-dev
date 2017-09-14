@@ -43,7 +43,7 @@ export default {
           id: 'gazePlot',
           title: 'Gaze Plot',
           options: OptionsCreator.createOptions( {
-            colorMetric: { type: Array, items: ['none', 'duration', 'char speed', 'syllable speed'], label: 'Word color metric' },
+            colorMetric: { type: Array, items: Metric.Types, label: 'Word color metric' },
 
             saccadeColor: { type: '#', label: 'Saccade color' },
             regressionColor: { type: '#', label: 'Regressive saccade color' },
@@ -100,7 +100,8 @@ export default {
 
       this.painter.clean();
 
-      this.painter.drawWords( page.text, Object.assign( {
+      const wordsWithGazingInfo = this.combineWordsAndGazeInfo( page.text, page.words );
+      this.painter.drawWords( wordsWithGazingInfo, Object.assign( {
         colorMetric: UI.colorMetric,
         showConnections: UI.showConnections,
       }, this.commonUI ) );
@@ -117,6 +118,36 @@ export default {
         }, UI ) );
       }
     },
+
+    isMatchingWord( word, info ) {
+      return Math.abs( word.rect.x - info.rect.x ) < 1 && Math.abs( word.rect.y - info.rect.y ) < 1;
+    },
+
+    combineWordsAndGazeInfo( words, wordsWithGazeInfo ) {
+      const result = [];
+      const gazeInfo = new Set( wordsWithGazeInfo );
+
+      words.forEach( word => {
+        const iterator = gazeInfo.values();
+        let item = iterator.next();
+        while ( !item.done ) {
+          if ( this.isMatchingWord( word, item.value ) ) {
+            const { feedback, focusing } = item.value;
+            result.push( Object.assign( { feedback, focusing }, word ) );
+            gazeInfo.delete( item.value );
+            break;
+          }
+
+          item = iterator.next();
+        }
+
+        if (item.done) {
+          result.push( word );
+        }
+      });
+
+      return result;
+    }
   },
 
   mounted() {
