@@ -33,7 +33,7 @@
           loading
         .container(v-else-if="!sessions.length")
           i No completed tasks yet
-        table.table(v-else)
+        table.table.completed(v-else)
           thead
             tr
               th Class
@@ -125,7 +125,11 @@ export default {
     },
 
     start( assignment, e ) {
+if (Student.MULTICLASS) {
+      this.$router.replace( `/assignment/${assignment.task.id}` );
+} else {
       this.$router.replace( `/assignment/${assignment.cls.id}` );
+}
     },
   },
 
@@ -158,5 +162,9 @@ export default {
 
   .card-header-icon {
     cursor: default;
+  }
+
+  .completed {
+    width: 100%;
   }
 </style>

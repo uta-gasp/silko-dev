@@ -70,6 +70,15 @@ export default class Class {
       }
 
       students.forEach( student => {
+if (Student.MULTICLASS) {
+        if ( task.id in student.assignments ) {
+          student.removeAssignment( task.id, err => {
+            if ( err ) {
+              return console.error( err );
+            }
+          } );
+        }
+} else {
         if ( student.assignments[ this.id ] === task.id ) {
           student.setAssignment( this.id, null, err => {
             if ( err ) {
@@ -77,6 +86,7 @@ export default class Class {
             }
           } );
         }
+}
       } );
     } );
 

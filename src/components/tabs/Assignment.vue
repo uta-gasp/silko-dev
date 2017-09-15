@@ -85,10 +85,18 @@ export default {
     init() {
       this.student = Student.instance;
       if ( this.student ) {
-        const taskID = this.student.assignments[ this.$route.params.id ];
+        let taskID;
+if (Student.MULTICLASS) {
+        taskID = this.$route.params.id;
+        if ( !(taskID in this.student.assignments) ) {
+          return this.$router.replace( 'assignments' );
+        }
+} else {
+        taskID = this.student.assignments[ this.$route.params.id ];
         if ( !taskID ) {
           return this.$router.replace( 'assignments' );
         }
+}
 
         this.student.loadTask( taskID, ( err, task ) => {
           if ( err ) {

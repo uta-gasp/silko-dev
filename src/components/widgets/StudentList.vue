@@ -18,13 +18,27 @@
               .has-text-centered Task
             th.is-narrow
         tbody
-          tr(v-for="student in students" :key="parent.id+student.id")
+          tr(v-for="student in students" :key="currentClass.id+student.id")
             td {{ student.name }}
             td.is-narrow
-              span.select
-                select(:value="getAssignment( student )" @input="setAssignment( student, $event )")
-                  option(value="") none
-                  option(v-for="task in tasks" :value="task.id" :key="parent.id+student.id+task.id") {{ task.name }}
+              .assignments
+                .assignment(v-for="(cls, task) in student.assignments")
+                  .name {{ getAssignmentName( task ) }}
+                  button.delete(@click="removeAssignment( student, task )")
+              p.control
+                .dropdown(:ref="currentClass.id+student.id" @focusout="hideTaskList( currentClass.id+student.id )")
+                  .dropdown-trigger
+                    button.button(aria-haspopup="true" aria-controls="dropdown-menu" @click="showTaskList( currentClass.id+student.id )")
+                      span Add a task
+                      span.icon.is-small
+                        i.fa.fa-angle-down(aria-hidden="true")
+                  .dropdown-menu(role="menu")
+                    .dropdown-content
+                      .dropdown-item(v-for="task in tasks" @click="addAssignment( student, task.id, $event )" ) {{ task.name }}
+              //- span.select
+              //-   select(:value="getAssignment( student )" @input="setAssignment( student, $event )")
+              //-     option(value="") none
+              //-     option(v-for="task in tasks" :value="task.id" :key="currentClass.id+student.id+task.id") {{ task.name }}
             td.is-narrow
               button.button.is-danger(title="Remove the student from this class" @click="remove( student )")
                 i.fa.fa-remove
@@ -63,7 +77,7 @@ export default {
 
   data() {
     return {
-      parent: this.cls,
+      currentClass: this.cls,
       students: null,
       schoolStudents: null,
       tasks: [],
@@ -71,6 +85,8 @@ export default {
 
       isEditing: false,
       currentGrade: null,
+
+      activeMenu: null,
     };
   },
 
@@ -97,7 +113,7 @@ export default {
 
   methods: {
     loadTasks() {
-      this.parent.getTasks( ( err, tasks ) => {
+      this.currentClass.getTasks( ( err, tasks ) => {
         if ( err ) {
           return this.setError( err, 'Failed to load tasks' );
         }
@@ -109,7 +125,7 @@ export default {
     },
 
     loadStudents() {
-      this.parent.getStudents( ( err, students ) => {
+      this.currentClass.getStudents( ( err, students ) => {
         if ( err ) {
           this.students = [];
           return this.setError( err, 'Failed to load students' );
@@ -200,7 +216,7 @@ export default {
 
     addNewStudents( e ) {
       if ( e.subitems ) {
-        this.parent.addStudents( e.subitems, err => {
+        this.currentClass.addStudents( e.subitems, err => {
           if ( err ) {
             this.setError( err, 'Failed to add new student' );
           }
@@ -219,23 +235,49 @@ export default {
       this.isEditing = false;
     },
 
+    addAssignment( student, taskID, e ) {
+      this.hideTaskList();
+
+      student.addAssignment( taskID, this.currentClass.id, err => {
+        if ( err ) {
+          this.setError( err, 'Failed to add the assignment' );
+        }
+        else {
+          this.setSuccess( 'The assignment was added' );
+        }
+      } );
+    },
+
+    removeAssignment( student, taskID, e ) {
+      student.removeAssignment( taskID, err => {
+        if ( err ) {
+          this.setError( err, 'Failed to remove the assignment' );
+        }
+        else {
+          this.setSuccess( 'The assignment was removed' );
+        }
+      } );
+    },
+
     getAssignment( student ) {
-      return student.assignments ? student.assignments[ this.parent.id ] : '';
+      return student.assignments ? student.assignments[ this.currentClass.id ] : '';
     },
 
     setAssignment( student, e ) {
-      student.setAssignment( this.parent.id, e.target.value, err => {
+      const taskID = e.target.value;
+
+      student.setAssignment( this.currentClass.id, taskID, err => {
         if ( err ) {
           this.setError( err, 'Failed to set the task to the student' );
         }
         else {
-          this.setSuccess( `The task was ${!e.target.value ? 'removed' : 'set'}` );
+          this.setSuccess( `The task was ${!taskID ? 'removed' : 'set'}` );
         }
       } );
     },
 
     remove( student, e ) {
-      this.parent.removeStudent( student, err => {
+      this.currentClass.removeStudent( student, err => {
         if ( err ) {
           this.setError( err, 'Failed to remove the student from the list' );
         }
@@ -246,6 +288,33 @@ export default {
         this.loadStudents();
       } );
     },
+
+    showTaskList( id ) {
+      this.hideTaskList();
+
+      this.activeMenu = this.$refs[ id ][0];
+      this.activeMenu.classList.add( 'is-active' );
+    },
+
+    hideTaskList( id ) {
+      const cb = () => {
+        if (this.activeMenu) {
+          this.activeMenu.classList.remove( 'is-active' );
+          this.activeMenu = null;
+        }
+      };
+
+      if (id) {
+        window.setTimeout( cb, 100 );
+      }
+      else {
+        cb();
+      }
+    },
+
+    getAssignmentName( id ) {
+      return this.tasks.find( task => task.id === id ).name;
+    }
   },
 
   mounted() {
@@ -264,5 +333,40 @@ export default {
     font-size: 12px;
     background-color: hsl(0, 0%, 98%);
     border-bottom: 1px solid #dbdbdb;
+  }
+
+  div.dropdown-item {
+    padding-right: 3rem;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  div.dropdown-item:hover {
+    background-color: whitesmoke;
+    color: #0a0a0a;
+  }
+
+  div.dropdown-item.is-active {
+    background-color: #00d1b2;
+    color: #fff;
+  }
+
+  .assignment {
+    display: inline-block;
+    background-color: #e0e2e4;
+    padding: 0.2em 0.3em;
+    border-radius: 3px;
+    border: 1px solid #c0c2c4;
+
+    margin-right: 0.3em;
+
+    .name {
+      display: inline-block;
+      margin-right: 0.5em;
+    }
+
+    .delete {
+      margin: 2px 0;
+    }
   }
 </style>

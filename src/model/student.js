@@ -23,6 +23,10 @@ export default class Student {
     return 'students';
   }
 
+  static get MULTICLASS() {
+    return true;
+  }
+
   static get isLogged() {
     return db.user && db.user.isStudent;
   }
@@ -52,6 +56,32 @@ export default class Student {
     return db.deleteField( this, `classes/${id}`, cb );
   }
 
+  addAssignment( task, cls, cb ) {
+    return db.setField( this, `assignments/${task}`, cls, err => {
+      if ( err ) {
+        console.error( '@/model/student.js/.addAssignment', err );
+      }
+      else {
+        this.assignments[ task ] = cls;
+      }
+
+      cb( err );
+    } );
+  }
+
+  removeAssignment( task, cb ) {
+    return db.deleteField( this, `assignments/${task}`, err => {
+      if ( err ) {
+        console.error( '@/model/student.js/.removeAssignment', err );
+      }
+      else {
+        delete this.assignments[ task ];
+      }
+
+      cb( err );
+    } );
+  }
+
   setAssignment( cls, task, cb ) {
     const prevAssignment = this.assignments[ cls ];
     if ( !task ) {
@@ -64,7 +94,7 @@ export default class Student {
     const onDone = err => {
       if ( err ) {
         this.assignments[ cls ] = prevAssignment;
-        return console.log( '@/model/student.js/.setAssignment', err );
+        console.error( '@/model/student.js/.setAssignment', err );
       }
 
       cb( err );
@@ -80,10 +110,15 @@ export default class Student {
 
   loadAssignments( cb ) {
     const taskIDs = [];
+if (Student.MULTICLASS) {
+    for ( let id in this.assignments ) {
+      taskIDs.push( id );
+    }
+} else {
     for ( let cls in this.assignments ) {
       taskIDs.push( this.assignments[ cls ] );
     }
-
+}
     return db.getFromIDs( Task, taskIDs, ( err, tasks ) => {
       if ( err ) {
         return cb( err );
@@ -94,7 +129,7 @@ export default class Student {
       tasks.forEach( task => {
         promises.push( db.get( Class, task.cls, ( err, cls ) => {
           if ( err ) {
-            return console.log( '@/model/student.js/.loadAssignments db.get Class', err ); // TODO is just logging error enough?
+            return console.error( '@/model/student.js/.loadAssignments db.get Class', err ); // TODO is just logging error enough?
           }
           result.push( { cls, task } );
         } ) );
@@ -130,13 +165,13 @@ export default class Student {
       sessions.forEach( session => {
         promises.push( db.get( Class, session.cls, ( err, cls ) => {
           if ( err ) {
-            return console.log( '@/model/student.js/.loadSessions db.get Class', err ); // TODO is just logging error enough?
+            return console.error( '@/model/student.js/.loadSessions db.get Class', err ); // TODO is just logging error enough?
           }
           result.get( session ).cls = cls;
         } ) );
         promises.push( db.get( Task, session.task, ( err, task ) => {
           if ( err ) {
-            return console.log( '@/model/student.js/.loadSessions db.get Task', err ); // TODO is just logging error enough?
+            return console.error( '@/model/student.js/.loadSessions db.get Task', err ); // TODO is just logging error enough?
           }
           result.get( session ).task = task;
         } ) );
@@ -165,8 +200,10 @@ export default class Student {
         return cb( err );
       }
 
-      // TODO enable this in production and remove the other line
+      // TODO
+      // This line is for in production mode
       this.setAssignment( task, null, cb );
+      // This line is for in dev mode
       // cb();
     } );
   }
