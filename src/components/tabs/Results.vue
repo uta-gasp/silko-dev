@@ -75,7 +75,7 @@
       @close="closeSessionSelectionBox")
       item-selection-box(
         :multiple="!isGazePlot"
-        :single-group="!isGazePlot"
+        :single-group="!isGazePlot && !studentWithSessions[0].multiGroup"
         :items="studentWithSessions"
         item-name="student"
         subitem-name="session"
@@ -275,18 +275,34 @@ export default {
 
       const grade = {
         text: `Students completed "${task.name}"`,
+        multiGroup: true,
         subitems: [],
       };
 
       task.students.forEach( student => {
-        grade.subitems.push( new SelectionBoxItem( {
-          id: student.ref.id,
-          text: student.ref.name,
-          selected: true,
-        } ) );
+        student.sessions.forEach( session => {
+          if (session.task.id === task.id) {
+            grade.subitems.push( new SelectionBoxItem( {
+              id: session.ref.id,
+              text: `${dataUtils.sessionDate( session.ref.date )}`,
+              selected: true,
+              group: student.ref.name,
+            } ) );
+          }
+        } );
+
+        // No sessions, just student names
+        // grade.subitems.push( new SelectionBoxItem( {
+        //   id: student.ref.id,
+        //   text: student.ref.name,
+        //   selected: true,
+        // } ) );
       } );
 
-      this.gradeWithStudents = [ grade ];
+      this.studentWithSessions = [ grade ];
+
+      // No sessions, just student names
+      // this.gradeWithStudents = [ grade ];
     },
 
     selectClassStudents( cls, visualizationName ) {

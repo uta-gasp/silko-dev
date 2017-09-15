@@ -1,10 +1,10 @@
 <template lang="pug">
   #item-select-box
-    div.tabs.is-centered.is-boxed(v-if="items.length > 1")
+    header.tabs.is-centered.is-boxed(v-if="items.length > 1")
       ul.ul
         li(:class="{ 'is-active': isItemSelected( item ) }" v-for="item in items" :key="item.id")
           a(@click="selectItem( item )") {{ item.text }}
-    .subitems
+    main.subitems
       .has-text-centered(v-if="!isItemSelected()")
         i Select a {{ itemName }}
       div(v-if="currentItem")
@@ -23,10 +23,10 @@
               :class="{ 'is-selected' : subitem.selected }"
               v-for="(subitem, index) in group.items"
               :key="subitem.id")
-              .card-content.title.is-6(@click="selectSubitem( subitem, index, $event )") {{ subitem.text }}
+              .card-content(@click="selectSubitem( subitem, index, $event )") {{ subitem.text }}
         .has-text-centered(v-if="!hasSubitems( currentItem )")
           i No available {{ subitemName }}
-    .field
+    footer.field
       p.control
         .level
           .level-left
