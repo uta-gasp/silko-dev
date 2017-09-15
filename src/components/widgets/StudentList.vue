@@ -15,26 +15,32 @@
           tr.is-subheader(v-if="students && students.length")
             th Name
             th.is-narrow
-              .has-text-centered Task
+              .has-text-centered Assignments
             th.is-narrow
         tbody
           tr(v-for="student in students" :key="currentClass.id+student.id")
             td {{ student.name }}
             td.is-narrow
-              .assignments
-                .assignment(v-for="(cls, task) in student.assignments")
-                  .name {{ getAssignmentName( task ) }}
-                  button.delete(@click="removeAssignment( student, task )")
-              p.control
-                .dropdown(:ref="currentClass.id+student.id" @focusout="hideTaskList( currentClass.id+student.id )")
-                  .dropdown-trigger
-                    button.button(aria-haspopup="true" aria-controls="dropdown-menu" @click="showTaskList( currentClass.id+student.id )")
-                      span Add a task
-                      span.icon.is-small
-                        i.fa.fa-angle-down(aria-hidden="true")
-                  .dropdown-menu(role="menu")
-                    .dropdown-content
-                      .dropdown-item(v-for="task in tasks" @click="addAssignment( student, task.id, $event )" ) {{ task.name }}
+              .tags
+                .tag.is-medium(v-for="(cls, task) in student.assignments") {{ getAssignmentName( task ) }}
+                  button.delete.is-small(@click="removeAssignment( student, task )")
+
+              //- .assignments
+              //-   .assignment(v-for="(cls, task) in student.assignments")
+              //-     .name {{ getAssignmentName( task ) }}
+              //-     button.delete.is-small(@click="removeAssignment( student, task )")
+              .dropdown(
+                  :ref="currentClass.id+student.id"
+                  v-show="availableTasks( student ).length"
+                  @focusout="hideTaskList( currentClass.id+student.id )")
+                .dropdown-trigger
+                  button.button(aria-haspopup="true" aria-controls="dropdown-menu" @click="showTaskList( currentClass.id+student.id )")
+                    span Add an assignment
+                    span.icon.is-small
+                      i.fa.fa-angle-down(aria-hidden="true")
+                .dropdown-menu(role="menu")
+                  .dropdown-content
+                    .dropdown-item(v-for="task in availableTasks( student )" @click="addAssignment( student, task.id, $event )" ) {{ task.name }}
               //- span.select
               //-   select(:value="getAssignment( student )" @input="setAssignment( student, $event )")
               //-     option(value="") none
@@ -44,7 +50,13 @@
                 i.fa.fa-remove
 
     modal-container(v-if="isEditing" title="Available students" @close="closeEditor")
-      item-selection-box(:items="schoolGrades" item-name="grade" subitem-name="student" @accept="addNewStudents")
+      item-selection-box(
+        :items="schoolGrades"
+        :multiple="true"
+        :single-group="false"
+        item-name="grade"
+        subitem-name="student"
+        @accept="addNewStudents")
 
     temporal-notification(type="danger" :show="showError")
       span {{ errorMessage }}
@@ -289,6 +301,10 @@ export default {
       } );
     },
 
+    availableTasks( student ) {
+      return this.tasks.filter( task => !student.assignments[ task.id ] );
+    },
+
     showTaskList( id ) {
       this.hideTaskList();
 
@@ -351,22 +367,30 @@ export default {
     color: #fff;
   }
 
-  .assignment {
-    display: inline-block;
-    background-color: #e0e2e4;
-    padding: 0.2em 0.3em;
-    border-radius: 3px;
-    border: 1px solid #c0c2c4;
-
-    margin-right: 0.3em;
-
-    .name {
-      display: inline-block;
-      margin-right: 0.5em;
-    }
-
-    .delete {
-      margin: 2px 0;
-    }
+  .tags {
+    margin-bottom: 0;
   }
+  .tags:not(:last-child) {
+    margin-bottom: 0;
+  }
+
+  // .assignment {
+  //   display: inline-block;
+  //   background-color: #e8eaec;
+  //   padding: 0.2em;
+  //   border-radius: 3px;
+  //   border: 1px solid #c0c2c4;
+
+  //   margin-right: 0.3em;
+
+  //   .name {
+  //     display: inline-block;
+  //     margin-right: 0.5em;
+  //   }
+
+  //   .delete {
+  //     margin: auto 0;
+  //     vertical-align: middle;
+  //   }
+  // }
 </style>

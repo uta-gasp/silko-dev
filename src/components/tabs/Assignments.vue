@@ -75,8 +75,8 @@ export default {
   data() {
     return {
       student: null,
-      assignments: null,  // {cls, task}
-      sessions: null,     // {cls, task, session}
+      assignments: null,  // [{cls, task}]
+      sessions: null,     // [{cls, task, session}]
       assignment: '',
     };
   },
