@@ -33,7 +33,7 @@
           loading
         .container(v-else-if="!sessions.length")
           i No completed tasks yet
-        table.table.completed(v-else)
+        table.table(v-else)
           thead
             tr
               th Class
@@ -44,7 +44,7 @@
             tr(v-for="session in sessions")
               td {{ session.cls.name }}
               td {{ session.task.name }}
-              td
+              td {{ getWPM( session.data ) }}
               td {{ session.session.date | prettifyDate }}
 
     temporal-notification(type="danger" :show="showError")
@@ -131,6 +131,34 @@ if (Student.MULTICLASS) {
       this.$router.replace( `/assignment/${assignment.cls.id}` );
 }
     },
+
+    getWPM( data ) {
+      // TODO: same piece of code as in components/vis/StudentSummary.vue:calculateStatistics
+      const pages = data.pages;
+
+      let firstPage;
+      let lastPage;
+      let wordCount = 0;
+      pages.forEach( page => {
+        if ( !firstPage && page.fixations ) {
+          firstPage = page;
+        }
+        if ( page.fixations ) {
+          lastPage = page;
+          wordCount += page.text.length;
+        }
+      } );
+
+      if ( !firstPage || !lastPage ) {
+        return '-';
+      }
+
+      const firstFixation = firstPage.fixations[0];
+      const lastFixation = lastPage.fixations[ lastPage.fixations.length - 1 ];
+      const duration = ( lastFixation.ts + lastFixation.duration ) - firstFixation.ts;
+
+      return ( wordCount / ( duration / 60000 ) ).toFixed( 0 )
+    }
   },
 
   created() {
@@ -162,9 +190,5 @@ if (Student.MULTICLASS) {
 
   .card-header-icon {
     cursor: default;
-  }
-
-  .completed {
-    width: 100%;
   }
 </style>

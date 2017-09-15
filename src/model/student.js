@@ -158,6 +158,7 @@ if (Student.MULTICLASS) {
           cls: {},
           task: {},
           session: null,
+          data: null,
         } );
       } );
 
@@ -174,6 +175,12 @@ if (Student.MULTICLASS) {
             return console.error( '@/model/student.js/.loadSessions db.get Task', err ); // TODO is just logging error enough?
           }
           result.get( session ).task = task;
+        } ) );
+        promises.push( db.get( Data, session.data, ( err, data ) => {
+          if ( err ) {
+            return console.error( '@/model/student.js/.loadSessions db.get Data', err ); // TODO is just logging error enough?
+          }
+          result.get( session ).data = data;
         } ) );
       } );
 

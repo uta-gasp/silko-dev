@@ -174,6 +174,7 @@ export default {
           }
           if ( page.fixations ) {
             lastPage = page;
+            wordCount += page.text.length
           }
         } );
 
@@ -184,10 +185,6 @@ export default {
         const firstFixation = firstPage.fixations[0];
         const lastFixation = lastPage.fixations[ lastPage.fixations.length - 1 ];
         duration += ( lastFixation.ts + lastFixation.duration ) - firstFixation.ts;
-
-        wordCount += pages.reduce( ( acc, page ) => {
-          return acc + page.text.length;
-        }, 0 );
 
         fixations = pages.reduce( ( acc, page ) => {
           return {

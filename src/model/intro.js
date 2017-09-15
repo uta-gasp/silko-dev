@@ -68,7 +68,6 @@ export default class Intro {
       if ( length > MAX_CHARS ) {
         const spaceTo = text.indexOf( ' ', MAX_CHARS_START );
         const spaceFrom = text.slice( 0, -MAX_CHARS_END ).lastIndexOf( ' ' );
-        console.log( spaceFrom );
         text = text.substr( 0, spaceTo ) + ' ... ' + text.slice( -length + spaceFrom );
       }
 
