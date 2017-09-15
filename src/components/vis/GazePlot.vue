@@ -90,15 +90,9 @@ export default {
     },
 
     mapAndShow() {
-      const page = this.currentPages[0];
-      if ( !page.fixations ) {
-        return;
-      }
-
-      const fixations = this.map( page ).fixations;
-      Regressions.compute( fixations );
-
       this.painter.clean();
+
+      const page = this.currentPages[0];
 
       const wordsWithGazingInfo = this.combineWordsAndGazeInfo( page.text, page.words );
       this.painter.drawWords( wordsWithGazingInfo, Object.assign( {
@@ -112,6 +106,17 @@ export default {
           hyphen: this.record.session.feedbacks.hyphen,
         }, UI.syllab ) );
       }
+
+      if ( !page.fixations ) {
+        this.isWarningMessageVisible = true;
+        return;
+      }
+
+      this.isWarningMessageVisible = false;
+
+      const fixations = this.map( page ).fixations;
+      Regressions.compute( fixations );
+
       if ( UI.showFixations && fixations ) {
         this.painter.drawFixations( fixations, Object.assign( {
           connectionColor: this.commonUI.wordRectColor,

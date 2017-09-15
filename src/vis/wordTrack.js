@@ -5,6 +5,7 @@ export default class WordTrack {
     this.name = userName;
     this.id = id;
 
+    this.doneMessage = 'done';
     this.pointerSize = 8;
     this.fixationTimer = null;
     this.nextTimer = null;
@@ -26,11 +27,6 @@ export default class WordTrack {
     this.onWordFixated = onWordFixated;
     this.onCompleted = onCompleted;
 
-    if ( !fixations ) {
-      onCompleted();
-      return;
-    }
-
     this.fixations = fixations;
     this.words = words;
 
@@ -39,6 +35,12 @@ export default class WordTrack {
     } );
 
     this.fixationIndex = 0;
+
+    if ( !fixations ) {
+      this.doneMessage = 'no data';
+      onCompleted( 'no data' );
+      return;
+    }
 
     this.pointer = document.createElement( 'div' );
     this.pointer.classList.add( 'pointer' );

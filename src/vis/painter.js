@@ -19,6 +19,7 @@ const UNMAPPED_FIXATION_COLOR = '#000';
 const MERGED_FIXATION_BORDER_COLOR = '#808';
 
 const CHECK_MARK = String.fromCharCode( 0x2713 );
+const NO_DATA_MARK = String.fromCharCode( 0x26A0 );
 
 export default class Painter {
 
@@ -124,10 +125,13 @@ export default class Painter {
     ctx.textBaseline = 'top';
     ctx.strokeStyle = '#000';
     ctx.fillStyle = name.color;
-    ctx.font = `bold ${settings.fontSize}px ${settings.fontFamily}`;
+
+    const isNoData = settings.reason === 'no data';
+    const fontFamily = isNoData ? 'Segoe UI' : settings.fontFamily;
+    ctx.font = `bold ${settings.fontSize}px ${fontFamily}`;
 
     ctx.fillText(
-      CHECK_MARK,
+      isNoData ? NO_DATA_MARK : CHECK_MARK,
       settings.location.x,
       settings.location.y + ( settings.nameSpacing * settings.fontSize ) * name.index
     );

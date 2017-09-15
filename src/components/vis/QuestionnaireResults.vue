@@ -1,6 +1,5 @@
 <template lang="pug">
   #questionnaire-results
-    vis-title {{ title }}
     .list
       table.table
         thead
@@ -30,7 +29,9 @@
         //-     td
         //-     td(v-for="question in questionnaire.questions")
 
-    control-panel(@close="close")
+    control-panel(
+      :title="title"
+      @close="close")
 
 </template>
 
@@ -38,14 +39,12 @@
 import DataUtils from '@/utils/data-utils.js';
 
 import ControlPanel from '@/components/vis/controlPanel';
-import VisTitle from '@/components/vis/VisTitle';
 
 export default {
   name: 'questionnaire-results',
 
   components: {
     'control-panel': ControlPanel,
-    'vis-title': VisTitle,
   },
 
   data() {

@@ -1,8 +1,12 @@
 <template lang="pug">
   #vis-plot(ref="root")
     canvas(ref="canvas")
-    vis-title {{ title }}
+    .message.is-danger.below-title(v-if="isWarningMessageVisible")
+      .message-header Missing data
+      .message-body Fixation data is missing on this page
+
     control-panel(
+      :title="title"
       :feedback="defaultFeedback"
       :questionnaire="data.records.length === 1 ? defaultQuestionnaire : null"
       :text-length="textLength"
@@ -27,7 +31,6 @@ import sgwmController from '@/vis/sgwmController.js';
 
 import ControlPanel from '@/components/vis/controlPanel';
 import Options from '@/components/vis/Options';
-import VisTitle from '@/components/vis/VisTitle';
 
 const COMMON_UI = {
   wordColor: '#666',
@@ -46,7 +49,6 @@ export default {
   components: {
     'control-panel': ControlPanel,
     'options': Options,
-    'vis-title': VisTitle,
   },
 
   data() {
@@ -67,6 +69,7 @@ export default {
       defaultQuestionnaire: this.data.records[0].data.questionnaire,
 
       isPlayerPaused: false,
+      isWarningMessageVisible: false,
     };
   },
 
@@ -164,6 +167,14 @@ export default {
       height: 100%;
       opacity: 1;
       background-color: rgba(255, 255, 255, 1);
+    }
+
+    .below-title {
+      position: fixed;
+      top: 3.5em;
+      right: 4px;
+      // left: 50%;
+      // transform: translateX(-50%);
     }
   }
 </style>

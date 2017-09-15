@@ -10,14 +10,14 @@ import VisPlot from '@/components/vis/VisPlot';
 
 const LEGEND_LOCATION = {
   x: 2,
-  y: 8,
+  y: 50,
 };
 
 const UI = {
   colorMetric: Metric.Type.NONE,
 
   nameFontFamily: 'Calibri, Arial, sans-serif',
-  nameFontSize: 20,
+  nameFontSize: 18,
   nameSpacing: 1.5,
 
   syllab: {
@@ -78,6 +78,8 @@ export default {
     },
 
     changePage() {
+      this.isWarningMessageVisible = false;
+
       if ( !this.painter ) {
         this.painter = new Painter( this.$refs.canvas, {
           syllab: this.defaultFeedback.syllabification,
@@ -135,7 +137,8 @@ export default {
           this.pageIndex, {  // callbacks
             fixation: ( fixation, pointer ) => {
             },
-            completed: () => {
+            completed: reason => {
+              this.isWarningMessageVisible = !!reason;
               const name = {
                 color: track.color,
                 index: ti,
@@ -145,6 +148,7 @@ export default {
                 fontFamily: UI.nameFontFamily,
                 nameSpacing: UI.nameSpacing,
                 location: LEGEND_LOCATION,
+                reason
               } );
             },
             syllabification: syllabification => {

@@ -1,12 +1,12 @@
 <template lang="pug">
   #vis-durations
-    vis-title {{ title }}
     .list
       .record(v-for="word in words")
         .word {{ word.text }}
         .duration {{ word.value }}
 
     control-panel(
+      :title="title"
       :feedback="defaultFeedback"
       :text-length="textLength"
       :options="options"
@@ -28,7 +28,6 @@ import OptionsCreator from '@/vis/optionsCreator.js';
 
 import ControlPanel from '@/components/vis/controlPanel';
 import Options from '@/components/vis/Options';
-import VisTitle from '@/components/vis/VisTitle';
 
 const UNITS = {
   SECONDS: 'seconds',
@@ -45,7 +44,6 @@ export default {
   components: {
     'control-panel': ControlPanel,
     'options': Options,
-    'vis-title': VisTitle,
   },
 
   data() {

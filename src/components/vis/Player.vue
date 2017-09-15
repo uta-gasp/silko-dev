@@ -35,7 +35,7 @@ export default {
 
   #player {
     display: inline-block;
-    margin: 4px auto;
+    // margin: 4px auto;
     padding: 4px;
     line-height: 0;
     vertical-align: top;

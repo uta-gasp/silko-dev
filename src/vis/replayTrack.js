@@ -41,7 +41,7 @@ export default class ReplayTrack {
 
     this.fixations = this.session[ pageIndex ].fixations;
     if ( !this.fixations ) {
-      this.callbacks.completed();
+      this.callbacks.completed( 'no data' );
       return;
     }
 

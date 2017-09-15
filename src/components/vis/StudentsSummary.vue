@@ -1,6 +1,5 @@
 <template lang="pug">
   #student-summary
-    vis-title {{ title }}
     .container
       table
         thead
@@ -14,7 +13,9 @@
               span(v-if="index === 1") {{ `${Math.floor(stat / 60).toFixed(0)}:${secondsToString( stat % 60 )}` }}
               span(v-else) {{ stat }}
 
-    control-panel(:options="options"
+    control-panel(
+      :title="title"
+      :options="options"
       @show-options="showOptions"
       @close="close"
     )
@@ -29,7 +30,6 @@ import sgwmController from '@/vis/sgwmController.js';
 
 import ControlPanel from '@/components/vis/controlPanel';
 import Options from '@/components/vis/Options';
-import VisTitle from '@/components/vis/VisTitle';
 
 sgwmController.initializeSettings();
 
@@ -39,7 +39,6 @@ export default {
   components: {
     'control-panel': ControlPanel,
     'options': Options,
-    'vis-title': VisTitle,
   },
 
   data() {
@@ -187,6 +186,10 @@ export default {
         duration += ( lastFixation.ts + lastFixation.duration ) - firstFixation.ts;
 
         fixations = pages.reduce( ( acc, page ) => {
+          if (!page.fixations) {
+            return acc;
+          }
+
           return {
             count: acc.count + page.fixations.length,
             duration: acc.duration + page.fixations.reduce( ( sum, fix ) => ( sum + fix.duration ), 0 ),
@@ -195,6 +198,10 @@ export default {
         }, fixations );
 
         regressionCount += pages.reduce( ( acc, page ) => {
+          if (!page.fixations) {
+            return acc;
+          }
+
           const mappedPage = sgwmController.map( page );
           return acc + Regressions.compute( mappedPage.fixations );
         }, 0 );
@@ -264,26 +271,26 @@ export default {
       this.students = students;
     },
 
-    map( session ) {
-      const sgwmSession = {
-        fixations: session.fixations,
-        words: session.words.map( word => {
-          return {
-            id: word.id,
-            x: word.rect.x,
-            y: word.rect.y,
-            width: word.rect.width,
-            height: word.rect.height,
-            text: word.text,
-          };
-        } ),
-      };
+    // map( session ) {
+    //   const sgwmSession = {
+    //     fixations: session.fixations,
+    //     words: session.words.map( word => {
+    //       return {
+    //         id: word.id,
+    //         x: word.rect.x,
+    //         y: word.rect.y,
+    //         width: word.rect.width,
+    //         height: word.rect.height,
+    //         text: word.text,
+    //       };
+    //     } ),
+    //   };
 
-      const sgwm = new SGWM();
-      const result = sgwm.map( sgwmSession );
+    //   const sgwm = new SGWM();
+    //   const result = sgwm.map( sgwmSession );
 
-      return result;
-    },
+    //   return result;
+    // },
   },
 
   mounted() {

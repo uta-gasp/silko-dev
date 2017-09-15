@@ -1,6 +1,5 @@
 <template lang="pug">
   #word-replay
-    vis-title {{ title }}
     .list(ref="root")
       table(ref="table")
         thead
@@ -11,15 +10,16 @@
         tbody
           tr(v-for="word in words" :key="word.key")
             td.word {{ word.text }}
-            td.duration(v-for="duration in word.durations")
+            td.duration(:class="{ 'is-danger': hasNoData( index ) }" v-for="(duration, index) in word.durations")
 
         tfoot
           tr
             td
             td(v-for="track in tracks")
-              span(:class="{ hidden: track.pointer }") done
+              span(:class="{ hidden: track.pointer }") {{ track.doneMessage }}
 
     control-panel(
+      :title="title"
       :feedback="null"
       :text-length="textLength"
       :options="options"
@@ -44,7 +44,6 @@ import WordTrack from '@/vis/wordTrack.js';
 
 import ControlPanel from '@/components/vis/controlPanel';
 import Options from '@/components/vis/Options';
-import VisTitle from '@/components/vis/VisTitle';
 
 sgwmController.initializeSettings();
 
@@ -58,7 +57,6 @@ export default {
   components: {
     'control-panel': ControlPanel,
     'options': Options,
-    'vis-title': VisTitle,
   },
 
   data() {
@@ -192,7 +190,7 @@ export default {
         const mappingResult = sgwmController.map( track.session[ this.pageIndex ] );
 
         track.start(
-          mappingResult.fixations,
+          mappingResult ? mappingResult.fixations : null,
           words,
           this.onWordFixated( track, rows ),
           this.onTrackCompleted( track, rows[ words.length + 1 ] ),
@@ -213,6 +211,11 @@ export default {
       cell.style.backgroundColor = rgb;
     },
 
+    hasNoData( trackIndex ) {
+      const hasFixations = this.tracks[ trackIndex ].fixations;
+      return !hasFixations;
+    },
+
     onWordFixated( track, rows ) {
       return ( word, duration, pointer ) => {
         const rawWord = track.words[ word.id ];
@@ -226,7 +229,7 @@ export default {
     },
 
     onTrackCompleted( track, row ) {
-      return () => {
+      return reason => {
         // const cell = row.cells[ track.id + 1 ];
         // cell.classList.remove( 'hidden' );
       };
@@ -326,6 +329,10 @@ export default {
         }
       }
     }
+  }
+
+  td.is-danger {
+    background-color: hsl(348, 100%, 81%);
   }
 </style>
 
