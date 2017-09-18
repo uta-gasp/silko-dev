@@ -5,7 +5,7 @@
         thead
           tr
             th(:class="headerNameClass" @click="sort( -1 )") Name
-            th(:class="statNameClass( stat, index )" v-for="(stat, index) in statistics" @click="sort( index )") {{ stat.name }}
+            th(:class="statNameClass( stat, index )" v-for="(stat, index) in statistics" :title="stat.title || ''" @click="sort( index )") {{ stat.name }}
         tbody
           tr(v-for="student in students" :key="student.ref.id")
             td {{ student.ref.name }}
@@ -26,6 +26,7 @@
 <script>
 import Regressions from '@/vis/regressions.js';
 import sgwmController from '@/vis/sgwmController.js';
+import Syllabifier from '@/utils/syllabifier.js';
 // import OptionsCreator from '@/vis/optionsCreator.js';
 
 import ControlPanel from '@/components/vis/controlPanel';
@@ -58,9 +59,10 @@ export default {
       statistics: [
         { name: 'Sessions', sortDir: 0 },
         { name: 'Reading time', sortDir: 0 },
-        { name: 'WPM', sortDir: 0 },
-        { name: 'SPW', sortDir: 0 },
-        { name: 'Fixation, ms', sortDir: 0 },
+        { name: 'WPM', title: 'Words per minute', sortDir: 0 },
+        { name: 'SPM', title: 'Syllables per minute (sessions)', sortDir: 0 },
+        { name: 'SPW', title: 'Seconds per word', sortDir: 0 },
+        { name: 'Fixation', title: 'Average fixation duration in milliseconds', sortDir: 0 },
         { name: 'Syllabifications', sortDir: 0 },
         { name: 'Regressions', sortDir: 0 },
       ],
@@ -118,9 +120,11 @@ export default {
     makeStudents() {
       const students = new Map();
 
+      // Records.session.feedbacks
       this.data.records.forEach( record => {
         const session = {
           data: record.data,
+          feedbacks: record.session.feedbacks,
         };
 
         if ( students.has( record.student.id ) ) {
@@ -161,29 +165,45 @@ export default {
         duration: 0,
         hyphenations: 0,
       };
+      let syllab = {
+        count: 0,
+        sessions: 0
+      };
 
       student.sessions.forEach( session => {
         const pages = session.data.pages;
+        const syllabifier = session.feedbacks.syllabification.enabled ? new Syllabifier( session.feedbacks.syllabification ) : null;
 
         let firstPage;
         let lastPage;
-        pages.forEach( page => {
+        pages.forEach( (page, pageIndex) => {
           if ( !firstPage && page.fixations ) {
             firstPage = page;
           }
           if ( page.fixations ) {
             lastPage = page;
-            wordCount += page.text.length
+
+            const fixRange = {
+              first: page.fixations[0],
+              last: page.fixations[ page.fixations.length - 1 ]
+            };
+
+            duration += (fixRange.last.ts + fixRange.last.duration) - fixRange.first.ts;
+            wordCount += page.text.length;
+
+            if (syllabifier) {
+              const text =  page.text.map( word => word.text ).join( ' ' );
+              syllab.count += syllabifier.getSyllabCount( text );
+              if (!pageIndex) {
+                syllab.sessions++;
+              }
+            }
           }
         } );
 
         if ( !firstPage || !lastPage ) {
           return;
         }
-
-        const firstFixation = firstPage.fixations[0];
-        const lastFixation = lastPage.fixations[ lastPage.fixations.length - 1 ];
-        duration += ( lastFixation.ts + lastFixation.duration ) - firstFixation.ts;
 
         fixations = pages.reduce( ( acc, page ) => {
           if (!page.fixations) {
@@ -212,9 +232,10 @@ export default {
       const totalDuration = new Date( 0, 0, 0, 0, 0, Math.round( duration / 1000 ) );
 
       result.push( totalDuration.getMinutes() * 60 + totalDuration.getSeconds() );
-      result.push( ( wordCount / ( duration / 60000 ) ).toFixed( 0 ) );
-      result.push( ( duration / wordCount / 1000 ).toFixed( 2 ) );
-      result.push( Math.round( fixations.duration / fixations.count ) );
+      result.push( wordCount ? ( wordCount / ( duration / 60000 ) ).toFixed( 0 ) : '-' );
+      result.push( syllab.count ? ( syllab.count / ( duration / 60000 ) ).toFixed( 0 ) + ` (${syllab.sessions})` : '-' );
+      result.push( duration ? ( duration / wordCount / 1000 ).toFixed( 2 ) : '-' );
+      result.push( fixations.count ? Math.round( fixations.duration / fixations.count ) : '-' );
       result.push( (fixations.hyphenations / student.sessions.length).toFixed( 2 ) );
       result.push( regressionCount );
 

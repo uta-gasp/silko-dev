@@ -181,6 +181,41 @@ export default class Syllabifier {
     return result;
   }
 
+  getSyllabCount( text ) {
+    if ( !this.rule ) {
+      return 0;
+    }
+
+    logger.info( 'counting syllab' );
+
+    const countWordSyllabs = (acc, word) => {
+      if ( !word ) {
+        return acc;
+      }
+
+      let result;
+      const exception = Object.keys( this.exceptions ).find( exception => this._isException( word, exception ) );
+      if ( exception ) {
+        result = this.exceptions[ exception ];
+      }
+      else {
+        result = this.rule( word, ' ' );
+      }
+
+      return acc + result.split( ' ' ).length;
+    };
+
+    if ( text instanceof Array ) {
+      return text.reduce( (acc, line) => {
+        const words = line.split( ' ' ).map( word => word.toLowerCase() );
+        return words.reduce( countWordSyllabs, acc );
+      }, 0 );
+    }
+    else {
+      return text.split( ' ' ).reduce( countWordSyllabs, 0 );
+    }
+  }
+
   _restore( el ) {
     let text = null;
     try {
