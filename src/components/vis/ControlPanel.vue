@@ -1,33 +1,32 @@
 <template lang="pug">
-  #control-panel
-    .columns.is-mobile
-      .column.title {{ title }}
-      .column.is-narrow
-        player.player(v-if="showPlayer" :is-paused="isPlayerPaused" @restart="restartPlayer" @toggle="togglePlayer")
+  #control-panel.columns.is-mobile
+    .column.title {{ title }}
+    .column.is-narrow
+      player.player(v-if="showPlayer" :is-paused="isPlayerPaused" @restart="restartPlayer" @toggle="togglePlayer")
 
-        .props(v-if="feedback")
-          abbr.prop.speech(:class="{ off: !feedback.speech.enabled }" title="Speech output")
-          abbr.prop.syllab(:class="{ off: !feedback.syllabification.enabled }" title="Syllabification")
-            span(v-if="feedback.syllabification.enabled") {{ feedback.syllabification.threshold.value }}
+      .props(v-if="feedback")
+        abbr.prop.speech(:class="{ off: !feedback.speech.enabled }" title="Speech output")
+        abbr.prop.syllab(:class="{ off: !feedback.syllabification.enabled }" title="Syllabification")
+          span(v-if="feedback.syllabification.enabled") {{ feedback.syllabification.threshold.value }}
 
-        .props(v-if="questionnaire && questionnaire.length")
-          abbr.prop.questionnaire(title="Questionnaire corectness") {{ correctAnswers }}
+      .props(v-if="questionnaire && questionnaire.length")
+        abbr.prop.questionnaire(title="Questionnaire corectness") {{ correctAnswers }}
 
-        .menu
-          template(v-if="textLength")
-            .navigation
-              abbr(title="Previous page")
-                button.icon-btn.prev(:class="{ disabled: !pageIndex }" @click="prevPage")
-              .page {{ dispPage }}
-              abbr(title="Next page")
-                button.icon-btn.next(:class="{ disabled: pageIndex === textLength - 1 }" @click="nextPage")
-            .separator
-          template(v-if="showOptionsButton")
-            abbr(title="Settings")
-              button.icon-btn.settings(@click="showOptions")
-            .separator
-          abbr(title="Close this visualization")
-            button.icon-btn.close(@click="close")
+      .menu
+        template(v-if="textLength")
+          .navigation
+            abbr(title="Previous page")
+              button.icon-btn.prev(:class="{ disabled: !pageIndex }" @click="prevPage")
+            .page {{ dispPage }}
+            abbr(title="Next page")
+              button.icon-btn.next(:class="{ disabled: pageIndex === textLength - 1 }" @click="nextPage")
+          .separator
+        template(v-if="showOptionsButton")
+          abbr(title="Settings")
+            button.icon-btn.settings(@click="showOptions")
+          .separator
+        abbr(title="Close this visualization")
+          button.icon-btn.close(@click="close")
 
 </template>
 
@@ -271,11 +270,14 @@ export default {
     color: #444;
     font: 18px 'Roboto Condensed', Arial, sans-serif;
     line-height: 46px;
+    overflow-x: hidden;
     text-overflow: ellipsis;
-    text-align: right;
+    text-align: left;
+    margin-left: 0.5em;
   }
 
   .column {
     margin-bottom: 0;
+    padding-bottom: 2px;
   }
 </style>
