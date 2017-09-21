@@ -80,6 +80,7 @@ export default {
           syllab: this.defaultFeedback.syllabification,
         } );
         this.painter.setFont( this.record.session.font );
+        this.painter.setScreenSize( this.record.session.screen );
       }
 
       this.mapAndShow();
@@ -94,7 +95,12 @@ export default {
 
       const page = this.currentPages[0];
 
-      const wordsWithGazingInfo = this.combineWordsAndGazeInfo( page.text, page.words );
+      const fixations = this.map( page ).fixations;
+      Regressions.compute( fixations );
+
+      // const wordsWithGazingInfo = this.combineWordsAndGazeInfo( page.text, page.words );
+      const wordsWithGazingInfo = this.addGazeInfoToWords( page.text, fixations );
+
       this.painter.drawWords( wordsWithGazingInfo, Object.assign( {
         colorMetric: UI.colorMetric,
         showConnections: UI.showConnections,
@@ -114,9 +120,6 @@ export default {
 
       this.isWarningMessageVisible = false;
 
-      const fixations = this.map( page ).fixations;
-      Regressions.compute( fixations );
-
       if ( UI.showFixations && fixations ) {
         this.painter.drawFixations( fixations, Object.assign( {
           connectionColor: this.commonUI.wordRectColor,
@@ -124,31 +127,55 @@ export default {
       }
     },
 
-    isMatchingWord( word, info ) {
-      return Math.abs( word.rect.x - info.rect.x ) < 1 && Math.abs( word.rect.y - info.rect.y ) < 1;
-    },
+    // isMatchingWord( word, info ) {
+    //   return Math.abs( word.rect.x - info.rect.x ) < 1 && Math.abs( word.rect.y - info.rect.y ) < 1;
+    // },
 
-    combineWordsAndGazeInfo( words, wordsWithGazeInfo ) {
+    // combineWordsAndGazeInfo( words, wordsWithGazeInfo ) {
+    //   const result = [];
+    //   const gazeInfo = new Set( wordsWithGazeInfo );
+
+    //   words.forEach( word => {
+    //     const iterator = gazeInfo.values();
+    //     let item = iterator.next();
+    //     while ( !item.done ) {
+    //       if ( this.isMatchingWord( word, item.value ) ) {
+    //         const { feedback, focusing } = item.value;
+    //         result.push( Object.assign( { feedback, focusing }, word ) );
+    //         gazeInfo.delete( item.value );
+    //         break;
+    //       }
+
+    //       item = iterator.next();
+    //     }
+
+    //     if (item.done) {
+    //       result.push( word );
+    //     }
+    //   });
+
+    //   return result;
+    // },
+
+    addGazeInfoToWords( words, fixations ) {
       const result = [];
-      const gazeInfo = new Set( wordsWithGazeInfo );
 
       words.forEach( word => {
-        const iterator = gazeInfo.values();
-        let item = iterator.next();
-        while ( !item.done ) {
-          if ( this.isMatchingWord( word, item.value ) ) {
-            const { feedback, focusing } = item.value;
-            result.push( Object.assign( { feedback, focusing }, word ) );
-            gazeInfo.delete( item.value );
-            break;
-          }
+        const focusing = {
+          count: 0,
+          duration: 0,
+        };
 
-          item = iterator.next();
+        if (fixations) {
+          fixations.forEach( fix => {
+            if (fix.word && fix.word.id === word.id) {
+              focusing.count += 1;
+              focusing.duration += fix.duration;
+            }
+          });
         }
 
-        if (item.done) {
-          result.push( word );
-        }
+        result.push( Object.assign( { focusing }, word ) );
       });
 
       return result;
