@@ -10,7 +10,7 @@ import VisPlot from '@/components/vis/VisPlot';
 
 const LEGEND_LOCATION = {
   x: 2,
-  y: 50,
+  y: 56,
 };
 
 const UI = {
@@ -84,6 +84,7 @@ export default {
         this.painter = new Painter( this.$refs.canvas, {
           syllab: this.defaultFeedback.syllabification,
         } );
+        this.painter.setScreenSize( this.data.records[0].session.screen );
       }
 
       if ( this.tracks.length ) {
@@ -118,7 +119,8 @@ export default {
         this.tracks.push( new ReplayTrack(
           this.$refs.root,
           name,
-          record.data.pages
+          record.data.pages,
+          this.painter.offset,
         ) );
       } );
     },

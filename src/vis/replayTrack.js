@@ -6,10 +6,11 @@ const FIXATION_GROW_INTERVAL = 100;
 
 export default class ReplayTrack {
 
-  constructor( root, userName, session ) {
+  constructor( root, userName, session, offset ) {
     this.root = root;
     this.name = userName;
     this.session = session;
+    this.offset = offset;
     this.color = Colors.colors[ colorIndex++ % Colors.colors.length ];
 
     this.pointerSize = 8;
@@ -172,8 +173,8 @@ export default class ReplayTrack {
     }
 
     const size = Math.round( Math.sqrt( this.currentDuration ) );
-    this.pointer.style = `left: ${this.currentFixation.x - size / 2}px;
-                              top: ${this.currentFixation.y - size / 2}px;
+    this.pointer.style = `left: ${this.currentFixation.x + this.offset.x - size / 2}px;
+                              top: ${this.currentFixation.y + this.offset.y - size / 2}px;
                               width: ${size}px;
                               height: ${size}px;
                               border-radius: ${size / 2}px;

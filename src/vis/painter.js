@@ -39,6 +39,13 @@ export default class Painter {
     this.clean();
   }
 
+  get offset() {
+    return {
+      x: this.offsetX,
+      y: this.offsetY,
+    };
+  }
+
   clean() {
     this.ctx.clearRect( 0, 0, this.width, this.height );
   }
@@ -118,7 +125,7 @@ export default class Painter {
         y: settings.location.y + ( settings.nameSpacing * settings.fontSize ) * index
       };
 
-      ctx.fillText( name.text, ...this._offset( location ) );
+      ctx.fillText( name.text, location.x, location.y );
     } );
   }
 
@@ -139,7 +146,7 @@ export default class Painter {
       y: settings.location.y + ( settings.nameSpacing * settings.fontSize ) * name.index
     };
 
-    ctx.fillText( isNoData ? NO_DATA_MARK : CHECK_MARK, ...this._offset( location ) );
+    ctx.fillText( isNoData ? NO_DATA_MARK : CHECK_MARK, location.x, location.y );
   }
 
   setScreenSize( screenSize ) {
