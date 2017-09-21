@@ -173,8 +173,6 @@ export default {
       position: fixed;
       top: 3.5em;
       right: 4px;
-      // left: 50%;
-      // transform: translateX(-50%);
     }
   }
 </style>

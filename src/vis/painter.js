@@ -24,7 +24,8 @@ const NO_DATA_MARK = String.fromCharCode( 0x26A0 );
 export default class Painter {
 
   constructor( el, settings ) {
-    this.width = parseInt( window.getComputedStyle( el ).width );
+    this.width = parseInt( document.body.offsetWidth );
+    console.log(this.width);
     this.height = parseInt( window.getComputedStyle( el ).height );
     el.setAttribute( 'width', this.width );
     el.setAttribute( 'height', this.height );

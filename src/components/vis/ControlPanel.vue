@@ -153,7 +153,6 @@ export default {
 
   .control-panel {
     display: inline-block;
-    // margin: 4px;
     padding: 4px;
     line-height: 0;
     vertical-align: top;
