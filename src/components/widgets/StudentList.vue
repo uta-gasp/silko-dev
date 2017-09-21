@@ -22,7 +22,7 @@
             td {{ student.name }}
             td.is-narrow
               .tags
-                .tag.is-medium(v-for="(cls, task) in student.assignments") {{ getAssignmentName( task ) }}
+                .tag.is-medium(v-for="(cls, task) in student.assignments" v-if="doesTaskBelongsToClass(task)") {{ getAssignmentName( task ) }}
                   button.delete.is-small(@click="removeAssignment( student, task )")
 
               //- .assignments
@@ -326,6 +326,10 @@ export default {
       else {
         cb();
       }
+    },
+
+    doesTaskBelongsToClass( id ) {
+      return this.tasks.some( task => task.id === id );
     },
 
     getAssignmentName( id ) {

@@ -178,13 +178,13 @@ export default {
     .visualization();
 
     .list {
-      margin: 48px auto 0;
+      margin: 52px auto 0;
 
       background-color: rgba(255, 255, 220, 0.8);
       border: solid 1px;
 
       width: 20vw;
-      height: ~"calc(100vh - 48px)";
+      height: ~"calc(100vh - 52px)";
       overflow-y: auto;
 
       text-align: left;

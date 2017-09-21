@@ -285,7 +285,7 @@ export default {
             grade.subitems.push( new SelectionBoxItem( {
               id: session.ref.id,
               text: `${dataUtils.sessionDate( session.ref.date )}`,
-              selected: true,
+              selected: false,
               group: student.ref.name,
             } ) );
           }
