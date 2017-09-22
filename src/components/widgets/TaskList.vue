@@ -17,11 +17,18 @@
               span.is-inline-block {{ task.name }}
               span.is-inline-block(v-if="!!task.pages") &nbsp;({{ task.pages.length }} pages)
             td.is-narrow
-              button.button.is-light(title="Edit the task" @click="edit( task )")
+              button.button.is-light(
+                :title="isLocked( task.id ) ? 'This task has recorded sessions' : 'Edit the task'"
+                :disabled="isLocked( task.id )"
+                @click="edit( task )")
                 i.fa.fa-edit
-              button.button.is-light(title="Create a new task from the existing" @click="copy( task )")
+              button.button.is-light(
+                title="Create a new task from the existing"
+                @click="copy( task )")
                 i.fa.fa-copy
-              button.button.is-danger(title="Delete the task" @click="remove( task )")
+              button.button.is-danger(
+                title="Delete the task"
+                @click="remove( task )")
                 i.fa.fa-remove
 
     modal-container(v-if="isEditing" :title="taskEditorTitle" @close="closeEditor")
@@ -35,6 +42,7 @@
 
 <script>
 import dataUtils from '@/utils/data-utils.js';
+import DBUtils from '@/db/utils.js';
 
 import ActionError from '@/components/mixins/actionError';
 import ActionSuccess from '@/components/mixins/actionSuccess';
@@ -62,6 +70,7 @@ export default {
     return {
       parent: this.cls,
       tasks: null,
+      locked: null,
 
       toEdit: null,
       toCopy: null,
@@ -121,6 +130,15 @@ export default {
         }
 
         this.tasks = tasks.sort( dataUtils.byName );
+
+        this.locked = [];
+        DBUtils.areTasksLocked( this.tasks.map( task => task.id ), (err, response) => {
+          if (err) {
+            return console.error( 'DBUtils.isTaskLocked:', err );
+          }
+
+          this.locked = response;
+        });
       } );
     },
 
@@ -175,6 +193,10 @@ export default {
 
     remove( task, e ) {
       this.toDelete = task;
+    },
+
+    isLocked( id, e ) {
+      return this.locked.indexOf( id ) >= 0;
     },
 
     removeWarningClosed( e ) {
