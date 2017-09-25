@@ -1,6 +1,6 @@
 {
-  "name": "functions",
-  "description": "Cloud Functions for Firebase",
+  "name": "Silko functions",
+  "description": "Silko Cloud Functions for Firebase",
   "dependencies": {
     "cors": "^2.8.4",
     "firebase-admin": "~5.2.1",

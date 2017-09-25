@@ -1,2 +1,2 @@
 call firebase deploy --project eye-school-test
-call firebase deploy --project silko-962b2
+call firebase deploy --project uta-gasp-silko

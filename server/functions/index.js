@@ -31,7 +31,6 @@ exports.isTaskLocked = functions.https.onRequest((req, res) => {
   });
 });
 
-
 exports.areTasksLocked = functions.https.onRequest((req, res) => {
 
   if (req.method !== 'GET') {
@@ -42,6 +41,10 @@ exports.areTasksLocked = functions.https.onRequest((req, res) => {
     const tasks = (req.query.ids ? req.query.ids : '').split( ',' );
 
     db.ref( '/sessions' ).once( 'value' ).then( snapshot => {
+      if (!snapshot.exists()) {
+        return res.status(200).send( { result: [] } );
+      }
+
       const sessions = snapshot.val();
 
       const usedTasks = new Set();
