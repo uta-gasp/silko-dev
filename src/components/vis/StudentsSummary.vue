@@ -167,7 +167,7 @@ export default {
       };
       let syllab = {
         count: 0,
-        sessions: 0
+        sessions: 0,
       };
 
       student.sessions.forEach( session => {
@@ -176,7 +176,7 @@ export default {
 
         let firstPage;
         let lastPage;
-        pages.forEach( (page, pageIndex) => {
+        pages.forEach( ( page, pageIndex ) => {
           if ( !firstPage && page.fixations ) {
             firstPage = page;
           }
@@ -185,16 +185,16 @@ export default {
 
             const fixRange = {
               first: page.fixations[0],
-              last: page.fixations[ page.fixations.length - 1 ]
+              last: page.fixations[ page.fixations.length - 1 ],
             };
 
-            duration += (fixRange.last.ts + fixRange.last.duration) - fixRange.first.ts;
+            duration += ( fixRange.last.ts + fixRange.last.duration ) - fixRange.first.ts;
             wordCount += page.text.length;
 
-            if (syllabifier) {
+            if ( syllabifier ) {
               const text =  page.text.map( word => word.text ).join( ' ' );
               syllab.count += syllabifier.getSyllabCount( text );
-              if (!pageIndex) {
+              if ( !pageIndex ) {
                 syllab.sessions++;
               }
             }
@@ -206,7 +206,7 @@ export default {
         }
 
         fixations = pages.reduce( ( acc, page ) => {
-          if (!page.fixations) {
+          if ( !page.fixations ) {
             return acc;
           }
 
@@ -218,7 +218,7 @@ export default {
         }, fixations );
 
         regressionCount += pages.reduce( ( acc, page ) => {
-          if (!page.fixations) {
+          if ( !page.fixations ) {
             return acc;
           }
 
@@ -236,7 +236,7 @@ export default {
       result.push( syllab.count ? ( syllab.count / ( duration / 60000 ) ).toFixed( 0 ) + ` (${syllab.sessions})` : '-' );
       result.push( duration ? ( duration / wordCount / 1000 ).toFixed( 2 ) : '-' );
       result.push( fixations.count ? Math.round( fixations.duration / fixations.count ) : '-' );
-      result.push( (fixations.hyphenations / student.sessions.length).toFixed( 2 ) );
+      result.push( ( fixations.hyphenations / student.sessions.length ).toFixed( 2 ) );
       result.push( regressionCount );
 
       return result;

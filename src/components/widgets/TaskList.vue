@@ -132,13 +132,13 @@ export default {
         this.tasks = tasks.sort( dataUtils.byName );
 
         this.locked = [];
-        DBUtils.areTasksLocked( this.tasks.map( task => task.id ), (err, response) => {
-          if (err) {
+        DBUtils.areTasksLocked( this.tasks.map( task => task.id ), ( err, response ) => {
+          if ( err ) {
             return console.error( 'DBUtils.isTaskLocked:', err );
           }
 
           this.locked = response;
-        });
+        } );
       } );
     },
 

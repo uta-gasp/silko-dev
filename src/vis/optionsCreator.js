@@ -31,17 +31,17 @@ export default class OptionsCreator {
 
   static createDefaults( source, subKeys, header ) {
     const result = {};
-    for (let key in source) {
+    for ( let key in source ) {
       let targetKey = key[0] === '_' ? key.substr( 1 ) : key;
-      if (subKeys && !subKeys.includes( targetKey ) ) {
+      if ( subKeys && !subKeys.includes( targetKey ) ) {
         continue;
       }
 
-      if ( typeof source[ key ] === 'object') {
+      if ( typeof source[ key ] === 'object' ) {
         copyPlaneKeys( result, source, key, header );
       }
       else {
-        if (header) {
+        if ( header ) {
           targetKey = header + '.' + targetKey;
         }
         result[ targetKey ] = source[ key ];
@@ -54,10 +54,10 @@ export default class OptionsCreator {
   static restoreDefaults( chapters ) {
     for ( let id in chapters ) {
       const chapter = chapters[ id ];
-      if (chapter.defaults) {
+      if ( chapter.defaults ) {
         clone( chapter.defaults, chapter.options );
       }
-      else if (Array.isArray( chapter.options )) {
+      else if ( Array.isArray( chapter.options ) ) {
         OptionsCreator.restoreDefaults( chapter.options );
       }
     }
@@ -89,14 +89,14 @@ function createOptionReference( id, receiver ) {
 
 function copyPlaneKeys( result, source, id, header ) {
   const ref = source[ id ];
-  for (let key in ref) {
-    if ( ref[ key ] === 'object') {
+  for ( let key in ref ) {
+    if ( ref[ key ] === 'object' ) {
       copyPlaneKeys( result, ref, id + '.' + key, header );
     }
     else {
       let targetKey = key[0] === '_' ? key.substr( 1 ) : key;
       let targetID = id[0] === '_' ? id.substr( 1 ) : id;
-      if (header) {
+      if ( header ) {
         targetID = header + '.' + targetID;
       }
       result[ targetID + '.' + targetKey ] = ref[ key ];

@@ -52,7 +52,7 @@ export default class Metric {
   static computeRange( words, metricType ) {
     let maxRange = 0;
 
-    if (metricType === Metric.Type.NONE ) {
+    if ( metricType === Metric.Type.NONE ) {
       return maxRange;
     }
 
@@ -99,7 +99,7 @@ export default class Metric {
 
   static get Types() {
     const result = [];
-    for (let key in Type) {
+    for ( let key in Type ) {
       result.push( Type[ key ] );
     }
     return result;

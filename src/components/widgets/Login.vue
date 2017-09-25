@@ -44,7 +44,7 @@ import TemporalNotification from '@/components/widgets/TemporalNotification';
 const checkValues = {
   INVALID: -1,
   UNKNOWN: 0,
-  VALID: 1
+  VALID: 1,
 };
 
 export default {
@@ -69,7 +69,7 @@ export default {
 
   computed: {
     isEmailValid() {
-      if (!this.email) {
+      if ( !this.email ) {
         return checkValues.UNKNOWN;
       }
       else if ( this.email.indexOf( '@' ) < 0 ) {
@@ -81,7 +81,7 @@ export default {
     },
 
     isPasswordValid() {
-      if (!this.password) {
+      if ( !this.password ) {
         return checkValues.UNKNOWN;
       }
       else {

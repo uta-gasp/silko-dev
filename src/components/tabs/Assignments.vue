@@ -125,11 +125,12 @@ export default {
     },
 
     start( assignment, e ) {
-if (Student.MULTICLASS) {
-      this.$router.replace( `/assignment/${assignment.task.id}` );
-} else {
-      this.$router.replace( `/assignment/${assignment.cls.id}` );
-}
+      if ( Student.MULTICLASS ) {
+        this.$router.replace( `/assignment/${assignment.task.id}` );
+      }
+      else {
+        this.$router.replace( `/assignment/${assignment.cls.id}` );
+      }
     },
 
     getWPM( data ) {
@@ -157,8 +158,8 @@ if (Student.MULTICLASS) {
       const lastFixation = lastPage.fixations[ lastPage.fixations.length - 1 ];
       const duration = ( lastFixation.ts + lastFixation.duration ) - firstFixation.ts;
 
-      return ( wordCount / ( duration / 60000 ) ).toFixed( 0 )
-    }
+      return ( wordCount / ( duration / 60000 ) ).toFixed( 0 );
+    },
   },
 
   created() {

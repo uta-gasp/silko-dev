@@ -150,7 +150,7 @@ export default {
                 fontFamily: UI.nameFontFamily,
                 nameSpacing: UI.nameSpacing,
                 location: LEGEND_LOCATION,
-                reason
+                reason,
               } );
             },
             syllabification: syllabification => {

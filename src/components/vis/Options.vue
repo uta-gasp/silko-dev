@@ -229,11 +229,11 @@ export default {
       select.classList.add( id );
 
       const currentValue = option.ref();
-      option.items.forEach( (itemName, index) => {
+      option.items.forEach( ( itemName, index ) => {
         const item = document.createElement( 'option' );
         item.value = itemName;
         item.textContent = itemName;
-        if (currentValue === itemName) {
+        if ( currentValue === itemName ) {
           item.selected = true;
         }
         select.appendChild( item );

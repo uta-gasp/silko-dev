@@ -25,7 +25,7 @@ export default class Painter {
 
   constructor( el, settings ) {
     this.width = parseInt( document.body.offsetWidth );
-    console.log(this.width);
+    console.log( this.width );
     this.height = parseInt( window.getComputedStyle( el ).height );
     el.setAttribute( 'width', this.width );
     el.setAttribute( 'height', this.height );
@@ -60,7 +60,7 @@ export default class Painter {
 
     words.forEach( word => {
       const wordSettings = Object.assign( {
-        alpha: Metric.getAlpha( word, settings.colorMetric, metricRange )
+        alpha: Metric.getAlpha( word, settings.colorMetric, metricRange ),
       }, settings );
 
       this._drawWord( word, wordSettings );
@@ -123,7 +123,7 @@ export default class Painter {
 
       const location = {
         x: settings.location.x + settings.fontSize,
-        y: settings.location.y + ( settings.nameSpacing * settings.fontSize ) * index
+        y: settings.location.y + ( settings.nameSpacing * settings.fontSize ) * index,
       };
 
       ctx.fillText( name.text, location.x, location.y );
@@ -144,7 +144,7 @@ export default class Painter {
 
     const location = {
       x: settings.location.x,
-      y: settings.location.y + ( settings.nameSpacing * settings.fontSize ) * name.index
+      y: settings.location.y + ( settings.nameSpacing * settings.fontSize ) * name.index,
     };
 
     ctx.fillText( isNoData ? NO_DATA_MARK : CHECK_MARK, location.x, location.y );
@@ -166,7 +166,7 @@ export default class Painter {
     ctx.textAlign = 'start';
     ctx.textBaseline = 'alphabetic';
     ctx.fillStyle = settings.wordColor;
-    ctx.fillText( word.text, ...this._offset( { x: rc.x, y : rc.y + 0.8 * rc.height } ) );
+    ctx.fillText( word.text, ...this._offset( { x: rc.x, y: rc.y + 0.8 * rc.height } ) );
 
     if ( settings.alpha > 0 ) {
       ctx.fillStyle = Colors.rgb2rgba( WORD_HIGHLIGHT_COLOR, settings.alpha );
@@ -211,7 +211,7 @@ export default class Painter {
     ctx.strokeStyle = settings.connectionColor;
     ctx.beginPath();
 
-    const x = settings.showIDs ? ( from._x ? from._x : from.x ) : from.x
+    const x = settings.showIDs ? ( from._x ? from._x : from.x ) : from.x;
     ctx.moveTo( ...this._offset( { x, y: from.y } ) );
     ctx.lineTo( ...this._offset( to ) );
     ctx.stroke();

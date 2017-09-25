@@ -281,7 +281,7 @@ export default {
 
       task.students.forEach( student => {
         student.sessions.forEach( session => {
-          if (session.task.id === task.id) {
+          if ( session.task.id === task.id ) {
             grade.subitems.push( new SelectionBoxItem( {
               id: session.ref.id,
               text: `${dataUtils.sessionDate( session.ref.date )}`,

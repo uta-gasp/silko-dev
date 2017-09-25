@@ -188,7 +188,7 @@ export default class Syllabifier {
 
     logger.info( 'counting syllab' );
 
-    const countWordSyllabs = (acc, word) => {
+    const countWordSyllabs = ( acc, word ) => {
       if ( !word ) {
         return acc;
       }
@@ -206,7 +206,7 @@ export default class Syllabifier {
     };
 
     if ( text instanceof Array ) {
-      return text.reduce( (acc, line) => {
+      return text.reduce( ( acc, line ) => {
         const words = line.split( ' ' ).map( word => word.toLowerCase() );
         return words.reduce( countWordSyllabs, acc );
       }, 0 );

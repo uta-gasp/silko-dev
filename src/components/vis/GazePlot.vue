@@ -166,20 +166,20 @@ export default {
           duration: 0,
         };
 
-        if (fixations) {
+        if ( fixations ) {
           fixations.forEach( fix => {
-            if (fix.word && fix.word.id === word.id) {
+            if ( fix.word && fix.word.id === word.id ) {
               focusing.count += 1;
               focusing.duration += fix.duration;
             }
-          });
+          } );
         }
 
         result.push( Object.assign( { focusing }, word ) );
-      });
+      } );
 
       return result;
-    }
+    },
   },
 
   mounted() {

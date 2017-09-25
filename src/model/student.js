@@ -110,15 +110,16 @@ export default class Student {
 
   loadAssignments( cb ) {
     const taskIDs = [];
-if (Student.MULTICLASS) {
-    for ( let id in this.assignments ) {
-      taskIDs.push( id );
+    if ( Student.MULTICLASS ) {
+      for ( let id in this.assignments ) {
+        taskIDs.push( id );
+      }
     }
-} else {
-    for ( let cls in this.assignments ) {
-      taskIDs.push( this.assignments[ cls ] );
+    else {
+      for ( let cls in this.assignments ) {
+        taskIDs.push( this.assignments[ cls ] );
+      }
     }
-}
     return db.getFromIDs( Task, taskIDs, ( err, tasks ) => {
       if ( err ) {
         return cb( err );

@@ -197,7 +197,7 @@ export default {
         const gradeA = Number.parseInt( a.text, 10 );
         const gradeB = Number.parseInt( b.text, 10 );
         if ( !Number.isNaN( gradeA ) && !Number.isNaN( gradeB ) ) {
-          if (gradeA === gradeB) {
+          if ( gradeA === gradeB ) {
             return a.text > b.text;
           }
           else {
@@ -314,13 +314,13 @@ export default {
 
     hideTaskList( id ) {
       const cb = () => {
-        if (this.activeMenu) {
+        if ( this.activeMenu ) {
           this.activeMenu.classList.remove( 'is-active' );
           this.activeMenu = null;
         }
       };
 
-      if (id) {
+      if ( id ) {
         window.setTimeout( cb, 100 );
       }
       else {
@@ -334,7 +334,7 @@ export default {
 
     getAssignmentName( id ) {
       return this.tasks.find( task => task.id === id ).name;
-    }
+    },
   },
 
   mounted() {
