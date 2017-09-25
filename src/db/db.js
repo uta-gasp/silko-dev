@@ -3,8 +3,10 @@ import UserCreator from './user-creator.js';
 import eventBus from '@/utils/event-bus.js';
 
 // TODO remove the first line, uncomment the other
-const config = require( `@/config/db.development.js` ).config;
-// const config = require( `@/config/db.${process.env.NODE_ENV}.js` ).config;
+// const config = require( `@/config/db.development.js` ).config;
+const config = require( `@/config/db.${process.env.NODE_ENV}.js` ).config;
+
+const ADMIN_UID = process.env.NODE_ENV === 'development' ? 'd1wjPNPQ0CVOssWFwqSm1r1inC62' : 'DKhFYCK9Z2RBhJ4whW8ujJm0s6c2';
 
 function ctor( obj ) {
   return Object.getPrototypeOf( obj ).constructor;
@@ -338,7 +340,7 @@ class DB {
       // otherwise get the user record, if it exists
       this.fb.child( `users/${user.uid}` ).once( 'value', snapshot => {
         let userRef = snapshot.val();
-        if ( !userRef && user.uid === 'd1wjPNPQ0CVOssWFwqSm1r1inC62' ) {
+        if ( !userRef && user.uid === ADMIN_UID ) {
           userRef = 'admin';
         }
 
