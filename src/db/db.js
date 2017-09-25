@@ -4,10 +4,11 @@ import eventBus from '@/utils/event-bus.js';
 
 // TODO remove the first line, uncomment the other
 // const config = require( `@/config/db.development.js` ).config;
-const config = require( `@/config/db.${process.env.NODE_ENV}.js` ).config;
+const configName = process.env.IS_DEV ? 'development' : process.env.NODE_ENV;
+const config = require( `@/config/db.${configName}.js` ).config;
 console.log( `Connecting to ${config.projectId}` );
 
-const ADMIN_UID = process.env.NODE_ENV === 'development'
+const ADMIN_UID = configName === 'development'
   ? 'd1wjPNPQ0CVOssWFwqSm1r1inC62'
   : 'sp4j975g5uWGUozTRhpHKgyaG8m2';  // 'DKhFYCK9Z2RBhJ4whW8ujJm0s6c2'
 

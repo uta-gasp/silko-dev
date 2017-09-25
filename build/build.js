@@ -1,6 +1,8 @@
 require('./check-versions')()
 
-process.env.NODE_ENV = 'production'
+process.env.NODE_ENV = process.env.NODE_ENV || 'production';
+process.env.IS_DEV = process.argv[2] === 'dev';
+console.log( `building for ${process.env.NODE_ENV}${process.env.IS_DEV ? ' [dev]' : ''}...` );
 
 var ora = require('ora')
 var rm = require('rimraf')
@@ -10,7 +12,7 @@ var webpack = require('webpack')
 var config = require('../config')
 var webpackConfig = require('./webpack.prod.conf')
 
-var spinner = ora('building for production...')
+var spinner = ora(`building for ${process.env.NODE_ENV}...`)
 spinner.start()
 
 rm(path.join(config.build.assetsRoot, config.build.assetsSubDirectory), err => {

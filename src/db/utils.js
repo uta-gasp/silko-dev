@@ -1,6 +1,7 @@
 // TODO remove the first line, uncomment the other
 // const config = require( `@/config/db.development.js` ).config;
-const config = require( `@/config/db.${process.env.NODE_ENV}.js` ).config;
+const configName = process.env.IS_DEV ? 'development' : process.env.NODE_ENV;
+const config = require( `@/config/db.${configName}.js` ).config;
 
 const path = `https://us-central1-${config.projectId}.cloudfunctions.net/`;
 
