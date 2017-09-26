@@ -7,6 +7,24 @@ const path = `https://us-central1-${config.projectId}.cloudfunctions.net/`;
 
 export default class DBUtils {
 
+  static isTaskLocked( id, cb ) {
+    DBUtils._call( 'isTaskLocked', { id }, cb );
+  }
+
+  static areTasksLocked( ids, cb ) {
+    DBUtils._call( 'areTasksLocked', { ids: ids.join( ',' ) }, cb );
+  }
+
+  static deleteTaskSessions( id, cb ) {
+    DBUtils._get( 'deleteTaskSessions', { id }, cb );
+  }
+
+  static deleteStudentTaskSessions( id, cb ) {
+    DBUtils._get( 'deleteStudentTaskSessions', { id }, cb );
+  }
+
+  // Private
+
   static _get( fnc, params, cb ) {
     const headers = new window.Headers();
     headers.append( 'Content-Type', 'text/json' );
@@ -63,19 +81,8 @@ export default class DBUtils {
     return { err, response };
   }
 
-  static isTaskLocked( id, cb ) {
-    DBUtils._get( 'isTaskLocked', { id }, ( error, json ) => {
-      if ( error ) {
-        return cb( error.message );
-      }
-
-      const { err, response } = DBUtils._parseResponse( json );
-      cb( err, response );
-    } );
-  }
-
-  static areTasksLocked( ids, cb ) {
-    DBUtils._get( 'areTasksLocked', { ids: ids.join( ',' ) }, ( error, json ) => {
+  static _call( name, params, cb ) {
+    DBUtils._get( name, params, ( error, json ) => {
       if ( error ) {
         return cb( error.message );
       }

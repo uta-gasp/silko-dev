@@ -187,7 +187,8 @@ export default {
         } );
       }
 
-      this.student.taskDone( this.task.cls, this.keys.session, err => {
+      const id = Student.MULTICLASS ? this.task.id : this.task.cls;
+      this.student.taskDone( id, this.keys.session, err => {
         if ( err ) {
           this.errorText = err;
         }

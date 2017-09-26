@@ -209,8 +209,13 @@ export default class Student {
       }
 
       // TODO
-      // This line is for in production mode
-      this.setAssignment( task, null, cb );
+      // These lines is for in production mode
+      if (Student.MULTICLASS) {
+        this.removeAssignment( task, cb );
+      }
+      else {
+        this.setAssignment( task, null, cb );
+      }
       // This line is for in dev mode
       // cb();
     } );

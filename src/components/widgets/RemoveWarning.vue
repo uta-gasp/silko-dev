@@ -9,7 +9,11 @@
             button.delete(@click="reject")
           .message-body
             .level
-              .level-item The {{ object }} "{{ name }}" will be deleted permanently. Continue?
+              .level-item
+                span
+                  span The {{ object }} "{{ name }}" will be deleted permanently.&nbsp;
+                  slot
+                  span Continue?
             .level
               .level-item
                 button.button.is-danger(@click="confirm") OK

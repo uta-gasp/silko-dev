@@ -35,6 +35,7 @@
       task-editor(:action="action" :task="toEdit" :source="toCopy" :intros="intros" @save="save")
 
     remove-warning(v-if="toDelete" object="task" :name="toDeleteName" @close="removeWarningClosed")
+      span All students assignments completed on this task will be deleted as well.&nbsp;
 
     temporal-notification(type="danger" :show="showError")
       span {{ errorMessage }}
@@ -208,6 +209,17 @@ export default {
             return this.setError( err, 'Failed to delete the task' );
           }
           else {
+            DBUtils.deleteTaskSessions( id, ( err, response ) => {
+              if ( err ) {
+                return console.error( 'DBUtils.deleteTaskSessions:', err );
+              }
+            } );
+            DBUtils.deleteStudentTaskSessions( id, ( err, response ) => {
+              if ( err ) {
+                return console.error( 'DBUtils.deleteStudentTaskSessions:', err );
+              }
+            } );
+
             this.setSuccess( 'The task was deleted' );
             this.$emit( 'deleted', { task: id } );
           }
