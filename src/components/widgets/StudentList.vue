@@ -170,8 +170,6 @@ export default {
     makeGrades( students ) {
       const grades = [];
       students.forEach( student => {
-        if (student.grade !== '1') return;
-
         let grade = grades.find( item => {
           return item.text === student.grade.toLowerCase();
         } );
