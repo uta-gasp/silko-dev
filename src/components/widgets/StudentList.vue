@@ -25,26 +25,20 @@
                 .tag.is-medium(v-for="(cls, task) in student.assignments" v-if="doesTaskBelongsToClass(task)") {{ getAssignmentName( task ) }}
                   button.delete.is-small(@click="removeAssignment( student, task )")
 
-              //- .assignments
-              //-   .assignment(v-for="(cls, task) in student.assignments")
-              //-     .name {{ getAssignmentName( task ) }}
-              //-     button.delete.is-small(@click="removeAssignment( student, task )")
               .dropdown(
                   :ref="currentClass.id+student.id"
-                  v-show="availableTasks( student ).length"
-                  @focusout="hideTaskList( currentClass.id+student.id )")
-                .dropdown-trigger
-                  button.button(aria-haspopup="true" aria-controls="dropdown-menu" @click="showTaskList( currentClass.id+student.id )")
+                  v-show="availableTasks( student ).length")
+                .dropdown-trigger(@click.stop="")
+                  button.button(aria-haspopup="true" aria-controls="dropdown-menu" @click="toggleTaskList( currentClass.id+student.id )")
                     span Add an assignment
                     span.icon.is-small
                       i.fa.fa-angle-down(aria-hidden="true")
                 .dropdown-menu(role="menu")
                   .dropdown-content
-                    .dropdown-item(v-for="task in availableTasks( student )" @click="addAssignment( student, task.id, $event )" ) {{ task.name }}
-              //- span.select
-              //-   select(:value="getAssignment( student )" @input="setAssignment( student, $event )")
-              //-     option(value="") none
-              //-     option(v-for="task in tasks" :value="task.id" :key="currentClass.id+student.id+task.id") {{ task.name }}
+                    .dropdown-item(
+                      v-for="task in availableTasks( student )"
+                      @click.stop="addAssignment( student, task.id, $event )" ) {{ task.name }}
+
             td.is-narrow
               button.button.is-danger(title="Remove the student from this class" @click="remove( student )")
                 i.fa.fa-remove
@@ -99,6 +93,10 @@ export default {
       currentGrade: null,
 
       activeMenu: null,
+
+      onBodyClick: () => {
+        this.hideTaskList();
+      }
     };
   },
 
@@ -124,6 +122,9 @@ export default {
   },
 
   methods: {
+    click() { this.hideTaskList(); },
+    focusout(name) { console.log(name); },
+
     loadTasks() {
       this.currentClass.getTasks( ( err, tasks ) => {
         if ( err ) {
@@ -183,7 +184,7 @@ export default {
           grades.push( grade );
         }
 
-        if ( !this.students.find( item => item.id === student.id ) ) {
+        if ( this.students && !this.students.find( item => item.id === student.id ) ) {
           grade.subitems.push( {
             id: student.id,
             text: student.name,
@@ -210,13 +211,6 @@ export default {
         else {
           return a.text > b.text;
         }
-        // if ( a.text[0] <= '9' && b.text[0] > '9' ) {
-        //   return true;
-        // }
-        // else if ( a.text[0] > '9' && b.text[0] <= '9' ) {
-        //   return false;
-        // }
-        // return a.text > b.text;
       } );
     },
 
@@ -254,8 +248,6 @@ export default {
     },
 
     addAssignment( student, taskID, e ) {
-      this.hideTaskList();
-
       student.addAssignment( taskID, this.currentClass.id, err => {
         if ( err ) {
           this.setError( err, 'Failed to add the assignment' );
@@ -277,22 +269,22 @@ export default {
       } );
     },
 
-    getAssignment( student ) {
-      return student.assignments ? student.assignments[ this.currentClass.id ] : '';
-    },
+    // getAssignment( student ) {
+    //   return student.assignments ? student.assignments[ this.currentClass.id ] : '';
+    // },
 
-    setAssignment( student, e ) {
-      const taskID = e.target.value;
+    // setAssignment( student, e ) {
+    //   const taskID = e.target.value;
 
-      student.setAssignment( this.currentClass.id, taskID, err => {
-        if ( err ) {
-          this.setError( err, 'Failed to set the task to the student' );
-        }
-        else {
-          this.setSuccess( `The task was ${!taskID ? 'removed' : 'set'}` );
-        }
-      } );
-    },
+    //   student.setAssignment( this.currentClass.id, taskID, err => {
+    //     if ( err ) {
+    //       this.setError( err, 'Failed to set the task to the student' );
+    //     }
+    //     else {
+    //       this.setSuccess( `The task was ${!taskID ? 'removed' : 'set'}` );
+    //     }
+    //   } );
+    // },
 
     remove( student, e ) {
       this.currentClass.removeStudent( student, err => {
@@ -311,6 +303,15 @@ export default {
       return this.tasks.filter( task => !student.assignments[ task.id ] );
     },
 
+    toggleTaskList( id ) {
+      if (this.activeMenu) {
+        this.hideTaskList( id );
+      }
+      else {
+        this.showTaskList( id );
+      }
+    },
+
     showTaskList( id ) {
       this.hideTaskList();
 
@@ -319,18 +320,9 @@ export default {
     },
 
     hideTaskList( id ) {
-      const cb = () => {
-        if ( this.activeMenu ) {
-          this.activeMenu.classList.remove( 'is-active' );
-          this.activeMenu = null;
-        }
-      };
-
-      if ( id ) {
-        window.setTimeout( cb, 100 );
-      }
-      else {
-        cb();
+      if ( this.activeMenu ) {
+        this.activeMenu.classList.remove( 'is-active' );
+        this.activeMenu = null;
       }
     },
 
@@ -343,6 +335,14 @@ export default {
     },
   },
 
+  created() {
+    window.document.body.addEventListener( 'click', this.onBodyClick );
+  },
+
+  destroyed() {
+    window.document.body.removeEventListener( 'click', this.onBodyClick );
+  },
+
   mounted() {
     this.loadTasks();
     this.loadAvailableStudents( err => {} );
@@ -351,6 +351,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
+
   .table {
     margin-bottom: 0;
   }
@@ -384,23 +385,4 @@ export default {
     margin-bottom: 0;
   }
 
-  // .assignment {
-  //   display: inline-block;
-  //   background-color: #e8eaec;
-  //   padding: 0.2em;
-  //   border-radius: 3px;
-  //   border: 1px solid #c0c2c4;
-
-  //   margin-right: 0.3em;
-
-  //   .name {
-  //     display: inline-block;
-  //     margin-right: 0.5em;
-  //   }
-
-  //   .delete {
-  //     margin: auto 0;
-  //     vertical-align: middle;
-  //   }
-  // }
 </style>

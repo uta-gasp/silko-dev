@@ -28,7 +28,7 @@
               th.is-narrow Actions
           tbody
             tr(v-for="item in classes" :key="item.id")
-              td.title.is-4 {{ item.name }}
+              td.title.is-4.no-wrapping {{ item.name }}
               td
                 task-list(:cls="item" :intros="intros" @saved="taskSaved" @created="taskCreated" @deleted="taskDeleted")
               td
@@ -233,4 +233,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
+  .no-wrapping {
+    word-break: keep-all;
+  }
 </style>
