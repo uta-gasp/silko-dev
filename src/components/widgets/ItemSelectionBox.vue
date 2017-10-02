@@ -1,6 +1,6 @@
 <template lang="pug">
   #item-select-box
-    header.tabs.is-centered.is-boxed(v-if="items.length > 1")
+    header.tabs.is-centered.is-boxed(v-if="items.length > 0")
       ul.ul
         li(:class="{ 'is-active': isItemSelected( item ) }" v-for="item in items" :key="item.id")
           a(@click="selectItem( item )") {{ item.text }}
@@ -14,7 +14,7 @@
         //-   v-for="subitem in currentItem.subitems"
         //-   :key="subitem.id")
         //-   .card-content.title.is-6(@click="selectSubitem( subitem, $event )") {{ subitem.text }}
-        article.message.is-primary.group(v-for="(group, name) in groups" v-if="group.items.length")
+        article.message.is-primary.group(v-for="(group, name) in groups" v-if="group.items.length" :key="name")
           .message-header(v-if="name !== '_'" @click="toggleItemsVisibility( group )")
             p {{ name }}
           .message-body.is-paddingless
@@ -215,7 +215,7 @@ export default {
     },
   },
 
-  mounted() {
+  created() {
     if ( this.items.length === 1 ) {
       this.selectItem( this.items[0] );
     }

@@ -147,10 +147,11 @@ export default {
       } );
     },
 
-    loadAvailableStudents() {
+    loadAvailableStudents( cb ) {
       this.teacher.getSchool( ( err, school ) => {
         if ( err ) {
-          return this.setError( err, 'Failed to load teacher\'s school' );
+          this.setError( err, 'Failed to load teacher\'s school' );
+          return cb( err );
         }
 
         school.getStudents( ( err, students ) => {
@@ -160,6 +161,8 @@ export default {
 
           this.schoolStudents = students;
           this.schoolGrades = this.makeGrades( students );
+
+          cb();
         } );
       } );
     },
@@ -167,6 +170,8 @@ export default {
     makeGrades( students ) {
       const grades = [];
       students.forEach( student => {
+        if (student.grade !== '1') return;
+
         let grade = grades.find( item => {
           return item.text === student.grade.toLowerCase();
         } );
@@ -222,8 +227,11 @@ export default {
     },
 
     openEditor( e ) {
-      this.loadAvailableStudents();
-      this.isEditing = true;
+      this.loadAvailableStudents( err => {
+        if (!err) {
+          this.isEditing = true;
+        }
+      });
     },
 
     addNewStudents( e ) {
@@ -339,7 +347,7 @@ export default {
 
   mounted() {
     this.loadTasks();
-    this.loadAvailableStudents();
+    this.loadAvailableStudents( err => {} );
   },
 };
 </script>
