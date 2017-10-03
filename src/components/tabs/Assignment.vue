@@ -25,6 +25,7 @@
 
 <script>
 import Student from '@/model/student.js';
+import Intro from '@/model/intro.js';
 
 import gazeTracking from '@/utils/gazeTracking.js';
 import eventBus from '@/utils/event-bus.js';
@@ -109,11 +110,14 @@ export default {
         } ).then( value => {
           this.task.getIntro( ( err, intro ) => {
             if ( err ) {
-              this.errorText = err;
-              return;
+              this.errorText = err.message ? err.message : err;
             }
-
-            this.intro = intro;
+            else if (intro) {
+              this.intro = intro;
+            }
+            else {
+              this.intro = new Intro();
+            }
           } );
         } );
       }

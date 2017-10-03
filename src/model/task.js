@@ -150,7 +150,12 @@ export default class Task {
   }
 
   getIntro( cb ) {
-    return db.get( Intro, this.intro, cb );
+    if (this.intro) {
+      return db.get( Intro, this.intro, cb );
+    }
+    else {
+      cb();
+    }
   }
 
 }
