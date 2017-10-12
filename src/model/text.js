@@ -6,7 +6,7 @@ export default class Text {
     this.id = id;
     this.task = task;
     this.student = student;
-    this.pages = []; // array of arrays of TextWord
+    this.pages = [];        // [[TextWord]]
   }
 
 }

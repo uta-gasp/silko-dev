@@ -8,13 +8,13 @@ const FOCUS_THRESHOLD = 150;
 const REENTRY_THRESHOLD = 1000;
 const SAMPLE_DURATION = 30;
 
+const HIGHLIGHT_CLASS = 'currentWord';
+
 export default class FeedbackProvider {
 
   constructor( syllab, speech ) {
     this.syllabifier = new Syllabifier( syllab );
     this.speaker = new Speaker( speech );
-
-    this.highlighClassName = 'currentWord';
 
     this.events = new EventEmitter();
     this.timer = null;
@@ -34,7 +34,7 @@ export default class FeedbackProvider {
   // Resets the highlighting
   cleanup() {
     if ( this.currentWord ) {
-      this.currentWord.classList.remove( this.highlighClassName );
+      this.currentWord.classList.remove( HIGHLIGHT_CLASS );
       this.currentWord = null;
     }
 
@@ -73,10 +73,10 @@ export default class FeedbackProvider {
     if ( this.currentWord !== el ) {
       // if (this.highlightingEnabled) {
       //     if (this.currentWord) {
-      //         this.currentWord.classList.remove( this.highlighClassName );
+      //         this.currentWord.classList.remove( HIGHLIGHT_CLASS );
       //     }
       //     if (el) {
-      //         el.classList.add( this.highlighClassName );
+      //         el.classList.add( HIGHLIGHT_CLASS );
       //     }
       // }
 

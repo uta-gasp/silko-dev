@@ -1,20 +1,24 @@
 const RE_WORD = /(\S+)(\|)([\w,#]+)\b/g;
 const RE_LINE = /^(.+)(\s\|)([\w,#]+)$/gm;
+
+const WORD_CLASS = 'word';  // must correspond to the style name in TaskText.vue
+const LINE_CLASS = 'line';  // must correspond to the style name in TaskText.vue
+
 const CLASS_NAMES = [   // must correspond to the styles in TaskText.vue
   'light',
   'dark',
 ];
 const WEIGHT_NAMES = [
   'bold',
-  'b',        // shortcuts always follow the full name
+  'b',                // in this list, shortcuts always follow the full name
   'bolder',
   'normal',
   'n',
   'lighter',
 ];
 const STYLE_NAMES = [
-  'regular=normal',
-  'r',        // shortcuts always follow the full name
+  'regular=normal',   // [style-to-use-in-editor]=[corresponding-css-style]
+  'r',                // in this list, shortcuts always follow the full name
   'italic',
   'i',
 ];
@@ -33,8 +37,6 @@ export default class TextPresenter {
     }
 
     this.pageIndex = -1;
-
-    this.WORD_CLASS = 'word';
   }
 
   get page() {
@@ -78,7 +80,7 @@ export default class TextPresenter {
   get words() {
     const result = new Map();
 
-    const els = document.querySelectorAll( '.' + this.WORD_CLASS );
+    const els = document.querySelectorAll( '.' + WORD_CLASS );
     Array.from( els ).forEach( el => {
       result.set( el, this.syllabifier.unprepare( el.textContent ) );
     } );
@@ -91,7 +93,8 @@ export default class TextPresenter {
   _createLines( el ) {
     el.innerHTML = '';
 
-    const lines = this.pages[ this.pageIndex ];
+    const page = this.pages[ this.pageIndex ];
+    const lines = page.lines || page;   // backward compatibility with format where Task.pages=[[String]]
 
     lines.forEach( line => {
       el.appendChild( this._lineToElement( line ) );
@@ -109,7 +112,7 @@ export default class TextPresenter {
 
     const el = document.createElement( 'div' );
     el.innerHTML = styledLine;
-    el.classList.add( 'line' );
+    el.classList.add( LINE_CLASS );
 
     return el;
   }
@@ -192,7 +195,7 @@ export default class TextPresenter {
         const wordText = this.syllabifier.prepare( word[ 0 ] );
 
         const span = document.createElement( 'span' );
-        span.classList.add( this.WORD_CLASS );
+        span.classList.add( WORD_CLASS );
         span.innerHTML = wordText;
         docFrag.appendChild( span );
 

@@ -1,4 +1,5 @@
 import Recordable from './commons/recordable.js';
+import TextPage from './commons/textPage.js';
 
 import Intro from './intro.js';
 
@@ -25,7 +26,7 @@ export default class Task {
     this.cls = '';
     this.type = '';
     this.intro = '';
-    this.pages = [];    // array of arrays of strings
+    this.pages = [];      // [TextPage]
     this.syllab = Task.defaultSyllab;
     this.speech = Task.defaultSpeech;
     this.questionnaire = [];
@@ -69,7 +70,9 @@ export default class Task {
       return [];
     }
 
-    let page = [];
+    let pageIndex = 0;
+    let page = new TextPage( pageIndex );
+
     const pages = [ page ];
     const lines = text.split( '\n' );
 
@@ -77,17 +80,17 @@ export default class Task {
       line = line.trim();
 
       if ( !line ) {
-        if ( page.length > 0 ) {
-          page = [];
+        if ( page.lines.length > 0 ) {
+          page = new TextPage( ++pageIndex );
           pages.push( page );
         }
         return;
       }
 
-      page.push( line );
+      page.lines.push( line );
     } );
 
-    if ( !page.length ) {
+    if ( !page.lines.length ) {
       pages.pop();
     }
 
@@ -95,7 +98,10 @@ export default class Task {
   }
 
   static pagesToText( pages ) {
-    return pages.map( page => page.join( '\n' ) ).join( '\n\n' );
+    return pages.map( page => {
+      const lines = page.lines || page;   // backward compatibility with format where Task.pages=[[String]]
+      return lines.join( '\n' )
+    }).join( '\n\n' );
   }
 
   static textToSyllabs( text ) {

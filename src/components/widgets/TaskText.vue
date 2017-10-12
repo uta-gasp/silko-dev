@@ -23,7 +23,7 @@ export default {
 
 <style lang="less" scoped>
 
-  @margin: 15;
+  @margin: 15;  // percentage
 
   #task-text {
     position: relative;
