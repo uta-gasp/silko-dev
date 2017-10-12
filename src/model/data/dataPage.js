@@ -1,12 +1,12 @@
-import TextWord from '../commons/textWord.js';
+import DataPageTextWord from './dataPageTextWord.js';
 
 const WORD_SELECTOR = '.word';
 
 export default class DataPage {
 
   constructor( text, words, fixations, syllabifications, speech ) {
-    this.text = text || TextWord.fromAll( WORD_SELECTOR );  // array of TextWord
-    this.words = words || [];                          // array of DataWord
+    this.text = text || DataPageTextWord.fromAll( WORD_SELECTOR );  // array of DataPageTextWord
+    this.words = words || [];                          // array of DataPageFocusedWord
     this.fixations = fixations || [];                  // array of Fixation
     this.syllabifications = syllabifications || [];    // array of FeedbackEvent
     this.speech = speech || [];                        // array of FeedbackEvent
@@ -54,7 +54,7 @@ export default class DataPage {
     this.fixations = result;
   }
 
-  // words - Map object of { el: DataWord }
+  // words - Map object of { el: DataPageFocusedWord }
   setWords( words ) {
     const focusedWords = [];
     for ( let word of words.values() ) {

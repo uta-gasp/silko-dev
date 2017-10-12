@@ -1,8 +1,8 @@
-import Rect from '../commons/rect.js';
+import Rect from './rect.js';
 import WordFocusing from './wordFocusing.js';
 import WordFeedback from './wordFeedback.js';
 
-export default class DataWord {
+export default class DataPageFocusedWord {
 
   constructor( el, page ) {
     this.text = el ? el.textContent : '';   // string

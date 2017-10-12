@@ -1,5 +1,5 @@
 import Recordable from './commons/recordable.js';
-import TextPage from './commons/textPage.js';
+import TextPage from './task/textPage.js';
 
 import Intro from './intro.js';
 

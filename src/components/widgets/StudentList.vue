@@ -122,9 +122,6 @@ export default {
   },
 
   methods: {
-    click() { this.hideTaskList(); },
-    focusout(name) { console.log(name); },
-
     loadTasks() {
       this.currentClass.getTasks( ( err, tasks ) => {
         if ( err ) {

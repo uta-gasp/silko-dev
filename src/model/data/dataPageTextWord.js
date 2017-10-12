@@ -1,6 +1,6 @@
 import Rect from './rect.js';
 
-export default class TextWord {
+export default class DataPageTextWord {
 
   constructor( id, text, rect ) {
     this.id = id;       // int (in text)
@@ -9,7 +9,7 @@ export default class TextWord {
   }
 
   static from( el, id ) {
-    return el ? new TextWord( id, el.textContent, Rect.from( el ) ) : null;
+    return el ? new DataPageTextWord( id, el.textContent, Rect.from( el ) ) : null;
   }
 
   static fromAll( selector ) {
@@ -18,7 +18,7 @@ export default class TextWord {
 
     for ( let i = 0; i < words.length; i += 1 ) {
       const word = words.item( i );
-      list.push( TextWord.from( word, i ) );
+      list.push( DataPageTextWord.from( word, i ) );
     }
 
     return list;

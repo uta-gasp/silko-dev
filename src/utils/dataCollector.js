@@ -5,7 +5,7 @@ import ScreenSize from '../model/session/screenSize.js';
 
 import Fixation from '../model/data/fixation.js';
 import DataPage from '../model/data/dataPage.js';
-import DataWord from '../model/data/dataWord.js';
+import DataPageFocusedWord from '../model/data/dataPageFocusedWord.js';
 import FeedbackEvent from '../model/data/feedbackEvent.js';
 
 import db from '../db/db.js';
@@ -170,7 +170,7 @@ export default class DataCollector {
       const page = this.pages.current;
       this.currentWord = page.words.get( el );
       if ( !this.currentWord ) {
-        this.currentWord = new DataWord( el, this.pages.pageIndex );
+        this.currentWord = new DataPageFocusedWord( el, this.pages.pageIndex );
         page.words.set( el, this.currentWord );
       }
 

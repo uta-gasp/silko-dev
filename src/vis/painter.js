@@ -25,7 +25,6 @@ export default class Painter {
 
   constructor( el, settings ) {
     this.width = parseInt( document.body.offsetWidth );
-    console.log( this.width );
     this.height = parseInt( window.getComputedStyle( el ).height );
     el.setAttribute( 'width', this.width );
     el.setAttribute( 'height', this.height );
