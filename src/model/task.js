@@ -17,6 +17,14 @@ class Threshold {
 
 };
 
+
+function uuidv4() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
 export default class Task {
 
   constructor( id ) {
@@ -141,6 +149,25 @@ export default class Task {
     return result.join( '\n' );
   }
 
+  // pages: [model/task/TextPage]
+  // images: [{page, src, location, trigger}], refer to model/task/TextPageImage
+  static embedImagesIntoPages( pages, images ) {
+    if (!images) {
+      return;
+    }
+
+    pages.forEach( page => page.images = [] );
+
+    images.forEach( image => {
+      const page = pages[ image.page ];
+      if (!page) {
+        return;
+      }
+
+      page.images.push( new TextPageImage( image ) );
+    });
+  }
+
   update( task, cb ) {
     const _task = {
       intro: task.intro,
@@ -149,6 +176,8 @@ export default class Task {
       speech: task.speech,
       questionnaire: task.questionnaire,
     };
+
+    Task.embedImagesIntoPages( _task.pages, task.images );
 
     _task.syllab.exceptions = Task.textToSyllabs( task.syllab.exceptions );
 
@@ -164,6 +193,10 @@ export default class Task {
     }
   }
 
+  uploadImage( file, meta, progressHandler, cb ) {
+    const uuid = uuidv4();
+    db.uploadFile( file, uuid, meta, progressHandler, cb );
+  }
 }
 
 Recordable.apply( Task );

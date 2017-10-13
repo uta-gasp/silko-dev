@@ -15,6 +15,10 @@
         :task="ref"
         @input="setFeedbackInput")
 
+      task-editor-images(v-show="currentTab === tabs.images"
+        :task="ref"
+        @input="setImagesInput")
+
       task-editor-questionnaire(v-show="currentTab === tabs.questionnaire"
         :task="ref"
         @input="setQuestionnaireInput")
@@ -36,6 +40,7 @@ import fullscreen from '@/components/mixins/fullscreen.js';
 import TaskPreview from '@/components/widgets/taskPreview';
 import TaskEditorText from '@/components/widgets/taskEditorText';
 import TaskEditorFeedback from '@/components/widgets/taskEditorFeedback';
+import TaskEditorImages from '@/components/widgets/taskEditorImages';
 import TaskEditorQuestionnaire from '@/components/widgets/taskEditorQuestionnaire';
 
 const TASK_DEFAULTS = 'task-defaults';
@@ -49,6 +54,7 @@ export default {
     'task-preview': TaskPreview,
     'task-editor-text': TaskEditorText,
     'task-editor-feedback': TaskEditorFeedback,
+    'task-editor-images': TaskEditorImages,
     'task-editor-questionnaire': TaskEditorQuestionnaire,
   },
 
@@ -64,6 +70,8 @@ export default {
       speech: Task.defaultSpeech,
       syllabExceptions: '',
 
+      images: [],
+
       questionnaire: [],
 
       inPreview: false,
@@ -74,6 +82,9 @@ export default {
         },
         feedback: {
           name: 'Feedback',
+        },
+        images: {
+          name: 'Images',
         },
         questionnaire: {
           name: 'Questionnaire',
@@ -157,6 +168,18 @@ export default {
           this.syllabExceptions = Task.syllabsToText( this.ref.syllab.exceptions );
         }
 
+        if ( this.ref.pages ) {
+          this.ref.pages.forEach( (page, index) => {
+            if (!page.images) {
+              return;
+            }
+
+            page.images.forEach( image => {
+              this.images.push( Object.assign( { page: index }, image ) );
+            });
+          });
+        }
+
         if ( this.ref.questionnaire ) {
           this.questionnaire = this.ref.questionnaire;
         }
@@ -193,6 +216,10 @@ export default {
       this.syllabExceptions = e.syllabExceptions;
     },
 
+    setImagesInput( e ) {
+      this.images = e.images;
+    },
+
     setDefaultFeedback( e ) {
       const defaults = JSON.stringify( {
         syllab: this.syllab,
@@ -214,6 +241,7 @@ export default {
         intro: this.intro,
         syllab: this.syllab,
         speech: this.speech,
+        images: this.images,
         questionnaire: this.questionnaire,
       } );
     },

@@ -30,7 +30,7 @@ export default class Class {
   createTask( task, type, cb ) {
     task.syllab.exceptions = Task.textToSyllabs( task.syllabExceptions );
 
-    db.add( Task, {
+    const taskObj = {
       name: task.name,
       owner: this.owner,
       cls: this.id,
@@ -40,7 +40,11 @@ export default class Class {
       syllab: task.syllab,
       speech: task.speech,
       questionnaire: task.questionnaire,
-    }, ( err, id ) => {
+    };
+
+    Task.embedImagesIntoPages( taskObj.pages, task.images );
+
+    db.add( Task, taskObj, ( err, id ) => {
       if ( err ) {
         return cb( err );
       }
