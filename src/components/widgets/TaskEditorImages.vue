@@ -19,8 +19,13 @@
             td {{ getImageName( image ) }}
             td {{ getImagePage( image ) }}
             td {{ image.location }}
-            td {{ formatEvent( image.on ) }}
-            td {{ formatEvent( image.off ) }}
+            td
+              .event-name {{ formatEventName( image.on ) }}
+              .event-param {{ formatEventParam0( image.on ) }}
+              .event-param {{ formatEventParam1( image.on ) }}
+            td
+              .event-name {{ formatEventName( image.off ) }}
+              .event-param {{ formatEventParam0( image.off ) }}
             td
               button.button.is-danger(
                 title="Remove the image"
@@ -31,10 +36,10 @@
 
     section.absolute-parent
       .has-text-centered
-        section.section.is-fullwidth.is-dropzone(
+        section.is-fullwidth.is-dropzone(
             :class="{ 'is-dragover': isDraggingFileOverDropzone }"
             @drag.stop.prevent=""
-            @dragstart.stop.prevent=""
+            @dragstart.stop.prevent="isDraggingFileOverDropzone = false"
             @dragend.stop.prevent="isDraggingFileOverDropzone = false"
             @dragleave.stop.prevent="isDraggingFileOverDropzone = false"
             @dragenter.stop.prevent="isDraggingFileOverDropzone = true"
@@ -49,7 +54,7 @@
                 span.file-label Choose an image…
                 span.help or drag it here
 
-      div.sticked-to-bottom(v-if="selectedFile")
+      div.sticked(:class="{ 'at-top': !images.length, 'at-bottom': images.length }" v-if="selectedFile")
         article.media
           figure.media-left
             p.image.is-64x64
@@ -63,7 +68,7 @@
               progress.progress.is-small.is-primary(v-show="isUploading" max="100" :value="uploadProgress")
           .media-right
             .field
-              button.button.is-primary(@click="uploadImage" :disabled="isUploading") Upload
+              button.button.is-primary(@click="uploadImage" :disabled="isUploading || !hasValidMeta") Upload
               button.button(@click="cancel" :disabled="isUploading") Cancel
         article
           .field.is-horizontal
@@ -89,9 +94,12 @@
                   option(value="none") initially
                   option(value="fixation") on fixation
               .field.is-horizontal(v-show="on === 'fixation'")
+                .field-label.is-normal.is-inner-label.no-wrap at
+                .field-body.text-container
+                  input.input(type="text" :value="onParams[0]" @input="paramChangeHandler( onParams, 0, $event )")
                 .field-label.is-normal.is-inner-label.no-wrap longer than
                 .field-body.number-container
-                  input.input.is-number(type="text" v-model="onParam")
+                  input.input.is-number(type="text" :value="onParams[1]" @input="paramChangeHandler( onParams, 1, $event )")
                 .field-label.is-normal.is-inner-label.no-wrap ms
           .field.is-horizontal
             .field-label.is-normal Hide
@@ -101,9 +109,9 @@
                   option(value="none") never
                   option(value="image") when other image is shown
                   option(value="delay") after
-              .field.is-horizontal(v-show="off === 'after'")
+              .field.is-horizontal(v-show="off === 'delay'")
                 .field-body.number-container
-                  input.input.is-number(type="text" v-model="offParam")
+                  input.input.is-number(type="text" :value="offParams[0]" @input="paramChangeHandler( offParams, 0, $event )")
                 .field-label.is-normal.is-inner-label.no-wrap sec
 
     temporal-notification(type="danger" :show="showError")
@@ -112,6 +120,7 @@
 </template>
 
 <script>
+import Task from '@/model/task.js';
 import TextPageImage from '@/model/task/textPageImage.js';
 
 import ActionError from '@/components/mixins/actionError';
@@ -138,9 +147,9 @@ export default {
       page: '-1',
       location: 'bottom',
       on: 'none',
-      onParam: 1000,
+      onParams: ['', 1000],
       off: 'none',
-      offParam: 1,
+      offParams: [1],
 
       isDraggingFileOverDropzone: false,
     };
@@ -160,6 +169,11 @@ export default {
 
     isUploading() {
       return this.uploadProgress >= 0;
+    },
+
+    hasValidMeta() {
+      return (this.on === 'fixation' ? this.onParams.every( value => !!value ) : true) &&
+             (this.off === 'delay' ? this.offParams.every( value => !!value ) : true);
     },
   },
 
@@ -207,8 +221,10 @@ export default {
         return image.file.name;
       }
       else if (image.src) {
-        const parts = image.src.split( '_' );
-        return parts[ parts.length - 1 ];
+        const splitter = Task.FILE_ID_SPLITTER;
+        const parts = image.src.split( splitter );
+        parts.shift();
+        return parts.join( splitter );
       }
       else {
         return '-';
@@ -219,12 +235,40 @@ export default {
       return image.page < 0 ? 'any' : (image.page + 1);
     },
 
-    formatEvent( event ) {
-      if( event.event === 'none' ) {
+    formatEventName( event ) {
+      if( event.name === 'none' ) {
         return '-';
       }
+      else  if (event.name === 'fixation') {
+        return `fixation on word`;
+      }
       else {
-        return event.event;
+        return event.name;
+      }
+    },
+
+    formatEventParam0( event ) {
+      if( event.name === 'none' ||
+          event.name === 'image' ) {
+        return '';
+      }
+      else  if (event.name === 'fixation') {
+        return `"${event.params[0]}"`;
+      }
+      else if (event.name === 'delay') {
+        return `${event.params[0]} seconds`;
+      }
+      else {
+        return event.params.join();
+      }
+    },
+
+    formatEventParam1( event ) {
+      if (event.name === 'fixation') {
+        return `longer that ${event.params[1]} ms`;
+      }
+      else {
+        return '';
       }
     },
 
@@ -251,16 +295,20 @@ export default {
     uploadImage( e ) {
       this.uploadProgress = 0;
 
-      const meta = {
+      const image = new TextPageImage({
         page: this.page,
         location: this.location,
-        on: this.on,
-        onParam: this.onParam,
-        off: this.off,
-        offParam: this.offParam,
-      };
+        on: {
+          name: this.on,
+          params: this.onParams,
+        },
+        off: {
+          name: this.off,
+          params: this.offParams,
+        },
+      });
 
-      this.task.uploadImage( this.selectedFile, meta,
+      this.task.uploadImage( this.selectedFile, image.meta(),
         percentage => {
           this.uploadProgress = percentage;
         },
@@ -273,20 +321,7 @@ export default {
           else {
             // TODO fire event
             // this.$emit( 'input', this.model );
-            const image = new TextPageImage({
-              src: url,
-              page: meta.page,
-              location: meta.location,
-              on: {
-                event: this.on,
-                param: this.onParam,
-              },
-              off: {
-                event: this.off,
-                param: this.offParam,
-              },
-            });
-
+            image.src = url;
             image.file = this.selectedFile;
             this.images.push( image );
 
@@ -299,6 +334,10 @@ export default {
     cancel( e ) {
       this.selectedFile = null;
     },
+
+    paramChangeHandler( array, index, e ) {
+      array.splice( index, 1, e.target.value);
+    }
   },
 
   created() {
@@ -323,49 +362,72 @@ export default {
     overflow-y: auto;
   }
 
-  .field:not(:last-child) {
-    margin-bottom: 0.25em;
+  .table td {
+    padding-top: 0;
+    padding-bottom: 0;
   }
 
-  .is-inner-label {
-    margin-left: 0.75rem;
-    margin-right: 0.75rem;
-    flex-grow: 0;
+  .event-name {
+
   }
 
-  .number-container {
-    flex-grow: 0;
-  }
-
-  .is-number {
-    width: 4rem;
-  }
-
-  .no-wrap {
-    white-space: nowrap;
-  }
-
-  .sticked-to-bottom {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-
-    background-color: #eee;
-    padding: 0.5em;
-    border: 1px solid #888;
-    // flex-grow: 3;
-    // flex-shrink: 0;
-    // flex-basis: 0;
+  .event-param {
+    font-size: 9pt;
   }
 
   .is-dropzone {
     background-color: white;
     outline: 2px dashed #aaa;
     outline-offset: -10px;
+    padding: 1em;
   }
 
   .is-dragover {
     background-color: #e4e2e0;
+  }
+
+  .sticked {
+    position: absolute;
+    left: 0;
+    right: 0;
+
+    background-color: #eee;
+    padding: 0.5em;
+    border: 1px solid #aaa;
+    border-radius: 5px;
+
+    &.at-top {
+      top: 0;
+    }
+
+    &.at-bottom {
+      bottom: 0;
+    }
+  }
+
+  .field:not(:last-child) {
+    margin-bottom: 0.25em;
+  }
+
+  .no-wrap {
+    white-space: nowrap;
+  }
+
+  .number-container {
+    flex-grow: 0;
+  }
+
+  .text-container {
+    flex-grow: 3;
+  }
+
+  .is-number {
+    width: 4rem;
+  }
+
+  .is-inner-label {
+    margin-left: 0.75rem;
+    margin-right: 0.75rem;
+    flex-grow: 0;
   }
 </style>

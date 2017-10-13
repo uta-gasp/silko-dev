@@ -73,6 +73,10 @@ export default class Task {
     };
   }
 
+  static get FILE_ID_SPLITTER() {
+    return '_';
+  }
+
   static textToPages( text ) {
     if ( !text ) {
       return [];
@@ -195,7 +199,8 @@ export default class Task {
 
   uploadImage( file, meta, progressHandler, cb ) {
     const uuid = uuidv4();
-    db.uploadFile( file, uuid, meta, progressHandler, cb );
+
+    db.uploadFile( file, `${uuid}${Task.FILE_ID_SPLITTER}`, meta, progressHandler, cb );
   }
 }
 

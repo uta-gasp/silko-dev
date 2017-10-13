@@ -328,13 +328,13 @@ class DB {
     } );
   }
 
-  uploadFile( file, uuid, meta, progressHandler, cb ) {
+  uploadFile( file, prefix, meta, progressHandler, cb ) {
     const folder = /image\//.test( file.type ) ? 'image' : 'file';
     const metadata = {
       customMetadata: meta,
     };
 
-    const uploadTask  = this.storage.child( `${folder}/${uuid}_${file.name}` ).put( file, metadata );
+    const uploadTask  = this.storage.child( `${folder}/${prefix}${file.name}` ).put( file, metadata );
     uploadTask.on( 'state_changed', snapshot => {
       if (snapshot.state === firebase.storage.TaskState.RUNNING) {
         progressHandler( 100 * (snapshot.bytesTransferred / snapshot.totalBytes) );
