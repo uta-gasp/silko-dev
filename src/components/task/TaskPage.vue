@@ -11,9 +11,10 @@
 <script>
 import TaskText from '@/components/widgets/TaskText';
 
-import TextPresenter from '@/utils/textPresenter.js';
-import FeedbackProvider from '@/utils/feedbackProvider.js';
-import DataCollector from '@/utils/dataCollector.js';
+import TextPresenter from '@/task/textPresenter.js';
+import FeedbackProvider from '@/task/feedbackProvider.js';
+import DataCollector from '@/task/dataCollector.js';
+
 import gazeTracking from '@/utils/gazeTracking.js';
 
 import Font from '@/model/session/font.js';

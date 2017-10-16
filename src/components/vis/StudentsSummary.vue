@@ -26,8 +26,9 @@
 <script>
 import Regressions from '@/vis/regressions.js';
 import sgwmController from '@/vis/sgwmController.js';
-import Syllabifier from '@/utils/syllabifier.js';
 // import OptionsCreator from '@/vis/optionsCreator.js';
+
+import Syllabifier from '@/task/syllabifier.js';
 
 import ControlPanel from '@/components/vis/controlPanel';
 import Options from '@/components/vis/Options';

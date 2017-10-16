@@ -22,8 +22,8 @@
 <script>
 import TaskText from '@/components/widgets/TaskText';
 
-import TextPresenter from '@/utils/textPresenter.js';
-import FeedbackProvider from '@/utils/feedbackProvider.js';
+import TextPresenter from '@/task/textPresenter.js';
+import FeedbackProvider from '@/task/feedbackProvider.js';
 
 export default {
   name: 'task-preview',

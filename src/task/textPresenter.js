@@ -43,6 +43,10 @@ export default class TextPresenter {
     return this.pageIndex;
   }
 
+  get originalPageIndex() {
+    return this.hasInstructionPage ? this.pageIndex - 1 : this.pageIndex;
+  }
+
   get isInstructionPage() {
     return this.pageIndex === 0 && this.hasInstructionPage;
   }

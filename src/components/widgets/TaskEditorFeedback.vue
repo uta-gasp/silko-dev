@@ -28,8 +28,8 @@
 <script>
 import Task from '@/model/task.js';
 
-import Syllabifier from '@/utils/syllabifier.js';
-import Speaker from '@/utils/speaker.js';
+import Syllabifier from '@/task/syllabifier.js';
+import Speaker from '@/task/speaker.js';
 
 import FeedbackEditor from '@/components/widgets/feedbackEditor';
 import BulmaCheckbox from '@/components/widgets/bulmaCheckbox';

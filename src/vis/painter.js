@@ -1,4 +1,4 @@
-import Syllabifier from '@/utils/syllabifier.js';
+import Syllabifier from '@/task/syllabifier.js';
 
 import Metric from '@/vis/metric.js';
 import Colors from '@/vis/colors.js';
