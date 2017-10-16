@@ -1,8 +1,20 @@
 class TextPageImageEvent {
-  constructor( name, params ) {
+  constructor( name ) {
     this.name = name;       // string
-    this.params = params;   // []
   }
+}
+
+function isGreaterThanInt( value, threshold ) {
+  if (value === '' || value === null || value === undefined) {
+    return false;
+  }
+
+  const int = +value;
+  if (Number.isNaN( int ) || !Number.isInteger( int )) {
+    return false;
+  }
+
+  return int > threshold;
 }
 
 export default class TextPageImage {
@@ -20,16 +32,44 @@ export default class TextPageImage {
     this.off = off;
   }
 
-  meta() {
+  static get EVENT() {
     return {
+      none: 'none',
+      fixation: 'fixation',
+      image: 'image',
+      delay: 'delay',
+    };
+  }
+
+  static isEventValid( event ) {
+    if (event.name === TextPageImage.EVENT.fixation) {
+      return event.word && isGreaterThanInt( event.duration, 100 );
+    }
+    else if (event.name === TextPageImage.EVENT.delay) {
+      return isGreaterThanInt( event.duration, 0 );
+    }
+    else {
+      return true;
+    }
+  }
+
+  get meta() {
+    const result = {
       page: this.page,
       location: this.location,
       on: this.on.name,
-      onParam0: this.on.params[0],
-      onParam1: this.on.params[1],
       off: this.off.name,
-      offParams0: this.off.params[0],
     };
+
+    if (this.on.name === TextPageImage.EVENT.fixation) {
+      result[ 'on-word' ] = this.on.word;
+      result[ 'on-duration' ] = this.on.duration;
+    }
+    else if (this.off.name === TextPageImage.EVENT.delay) {
+      result[ 'off-duration' ] = this.off.duration;
+    }
+
+    return result;
   }
 
 };

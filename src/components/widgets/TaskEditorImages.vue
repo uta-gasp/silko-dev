@@ -21,11 +21,10 @@
             td {{ image.location }}
             td
               .event-name {{ formatEventName( image.on ) }}
-              .event-param {{ formatEventParam0( image.on ) }}
-              .event-param {{ formatEventParam1( image.on ) }}
+              .event-param {{ formatEventParams( image.on ) }}
             td
               .event-name {{ formatEventName( image.off ) }}
-              .event-param {{ formatEventParam0( image.off ) }}
+              .event-param {{ formatEventParams( image.off ) }}
             td
               button.button.is-danger(
                 title="Remove the image"
@@ -68,7 +67,7 @@
               progress.progress.is-small.is-primary(v-show="isUploading" max="100" :value="uploadProgress")
           .media-right
             .field
-              button.button.is-primary(@click="uploadImage" :disabled="isUploading || !hasValidMeta") Upload
+              button.button.is-primary(@click="uploadImage" :disabled="isUploading || !hasValidParams") Upload
               button.button(@click="cancel" :disabled="isUploading") Cancel
         article
           .field.is-horizontal
@@ -91,37 +90,30 @@
             .field-body
               .select
                 select(v-model="on")
-                  option(value="none") initially
-                  option(value="fixation") on fixation
+                  option(v-for="(text, id) in ON" :value="id" :key="id") {{ text }}
               .field.is-horizontal(v-show="on === 'fixation'")
                 .field-label.is-normal.is-inner-label.no-wrap at
-                .field-body.text-container
+                .field-body.select-container
                   .select
-                    select(
-                      :value="onParams[0]"
-                      @input="paramChangeHandler( onParams, 0, $event )")
-                      option(v-for="word in currentWords" :value="word") {{ word }}
+                    select(v-model="fixationWord")
+                      option(v-for="word in currentWords" :value="word" :key="word") {{ word }}
                 .field-label.is-normal.is-inner-label.no-wrap longer than
                 .field-body.number-container
                   input.input.is-number(
                     type="text"
-                    :value="onParams[1]"
-                    @input="paramChangeHandler( onParams, 1, $event )")
+                    v-model="fixationDuration")
                 .field-label.is-normal.is-inner-label.no-wrap ms
           .field.is-horizontal
             .field-label.is-normal Hide
             .field-body
               .select
                 select(v-model="off")
-                  option(value="none") never
-                  option(value="image") when other image is shown
-                  option(value="delay") after
+                  option(v-for="(text, id) in OFF" :value="id" :key="id") {{ text }}
               .field.is-horizontal(v-show="off === 'delay'")
                 .field-body.number-container
                   input.input.is-number(
                     type="text"
-                    :value="offParams[0]"
-                    @input="paramChangeHandler( offParams, 0, $event )")
+                    v-model="delayDuration")
                 .field-label.is-normal.is-inner-label.no-wrap sec
 
     temporal-notification(type="danger" :show="showError")
@@ -137,7 +129,7 @@ import ActionError from '@/components/mixins/actionError';
 
 import TemporalNotification from '@/components/widgets/TemporalNotification';
 
-function getPage( text ) {
+function getPages( text ) {
   return text.split('\n\n').filter( page => !!page.trim() );
 }
 
@@ -153,7 +145,7 @@ function getUniqueWords( text ) {
 }
 
 function getPageUniqueWords( text, pageIndex ) {
-  const page = getPage( text )[ pageIndex ];
+  const page = getPages( text )[ pageIndex ];
   if (!page) {
     return [];
   }
@@ -177,15 +169,27 @@ export default {
       selectedFile: null,
       uploadProgress: -1,
 
-      // meta
       page: '-1',
       location: 'bottom',
-      on: 'none',
-      onParams: ['', 1000],
-      off: 'none',
-      offParams: [1],
+      on: TextPageImage.EVENT.none,
+      fixationWord: '',
+      fixationDuration: 1000,
+      off: TextPageImage.EVENT.none,
+      delayDuration: 1,
 
       isDraggingFileOverDropzone: false,
+
+      ON: {
+        [TextPageImage.EVENT.none]: 'initially',
+        [TextPageImage.EVENT.fixation]: 'on fixation',
+      },
+
+      OFF: {
+        [TextPageImage.EVENT.none]: 'never',
+        [TextPageImage.EVENT.image]: 'when other image is shown',
+        [TextPageImage.EVENT.delay]: 'after',
+      },
+
     };
   },
 
@@ -216,9 +220,9 @@ export default {
       return this.uploadProgress >= 0;
     },
 
-    hasValidMeta() {
-      return (this.on === 'fixation' ? this.onParams.every( value => !!value ) : true) &&
-             (this.off === 'delay' ? this.offParams.every( value => !!value ) : true);
+    hasValidParams() {
+      return TextPageImage.isEventValid( this.constructImageEvent( this.on ) ) &&
+             TextPageImage.isEventValid( this.constructImageEvent( this.off ) );
     },
   },
 
@@ -283,10 +287,10 @@ export default {
     },
 
     formatEventName( event ) {
-      if( event.name === 'none' ) {
+      if( event.name === TextPageImage.EVENT.none ) {
         return '-';
       }
-      else  if (event.name === 'fixation') {
+      else  if (event.name === TextPageImage.EVENT.fixation) {
         return `fixation on word`;
       }
       else {
@@ -294,25 +298,12 @@ export default {
       }
     },
 
-    formatEventParam0( event ) {
-      if( event.name === 'none' ||
-          event.name === 'image' ) {
-        return '';
+    formatEventParams( event ) {
+      if (event.name === TextPageImage.EVENT.fixation) {
+        return `"${event.word}"\nlonger than ${event.duration} ms`;
       }
-      else  if (event.name === 'fixation') {
-        return `"${event.params[0]}"`;
-      }
-      else if (event.name === 'delay') {
-        return `${event.params[0]} seconds`;
-      }
-      else {
-        return event.params.join();
-      }
-    },
-
-    formatEventParam1( event ) {
-      if (event.name === 'fixation') {
-        return `longer that ${event.params[1]} ms`;
+      else if (event.name === TextPageImage.EVENT.delay) {
+        return `${event.duration} seconds`;
       }
       else {
         return '';
@@ -334,6 +325,9 @@ export default {
       else if (file.type !== 'image/jpeg' && file.type !== 'image/png') {
         return this.setError( 'Only JPEG and PNG images are supported' );
       }
+      else if (file.size > 100000) {
+        return this.setError( 'File size must not exceed 100 kB' );
+      }
       else {
         this.selectedFile = file;
       }
@@ -345,17 +339,11 @@ export default {
       const image = new TextPageImage({
         page: this.page,
         location: this.location,
-        on: {
-          name: this.on,
-          params: this.onParams,
-        },
-        off: {
-          name: this.off,
-          params: this.offParams,
-        },
+        on: this.constructImageEvent( this.on ),
+        off: this.constructImageEvent( this.off ),
       });
 
-      this.task.uploadImage( this.selectedFile, image.meta(),
+      this.task.uploadImage( this.selectedFile, image.meta,
         percentage => {
           this.uploadProgress = percentage;
         },
@@ -382,17 +370,25 @@ export default {
       this.selectedFile = null;
     },
 
-    paramChangeHandler( array, index, e ) {
-      array.splice( index, 1, e.target.value);
-    }
+    constructImageEvent( name ) {
+      const eventObj = {
+        name: name
+      }
+
+      if (eventObj.name === TextPageImage.EVENT.fixation) {
+        eventObj.word = this.fixationWord;
+        eventObj.duration = this.fixationDuration;
+      }
+      else if (eventObj.name === TextPageImage.EVENT.delay) {
+        eventObj.duration = this.delayDuration;
+      }
+
+      return eventObj;
+    },
   },
 
   created() {
     this.listImages();
-  },
-
-  activated() {
-    console.log('activated');
   },
 };
 </script>
@@ -424,6 +420,7 @@ export default {
 
   .event-param {
     font-size: 9pt;
+    white-space: pre;
   }
 
   .is-dropzone {
@@ -470,6 +467,10 @@ export default {
 
   .text-container {
     flex-grow: 3;
+  }
+
+  .select-container {
+    flex-grow: 0;
   }
 
   .is-number {
