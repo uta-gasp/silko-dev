@@ -334,7 +334,7 @@ class DB {
       customMetadata: meta,
     };
 
-    const uploadTask  = this.storage.child( `${folder}/${prefix}${file.name}` ).put( file, metadata );
+    const uploadTask = this.storage.child( `${folder}/${prefix}${file.name}` ).put( file, metadata );
     uploadTask.on( 'state_changed', snapshot => {
       if (snapshot.state === firebase.storage.TaskState.RUNNING) {
         progressHandler( 100 * (snapshot.bytesTransferred / snapshot.totalBytes) );
@@ -346,6 +346,20 @@ class DB {
     });
 
     return uploadTask;
+  }
+
+  deleteFile( url, cb ) {
+    const pathParts = new URL( url ).pathname.split( '/' );
+    const filename = pathParts[ pathParts.length - 1];
+    if (!filename) {
+      return cb( new Error( 'invalid url' ) );
+    }
+
+    this.storage.
+      child( decodeURIComponent( filename ) ).
+      delete().
+      then( _ => cb() ).
+      catch( err => cb( err ) );
   }
 
   _onUserChanged( user ) {

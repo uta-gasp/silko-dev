@@ -1,5 +1,6 @@
 import Recordable from './commons/recordable.js';
 import TextPage from './task/textPage.js';
+import TextPageImage from './task/textPageImage.js';
 
 import Intro from './intro.js';
 
@@ -154,7 +155,7 @@ export default class Task {
   }
 
   // pages: [model/task/TextPage]
-  // images: [{page, src, location, trigger}], refer to model/task/TextPageImage
+  // images: [model/task/TextPageImage || {src, page, location, on: TextPageImageEvent, off: TextPageImageEvent}]
   static embedImagesIntoPages( pages, images ) {
     if (!images) {
       return;
@@ -163,12 +164,17 @@ export default class Task {
     pages.forEach( page => page.images = [] );
 
     images.forEach( image => {
-      const page = pages[ image.page ];
-      if (!page) {
-        return;
+      if (image.page < 0) {
+        pages.forEach( page => page.images.push( new TextPageImage( image ) ) );
       }
+      else {
+        const page = pages[ image.page ];
+        if (!page) {
+          return;
+        }
 
-      page.images.push( new TextPageImage( image ) );
+        page.images.push( new TextPageImage( image ) );
+      }
     });
   }
 
@@ -201,6 +207,11 @@ export default class Task {
     const uuid = uuidv4();
 
     db.uploadFile( file, `${uuid}${Task.FILE_ID_SPLITTER}`, meta, progressHandler, cb );
+  }
+
+  // @image: TaskPageImage
+  deleteImage( image, cb ) {
+    db.deleteFile( image.src, cb );
   }
 }
 

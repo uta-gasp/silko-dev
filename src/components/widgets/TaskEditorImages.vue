@@ -54,7 +54,7 @@
                 span.file-label Choose an image…
                 span.help or drag it here
 
-      div.sticked(:class="{ 'at-top': !images.length, 'at-bottom': images.length }" v-if="selectedFile")
+      .sticked(:class="{ 'at-top': !images.length, 'at-bottom': images.length }" v-if="selectedFile")
         article.media
           figure.media-left
             p.image.is-64x64
@@ -77,7 +77,7 @@
               .select
                 select(v-model="page")
                   option(value="-1") any
-                  option(v-for="(page, index) in task.pages" :key="index" :value="index") {{ index + 1 }}
+                  option(v-for="index in pageCount" :key="index" :value="index - 1") {{ index }}
           .field.is-horizontal
             .field-label.is-normal Location
             .field-body
@@ -85,7 +85,7 @@
                 select(v-model="location")
                   option(value="left") left
                   option(value="bottom") bottom
-                  option(value="top") top
+                  option(value="right") right
           .field.is-horizontal
             .field-label.is-normal Show
             .field-body
@@ -96,10 +96,17 @@
               .field.is-horizontal(v-show="on === 'fixation'")
                 .field-label.is-normal.is-inner-label.no-wrap at
                 .field-body.text-container
-                  input.input(type="text" :value="onParams[0]" @input="paramChangeHandler( onParams, 0, $event )")
+                  .select
+                    select(
+                      :value="onParams[0]"
+                      @input="paramChangeHandler( onParams, 0, $event )")
+                      option(v-for="word in currentWords" :value="word") {{ word }}
                 .field-label.is-normal.is-inner-label.no-wrap longer than
                 .field-body.number-container
-                  input.input.is-number(type="text" :value="onParams[1]" @input="paramChangeHandler( onParams, 1, $event )")
+                  input.input.is-number(
+                    type="text"
+                    :value="onParams[1]"
+                    @input="paramChangeHandler( onParams, 1, $event )")
                 .field-label.is-normal.is-inner-label.no-wrap ms
           .field.is-horizontal
             .field-label.is-normal Hide
@@ -111,7 +118,10 @@
                   option(value="delay") after
               .field.is-horizontal(v-show="off === 'delay'")
                 .field-body.number-container
-                  input.input.is-number(type="text" :value="offParams[0]" @input="paramChangeHandler( offParams, 0, $event )")
+                  input.input.is-number(
+                    type="text"
+                    :value="offParams[0]"
+                    @input="paramChangeHandler( offParams, 0, $event )")
                 .field-label.is-normal.is-inner-label.no-wrap sec
 
     temporal-notification(type="danger" :show="showError")
@@ -126,6 +136,30 @@ import TextPageImage from '@/model/task/textPageImage.js';
 import ActionError from '@/components/mixins/actionError';
 
 import TemporalNotification from '@/components/widgets/TemporalNotification';
+
+function getPage( text ) {
+  return text.split('\n\n').filter( page => !!page.trim() );
+}
+
+function getUniqueWords( text ) {
+  return Array.from(
+    new Set( text.trim().
+      split( /\s/ig ).
+      map( word => word.trim() ).
+      filter( word => word.length ).
+      sort()
+    )
+  );
+}
+
+function getPageUniqueWords( text, pageIndex ) {
+  const page = getPage( text )[ pageIndex ];
+  if (!page) {
+    return [];
+  }
+
+  return getUniqueWords( page );
+}
 
 export default {
   name: 'task-editor-images',
@@ -160,11 +194,22 @@ export default {
       type: Object,
       default: () => { return {}; },
     },
+
+    currentText: {
+      type: String,
+      required: true,
+    },
   },
 
   computed: {
-    model() {
-      return this.images;
+    pageCount() {
+      return getPages( this.currentText ).length;
+    },
+
+    currentWords() {
+      return +this.page < 0 ?
+        getUniqueWords( this.currentText ) :
+        getPageUniqueWords( this.currentText, +this.page );
     },
 
     isUploading() {
@@ -177,10 +222,6 @@ export default {
     },
   },
 
-  watch: {
-    images() { this.$emit( 'input', this.model ); },
-  },
-
   methods: {
     listImages() {
       const images = [];
@@ -191,7 +232,9 @@ export default {
         }
 
         page.images.forEach( image => {
-          images.push( Object.assign( { page: index }, image ) );
+          if (!images.find( img => img.src === image.src )) {
+            images.push( image );
+          }
         });
       });
 
@@ -199,9 +242,13 @@ export default {
     },
 
     remove( index ) {
-      this.images.splice( index, 1 );
-      // TODO fire event
-      // this.$emit( 'input', this.model );
+      const deletedImage = this.images.splice( index, 1 )[0];
+      this.task.deleteImage( deletedImage, err => {
+        if (err) {
+          this.setError( err, 'Cannot delete the image' );
+        }
+      } );
+      this.$emit( 'input', { images: this.images } );
     },
 
     getImageURL( file ) {
@@ -224,7 +271,7 @@ export default {
         const splitter = Task.FILE_ID_SPLITTER;
         const parts = image.src.split( splitter );
         parts.shift();
-        return parts.join( splitter );
+        return parts.join( splitter ).split( '?' )[0];
       }
       else {
         return '-';
@@ -319,13 +366,13 @@ export default {
             this.setError( err, 'Cannot upload the file' );
           }
           else {
-            // TODO fire event
-            // this.$emit( 'input', this.model );
             image.src = url;
             image.file = this.selectedFile;
             this.images.push( image );
 
             this.selectedFile = null;
+
+            this.$emit( 'input', { images: this.images } );
           }
         }
       );
@@ -342,6 +389,10 @@ export default {
 
   created() {
     this.listImages();
+  },
+
+  activated() {
+    console.log('activated');
   },
 };
 </script>

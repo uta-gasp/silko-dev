@@ -1,7 +1,7 @@
 class TextPageImageEvent {
   constructor( name, params ) {
-    this.name = name;
-    this.params = params;
+    this.name = name;       // string
+    this.params = params;   // []
   }
 }
 

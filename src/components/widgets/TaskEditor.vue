@@ -17,6 +17,7 @@
 
       task-editor-images(v-show="currentTab === tabs.images"
         :task="ref"
+        :current-text="text"
         @input="setImagesInput")
 
       task-editor-questionnaire(v-show="currentTab === tabs.questionnaire"
