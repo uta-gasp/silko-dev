@@ -1,15 +1,23 @@
 <template lang="pug">
   #task-page
+
     task-text(ref="container")
+
+    task-images(
+      :images="images"
+      :fixation="fixation")
+
     .is-bottom-right
       a.button.is-primary.is-large(v-show="hasNextPage" @click="next")
         span {{ titleNext }}
       a.button.is-primary.is-large(v-show="!hasNextPage" @click="finish")
         span {{ titleFinish }}
+
 </template>
 
 <script>
 import TaskText from '@/components/widgets/TaskText';
+import TaskImages from '@/components/widgets/TaskImages';
 
 import TextPresenter from '@/task/textPresenter.js';
 import FeedbackProvider from '@/task/feedbackProvider.js';
@@ -19,11 +27,14 @@ import gazeTracking from '@/utils/gazeTracking.js';
 
 import Font from '@/model/session/font.js';
 
+const FIX_UPDATE_INTERVAL = 25;
+
 export default {
   name: 'task-page',
 
   components: {
     'task-text': TaskText,
+    'task-images': TaskImages,
   },
 
   data() {
@@ -31,7 +42,15 @@ export default {
       textPresenter: null,
       feedbackProvider: null,
       collector: null,
+
       font: Font.from( TaskText.data().textStyle ),
+
+      fixation: {
+        word: null,
+        duration: 0,
+      },
+
+      fixationUpdateTimer: null,
     };
   },
 
@@ -53,7 +72,20 @@ export default {
     titleFinish() {
       return this.texts.finish || 'Finish';
     },
-  },
+
+    images() {
+      if (!this.textPresenter) {
+        return [];
+      }
+
+      const pageIndex = this.textPresenter.originalPageIndex;
+      if (pageIndex < 0) {
+        return [];
+      }
+
+      return this.task.pages[ pageIndex ].images;
+    },
+ },
 
   methods: {
 
@@ -75,6 +107,9 @@ export default {
       this.collector.stop( ( err, keys ) => {
         this.$emit( 'saved', { err, keys } );
       } );
+
+      window.clearInterval( this.fixationUpdateTimer );
+      this.fixationUpdateTimer = null;
     },
   },
 
@@ -89,26 +124,44 @@ export default {
     this.feedbackProvider.events.addListener( 'syllabified', data => this.collector.syllabified( data ) );
     this.feedbackProvider.events.addListener( 'pronounced', data => this.collector.pronounced( data ) );
 
-    gazeTracking.setCallback( 'stateUpdated', 'task-page', state => {
-      if ( state.isConnected && state.isTracking && !state.isBusy ) {
-        this.collector.start();
-      }
-    } );
+//     gazeTracking.setCallback( 'stateUpdated', 'task-page', state => {
+//       if ( state.isConnected && state.isTracking && !state.isBusy ) {
+//         this.collector.start();
+//       }
+//     } );
+
     gazeTracking.setCallback( 'wordFocused', 'task-page', word => {
       if ( !this.textPresenter.isInstructionPage ) {
         this.feedbackProvider.setFocusedWord( word );
       }
-      this.collector.setFocusedWord( word, this.textPresenter.page );
+      const wordText = this.collector.setFocusedWord( word, this.textPresenter.page );
+      this.fixation = { word: wordText, duration: 0 };
     } );
+
     gazeTracking.setCallback( 'wordLeft', 'task-page', word => {
       if ( !this.textPresenter.isInstructionPage ) {
         this.feedbackProvider.setFocusedWord( null );
       }
       this.collector.setFocusedWord( null );
+      this.fixation = { word: null, duration: 0 };
     } );
+
     gazeTracking.setCallback( 'gazePoint', 'task-page', gazePoint => {
       this.collector.addGazePoint( gazePoint, this.textPresenter.page );
     } );
+
+    this.collector.start();
+    this.fixationUpdateTimer = window.setInterval( () => {
+      const word = this.collector.focusedWord;
+      if (!word) {
+        if (this.fixation.word) {
+          this.fixation = { word: null, duration: 0 };
+        }
+      }
+      else {
+        this.fixation = { word: word.text, duration: word.duration };
+      }
+    }, FIX_UPDATE_INTERVAL );
 
     this.next();
   },

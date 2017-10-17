@@ -4,6 +4,24 @@ class TextPageImageEvent {
   }
 }
 
+class TextPageImageFixationEvent extends TextPageImageEvent {
+  constructor( name, word, duration ) {
+    super( name );
+
+    this.word = word;
+    this.duration = duration;
+  }
+}
+
+class TextPageImageDelayEvent extends TextPageImageEvent {
+  constructor( name, duration ) {
+    super( name );
+
+    this.duration = duration;
+  }
+}
+
+
 function isGreaterThanInt( value, threshold ) {
   if (value === '' || value === null || value === undefined) {
     return false;

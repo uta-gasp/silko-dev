@@ -1,14 +1,14 @@
-import Data from '../model/data.js';
-import Session from '../model/session.js';
+import Data from '@/model/data.js';
+import Session from '@/model/session.js';
 
-import ScreenSize from '../model/session/screenSize.js';
+import ScreenSize from '@/model/session/screenSize.js';
 
-import Fixation from '../model/data/fixation.js';
-import DataPage from '../model/data/dataPage.js';
-import DataPageFocusedWord from '../model/data/dataPageFocusedWord.js';
-import FeedbackEvent from '../model/data/feedbackEvent.js';
+import Fixation from '@/model/data/fixation.js';
+import DataPage from '@/model/data/dataPage.js';
+import DataPageFocusedWord from '@/model/data/dataPageFocusedWord.js';
+import FeedbackEvent from '@/model/data/feedbackEvent.js';
 
-import db from '../db/db.js';
+import db from '@/db/db.js';
 
 const MIN_FIXATION_DURATION = 80;
 
@@ -99,9 +99,9 @@ export default class DataCollector {
   }
 
   start() {
-    if ( !this.pages.ready ) {
-      this.pages.add();
-    }
+    // if ( !this.pages.ready ) {
+    //   this.pages.add();
+    // }
     this.timer.start();
   }
 
@@ -127,6 +127,18 @@ export default class DataCollector {
     } );
 
     return result;
+  }
+
+  get focusedWord() {
+    if (!this.currentWord) {
+      return null;
+    }
+    else {
+      return {
+        text: this.currentWord.text,
+        duration: this.currentWord.focusing.currentDuration( this.timer.value ),
+      };
+    }
   }
 
   get wordReadingDuration() {
@@ -158,7 +170,7 @@ export default class DataCollector {
   //        word:         - the focused word  (DOM element)
   setFocusedWord( el ) {
     if ( this.focusedElem === el || !this.pages.ready ) {
-      return;
+      return null;
     }
 
     if ( this.currentWord ) {
@@ -178,6 +190,8 @@ export default class DataCollector {
     }
 
     this.focusedElem = el;
+
+    return this.currentWord ? this.currentWord.text : null;
   };
 
   addGazePoint( gazePoint ) {

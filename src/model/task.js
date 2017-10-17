@@ -163,9 +163,15 @@ export default class Task {
 
     pages.forEach( page => page.images = [] );
 
+    const imageSet = new Set( images )
+
     images.forEach( image => {
       if (image.page < 0) {
-        pages.forEach( page => page.images.push( new TextPageImage( image ) ) );
+        pages.forEach( page => {
+          if (!page.images.find( img => img.src === image.src )) {
+            page.images.push( new TextPageImage( image ) )
+          }
+        });
       }
       else {
         const page = pages[ image.page ];

@@ -19,4 +19,8 @@ export default class WordFocusing {
     this.duration += ts - this.last;
   }
 
+  currentDuration( ts ) {
+    return (ts - this.last);
+  }
+
 }

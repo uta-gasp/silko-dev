@@ -6,7 +6,16 @@
         .column(v-if="task.syllab.language")
           button.button.is-primary.is-small(@click="syllabifyAll") Syllabify all
         .column(v-if="task.speech.language") Alt + click on a word to pronounce it.
-    task-text(ref="container" @click.native.ctrl="syllabify" @click.native.alt="pronounce")
+
+    task-text(ref="container"
+      @click.native.ctrl="syllabify"
+      @click.native.alt="pronounce"
+      @click.native="fixate")
+
+    task-images(
+      :images="images"
+      :fixation="fixation")
+
     .columns.at-bottom
       .column.has-text-right
         button.button.is-primary(:disabled="!hasPrevPage" @click="prev")
@@ -21,6 +30,7 @@
 
 <script>
 import TaskText from '@/components/widgets/TaskText';
+import TaskImages from '@/components/widgets/TaskImages';
 
 import TextPresenter from '@/task/textPresenter.js';
 import FeedbackProvider from '@/task/feedbackProvider.js';
@@ -30,12 +40,14 @@ export default {
 
   components: {
     'task-text': TaskText,
+    'task-images': TaskImages,
   },
 
   data() {
     return {
       textPresenter: null,
       feedbackProvider: null,
+      fixatedWord: '',
     };
   },
 
@@ -57,6 +69,23 @@ export default {
 
     hasPrevPage() {
       return this.textPresenter ? this.textPresenter.hasPrevPage : false;
+    },
+
+    images() {
+      if (!this.textPresenter) {
+        return [];
+      }
+
+      const pageIndex = this.textPresenter.originalPageIndex;
+      if (pageIndex < 0) {
+        return [];
+      }
+
+      return this.task.pages[ pageIndex ].images;
+    },
+
+    fixation() {
+      return { word: this.fixatedWord, duration: 999999 };
     },
   },
 
@@ -96,6 +125,15 @@ export default {
         const text = this.feedbackProvider.syllabifier.unprepare( e.target.textContent );
         if ( text ) {
           this.feedbackProvider.speaker.say( text );
+        }
+      }
+    },
+
+    fixate( e ) {
+      if ( e.target.classList.contains( 'word' ) ) {
+        const text = this.feedbackProvider.syllabifier.unprepare( e.target.textContent );
+        if ( text ) {
+          this.fixatedWord = text;
         }
       }
     },

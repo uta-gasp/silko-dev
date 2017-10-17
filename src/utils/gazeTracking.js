@@ -20,8 +20,8 @@ const callbacks = {
 
 for ( let name in callbacks ) {
   callbacks[ name ] = arg => {
-    for ( let cb in callbackLists[ name ] ) {
-      callbackLists[ name ][ cb ]( arg );
+    for ( let id in callbackLists[ name ] ) {
+      callbackLists[ name ][ id ]( arg );
     }
   };
 }
@@ -68,19 +68,13 @@ class GazeTracking {
         // }
 
         if ( state.isTracking ) {
-          if ( callbacks.started ) {
-            callbacks.started();
-          }
+          callbacks.started();
         }
         else if ( state.isStopped ) {
-          if ( callbacks.stopped ) {
-            callbacks.stopped();
-          }
+          callbacks.stopped();
         }
 
-        if ( callbacks.stateUpdated ) {
-          callbacks.stateUpdated( state );
-        }
+        callbacks.stateUpdated( state );
 
         if ( state.isDisconnected ) {
           this.scheduleReconnection();
@@ -89,21 +83,15 @@ class GazeTracking {
 
       target: ( event, target ) => {
         if ( event === 'focused' ) {
-          if ( callbacks.wordFocused ) {
-            callbacks.wordFocused( target );
-          }
+          callbacks.wordFocused( target );
         }
         else if ( event === 'left' ) {
-          if ( callbacks.wordLeft ) {
-            callbacks.wordLeft( target );
-          }
+          callbacks.wordLeft( target );
         }
       },
 
       fixation: fix => {
-        if ( callbacks.gazePoint ) {
-          callbacks.gazePoint( fix );
-        }
+        callbacks.gazePoint( fix );
       },
     } );
   }

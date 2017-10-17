@@ -140,6 +140,8 @@ export default {
         speech: { ...this.speech },
       } );
 
+      Task.embedImagesIntoPages( result.pages, this.images );
+
       result.syllab.exceptions = Task.textToSyllabs( this.syllabExceptions );
       return result;
     },
