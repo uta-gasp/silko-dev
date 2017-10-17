@@ -95,8 +95,11 @@ export default {
 
       const page = this.currentPages[0];
 
-      const fixations = this.map( page ).fixations;
-      Regressions.compute( fixations );
+      const fixations = page.fixations ? this.map( page ).fixations : null;
+
+      if (fixations) {
+        Regressions.compute( fixations );
+      }
 
       // const wordsWithGazingInfo = this.combineWordsAndGazeInfo( page.text, page.words );
       const wordsWithGazingInfo = this.addGazeInfoToWords( page.text, fixations );

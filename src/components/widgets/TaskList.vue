@@ -132,7 +132,6 @@ export default {
 
         this.tasks = tasks.sort( dataUtils.byName );
 
-        this.locked = [];
         DBUtils.areTasksLocked( this.tasks.map( task => task.id ), ( err, response ) => {
           if ( err ) {
             return console.error( 'DBUtils.isTaskLocked:', err );
@@ -197,7 +196,7 @@ export default {
     },
 
     isLocked( id, e ) {
-      return this.locked.indexOf( id ) >= 0;
+      return this.locked === null || this.locked.indexOf( id ) >= 0;
     },
 
     removeWarningClosed( e ) {

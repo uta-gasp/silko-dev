@@ -15,7 +15,7 @@ const LINE_COLORS = [
   `rgba(255,0,255,${LINE_COLOR_A}`,
 ];
 
-const UNMAPPED_FIXATION_COLOR = '#000';
+const UNMAPPED_FIXATION_COLOR = 'rgba(0,0,0,0.5)';
 const MERGED_FIXATION_BORDER_COLOR = '#808';
 
 const CHECK_MARK = String.fromCharCode( 0x2713 );
