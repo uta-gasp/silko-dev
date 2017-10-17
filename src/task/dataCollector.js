@@ -7,6 +7,7 @@ import Fixation from '@/model/data/fixation.js';
 import DataPage from '@/model/data/dataPage.js';
 import DataPageFocusedWord from '@/model/data/dataPageFocusedWord.js';
 import FeedbackEvent from '@/model/data/feedbackEvent.js';
+import Image from '@/model/data/image.js';
 
 import db from '@/db/db.js';
 
@@ -58,6 +59,10 @@ class Pages {
 
   get current() {
     return this.items[ this.pageIndex ];
+  }
+
+  get last() {
+    return this.items[ this.items.length - 1 ];
   }
 
   get ready() {
@@ -112,6 +117,7 @@ export default class DataCollector {
   }
 
   nextPage() {
+    this._closeImages();
     this.pages.add();
   }
 
@@ -161,7 +167,7 @@ export default class DataCollector {
     }
 
     return sum / count;
-  };
+  }
 
   // Loggers
 
@@ -192,7 +198,7 @@ export default class DataCollector {
     this.focusedElem = el;
 
     return this.currentWord ? this.currentWord.text : null;
-  };
+  }
 
   addGazePoint( gazePoint ) {
     if ( !this.pages.ready ) {
@@ -200,7 +206,7 @@ export default class DataCollector {
     }
 
     this.pages.current.data.fixations.push( Fixation.from( gazePoint, this.timer.value ) );
-  };
+  }
 
   syllabified( el ) {
     if ( !el || !this.pages.ready ) {
@@ -218,7 +224,7 @@ export default class DataCollector {
         word.rect
       ) );
     }
-  };
+  }
 
   pronounced( el ) {
     if ( !el || !this.pages.ready ) {
@@ -236,7 +242,32 @@ export default class DataCollector {
         word.rect
       ) );
     }
-  };
+  }
+
+  // @image: TaskPageImage
+  imageShow( image ) {
+    const page = this.pages.current;
+    page.data.images.push( new Image( image, this.timer.value ) );
+  }
+
+  // @image: TaskPageImage
+  imageHide( image ) {
+    const page = this.pages.current || this.pages.last;
+    const currentImage = page.data.images.find( img => img.src === image.src && img.isCurrent );
+
+    if (currentImage) {
+      currentImage.hide( this.timer.value );
+    }
+  }
+
+  _closeImages() {
+    const page = this.pages.current || this.pages.last;
+    const currentImage = page.data.images.forEach( img => {
+      if (img.isCurrent) {
+        img.hide( this.timer.value );
+      }
+    });
+  }
 
   _save( cb ) {
     const data = {
@@ -264,6 +295,6 @@ export default class DataCollector {
         cb( null, { data: dataKey, session: sessionKey } );
       } );
     } );
-  };
+  }
 
 };

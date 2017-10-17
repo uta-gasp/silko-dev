@@ -19,13 +19,6 @@ class Threshold {
 };
 
 
-function uuidv4() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
-}
-
 export default class Task {
 
   constructor( id ) {
@@ -72,10 +65,6 @@ export default class Task {
       language: '',
       threshold: new Threshold( 4000, false, 3000, 4000, false ),
     };
-  }
-
-  static get FILE_ID_SPLITTER() {
-    return '_';
   }
 
   static textToPages( text ) {
@@ -210,9 +199,8 @@ export default class Task {
   }
 
   uploadImage( file, meta, progressHandler, cb ) {
-    const uuid = uuidv4();
-
-    db.uploadFile( file, `${uuid}${Task.FILE_ID_SPLITTER}`, meta, progressHandler, cb );
+    const prefix = TextPageImage.getPrefix();
+    db.uploadFile( file, prefix, meta, progressHandler, cb );
   }
 
   // @image: TaskPageImage

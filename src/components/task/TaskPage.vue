@@ -5,7 +5,9 @@
 
     task-images(
       :images="images"
-      :fixation="fixation")
+      :fixation="fixation"
+      @show="onImageShow"
+      @hide="onImageHide")
 
     .is-bottom-right
       a.button.is-primary.is-large(v-show="hasNextPage" @click="next")
@@ -110,6 +112,14 @@ export default {
 
       window.clearInterval( this.fixationUpdateTimer );
       this.fixationUpdateTimer = null;
+    },
+
+    onImageShow( e ) {
+      this.collector.imageShow( e );
+    },
+
+    onImageHide( e ) {
+      this.collector.imageHide( e );
     },
   },
 

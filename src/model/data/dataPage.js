@@ -4,12 +4,13 @@ const WORD_SELECTOR = '.word';
 
 export default class DataPage {
 
-  constructor( text, words, fixations, syllabifications, speech ) {
-    this.text = text || DataPageTextWord.fromAll( WORD_SELECTOR );  // array of DataPageTextWord
-    this.words = words || [];                          // array of DataPageFocusedWord
-    this.fixations = fixations || [];                  // array of Fixation
-    this.syllabifications = syllabifications || [];    // array of FeedbackEvent
-    this.speech = speech || [];                        // array of FeedbackEvent
+  constructor( text, words, fixations, syllabifications, speech, images ) {
+    this.text = text || DataPageTextWord.fromAll( WORD_SELECTOR );  // [DataPageTextWord]
+    this.words = words || [];                          // [DataPageFocusedWord]
+    this.fixations = fixations || [];                  // [Fixation]
+    this.syllabifications = syllabifications || [];    // [FeedbackEvent]
+    this.speech = speech || [];                        // [FeedbackEvent]
+    this.images = images || [];                        // [Image]
     this.isIntro = false;
   }
 

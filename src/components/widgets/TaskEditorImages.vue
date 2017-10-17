@@ -272,10 +272,7 @@ export default {
         return image.file.name;
       }
       else if (image.src) {
-        const splitter = Task.FILE_ID_SPLITTER;
-        const parts = image.src.split( splitter );
-        parts.shift();
-        return parts.join( splitter ).split( '?' )[0];
+        return TextPageImage.getNameFromSource( image.src );
       }
       else {
         return '-';

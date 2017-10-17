@@ -20,8 +20,14 @@ export default {
       },
 
       imageController: new ImageController({
-        onShow: image => this.image[ image.location ] = image.src,
-        onHide: image => this.image[ image.location ] = '',
+        onShow: image => {
+          this.image[ image.location ] = image.src;
+          this.$emit( 'show', image );
+        },
+        onHide: image => {
+          this.image[ image.location ] = '';
+          this.$emit( 'hide', image );
+        },
       }),
     };
   },
