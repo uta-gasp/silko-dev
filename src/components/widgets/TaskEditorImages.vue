@@ -8,14 +8,14 @@
             th Name
             th Page
             th Location
-            th On-event
-            th Off-event
+            th On
+            th Off
             th
         tbody
           tr(v-for="(image, index) in images" :key="index")
             td
               p.image.is-64x64
-                img(v-if="canShow( image )" :src="getLink( image )")
+                img.preview(v-if="canShow( image )" :src="getLink( image )")
             td {{ getImageName( image ) }}
             td {{ getImagePage( image ) }}
             td {{ image.location }}
@@ -28,7 +28,7 @@
             td
               button.button.is-danger(
                 title="Remove the image"
-                @click="remove( image )")
+                @click="remove( index )")
                 i.fa.fa-remove
       section(v-else)
         i No images
@@ -249,6 +249,7 @@ export default {
 
     remove( index ) {
       const deletedImage = this.images.splice( index, 1 )[0];
+      Object.keys( deletedImage ).forEach( key => console.log( key, deletedImage[key] ));
       this.task.deleteImage( deletedImage, err => {
         if ( err ) {
           this.setError( err, 'Cannot delete the image' );
@@ -407,6 +408,12 @@ export default {
   .table td {
     padding-top: 0;
     padding-bottom: 0;
+  }
+
+  .is-64x64 .preview {
+    position: relative;
+    top: 32px;
+    transform: translateY(-50%);
   }
 
   .event-name {
