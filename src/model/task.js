@@ -1,6 +1,6 @@
 import Recordable from './commons/recordable.js';
 import TextPage from './task/textPage.js';
-import TextPageImage from './task/textPageImage.js';
+import { TextPageImage } from './task/textPageImage.js';
 
 import Intro from './intro.js';
 
@@ -17,7 +17,6 @@ class Threshold {
   }
 
 };
-
 
 export default class Task {
 
@@ -102,8 +101,8 @@ export default class Task {
   static pagesToText( pages ) {
     return pages.map( page => {
       const lines = page.lines || page;   // backward compatibility with format where Task.pages=[[String]]
-      return lines.join( '\n' )
-    }).join( '\n\n' );
+      return lines.join( '\n' );
+    } ).join( '\n\n' );
   }
 
   static textToSyllabs( text ) {
@@ -146,31 +145,29 @@ export default class Task {
   // pages: [model/task/TextPage]
   // images: [model/task/TextPageImage || {src, page, location, on: TextPageImageEvent, off: TextPageImageEvent}]
   static embedImagesIntoPages( pages, images ) {
-    if (!images) {
+    if ( !images ) {
       return;
     }
 
-    pages.forEach( page => page.images = [] );
-
-    const imageSet = new Set( images )
+    pages.forEach( page => { page.images = []; } );
 
     images.forEach( image => {
-      if (image.page < 0) {
+      if ( image.page < 0 ) {
         pages.forEach( page => {
-          if (!page.images.find( img => img.src === image.src )) {
-            page.images.push( new TextPageImage( image ) )
+          if ( !page.images.find( img => img.src === image.src ) ) {
+            page.images.push( new TextPageImage( image ) );
           }
-        });
+        } );
       }
       else {
         const page = pages[ image.page ];
-        if (!page) {
+        if ( !page ) {
           return;
         }
 
         page.images.push( new TextPageImage( image ) );
       }
-    });
+    } );
   }
 
   update( task, cb ) {
@@ -190,7 +187,7 @@ export default class Task {
   }
 
   getIntro( cb ) {
-    if (this.intro) {
+    if ( this.intro ) {
       return db.get( Intro, this.intro, cb );
     }
     else {
@@ -207,6 +204,7 @@ export default class Task {
   deleteImage( image, cb ) {
     db.deleteFile( image.src, cb );
   }
+
 }
 
 Recordable.apply( Task );

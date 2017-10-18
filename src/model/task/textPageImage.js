@@ -1,51 +1,83 @@
-class TextPageImageEvent {
-  constructor( name ) {
-    this.name = name;       // string
-  }
-}
-
-class TextPageImageFixationEvent extends TextPageImageEvent {
-  constructor( name, word, duration ) {
-    super( name );
-
-    this.word = word;
-    this.duration = duration;
-  }
-}
-
-class TextPageImageDelayEvent extends TextPageImageEvent {
-  constructor( name, duration ) {
-    super( name );
-
-    this.duration = duration;
-  }
-}
-
-
-function isGreaterThanInt( value, threshold ) {
-  if (value === '' || value === null || value === undefined) {
-    return false;
-  }
-
-  const int = +value;
-  if (Number.isNaN( int ) || !Number.isInteger( int )) {
-    return false;
-  }
-
-  return int > threshold;
-}
-
 function uuidv4() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace( /[xy]/g, c => {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : ( r & 0x3 | 0x8 );
+    return v.toString( 16 );
+  } );
 }
 
 const FILE_ID_SPLITTER = '_';
 
+export class TextPageImageEvent {
 
-export default class TextPageImage {
+  // @param {string} name
+  constructor( name ) {
+    this.name = name;       // string
+  }
+
+  get isValid() {
+    return true;
+  }
+
+  // @param {object} meta
+  // @param {string} type
+  setMeta( meta, type ) {
+    Object.getOwnPropertyNames( this ).forEach( prop => {
+      const id = prop === 'name' ? type : `${type}-${prop}`;
+      meta[ id ] = this[ prop ];
+    } );
+  }
+
+  // @param {number} value
+  // @param {number} threshold
+  _isGreaterThanInt( value, threshold ) {
+    if ( value === '' || value === null || value === undefined ) {
+      return false;
+    }
+
+    const int = +value;
+    if ( Number.isNaN( int ) || !Number.isInteger( int ) ) {
+      return false;
+    }
+
+    return int > threshold;
+  }
+
+}
+
+export class TextPageImageFixationEvent extends TextPageImageEvent {
+
+  // @param {string} word
+  // @param {number} duration
+  constructor( word, duration ) {
+    super( TextPageImage.EVENT.fixation );
+
+    this.word = word;
+    this.duration = duration;
+  }
+
+  get isValid() {
+    return this.word && this._isGreaterThanInt( this.duration, 100 );
+  }
+
+}
+
+export class TextPageImageDelayEvent extends TextPageImageEvent {
+
+  // @param {number} duration
+  constructor( duration ) {
+    super( TextPageImage.EVENT.delay );
+
+    this.duration = duration;
+  }
+
+  get isValid() {
+    return this._isGreaterThanInt( this.duration, 0 );
+  }
+
+}
+
+export class TextPageImage {
 
   // src:       URL string
   // page:      -1 for all pages, <n> for a certain page
@@ -54,7 +86,7 @@ export default class TextPageImage {
   // off:       TextPageImageEvent
   constructor( { src, page, location, on, off } ) {
     this.src = src;
-    this.page = page,
+    this.page = page;
     this.location = location;
     this.on = on;
     this.off = off;
@@ -69,33 +101,14 @@ export default class TextPageImage {
     };
   }
 
-  static isEventValid( event ) {
-    if (event.name === TextPageImage.EVENT.fixation) {
-      return event.word && isGreaterThanInt( event.duration, 100 );
-    }
-    else if (event.name === TextPageImage.EVENT.delay) {
-      return isGreaterThanInt( event.duration, 0 );
-    }
-    else {
-      return true;
-    }
-  }
-
   get meta() {
     const result = {
       page: this.page,
       location: this.location,
-      on: this.on.name,
-      off: this.off.name,
     };
 
-    if (this.on.name === TextPageImage.EVENT.fixation) {
-      result[ 'on-word' ] = this.on.word;
-      result[ 'on-duration' ] = this.on.duration;
-    }
-    else if (this.off.name === TextPageImage.EVENT.delay) {
-      result[ 'off-duration' ] = this.off.duration;
-    }
+    this.on.setMeta( result, 'on' );
+    this.off.setMeta( result, 'off' );
 
     return result;
   }
@@ -110,4 +123,5 @@ export default class TextPageImage {
     const uuid = uuidv4();
     return `${uuid}${FILE_ID_SPLITTER}`;
   }
+
 };

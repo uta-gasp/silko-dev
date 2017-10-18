@@ -136,7 +136,7 @@ export default class DataCollector {
   }
 
   get focusedWord() {
-    if (!this.currentWord) {
+    if ( !this.currentWord ) {
       return null;
     }
     else {
@@ -255,18 +255,18 @@ export default class DataCollector {
     const page = this.pages.current || this.pages.last;
     const currentImage = page.data.images.find( img => img.src === image.src && img.isCurrent );
 
-    if (currentImage) {
+    if ( currentImage ) {
       currentImage.hide( this.timer.value );
     }
   }
 
   _closeImages() {
     const page = this.pages.current || this.pages.last;
-    const currentImage = page.data.images.forEach( img => {
-      if (img.isCurrent) {
+    page.data.images.forEach( img => {
+      if ( img.isCurrent ) {
         img.hide( this.timer.value );
       }
-    });
+    } );
   }
 
   _save( cb ) {

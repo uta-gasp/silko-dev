@@ -336,30 +336,30 @@ class DB {
 
     const uploadTask = this.storage.child( `${folder}/${prefix}${file.name}` ).put( file, metadata );
     uploadTask.on( 'state_changed', snapshot => {
-      if (snapshot.state === firebase.storage.TaskState.RUNNING) {
-        progressHandler( 100 * (snapshot.bytesTransferred / snapshot.totalBytes) );
+      if ( snapshot.state === firebase.storage.TaskState.RUNNING ) {
+        progressHandler( 100 * ( snapshot.bytesTransferred / snapshot.totalBytes ) );
       }
     }, err => {
       cb( err );
     }, _ => {
       cb( null, uploadTask.snapshot.downloadURL );
-    });
+    } );
 
     return uploadTask;
   }
 
   deleteFile( url, cb ) {
-    const pathParts = new URL( url ).pathname.split( '/' );
-    const filename = pathParts[ pathParts.length - 1];
-    if (!filename) {
+    const pathParts = new window.URL( url ).pathname.split( '/' );
+    const filename = pathParts[ pathParts.length - 1 ];
+    if ( !filename ) {
       return cb( new Error( 'invalid url' ) );
     }
 
-    this.storage.
-      child( decodeURIComponent( filename ) ).
-      delete().
-      then( _ => cb() ).
-      catch( err => cb( err ) );
+    this.storage
+      .child( decodeURIComponent( filename ) )
+      .delete()
+      .then( _ => cb() )
+      .catch( err => cb( err ) );
   }
 
   _onUserChanged( user ) {

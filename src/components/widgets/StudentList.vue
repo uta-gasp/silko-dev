@@ -96,7 +96,7 @@ export default {
 
       onBodyClick: () => {
         this.hideTaskList();
-      }
+      },
     };
   },
 
@@ -217,10 +217,10 @@ export default {
 
     openEditor( e ) {
       this.loadAvailableStudents( err => {
-        if (!err) {
+        if ( !err ) {
           this.isEditing = true;
         }
-      });
+      } );
     },
 
     addNewStudents( e ) {
@@ -301,7 +301,7 @@ export default {
     },
 
     toggleTaskList( id ) {
-      if (this.activeMenu) {
+      if ( this.activeMenu ) {
         this.hideTaskList( id );
       }
       else {
@@ -342,7 +342,7 @@ export default {
 
   mounted() {
     this.loadTasks();
-    this.loadAvailableStudents( err => {} );
+    this.loadAvailableStudents( () => {} );
   },
 };
 </script>

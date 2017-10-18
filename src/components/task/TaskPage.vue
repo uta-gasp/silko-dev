@@ -76,18 +76,18 @@ export default {
     },
 
     images() {
-      if (!this.textPresenter) {
+      if ( !this.textPresenter ) {
         return [];
       }
 
       const pageIndex = this.textPresenter.originalPageIndex;
-      if (pageIndex < 0) {
+      if ( pageIndex < 0 ) {
         return [];
       }
 
       return this.task.pages[ pageIndex ].images;
     },
- },
+  },
 
   methods: {
 
@@ -134,11 +134,11 @@ export default {
     this.feedbackProvider.events.addListener( 'syllabified', data => this.collector.syllabified( data ) );
     this.feedbackProvider.events.addListener( 'pronounced', data => this.collector.pronounced( data ) );
 
-//     gazeTracking.setCallback( 'stateUpdated', 'task-page', state => {
-//       if ( state.isConnected && state.isTracking && !state.isBusy ) {
-//         this.collector.start();
-//       }
-//     } );
+    //     gazeTracking.setCallback( 'stateUpdated', 'task-page', state => {
+    //       if ( state.isConnected && state.isTracking && !state.isBusy ) {
+    //         this.collector.start();
+    //       }
+    //     } );
 
     gazeTracking.setCallback( 'wordFocused', 'task-page', word => {
       if ( !this.textPresenter.isInstructionPage ) {
@@ -163,8 +163,8 @@ export default {
     this.collector.start();
     this.fixationUpdateTimer = window.setInterval( () => {
       const word = this.collector.focusedWord;
-      if (!word) {
-        if (this.fixation.word) {
+      if ( !word ) {
+        if ( this.fixation.word ) {
           this.fixation = { word: null, duration: 0 };
         }
       }

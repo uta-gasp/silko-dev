@@ -172,15 +172,15 @@ export default {
         }
 
         if ( this.ref.pages ) {
-          this.ref.pages.forEach( (page, index) => {
-            if (!page.images) {
+          this.ref.pages.forEach( ( page, index ) => {
+            if ( !page.images ) {
               return;
             }
 
             page.images.forEach( image => {
               this.images.push( Object.assign( { page: index }, image ) );
-            });
-          });
+            } );
+          } );
         }
 
         if ( this.ref.questionnaire ) {

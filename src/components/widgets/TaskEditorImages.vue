@@ -122,31 +122,33 @@
 </template>
 
 <script>
-import Task from '@/model/task.js';
-import TextPageImage from '@/model/task/textPageImage.js';
+import { TextPageImage,
+  TextPageImageEvent,
+  TextPageImageFixationEvent,
+  TextPageImageDelayEvent } from '@/model/task/textPageImage.js';
 
 import ActionError from '@/components/mixins/actionError';
 
 import TemporalNotification from '@/components/widgets/TemporalNotification';
 
 function getPages( text ) {
-  return text.split('\n\n').filter( page => !!page.trim() );
+  return text.split( '\n\n' ).filter( page => !!page.trim() );
 }
 
 function getUniqueWords( text ) {
   return Array.from(
-    new Set( text.trim().
-      split( /\s/ig ).
-      map( word => word.trim() ).
-      filter( word => word.length ).
-      sort()
+    new Set( text.trim()
+      .split( /\s/ig )
+      .map( word => word.trim() )
+      .filter( word => word.length )
+      .sort()
     )
   );
 }
 
 function getPageUniqueWords( text, pageIndex ) {
   const page = getPages( text )[ pageIndex ];
-  if (!page) {
+  if ( !page ) {
     return [];
   }
 
@@ -211,9 +213,9 @@ export default {
     },
 
     currentWords() {
-      return +this.page < 0 ?
-        getUniqueWords( this.currentText ) :
-        getPageUniqueWords( this.currentText, +this.page );
+      return +this.page < 0
+        ? getUniqueWords( this.currentText )
+        : getPageUniqueWords( this.currentText, +this.page );
     },
 
     isUploading() {
@@ -221,8 +223,8 @@ export default {
     },
 
     hasValidParams() {
-      return TextPageImage.isEventValid( this.constructImageEvent( this.on ) ) &&
-             TextPageImage.isEventValid( this.constructImageEvent( this.off ) );
+      return this.constructImageEvent( this.on ).isValid &&
+             this.constructImageEvent( this.off ).isValid;
     },
   },
 
@@ -230,17 +232,17 @@ export default {
     listImages() {
       const images = [];
 
-      this.task.pages.forEach( (page, index) => {
-        if (!page.images) {
+      this.task.pages.forEach( ( page, index ) => {
+        if ( !page.images ) {
           return;
         }
 
         page.images.forEach( image => {
-          if (!images.find( img => img.src === image.src )) {
+          if ( !images.find( img => img.src === image.src ) ) {
             images.push( image );
           }
-        });
-      });
+        } );
+      } );
 
       this.images = images;
     },
@@ -248,7 +250,7 @@ export default {
     remove( index ) {
       const deletedImage = this.images.splice( index, 1 )[0];
       this.task.deleteImage( deletedImage, err => {
-        if (err) {
+        if ( err ) {
           this.setError( err, 'Cannot delete the image' );
         }
       } );
@@ -268,10 +270,10 @@ export default {
     },
 
     getImageName( image ) {
-      if (image.file) {
+      if ( image.file ) {
         return image.file.name;
       }
-      else if (image.src) {
+      else if ( image.src ) {
         return TextPageImage.getNameFromSource( image.src );
       }
       else {
@@ -280,14 +282,14 @@ export default {
     },
 
     getImagePage( image ) {
-      return image.page < 0 ? 'any' : (image.page + 1);
+      return image.page < 0 ? 'any' : ( image.page + 1 );
     },
 
     formatEventName( event ) {
-      if( event.name === TextPageImage.EVENT.none ) {
+      if ( event.name === TextPageImage.EVENT.none ) {
         return '-';
       }
-      else  if (event.name === TextPageImage.EVENT.fixation) {
+      else if ( event.name === TextPageImage.EVENT.fixation ) {
         return `fixation on word`;
       }
       else {
@@ -296,10 +298,10 @@ export default {
     },
 
     formatEventParams( event ) {
-      if (event.name === TextPageImage.EVENT.fixation) {
+      if ( event.name === TextPageImage.EVENT.fixation ) {
         return `"${event.word}"\nlonger than ${event.duration} ms`;
       }
-      else if (event.name === TextPageImage.EVENT.delay) {
+      else if ( event.name === TextPageImage.EVENT.delay ) {
         return `${event.duration} seconds`;
       }
       else {
@@ -308,7 +310,7 @@ export default {
     },
 
     dropFile( e ) {
-      this.isDraggingFileOverDropzone = false
+      this.isDraggingFileOverDropzone = false;
       const dt = e.dataTransfer;
       const files = dt.files;
       this.selectFile( { target: { files } } );
@@ -316,13 +318,13 @@ export default {
 
     selectFile( e ) {
       const file = e.target.files[0];
-      if (!file) {
-        return;
+      if ( !file ) {
+
       }
-      else if (file.type !== 'image/jpeg' && file.type !== 'image/png') {
+      else if ( file.type !== 'image/jpeg' && file.type !== 'image/png' ) {
         return this.setError( 'Only JPEG and PNG images are supported' );
       }
-      else if (file.size > 100000) {
+      else if ( file.size > 100000 ) {
         return this.setError( 'File size must not exceed 100 kB' );
       }
       else {
@@ -333,21 +335,21 @@ export default {
     uploadImage( e ) {
       this.uploadProgress = 0;
 
-      const image = new TextPageImage({
+      const image = new TextPageImage( {
         page: this.page,
         location: this.location,
         on: this.constructImageEvent( this.on ),
         off: this.constructImageEvent( this.off ),
-      });
+      } );
 
       this.task.uploadImage( this.selectedFile, image.meta,
         percentage => {
           this.uploadProgress = percentage;
         },
-        (err, url) => {
+        ( err, url ) => {
           this.uploadProgress = -1;
 
-          if (err) {
+          if ( err ) {
             this.setError( err, 'Cannot upload the file' );
           }
           else {
@@ -368,19 +370,15 @@ export default {
     },
 
     constructImageEvent( name ) {
-      const eventObj = {
-        name: name
+      if ( name === TextPageImage.EVENT.fixation ) {
+        return new TextPageImageFixationEvent( this.fixationWord, this.fixationDuration );
       }
-
-      if (eventObj.name === TextPageImage.EVENT.fixation) {
-        eventObj.word = this.fixationWord;
-        eventObj.duration = this.fixationDuration;
+      else if ( name === TextPageImage.EVENT.delay ) {
+        return new TextPageImageDelayEvent( this.delayDuration );
       }
-      else if (eventObj.name === TextPageImage.EVENT.delay) {
-        eventObj.duration = this.delayDuration;
+      else {
+        return new TextPageImageEvent( name );
       }
-
-      return eventObj;
     },
   },
 

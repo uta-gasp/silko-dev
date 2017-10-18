@@ -19,7 +19,7 @@ export default {
         bottom: '',
       },
 
-      imageController: new ImageController({
+      imageController: new ImageController( {
         onShow: image => {
           this.image[ image.location ] = image.src;
           this.$emit( 'show', image );
@@ -28,7 +28,7 @@ export default {
           this.image[ image.location ] = '';
           this.$emit( 'hide', image );
         },
-      }),
+      } ),
     };
   },
 
@@ -46,12 +46,12 @@ export default {
   methods: {
     hasImageAt( location ) {
       const images = this.images;
-      if (!images) {
+      if ( !images ) {
         return false;
       }
 
       return images.some( image => image.location === location );
-    }
+    },
   },
 
   watch: {

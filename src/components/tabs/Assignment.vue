@@ -112,7 +112,7 @@ export default {
             if ( err ) {
               this.errorText = err.message ? err.message : err;
             }
-            else if (intro) {
+            else if ( intro ) {
               this.intro = intro;
             }
             else {

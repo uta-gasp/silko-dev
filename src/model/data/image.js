@@ -1,8 +1,8 @@
-import TextPageImage from '@/model/task/textPageImage.js'
+// @ts-check
 
 export default class Image {
 
-  // @image: TaskPageImage
+  // @param {TaskPageImage} image
   constructor( image, ts ) {
     this.src = image.src;
     this.location = image.location;
@@ -17,7 +17,9 @@ export default class Image {
     return !this.hidden;
   }
 
+  // @param {number} ts
   hide( ts ) {
     this.hidden = ts;
   }
+
 }

@@ -72,12 +72,12 @@ export default {
     },
 
     images() {
-      if (!this.textPresenter) {
+      if ( !this.textPresenter ) {
         return [];
       }
 
       const pageIndex = this.textPresenter.originalPageIndex;
-      if (pageIndex < 0) {
+      if ( pageIndex < 0 ) {
         return [];
       }
 

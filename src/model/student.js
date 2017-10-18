@@ -210,7 +210,7 @@ export default class Student {
 
       // TODO
       // These lines is for in production mode
-      if (Student.MULTICLASS) {
+      if ( Student.MULTICLASS ) {
         this.removeAssignment( task, cb );
       }
       else {

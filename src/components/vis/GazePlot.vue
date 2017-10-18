@@ -97,7 +97,7 @@ export default {
 
       const fixations = page.fixations ? this.map( page ).fixations : null;
 
-      if (fixations) {
+      if ( fixations ) {
         Regressions.compute( fixations );
       }
 
