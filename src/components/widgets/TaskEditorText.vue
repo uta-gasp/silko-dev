@@ -109,15 +109,15 @@ export default {
   },
 
   watch: {
-    name( value ) {
+    name() {
       this.$emit( 'input', this.currentModel );
     },
 
-    intro( value ) {
+    intro() {
       this.$emit( 'input', this.currentModel );
     },
 
-    text( value ) {
+    text() {
       this.$emit( 'input', this.currentModel );
     },
   },

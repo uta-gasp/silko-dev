@@ -166,7 +166,7 @@ export default {
       const words = this.defaultText[ this.pageIndex ].map( word => {
         return {
           text: word.text.replace( hyphenRegExp, '' ),
-          durations: this.tracks.map( track => 0 ),
+          durations: this.tracks.map( _ => 0 ),
           key: Math.random(),
         };
       } );
@@ -185,7 +185,7 @@ export default {
 
       const rows = this.$refs.table.querySelectorAll( 'tr' );
 
-      this.tracks.forEach( ( track, ti ) => {
+      this.tracks.forEach( track => {
         const words = track.session[ this.pageIndex ].text;
         const mappingResult = sgwmController.map( track.session[ this.pageIndex ] );
 
@@ -217,7 +217,7 @@ export default {
     },
 
     onWordFixated( track, rows ) {
-      return ( word, duration, pointer ) => {
+      return ( word, duration ) => {
         const rawWord = track.words[ word.id ];
         rawWord.totalDuration = rawWord.totalDuration + duration;
 
@@ -228,8 +228,8 @@ export default {
       };
     },
 
-    onTrackCompleted( track, row ) {
-      return reason => {
+    onTrackCompleted( /* track, row */ ) {
+      return _ => {
         // const cell = row.cells[ track.id + 1 ];
         // cell.classList.remove( 'hidden' );
       };

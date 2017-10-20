@@ -171,7 +171,7 @@ export default {
         this.$emit( 'created', { err: 'A task with the same name exists already' } );
       }
       else {
-        this.parent.createTask( task, 'text', ( err, newTask ) => {
+        this.parent.createTask( task, 'text', ( err, _ /* newTask */ ) => {
           this.$emit( 'created', { err } );
 
           if ( err ) {
@@ -208,12 +208,12 @@ export default {
             return this.setError( err, 'Failed to delete the task' );
           }
           else {
-            DBUtils.deleteTaskSessions( id, ( err, response ) => {
+            DBUtils.deleteTaskSessions( id, ( err, _ /* response */ ) => {
               if ( err ) {
                 return console.error( 'DBUtils.deleteTaskSessions:', err );
               }
             } );
-            DBUtils.deleteStudentTaskSessions( id, ( err, response ) => {
+            DBUtils.deleteStudentTaskSessions( id, ( err, _ /* response */ ) => {
               if ( err ) {
                 return console.error( 'DBUtils.deleteStudentTaskSessions:', err );
               }

@@ -153,7 +153,7 @@ export default {
     createClass( name ) {
       this.isCreating = true;
 
-      this.teacher.createClass( name, ( err, id ) => {
+      this.teacher.createClass( name, ( err, _ ) => {
         this.isCreating = false;
 
         if ( err ) {

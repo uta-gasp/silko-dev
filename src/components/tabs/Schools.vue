@@ -127,7 +127,7 @@ export default {
 
     createSchool() {
       this.isCreating = true;
-      Admin.createSchool( this.newName.trim(), this.newEmail.trim(), ( err, id ) => {
+      Admin.createSchool( this.newName.trim(), this.newEmail.trim(), ( err, _ ) => {
         this.isCreating = false;
 
         if ( err ) {

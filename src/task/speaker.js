@@ -27,8 +27,10 @@ export default class Speaker {
     return new SpeechFeedback( { ...this.options, enabled: !!this.voice } );
   }
 
-  // @wordFocus - WordFocus
-  inspect( el, wordFocus ) {
+  /**
+   * @param {WordFocus} wordFocus
+   */
+  inspect( _ /* el */, wordFocus ) {
     if ( !this.voice ) {
       return false;
     }

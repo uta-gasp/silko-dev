@@ -232,7 +232,7 @@ export default {
     listImages() {
       const images = [];
 
-      this.task.pages.forEach( ( page, index ) => {
+      this.task.pages.forEach( page => {
         if ( !page.images ) {
           return;
         }
@@ -249,7 +249,7 @@ export default {
 
     remove( index ) {
       const deletedImage = this.images.splice( index, 1 )[0];
-      Object.keys( deletedImage ).forEach( key => console.log( key, deletedImage[key] ));
+      Object.keys( deletedImage ).forEach( key => console.log( key, deletedImage[key] ) );
       this.task.deleteImage( deletedImage, err => {
         if ( err ) {
           this.setError( err, 'Cannot delete the image' );

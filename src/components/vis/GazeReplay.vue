@@ -137,7 +137,7 @@ export default {
       this.tracks.forEach( ( track, ti ) => {
         track.start(
           this.pageIndex, {  // callbacks
-            fixation: ( fixation, pointer ) => {
+            fixation: () => {
             },
             completed: reason => {
               this.isWarningMessageVisible = !!reason;

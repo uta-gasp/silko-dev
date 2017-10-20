@@ -16,6 +16,13 @@ module.exports = {
         "brace-style": ["error", "stroustrup", { "allowSingleLine": true }],
         "no-multi-spaces": ["error", { "ignoreEOLComments": true }],
         "comma-dangle": ["error", "always-multiline"],
-        "padded-blocks": ["error", { "blocks": "never", "classes": "always",  }]
+        "padded-blocks": ["error", { "blocks": "never", "classes": "always" }],
+        "no-unused-vars": ["error", {
+            "vars": "local", 
+            "varsIgnorePattern": "^[A-Z]", 
+            "args": "all", 
+            "argsIgnorePattern": "^[_e]$", 
+            "ignoreRestSiblings": true
+        }]
     }
 };

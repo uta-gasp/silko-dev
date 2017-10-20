@@ -148,7 +148,7 @@ export default {
       this.fixation = { word: wordText, duration: 0 };
     } );
 
-    gazeTracking.setCallback( 'wordLeft', 'task-page', word => {
+    gazeTracking.setCallback( 'wordLeft', 'task-page', _ => {
       if ( !this.textPresenter.isInstructionPage ) {
         this.feedbackProvider.setFocusedWord( null );
       }

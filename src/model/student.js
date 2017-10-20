@@ -136,7 +136,7 @@ export default class Student {
         } ) );
       } );
 
-      Promise.all( promises ).then( values => {
+      Promise.all( promises ).then( _ => {
         cb( null, result );
       } );
     } );
@@ -185,7 +185,7 @@ export default class Student {
         } ) );
       } );
 
-      Promise.all( promises ).then( values => {
+      Promise.all( promises ).then( _ => {
         const arr = [];
         result.forEach( ( obj, session ) => {
           obj.session = session;

@@ -100,7 +100,7 @@ export default {
     login( e ) {
       this.inProgress = true;
 
-      login.logIn( this.email, this.password, ( err, user ) => {
+      login.logIn( this.email, this.password, ( err, _ /* user */ ) => {
         this.inProgress = false;
 
         if ( err ) {

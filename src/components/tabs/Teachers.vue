@@ -195,7 +195,7 @@ export default {
     createTeacher() {
       this.isCreating = true;
 
-      const onFinished = ( err, id ) => {
+      const onFinished = ( err, _ ) => {
         this.isCreating = false;
 
         if ( err ) {

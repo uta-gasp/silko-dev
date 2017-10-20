@@ -228,10 +228,10 @@ export default {
   },
 
   created() {
-    eventBus.$on( 'login', id => {
+    eventBus.$on( 'login', _ => {
       this.user = login.user;
     } );
-    eventBus.$on( 'logout', id => {
+    eventBus.$on( 'logout', _ => {
       this.user = null;
     } );
 

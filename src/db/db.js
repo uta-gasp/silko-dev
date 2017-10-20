@@ -245,7 +245,7 @@ class DB {
       } ) );
     } );
 
-    return Promise.all( promises ).then( values => {
+    return Promise.all( promises ).then( _ => {
       cb( errors.join( ', ' ), results );
     } );
   }

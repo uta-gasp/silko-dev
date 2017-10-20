@@ -134,7 +134,7 @@ export default class Class {
     delete this.students[ student.id ];
     db.deleteField( this, `students/${student.id}`, cb );
 
-    db.get( Student, student.id, ( err, _student ) => {
+    db.get( Student, student.id, ( err, _ /* studnet */ ) => {
       if ( err ) {
         return console.error( err );
       }

@@ -263,7 +263,7 @@ export default {
     createStudent( email ) {
       this.isCreating = true;
 
-      const onFinished = ( err, id ) => {
+      const onFinished = ( err, _ ) => {
         this.isCreating = false;
 
         if ( err ) {

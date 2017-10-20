@@ -126,6 +126,7 @@ export default class TextPresenter {
       return applyStyle( ...arguments, true );
     }
 
+    /* eslint no-unused-vars: ["error", { "args": "none" } ] */
     function applyStyle( match, p1, p2, p3, offset, string, addSpace ) {
       const text = p1;
       const styles = p3;

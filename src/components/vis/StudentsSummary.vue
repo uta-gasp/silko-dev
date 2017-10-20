@@ -252,7 +252,7 @@ export default {
     },
 
     sort( statIndex ) {
-      const newSortDirection = this.computeSortDirection( statIndex );
+      const newSortDirection = this.computeSortDirection();
 
       this.nameSortDir = statIndex < 0 ? newSortDirection : 0;
       this.statistics.forEach( ( stat, index ) => {
@@ -264,7 +264,7 @@ export default {
       this.sortedStatIndex = statIndex;
     },
 
-    computeSortDirection( statIndex ) {
+    computeSortDirection() {
       let currentSortDirection = 0;
       if ( this.sortedStatIndex < 0 ) {
         currentSortDirection = this.nameSortDir;

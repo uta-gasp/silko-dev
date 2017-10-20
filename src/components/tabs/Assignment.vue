@@ -107,7 +107,7 @@ export default {
           }
 
           this.task = task;
-        } ).then( value => {
+        } ).then( _ => {
           this.task.getIntro( ( err, intro ) => {
             if ( err ) {
               this.errorText = err.message ? err.message : err;
