@@ -15,6 +15,8 @@ export default class ImageController {
 
     this.timers = new Map();
 
+    this._prefetch();
+
     this._start();
   }
 
@@ -50,6 +52,13 @@ export default class ImageController {
           this.locations[ image.location ] !== image ) {
         this._show( image );
       }
+    } );
+  }
+
+  _prefetch() {
+    this.images.forEach( image => {
+      image.el = new Image();
+      image.el.src = image.src;
     } );
   }
 
