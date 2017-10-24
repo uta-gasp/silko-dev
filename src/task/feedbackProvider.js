@@ -104,6 +104,8 @@ export default class FeedbackProvider {
         this.lastFocusedWord = el;
       }
     }
+
+    return this.currentWord ? this.words.get( this.currentWord ).word : null;
   }
 
   _tick() {

@@ -262,6 +262,10 @@ export default class DataCollector {
 
   _closeImages() {
     const page = this.pages.current || this.pages.last;
+    if (!page) {
+      return;
+    }
+
     page.data.images.forEach( img => {
       if ( img.isCurrent ) {
         img.hide( this.timer.value );

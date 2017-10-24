@@ -1,6 +1,6 @@
 // ts-check-only
-import DataPage from '../model/data/dataPage';
-import DataPageTextWord from '../model/data/dataPageTextWord';
+import DataPage from '@/model/data/dataPage';
+import DataPageTextWord from '@/model/data/dataPageTextWord';
 
 /**
  * Word

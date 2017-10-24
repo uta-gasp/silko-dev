@@ -1,6 +1,11 @@
 import SyllabificationFeedback from '@/model/session/syllabificationFeedback.js';
 
 import loggerFactory from '@/utils/logger.js';
+
+// ts-check-only
+import WordFocus from './wordFocus.js';
+
+
 const logger = loggerFactory( 'syllabifier' );
 
 const RESTORE_INTERVAL = 3000;
@@ -9,6 +14,9 @@ const EXTRA_THRESHOLD_FOR_CHAR = 0.05;
 
 export default class Syllabifier {
 
+  /**
+   * @param {SyllabificationFeedback} options 
+   */
   constructor( options ) {
     this.options = { ...options };
     this.options.threshold.factor = 4;
@@ -27,6 +35,9 @@ export default class Syllabifier {
     logger.info( 'created', options );
   }
 
+  /**
+   * @returns {{hyphen: string, colors: string[]}}
+   */
   static get MODES() {
     return {
       hyphen: String.fromCharCode( 0x00B7 ), // DOTS: 00B7 2010 2022 2043 LINES: 2758 22EE 205E 237F
@@ -34,10 +45,18 @@ export default class Syllabifier {
     };
   }
 
+  /**
+   * @returns {string[]}
+   */
   static get LANGS() {
     return Object.keys( rules );
   }
 
+  /**
+   * @param {string} word 
+   * @param {string} hyphen
+   * @returns {string[]} - 2 values 
+   */
   static getPrefixAndSuffix( word, hyphen ) {
     const chars = Array.from( word );
     const prefix = [];
@@ -51,14 +70,24 @@ export default class Syllabifier {
     return [ prefix.join( '' ), postfix.join( '' ) ];
   }
 
+  /**
+   * @returns {boolean}
+   */
   get enabled() {
     return !!this.rule;
   }
 
+  /**
+   * @returns {SyllabificationFeedback}
+   */
   get setup() {
     return new SyllabificationFeedback( { ...this.options, hyphen: this.hyphen, enabled: !!this.rule } );
   }
 
+  /**
+   * @param {string | string[]} text
+   * @returns {string | string[]} 
+   */
   prepare( text ) {
     if ( !this.rule || this.options.mode !== 'hyphen' ) {
       return text;
@@ -95,11 +124,19 @@ export default class Syllabifier {
     }
   }
 
+  /**
+   * @param {string} text 
+   * @returns {string}
+   */
   unprepare( text ) {
     return text.replace( new RegExp( this.hyphen, 'g' ), '' );
   }
 
-  // @wordFocus - WordFocus
+  /**
+   * @param {HTMLElement} el
+   * @param {WordFocus} wordFocus
+   * @returns {boolean} true if the word was syllabified
+   */
   inspect( el, wordFocus ) {
     if ( !this.rule ) {
       return false;
@@ -134,6 +171,11 @@ export default class Syllabifier {
     return true;
   }
 
+  /**
+   * @param {HTMLElement} el
+   * @param {string} word
+   * @returns {boolean} true if the word was syllabified
+   */
   syllabifyElementText( el, word ) {
     if ( !this.rule ) {
       return false;
@@ -144,6 +186,9 @@ export default class Syllabifier {
     return true;
   }
 
+  /**
+   * @param {number} wordReadingDuration 
+   */
   setAvgWordReadingDuration( wordReadingDuration ) {
     if ( !this.options.threshold.smart || !wordReadingDuration ) {
       return;
@@ -156,6 +201,11 @@ export default class Syllabifier {
               ) );
   }
 
+  /**
+   * @param {string} word 
+   * @param {string} hyphen 
+   * @returns {string}
+   */
   syllabifyWord( word, hyphen ) {
     logger.info( 'syllabifying', word );
 
@@ -181,6 +231,10 @@ export default class Syllabifier {
     return result;
   }
 
+  /**
+   * @param {string | string[]} text 
+   * @returns {number}
+   */
   getSyllabCount( text ) {
     if ( !this.rule ) {
       return 0;
@@ -216,6 +270,9 @@ export default class Syllabifier {
     }
   }
 
+  /**
+   * @param {HTMLElement} el 
+   */
   _restore( el ) {
     let text = null;
     try {
@@ -233,10 +290,23 @@ export default class Syllabifier {
     }
   }
 
+  /**
+   * @param {string} word 
+   * @param {string} exception 
+   * @returns {boolean}
+   */
   _isException( word, exception ) {
     return word.toLowerCase().indexOf( exception ) >= 0;
   }
 
+  /**
+   * 
+   * @param {string} word 
+   * @param {string} exception 
+   * @param {string} syllabified 
+   * @param {string} hyphen 
+   * @returns {string}
+   */
   _formatException( word, exception, syllabified, hyphen ) {
     logger.info( 'params:', word, exception, syllabified, hyphen );
     const start = word.toLowerCase().indexOf( exception );
@@ -264,6 +334,10 @@ export default class Syllabifier {
     return prefix + result + postfix;
   }
 
+  /**
+   * @param {string[]} syllabs 
+   * @returns {string}
+   */
   _colorize( syllabs ) {
     const colors = Syllabifier.MODES[ 'colors' ];
     let colorIndex = 0;
@@ -282,6 +356,12 @@ export default class Syllabifier {
 };
 
 const rules = {
+
+  /**
+   * @param {string} word 
+   * @param {string} hyphen 
+   * @returns {string}
+   */
   Finnish( word, hyphen ) {
     const vowels = [ 'a', 'o', 'u', 'i', 'e', 'ä', 'ö', 'y' ];
     const consonants = [ 'b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm',
@@ -310,8 +390,9 @@ const rules = {
         if ( i < word.length - 1 ) {
           const charPrevious = word[ i + 1 ];
           const typePrevious = getType( charPrevious );
-          if ( charPrevious !== char && typePrevious === type &&
-                        !diftongs.includes( char + charPrevious ) ) {
+          if ( charPrevious !== char && 
+                typePrevious === type &&
+                !diftongs.includes( char + charPrevious ) ) {
             result.unshift( hyphen );
             vowelsInRow = 0;
           }

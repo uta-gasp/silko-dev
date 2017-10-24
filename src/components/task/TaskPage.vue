@@ -141,10 +141,11 @@ export default {
     //     } );
 
     gazeTracking.setCallback( 'wordFocused', 'task-page', word => {
+      let wordText = null;
       if ( !this.textPresenter.isInstructionPage ) {
-        this.feedbackProvider.setFocusedWord( word );
+        wordText = this.feedbackProvider.setFocusedWord( word );
       }
-      const wordText = this.collector.setFocusedWord( word, this.textPresenter.page );
+      this.collector.setFocusedWord( word, this.textPresenter.page );
       this.fixation = { word: wordText, duration: 0 };
     } );
 
@@ -169,7 +170,7 @@ export default {
         }
       }
       else {
-        this.fixation = { word: word.text, duration: word.duration };
+        this.fixation = { word: this.fixation.word, duration: word.duration };
       }
     }, FIX_UPDATE_INTERVAL );
 

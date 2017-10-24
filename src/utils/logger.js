@@ -24,29 +24,38 @@ class Logger {
     this.info( `${this.name}: __module_created___` );
   }
 
-  info() {
+  /**
+   * @param {...any} args
+   */
+  info( ...args ) {
     if ( this.enabled ) {
-      const args = this._stringify( arguments );
-      console.info( `%c  `, this.format, this._format( args ) );
-    }
-  }
-
-  ok() {
-    if ( this.enabled ) {
-      const args = this._stringify( arguments );
-      console.log( `%c  `, this.format, this._format( args ) );
-    }
-  }
-
-  error() {
-    if ( this.enabled ) {
-      const args = this._stringify( arguments );
-      console.error( `%c  `, this.format, this._format( args ) );
+      const _args = this._stringify( args );
+      console.info( `%c  `, this.format, this._format( _args ) );
     }
   }
 
   /**
-   * @param {...any} args 
+   * @param {...any} args
+   */
+  ok( ...args ) {
+    if ( this.enabled ) {
+      const _args = this._stringify( args );
+      console.log( `%c  `, this.format, this._format( _args ) );
+    }
+  }
+
+  /**
+   * @param {...any} args
+   */
+  error( ...args ) {
+    if ( this.enabled ) {
+      const _args = this._stringify( args );
+      console.error( `%c  `, this.format, this._format( _args ) );
+    }
+  }
+
+  /**
+   * @param {object} args 
    * @returns {string}
    */
   _stringify( args ) {
@@ -66,5 +75,5 @@ class Logger {
  * @param {string} module 
  */
 export default function( module ) {
-  return enabled ? new Logger( module ) : { info() {}, ok() {}, error() {} };
+  return enabled ? new Logger( module ) : { info(...args) {}, ok(...args) {}, error(...args) {} };
 };

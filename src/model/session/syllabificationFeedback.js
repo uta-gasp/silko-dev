@@ -7,6 +7,7 @@ export default class SyllabificationFeedback extends Feedback {
     this.hyphen = options.hyphen;       // string
     this.mode = options.mode;           // string, a key from Syllabifier.MODES
     this.temporary = options.temporary; // boolean
+    this.exceptions = {};
   }
 
 }

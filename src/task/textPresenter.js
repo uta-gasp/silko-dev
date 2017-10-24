@@ -1,3 +1,7 @@
+// ts-check-only
+import ModelTask from '@/model/task.js';
+import Syllabifier from '@/task/syllabifier.js';
+
 const RE_WORD = /(\S+)(\|)([\w,#]+)\b/g;
 const RE_LINE = /^(.+)(\s\|)([\w,#]+)$/gm;
 
@@ -25,6 +29,12 @@ const STYLE_NAMES = [
 
 export default class TextPresenter {
 
+  /**
+   * @param {ModelTask} task 
+   * @param {string[]} firstPage 
+   * @param {HTMLElement} container 
+   * @param {Syllabifier} syllabifier 
+   */
   constructor( task, firstPage, container, syllabifier ) {
     this.container = container;
     this.syllabifier = syllabifier;
@@ -44,22 +54,37 @@ export default class TextPresenter {
     this.pageIndex = -1;
   }
 
+  /**
+   * @returns {number}
+   */
   get page() {
     return this.pageIndex;
   }
 
+  /**
+   * @returns {number}
+   */
   get originalPageIndex() {
     return this.hasInstructionPage ? this.pageIndex - 1 : this.pageIndex;
   }
 
+  /**
+   * @returns {boolean}
+   */
   get isInstructionPage() {
     return this.pageIndex === 0 && this.hasInstructionPage;
   }
 
+  /**
+   * @returns {boolean}
+   */
   get hasNextPage() {
     return ( this.pageIndex + 1 ) < this.pages.length;
   }
 
+  /**
+   * @returns {boolean}
+   */
   get hasPrevPage() {
     return ( this.pageIndex - 1 ) >= 0;
   }
@@ -86,6 +111,9 @@ export default class TextPresenter {
     this._createLines( this.container );
   }
 
+  /**
+   * @returns {Map}
+   */
   get words() {
     const result = new Map();
 
@@ -99,6 +127,9 @@ export default class TextPresenter {
 
   // Private
 
+  /**
+   * @param {HTMLElement} el 
+   */
   _createLines( el ) {
     el.innerHTML = '';
 
@@ -112,10 +143,14 @@ export default class TextPresenter {
     this._splitText();
   }
 
-  // Creates a text line from a string. Features:
-  //      Classes can be listed after "|" (lines) or "\" (words)
-  //      For example, "This is\b a text|n" will expand
-  //      to HTML "<span class="n">This <span class="b">is</span> a text</span>"
+ /**
+   * Creates a text line from a string. Features:
+   *      Classes can be listed after "|" (lines) or "\" (words)
+   *      For example, "This is\b a text|n" will expand
+   *      to HTML "<span class="n">This <span class="b">is</span> a text</span>"
+   * @param {string} line
+   * @returns {HTMLElement} 
+   */
   _lineToElement( line ) {
     const styledLine = this._parseStyles( line );
 
@@ -126,6 +161,10 @@ export default class TextPresenter {
     return el;
   }
 
+  /**
+   * @param {string} line 
+   * @returns {string}
+   */
   _parseStyles( line ) {
     function applyStyleAndSpace() {
       return applyStyle( ...arguments, true );
@@ -178,12 +217,12 @@ export default class TextPresenter {
 
     const nodeIterator = document.createNodeIterator(
       this.container,
-      window.NodeFilter.SHOW_TEXT,
+      NodeFilter.SHOW_TEXT,
       { acceptNode: node => {
-        if ( !/^\s*$/.test( node.data ) ) {
-          return window.NodeFilter.FILTER_ACCEPT;
+        if ( !/^\s*$/.test( node.nodeValue ) ) {
+          return NodeFilter.FILTER_ACCEPT;
         }
-        return window.NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_REJECT;
       }}
     );
 
