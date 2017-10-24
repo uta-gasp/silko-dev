@@ -3,14 +3,26 @@ import Session from '@/vis/data/session.js';
 
 import dataUtils from '@/utils/data-utils.js';
 
+// ts-check-only
+import ModelClass from '@/model/class.js';
+import ModelStudent from '@/model/student.js';
+import Task from './task.js';
+
 export default class Class {
 
+  /**
+   * @param {ModelClass} ref 
+   * @param {Task[]} tasks 
+   */
   constructor( ref, tasks ) {
     this.ref = ref;     // model/Class
     this.tasks = tasks; // [ ./Task ]
     this.students = null; // [ ./Student ]
   }
 
+  /**
+   * @param {function} cb 
+   */
   loadStudents( cb ) {
     this.ref.getStudents( ( err, students ) => {
       this.students = [];
@@ -26,6 +38,10 @@ export default class Class {
     } );
   }
 
+  /**
+   * @param {ModelStudent} student 
+   * @param {function} cb 
+   */
   _loadStudentSessions( student, cb ) {
     student.getSessions( ( err, sessions ) => {
       if ( err ) {

@@ -1,11 +1,48 @@
 import OptionsCreator from '@/vis/optionsCreator.js';
 
+/**
+ * Rect
+ * @typedef {Object} Rect
+ * @property {number} x
+ * @property {number} y
+ * @property {number} width
+ * @property {number} height
+ */
+
+/**
+ * Fixation
+ * @typedef {Object} Fixation
+ * @property {number} ts
+ * @property {number} duration
+ * @property {Rect} rect
+ */
+
+/**
+ * Word
+ * @typedef {Object} Word
+ * @property {number} id
+ * @property {string} text
+ * @property {Rect} rect
+ */
+
+/**
+ * Page
+ * @typedef {Object} Page
+ * @property {Fixation[]} fixations
+ * @property {Word[]} text
+ * @property {Rect} rect
+ */
+
+/**
+ * @external SGWM
+ * @see {@link https://uta-gasp.github.com/sgwm/|SWGM}
+ */
+
 const _SGWM = {};
 
-export default class sgwm {
+export default class sgwmController {
 
   static initializeSettings() {
-    const SGWM = window.SGWM;
     let settings;
 
     settings = new SGWM.FixationProcessorSettings();
@@ -128,15 +165,21 @@ export default class sgwm {
   }
 
   static save() {
-    Object.values( _SGWM ).forEach( settings => {
-      settings.save();
-    } );
+    for(let name in _SGWM ) {
+      _SGWM[ name ].save();
+    }
   }
 
+  /**
+   * @returns {object}
+   */
   static get settings() {
     return _SGWM;
   }
 
+  /**
+   * @param {Page} page 
+   */
   static map( page ) {
     const sgwmSession = {
       fixations: page.fixations,

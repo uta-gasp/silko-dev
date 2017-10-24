@@ -1,4 +1,4 @@
-const enabled = !!window['webpackHotUpdate'];
+const enabled = !!window[ 'webpackHotUpdate' ];
 
 function random( max, step = 1, min = 0 ) {
   min = Math.ceil( min );
@@ -10,6 +10,9 @@ function random( max, step = 1, min = 0 ) {
 
 class Logger {
 
+  /**
+   * @param {string} name 
+   */
   constructor( name ) {
     this.name = name;
     this.enabled = true;
@@ -42,16 +45,26 @@ class Logger {
     }
   }
 
+  /**
+   * @param {...any} args 
+   * @returns {string}
+   */
   _stringify( args ) {
     return Array.from( args ).map( arg => ( typeof arg === 'object' ? JSON.stringify( arg ) : arg ) ).join( ' ' );
   }
 
+  /**
+   * @param {string} args 
+   */
   _format( args ) {
     return `${this.name}: ${args}`;
   }
 
 }
 
+/**
+ * @param {string} module 
+ */
 export default function( module ) {
   return enabled ? new Logger( module ) : { info() {}, ok() {}, error() {} };
 };

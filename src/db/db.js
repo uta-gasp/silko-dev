@@ -72,7 +72,7 @@ class DB {
       email += this.FAKE_EMAIL_DOMAIN;
     }
 
-    this.auth.signInWithEmailAndPassword( email, password ).then( user => {
+    return this.auth.signInWithEmailAndPassword( email, password ).then( user => {
       this.currentPassword = password;
       cb( null, user );
     } ).catch( err => {

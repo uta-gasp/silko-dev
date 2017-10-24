@@ -1,9 +1,29 @@
 export default class OptionsCreator {
 
-  static get SGWM() {
-    return {};
-  }
+/**
+ * @typedef OptionItem
+ * @property {string} type - Array, String, Boolean, Number, or '#' for colors
+ * @property {string} label
+ * @property {string[]} [items] - if type === Array
+ * @property {number} [step]  - if type === Number
+ */
 
+/**
+ * @typedef OptionItems
+ */
+
+/**
+ * @typedef OptionGroup
+ * @property {string} title
+ * @property {OptionItems} options
+ * @property {any[]} defaults
+ */
+
+ /**
+   * @param {OptionItems | OptionGroup[]} options 
+   * @param {object} [receiver] 
+   * @returns {object}
+   */
   static createOptions( options, receiver ) {
     let result;
     if ( options instanceof Array ) {
@@ -29,6 +49,12 @@ export default class OptionsCreator {
     return result;
   }
 
+  /**
+   * @param {object} source - list of name-value pairs
+   * @param {string[]} [subKeys] 
+   * @param {string} [header] 
+   * @returns {object}
+   */
   static createDefaults( source, subKeys, header ) {
     const result = {};
     for ( let key in source ) {
@@ -51,6 +77,9 @@ export default class OptionsCreator {
     return result;
   }
 
+  /**
+   * @param {OptionGroup | OptionItems} chapters 
+   */
   static restoreDefaults( chapters ) {
     for ( let id in chapters ) {
       const chapter = chapters[ id ];
@@ -65,6 +94,11 @@ export default class OptionsCreator {
 
 }
 
+/**
+ * @param {string} id 
+ * @param {object} receiver 
+ * @returns {function}
+ */
 function createOptionReference( id, receiver ) {
   return value => {
     const ids = id.split( '.' );
@@ -87,6 +121,13 @@ function createOptionReference( id, receiver ) {
   };
 };
 
+/**
+ * 
+ * @param {object} result 
+ * @param {object} source 
+ * @param {string} id 
+ * @param {string} header 
+ */
 function copyPlaneKeys( result, source, id, header ) {
   const ref = source[ id ];
   for ( let key in ref ) {
@@ -104,6 +145,10 @@ function copyPlaneKeys( result, source, id, header ) {
   }
 }
 
+/**
+ * @param {object} from 
+ * @param {object} to 
+ */
 function clone( from, to ) {
   for ( let key in from ) {
     if ( typeof from[ key ] === 'object' ) {

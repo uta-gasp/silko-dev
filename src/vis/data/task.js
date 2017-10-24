@@ -2,6 +2,10 @@ import DBTask from '@/model/task.js';
 
 export default class Task {
 
+  /**
+   * @param {string} id 
+   * @param {string} name 
+   */
   constructor( id, name ) {
     this.id = id;
     this.name = name;
@@ -14,7 +18,7 @@ export default class Task {
         this.hasQuestionnaire = task.questionnaire && task.questionnaire.length;
       }
       else {
-        console.log( '@/model/task.js/.ctor DBTask.get', err );
+        console.error( '@/model/task.js/.ctor DBTask.get', err );
       }
     } );
   }

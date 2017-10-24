@@ -3,6 +3,91 @@ import Syllabifier from '@/task/syllabifier.js';
 import Metric from '@/vis/metric.js';
 import Colors from '@/vis/colors.js';
 
+/**
+ * Point
+ * @typedef {Object} Point
+ * @property {number} x
+ * @property {number} y
+ * @property {number} [_x]
+ * @property {boolean} [isRegression]
+ */
+
+/**
+ * Word
+ * @typedef {Object} Word
+ * @property {number} id
+ * @property {string} text
+ * @property {Rect} rect
+ * @property {number} left
+ * @property {number} right
+ * @property {number} top
+ * @property {{charSpeed: number, syllableSpeed: number}} reading
+ * @property {{duration: number, count: number}} [focusing]
+ */
+
+/**
+ * Rect
+ * @typedef {Object} Rect
+ * @property {number} x
+ * @property {number} y
+ * @property {number} width
+ * @property {number} height
+ */
+ 
+/**
+ * Event
+ * @typedef {Object} Event
+ * @property {number} id
+ * @property {string} text
+ * @property {Rect} rect
+ */
+
+/**
+ * Settings
+ * @typedef {Object} Settings
+ * @property {boolean} [isSyllabified]
+ * @property {string} [colorMetric]
+ * @property {number} [alpha]
+ * @property {string} [hyphen]
+ * @property {string} [background]
+ * @property {string} [wordColor]
+ * @property {boolean} drawWordFrame
+ * @property {{hyphen: string}} [syllab]
+ * @property {boolean} [showSaccades]
+ * @property {boolean} [showConnections]
+ * @property {string} [color]
+ * @property {number} [fontSize]
+ * @property {string} [fontFamily]
+ * @property {Point} [location]
+ * @property {number} [nameSpacing]
+ * @property {string} [reason]
+ * @property {string} [wordRectColor]
+ * @property {string} [regressionColor]
+ * @property {string} [saccadeColor]
+ * @property {string} [connectionColor]
+ * @property {boolean} [showIDs]
+ */
+
+/**
+ * Fixation
+ * @typedef {Object} Fixation
+ * @property {number} ts
+ * @property {number} duration
+ * @property {number} x
+ * @property {number} y
+ * @property {Word} word
+ * @property {number} line
+ * @property {boolean} [isRegression]
+ * @property {boolean} [merged]
+ */
+
+/**
+ * Name
+ * @typedef {Object} Name
+ * @property {string} text
+ * @property {string} color
+ */
+
 const WORD_HIGHLIGHT_COLOR = '#A06';
 
 const LINE_COLOR_A = 0.5;
@@ -23,11 +108,15 @@ const NO_DATA_MARK = String.fromCharCode( 0x26A0 );
 
 export default class Painter {
 
+  /**
+   * @param {HTMLCanvasElement} el 
+   * @param {Settings} settings 
+   */
   constructor( el, settings ) {
-    this.width = parseInt( document.body.offsetWidth );
+    this.width = document.body.offsetWidth;
     this.height = parseInt( window.getComputedStyle( el ).height );
-    el.setAttribute( 'width', this.width );
-    el.setAttribute( 'height', this.height );
+    el.setAttribute( 'width', this.width + '');
+    el.setAttribute( 'height', this.height + '' );
 
     this.offsetX = 0;
     this.offsetY = 0;
@@ -39,6 +128,9 @@ export default class Painter {
     this.clean();
   }
 
+  /**
+   * @returns {{x: number, y: number}}
+   */
   get offset() {
     return {
       x: this.offsetX,
@@ -50,10 +142,17 @@ export default class Painter {
     this.ctx.clearRect( 0, 0, this.width, this.height );
   }
 
+  /**
+   * @param {{style: string, weight: string, size: number | string, family: string}} font 
+   */
   setFont( font ) {
     this.ctx.font = `${font.style} ${font.weight} ${font.size} ${font.family}`;
   }
 
+  /**
+   * @param {Word[]} words 
+   * @param {Settings} settings 
+   */
   drawWords( words, settings ) {
     const metricRange = Metric.computeRange( words, settings.colorMetric );
 
@@ -66,12 +165,21 @@ export default class Painter {
     } );
   }
 
+  /**
+   * @param {Event[]} events 
+   * @param {Settings} settings 
+   */
   drawSyllabifications( events, settings ) {
     events.forEach( event => {
       this.drawSyllabification( event, settings );
     } );
   }
 
+  /**
+   * 
+   * @param {Event} event 
+   * @param {Settings} settings 
+   */
   drawSyllabification( event, settings ) {
     const ctx = this.ctx;
 
@@ -89,6 +197,10 @@ export default class Painter {
     ctx.fillText( word, ...this._offset( { x: rc.x, y: rc.y + 0.8 * rc.height } ) );
   }
 
+  /**
+   * @param {Fixation[]} fixations 
+   * @param {Settings} settings 
+   */
   drawFixations( fixations, settings ) {
     let prevFix;
 
@@ -111,6 +223,10 @@ export default class Painter {
     } );
   }
 
+  /**
+   * @param {Name[]} names 
+   * @param {Settings} settings 
+   */
   drawNames( names, settings ) {
     const ctx = this.ctx;
 
@@ -129,6 +245,10 @@ export default class Painter {
     } );
   }
 
+  /**
+   * @param {Name} names 
+   * @param {Settings} settings 
+   */
   checkName( name, settings ) {
     const ctx = this.ctx;
 
@@ -149,15 +269,27 @@ export default class Painter {
     ctx.fillText( isNoData ? NO_DATA_MARK : CHECK_MARK, location.x, location.y );
   }
 
+  /**
+   * @param {{width: number, height: number}} screenSize 
+   */
   setScreenSize( screenSize ) {
     this.offsetX = ( this.width - screenSize.width ) / 2;
     this.offsetY = ( this.height - screenSize.height ) / 2;
   }
 
-  _offset( {x, y} ) {
+  /**
+   * 
+   * @param {Point} point 
+   * @returns {[number, number]}
+   */
+  _offset( { x, y } ) {
     return [ x + this.offsetX, y + this.offsetY ];
   }
 
+  /**
+   * @param {Word} word
+   * @param {Settings} settings 
+   */
   _drawWord( word, settings ) {
     const ctx = this.ctx;
     const rc = word.rect;
@@ -190,6 +322,11 @@ export default class Painter {
     }
   }
 
+  /**
+   * @param {Point} from 
+   * @param {Point} to 
+   * @param {Settings} settings 
+   */
   _drawSaccade( from, to, settings ) {
     const ctx = this.ctx;
 
@@ -204,6 +341,11 @@ export default class Painter {
     ctx.stroke();
   }
 
+  /**
+   * @param {Point} from 
+   * @param {Point} to 
+   * @param {Settings} settings 
+   */
   _drawConnection( from, to, settings ) {
     const ctx = this.ctx;
 
@@ -216,6 +358,10 @@ export default class Painter {
     ctx.stroke();
   };
 
+  /**
+   * @param {Fixation} fixation 
+   * @param {Settings} settings 
+   */
   _drawFixation( fixation, settings ) {
     const ctx = this.ctx;
 

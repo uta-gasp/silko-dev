@@ -1,3 +1,6 @@
+/**
+ * @param {number} timeComponent 
+ */
 function formatTimeComponent( timeComponent ) {
   let formattedTimeComponent = '' + timeComponent;
   if ( formattedTimeComponent.length < 2 ) {
@@ -8,6 +11,10 @@ function formatTimeComponent( timeComponent ) {
 
 export default class DataUtils {
 
+  /**
+   * @param {object} list 
+   * @returns {array}
+   */
   static toArray( list ) {
     const result = [];
     for ( let id in list ) {
@@ -19,10 +26,20 @@ export default class DataUtils {
     return result;
   }
 
+  /**
+   * @param {{name: string}} a 
+   * @param {{name: string}} b 
+   * @returns {boolean}
+   */
   static byName( a, b ) {
     return a.name.toLowerCase() > b.name.toLowerCase();
   }
 
+  /**
+   * @param {array} arr 
+   * @param {string} name 
+   * @returns {string}
+   */
   static displayCount( arr, name ) {
     if ( arr === null ) {
       return '';
@@ -30,6 +47,10 @@ export default class DataUtils {
     return `${arr.length ? arr.length : 'No'} ${name}${arr.length !== 1 ? 's' : ''}`;
   }
 
+  /**
+   * @param {string} dateString 
+   * @returns {string}
+   */
   static sessionDate( dateString ) {
     const date = new Date( dateString );
     const hours = formatTimeComponent( date.getHours() );

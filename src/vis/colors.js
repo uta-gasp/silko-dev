@@ -1,3 +1,17 @@
+/**
+ * @typedef {Object} CMYK
+ * @property {number} c
+ * @property {number} m
+ * @property {number} y
+ * @property {number} k
+ */
+
+/**
+ * @typedef {Object} ColorWithAlpha
+ * @property {string} hex
+ * @property {number} a
+ */
+
 const COLORS = [
   '#5DA5DA',
   '#FAA43A',
@@ -9,62 +23,18 @@ const COLORS = [
   '#4D4D4D',
   '#F15854',
 
-  // '#FF0000',
-  // '#00FF00',
-  // '#0000FF',
-  // '#FFFF00',
-  // '#FF00FF',
-  // '#00FFFF',
-  // '#800000',
-  // '#008000',
-  // '#000080',
-  // '#808000',
-  // '#800080',
-  // '#008080',
-  // '#C0C0C0',
-  // '#808080',
-  // '#9999FF',
-  // '#993366',
-  // '#FFFFCC',
-  // '#CCFFFF',
-  // '#660066',
-  // '#FF8080',
-  // '#0066CC',
-  // '#CCCCFF',
-  // '#000080',
-  // '#FF00FF',
-  // '#FFFF00',
-  // '#00FFFF',
-  // '#800080',
-  // '#800000',
-  // '#008080',
-  // '#0000FF',
-  // '#00CCFF',
-  // '#CCFFFF',
-  // '#CCFFCC',
-  // '#FFFF99',
-  // '#99CCFF',
-  // '#FF99CC',
-  // '#CC99FF',
-  // '#FFCC99',
-  // '#3366FF',
-  // '#33CCCC',
-  // '#99CC00',
-  // '#FFCC00',
-  // '#FF9900',
-  // '#FF6600',
-  // '#666699',
-  // '#969696',
-  // '#003366',
-  // '#339966',
-  // '#003300',
-  // '#333300',
-  // '#993300',
-  // '#993366',
-  // '#333399',
-  // '#333333',
+  // '#FF0000','#00FF00','#0000FF','#FFFF00','#FF00FF','#00FFFF','#800000','#008000','#000080',
+  // '#808000','#800080','#008080','#C0C0C0','#808080','#9999FF','#993366','#FFFFCC','#CCFFFF',
+  // '#660066','#FF8080','#0066CC','#CCCCFF','#000080','#FF00FF','#FFFF00','#00FFFF','#800080',
+  // '#800000','#008080','#0000FF','#00CCFF','#CCFFFF','#CCFFCC','#FFFF99','#99CCFF','#FF99CC',
+  // '#CC99FF','#FFCC99','#3366FF','#33CCCC','#99CC00','#FFCC00','#FF9900','#FF6600','#666699',
+  // '#969696','#003366','#339966','#003300','#333300','#993300','#993366','#333399','#333333',
 ];
 
+/**
+ * @param {string} color - in format '#XXXXXX' 
+ * @returns {CMYK}
+ */
 function rgb2cmyk( color ) {
   color = color.substr( 1 );
 
@@ -88,6 +58,10 @@ function rgb2cmyk( color ) {
   };
 }
 
+/**
+ * @param {CMYK} color 
+ * @returns {string} in format '#XXXXXX'
+ */
 function cmyk2rgb( color ) {
   let r = color.c * ( 1.0 - color.k ) + color.k;
   let g = color.m * ( 1.0 - color.k ) + color.k;
@@ -98,17 +72,28 @@ function cmyk2rgb( color ) {
   return '#' + decToHex( r ) + decToHex( g ) + decToHex( b );
 }
 
-function decToHex( aNum, aPadding ) {
-  let hex = Number( aNum ).toString( 16 );
-  aPadding = !aPadding && aPadding !== 0 ? 2 : aPadding;
+/**
+ * 
+ * @param {number} value
+ * @param {number} [n=2] 
+ * @returns {string} n-digit hex value
+ */
+function decToHex( value, n ) {
+  let hex = Number( value ).toString( 16 );
+  n = !n && n !== 0 ? 2 : n;
 
-  while ( hex.length < aPadding ) {
+  while ( hex.length < n ) {
     hex = '0' + hex;
   }
 
   return hex;
 }
 
+/**
+ * @param {string} str 
+ * @param {number} count 
+ * @return {string}
+ */
 function clone( str, count ) {
   let result = '';
   for ( let i = 0; i < count; i += 1 ) {
@@ -117,6 +102,10 @@ function clone( str, count ) {
   return result;
 }
 
+/**
+ * @param {number} c 
+ * @return {string} 2-digit hex value
+ */
 function componentToHex( c ) {
   const hex = c.toString( 16 );
   return hex.length === 1 ? '0' + hex : hex;
@@ -136,6 +125,13 @@ function componentToHex( c ) {
 //         parseInt( colorComps[ 3 ] ) );
 // }
 
+/**
+ * @param {number} r 
+ * @param {number} g 
+ * @param {number} b 
+ * @param {number} a 
+ * @returns {ColorWithAlpha}
+ */
 function rgbaToHex( r, g, b, a ) {
   return {
     hex: '#' + componentToHex( r ) + componentToHex( g ) + componentToHex( b ),
@@ -145,6 +141,10 @@ function rgbaToHex( r, g, b, a ) {
 
 export default class Colors {
 
+  /**
+   * @param {{color: string, weight: number}[]} colors 
+   * @returns {string}
+   */
   static mix( colors ) {
     let c = 0;
     let m = 0;
@@ -169,7 +169,12 @@ export default class Colors {
     return cmyk2rgb( cmyk );
   };
 
-  // color is a string of #XXX or #XXXXXX}
+  /**
+   * 
+   * @param {string} color - a string of #XXX or #XXXXXX}
+   * @param {number | string} alpha 
+   * @returns {string} 'rgba(...)'
+   */
   static rgb2rgba( color, alpha ) {
     const cmyk = rgb2cmyk( color );
 
@@ -182,10 +187,17 @@ export default class Colors {
     return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
   };
 
+  /**
+   * @returns {string[]}
+   */
   static get colors() {
     return COLORS;
   }
 
+  /**
+   * @param {string} color 
+   * @returns {string} this color (or black, if 'color' is not a color) in format '#XXXXXX'
+   */
   static validateColor( color ) {
     if ( color[0] !== '#' ) {
       return '#000000';
@@ -202,6 +214,10 @@ export default class Colors {
     return '#000000';
   }
 
+  /**
+   * @param {string} cssColor 
+   * @returns {ColorWithAlpha}
+   */
   static cssColorToHex( cssColor ) {
     const colorRegex = /^\D+(\d+)\D+(\d+)\D+(\d+)\D*(\d|.+)\D+$/gim;
     const colorComps = colorRegex.exec( cssColor );
@@ -213,6 +229,11 @@ export default class Colors {
       colorComps[ 4 ] ? parseFloat( colorComps[ 4 ] ) : undefined );
   }
 
+  /**
+   * 
+   * @param {string} rgb - color in '#XXXXXX' 
+   * @param {number} a - alpha value
+   */
   static hexToRgba( rgb, a ) {
     const r = Number.parseInt( rgb.substr( 1, 2 ), 16 );
     const g = Number.parseInt( rgb.substr( 3, 2 ), 16 );

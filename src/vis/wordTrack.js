@@ -1,5 +1,52 @@
-export default class WordTrack {
+// ts-check-only
+import DataPage from '../model/data/dataPage';
+import DataPageTextWord from '../model/data/dataPageTextWord';
 
+/**
+ * Word
+ * @typedef {Object} Word
+ * @property {number} id
+ * @property {string} text
+ */
+
+/**
+ * Fixation
+ * @typedef {Object} Fixation
+ * @property {number} ts
+ * @property {number} duration
+ * @property {Word} word
+ */
+
+/**
+ * @callback OnWordFixatedCallback
+ * @param {SGWMWord} word
+ * @param {number} duration
+ */
+
+/**
+ * @callback OnCompletedCallback
+ */
+
+export class ReplayWord {
+
+  /**
+   * @param {DataPageTextWord} ref 
+   */
+  constructor( ref ) {
+    this.id = ref.id;
+    this.totalDuration = 0;
+  }
+
+}
+
+export class WordTrack {
+
+  /**
+   * @param {HTMLElement} root
+   * @param {string} userName 
+   * @param {DataPage[]} session 
+   * @param {number} id 
+   */
   constructor( root, userName, session, id ) {
     this.root = root;
     this.name = userName;
@@ -23,12 +70,18 @@ export default class WordTrack {
     this.__next = this._next.bind( this );
   }
 
+  /**
+   * @param {Fixation[]} fixations 
+   * @param {DataPageTextWord[]} words 
+   * @param {function} onWordFixated 
+   * @param {function} onCompleted 
+   */
   start( fixations, words, onWordFixated, onCompleted ) {
     this.onWordFixated = onWordFixated;
     this.onCompleted = onCompleted;
 
     this.fixations = fixations;
-    this.words = words;
+    this.words = words.map( word => new ReplayWord( word ) );
 
     this.words.forEach( word => {
       word.totalDuration = 0;
@@ -67,6 +120,9 @@ export default class WordTrack {
     }
   }
 
+  /**
+   * @returns {boolean}
+   */
   togglePause() {
     if ( !this.pointer ) {
       return false;
@@ -86,8 +142,10 @@ export default class WordTrack {
     }
   }
 
+  // Private
+
   _next() {
-    let fixation = this.fixations[ this.fixationIndex ];
+    const fixation = this.fixations[ this.fixationIndex ];
 
     this._moveFixation( fixation.word, fixation.duration );
 
@@ -104,6 +162,11 @@ export default class WordTrack {
     }
   };
 
+  /**
+   * 
+   * @param {Word} word 
+   * @param {number} duration 
+   */
   _moveFixation( word, duration ) {
     if ( this.fixationTimer ) {
       clearTimeout( this.fixationTimer );

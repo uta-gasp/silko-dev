@@ -40,7 +40,7 @@ import Vue from 'vue';
 
 import OptionsCreator from '@/vis/optionsCreator.js';
 import sgwmController from '@/vis/sgwmController.js';
-import WordTrack from '@/vis/wordTrack.js';
+import { WordTrack } from '@/vis/wordTrack.js';
 
 import ControlPanel from '@/components/vis/controlPanel';
 import Options from '@/components/vis/Options';
@@ -229,7 +229,7 @@ export default {
     },
 
     onTrackCompleted( /* track, row */ ) {
-      return _ => {
+      return () => {
         // const cell = row.cells[ track.id + 1 ];
         // cell.classList.remove( 'hidden' );
       };

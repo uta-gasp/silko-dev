@@ -1,7 +1,27 @@
-export default class Regressions {
+/**
+ * Word
+ * @typedef {Object} Word
+ * @property {number} id
+ * @property {string} text
+ */
 
-  // adds "isRegression: Boolean" to fixations that
-  // returns the number of regressions
+/**
+ * MappedFixation
+ * @typedef {Object} MappedFixation
+ * @property {number} ts
+ * @property {number} duration
+ * @property {number} line
+ * @property {Word} word
+ * @property {Boolean} isRegression
+ */
+
+ export default class Regressions {
+
+  /**
+   * Adds "isRegression: Boolean" to fixations that
+   * @param {MappedFixation[]} mappedFixations 
+   * @returns {number} number of regressions
+   */
   static compute( mappedFixations ) {
     let regressionCount = 0;
     let lastWordID = -1;

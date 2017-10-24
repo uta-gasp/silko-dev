@@ -1,3 +1,15 @@
+/**
+ * Word
+ * @typedef {Object} Word
+ * @property {string} text
+ * @property {{charSpeed: number, syllableSpeed: number}} reading
+ * @property {{duration: number, count: number}} [focusing]
+ */
+
+/**
+ * @param {Word} word
+ * @param {number} maxDuration
+ */
 function mapDurationToAlpha( word, maxDuration ) {
   let result = 0;
   if ( word.focusing && word.focusing.duration > DURATION_TRANSPARENT ) {
@@ -6,6 +18,10 @@ function mapDurationToAlpha( word, maxDuration ) {
   return result;
 }
 
+/**
+ * @param {Word} word 
+ * @param {number} maxCharSpeed 
+ */
 function mapCharSpeedTAlpha( word, maxCharSpeed ) {
   let result = 0;
   if ( word.reading && word.reading.charSpeed > 0 ) {
@@ -14,6 +30,10 @@ function mapCharSpeedTAlpha( word, maxCharSpeed ) {
   return result;
 }
 
+/**
+ * @param {Word} word 
+ * @param {number} mapFocusCount 
+ */
 function mapFocusCountToAlpha( word, mapFocusCount ) {
   let result = 0;
   if ( word.focusing && word.focusing.count > 0 ) {
@@ -49,6 +69,11 @@ alphaComputers.set( Type.FOCUS_COUNT, mapFocusCountToAlpha );
 
 export default class Metric {
 
+  /**
+   * @param {Word[]} words 
+   * @param {string} metricType 
+   * @returns {number}
+   */
   static computeRange( words, metricType ) {
     let maxRange = 0;
 
@@ -89,14 +114,26 @@ export default class Metric {
     return maxRange;
   }
 
+  /**
+   * @param {Word} word 
+   * @param {string} metricType 
+   * @param {number} metricRange 
+   * @returns {number} 0..1
+   */
   static getAlpha( word, metricType, metricRange ) {
     return alphaComputers.get( metricType )( word, metricRange );
   }
 
+  /**
+   * @returns {object} list of metric types
+   */
   static get Type() {
     return Type;
   }
 
+  /**
+   * @returns {string[]} list of metric types
+   */
   static get Types() {
     const result = [];
     for ( let key in Type ) {

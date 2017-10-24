@@ -1,11 +1,26 @@
 import Colors from '@/vis/colors.js';
 
+// ts-check-only
+import DataPage from '@/model/data/dataPage';
+
+/**
+ * @typedef {Object} Point
+ * @property {number} x
+ * @property {number} y
+ */
+
 let colorIndex = 0;
 
 const FIXATION_GROW_INTERVAL = 100;
 
 export default class ReplayTrack {
 
+  /**
+   * @param {HTMLElement} root
+   * @param {string} userName 
+   * @param {DataPage[]} session 
+   * @param {Point} offset 
+   */
   constructor( root, userName, session, offset ) {
     this.root = root;
     this.name = userName;
@@ -173,12 +188,14 @@ export default class ReplayTrack {
     }
 
     const size = Math.round( Math.sqrt( this.currentDuration ) );
-    this.pointer.style = `left: ${this.currentFixation.x + this.offset.x - size / 2}px;
-                              top: ${this.currentFixation.y + this.offset.y - size / 2}px;
-                              width: ${size}px;
-                              height: ${size}px;
-                              border-radius: ${size / 2}px;
-                              background-color: ${this.color};`;
+    this.pointer.setAttribute( 'style', `
+      left: ${this.currentFixation.x + this.offset.x - size / 2}px;
+      top: ${this.currentFixation.y + this.offset.y - size / 2}px;
+      width: ${size}px;
+      height: ${size}px;
+      border-radius: ${size / 2}px;
+      background-color: ${this.color};`
+    );
 
     this.currentDuration += FIXATION_GROW_INTERVAL;
   };
