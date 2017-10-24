@@ -35,6 +35,7 @@ export default class Class {
       owner: this.owner,
       cls: this.id,
       type: type,
+      alignment: task.alignment,
       intro: task.intro,
       pages: Task.textToPages( task.text ),
       syllab: task.syllab,
@@ -95,8 +96,16 @@ export default class Class {
       } );
     } );
 
+    task.deleteAllImages( err => {
+      if (err) {
+        console.error( err );
+      }
+    });
+
     db.delete( task, err => {
-      console.error( err );
+      if (err) {
+        console.error( err );
+      }
     } );
   }
 

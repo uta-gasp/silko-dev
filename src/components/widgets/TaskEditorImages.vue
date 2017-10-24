@@ -12,19 +12,18 @@
             th Off
             th
         tbody
-          tr(v-for="(image, index) in images" :key="index")
+          tr.is-64(v-for="(image, index) in images" :key="index")
             td
-              p.image.is-64x64
-                img.preview(v-if="canShow( image )" :src="getLink( image )")
+              p.image.is-64x64.preview(v-if="canShow( image )" :style="getCSSBackgroundImage( image )")
             td {{ getImageName( image ) }}
             td {{ getImagePage( image ) }}
             td {{ image.location }}
             td
               .event-name {{ formatEventName( image.on ) }}
-              .event-param {{ formatEventParams( image.on ) }}
+              .event-param(v-show="hasParameters( image.on )") {{ formatEventParams( image.on ) }}
             td
               .event-name {{ formatEventName( image.off ) }}
-              .event-param {{ formatEventParams( image.off ) }}
+              .event-param(v-show="hasParameters( image.off )") {{ formatEventParams( image.off ) }}
             td
               button.button.is-danger(
                 title="Remove the image"
@@ -122,6 +121,7 @@
 </template>
 
 <script>
+import Task from '@/model/task.js';
 import { TextPageImage,
   TextPageImageEvent,
   TextPageImageFixationEvent,
@@ -231,6 +231,9 @@ export default {
   methods: {
     listImages() {
       const images = [];
+      if (!this.task) {
+        return;
+      }
 
       this.task.pages.forEach( page => {
         if ( !page.images ) {
@@ -249,8 +252,7 @@ export default {
 
     remove( index ) {
       const deletedImage = this.images.splice( index, 1 )[0];
-      Object.keys( deletedImage ).forEach( key => console.log( key, deletedImage[key] ) );
-      this.task.deleteImage( deletedImage, err => {
+      Task.deleteImage( deletedImage, err => {
         if ( err ) {
           this.setError( err, 'Cannot delete the image' );
         }
@@ -266,8 +268,8 @@ export default {
       return !!image.file || !!image.src;
     },
 
-    getLink( image ) {
-      return image.file ? this.getImageURL( image.file ) : image.src;
+    getCSSBackgroundImage( image ) {
+      return `background-image: url('${image.file ? this.getImageURL( image.file ) : image.src}')`;
     },
 
     getImageName( image ) {
@@ -284,6 +286,10 @@ export default {
 
     getImagePage( image ) {
       return image.page < 0 ? 'any' : ( image.page + 1 );
+    },
+
+    hasParameters( imageShowEvent ) {
+      return TextPageImageEvent.hasParameters( imageShowEvent );
     },
 
     formatEventName( event ) {
@@ -343,7 +349,7 @@ export default {
         off: this.constructImageEvent( this.off ),
       } );
 
-      this.task.uploadImage( this.selectedFile, image.meta,
+      Task.uploadImage( this.selectedFile, image.meta,
         percentage => {
           this.uploadProgress = percentage;
         },
@@ -410,14 +416,21 @@ export default {
     padding-bottom: 0;
   }
 
-  .is-64x64 .preview {
+  .is-64 td {
+    min-height: 64px;
+    vertical-align: middle;
+  }
+
+  .is-64x64.preview {
     position: relative;
     top: 32px;
     transform: translateY(-50%);
+    background-position: center;
+    background-size: cover;
   }
 
   .event-name {
-
+    font-size: 12pt;
   }
 
   .event-param {

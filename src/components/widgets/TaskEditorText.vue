@@ -6,6 +6,12 @@
           label.label Name
           input.input(type="text" placeholder="Name" v-model="name")
         .column.is-narrow
+          label.label Alignment
+          .select
+            select(v-model="alignment")
+              option(value="center") center
+              option(value="left") left
+        .column.is-narrow
           label.label Introduction
           span.select
             select(v-model="intro")
@@ -77,6 +83,7 @@ export default {
   data() {
     return {
       name: this.task && this.task.name ? this.task.name : '',
+      alignment: this.task && this.task.alignment ? this.task.alignment : 'center',
       intro: this.task && this.task.intro ? this.task.intro : '',
       text: this.task && this.task.pages ? Task.pagesToText( this.task.pages ) : '',
     };
@@ -102,6 +109,7 @@ export default {
     currentModel() {
       return {
         name: this.name,
+        alignment: this.alignment,
         intro: this.intro,
         text: this.text,
       };
@@ -110,6 +118,10 @@ export default {
 
   watch: {
     name() {
+      this.$emit( 'input', this.currentModel );
+    },
+
+    alignment() {
       this.$emit( 'input', this.currentModel );
     },
 

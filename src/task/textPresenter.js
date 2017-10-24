@@ -30,10 +30,15 @@ export default class TextPresenter {
     this.syllabifier = syllabifier;
 
     this.pages = task.pages;
+    this.alignment = task.alignment;
     this.hasInstructionPage = !!( firstPage && firstPage.length );
 
     if ( this.hasInstructionPage ) {
       this.pages.unshift( firstPage );
+    }
+
+    if (task.alignment === 'left') {
+      this.container.classList.add( 'alignLeft' );
     }
 
     this.pageIndex = -1;

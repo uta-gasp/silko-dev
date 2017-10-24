@@ -64,6 +64,7 @@ export default {
       ref: this.task || this.source || JSON.parse( window.localStorage.getItem( TASK_DEFAULTS ) ),
 
       name: '',
+      alignment: '',
       text: '',
       intro: '',
 
@@ -135,6 +136,7 @@ export default {
       result = Object.assign( result, {
         name: this.name.trim(),
         type: 'text',
+        alignment: this.alignment,
         pages: Task.textToPages( this.text ),
         syllab: { ...this.syllab },
         speech: { ...this.speech },
@@ -150,42 +152,47 @@ export default {
   methods: {
 
     init() {
-      if ( this.ref ) {
-        if ( this.ref.name ) {
-          this.name = this.ref.name;
-        }
-        if ( this.ref.pages ) {
-          this.text = Task.pagesToText( this.ref.pages );
-        }
-        if ( this.ref.intro ) {
-          this.intro = this.ref.intro;
-        }
+      if ( !this.ref ) {
+        return;
+      }
+       
+      if ( this.ref.name ) {
+        this.name = this.ref.name;
+      }
+      if ( this.ref.pages ) {
+        this.text = Task.pagesToText( this.ref.pages );
+      }
+      if ( this.ref.alignment ) {
+        this.alignment = this.ref.alignment;
+      }
+      if ( this.ref.intro ) {
+        this.intro = this.ref.intro;
+      }
 
-        if ( this.ref.syllab ) {
-          this.syllab = this.ref.syllab;
-        }
-        if ( this.ref.speech ) {
-          this.speech = this.ref.speech;
-        }
-        if ( this.ref.syllab.exceptions ) {
-          this.syllabExceptions = Task.syllabsToText( this.ref.syllab.exceptions );
-        }
+      if ( this.ref.syllab ) {
+        this.syllab = this.ref.syllab;
+      }
+      if ( this.ref.speech ) {
+        this.speech = this.ref.speech;
+      }
+      if ( this.ref.syllab.exceptions ) {
+        this.syllabExceptions = Task.syllabsToText( this.ref.syllab.exceptions );
+      }
 
-        if ( this.ref.pages ) {
-          this.ref.pages.forEach( ( page, index ) => {
-            if ( !page.images ) {
-              return;
-            }
+      if ( this.ref.pages ) {
+        this.ref.pages.forEach( ( page, index ) => {
+          if ( !page.images ) {
+            return;
+          }
 
-            page.images.forEach( image => {
-              this.images.push( Object.assign( { page: index }, image ) );
-            } );
+          page.images.forEach( image => {
+            this.images.push( Object.assign( { page: index }, image ) );
           } );
-        }
+        } );
+      }
 
-        if ( this.ref.questionnaire ) {
-          this.questionnaire = this.ref.questionnaire;
-        }
+      if ( this.ref.questionnaire ) {
+        this.questionnaire = this.ref.questionnaire;
       }
     },
 
@@ -209,6 +216,7 @@ export default {
 
     setTextInput( e ) {
       this.name = e.name;
+      this.alignment = e.alignment;
       this.intro = e.intro;
       this.text = e.text;
     },
@@ -241,6 +249,7 @@ export default {
       this.$emit( 'save', {
         name: this.name.trim(),
         text: this.text,
+        alignment: this.alignment,
         intro: this.intro,
         syllab: this.syllab,
         speech: this.speech,

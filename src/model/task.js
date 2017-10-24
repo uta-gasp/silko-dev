@@ -26,6 +26,7 @@ export default class Task {
     this.owner = '';
     this.cls = '';
     this.type = '';
+    this.alignment = '';
     this.intro = '';
     this.pages = [];      // [TextPage]
     this.syllab = Task.defaultSyllab;
@@ -172,6 +173,7 @@ export default class Task {
 
   update( task, cb ) {
     const _task = {
+      alignment: task.alignment,
       intro: task.intro,
       pages: Task.textToPages( task.text ),
       syllab: task.syllab,
@@ -195,16 +197,29 @@ export default class Task {
     }
   }
 
-  uploadImage( file, meta, progressHandler, cb ) {
+  static uploadImage( file, meta, progressHandler, cb ) {
     const prefix = TextPageImage.getPrefix();
     db.uploadFile( file, prefix, meta, progressHandler, cb );
   }
 
   // @image: TaskPageImage
-  deleteImage( image, cb ) {
+  static deleteImage( image, cb ) {
     db.deleteFile( image.src, cb );
   }
 
+  deleteAllImages( cb ) {
+    const promises = [];
+
+    this.pages.forEach( page => {
+      page.images.forEach( image => {
+        promises.push( db.deleteFile( image.src, _ => {} ) );
+      })
+    });
+
+    Promise.all( promises ).then( _ => {
+      cb();
+    });
+  }
 }
 
 Recordable.apply( Task );

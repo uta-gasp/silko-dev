@@ -31,6 +31,14 @@ export class TextPageImageEvent {
     return true;
   }
 
+  /**
+   * @param {TextPageImageEvent} event
+   * @returns {boolean}
+   */
+  static hasParameters( event ) {
+    return Object.keys( event ).length > 1;  // has other props other than 'name'
+  }
+
   /** 
    * @param {any} meta
    * @param {string} type

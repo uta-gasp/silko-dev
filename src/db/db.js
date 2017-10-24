@@ -355,7 +355,7 @@ class DB {
       return cb( new Error( 'invalid url' ) );
     }
 
-    this.storage
+    return this.storage
       .child( decodeURIComponent( filename ) )
       .delete()
       .then( _ => cb() )
