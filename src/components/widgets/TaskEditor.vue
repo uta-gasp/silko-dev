@@ -155,7 +155,7 @@ export default {
       if ( !this.ref ) {
         return;
       }
-       
+
       if ( this.ref.name ) {
         this.name = this.ref.name;
       }

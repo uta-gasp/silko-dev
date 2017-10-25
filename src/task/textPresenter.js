@@ -47,7 +47,7 @@ export default class TextPresenter {
       this.pages.unshift( firstPage );
     }
 
-    if (task.alignment === 'left') {
+    if ( task.alignment === 'left' ) {
       this.container.classList.add( 'alignLeft' );
     }
 
@@ -143,7 +143,7 @@ export default class TextPresenter {
     this._splitText();
   }
 
- /**
+  /**
    * Creates a text line from a string. Features:
    *      Classes can be listed after "|" (lines) or "\" (words)
    *      For example, "This is\b a text|n" will expand
@@ -217,12 +217,12 @@ export default class TextPresenter {
 
     const nodeIterator = document.createNodeIterator(
       this.container,
-      NodeFilter.SHOW_TEXT,
+      window.NodeFilter.SHOW_TEXT,
       { acceptNode: node => {
         if ( !/^\s*$/.test( node.nodeValue ) ) {
-          return NodeFilter.FILTER_ACCEPT;
+          return window.NodeFilter.FILTER_ACCEPT;
         }
-        return NodeFilter.FILTER_REJECT;
+        return window.NodeFilter.FILTER_REJECT;
       }}
     );
 
@@ -241,7 +241,7 @@ export default class TextPresenter {
           docFrag.appendChild( space );
         }
 
-        const wordText = this.syllabifier.prepare( word[ 0 ] );
+        const wordText = this.syllabifier.prepareWord( word[ 0 ] );
 
         const span = document.createElement( 'span' );
         span.classList.add( WORD_CLASS );

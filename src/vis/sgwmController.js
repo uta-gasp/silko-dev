@@ -1,41 +1,12 @@
 import OptionsCreator from '@/vis/optionsCreator.js';
 
-/**
- * Rect
- * @typedef {Object} Rect
- * @property {number} x
- * @property {number} y
- * @property {number} width
- * @property {number} height
- */
-
-/**
- * Fixation
- * @typedef {Object} Fixation
- * @property {number} ts
- * @property {number} duration
- * @property {Rect} rect
- */
-
-/**
- * Word
- * @typedef {Object} Word
- * @property {number} id
- * @property {string} text
- * @property {Rect} rect
- */
-
-/**
- * Page
- * @typedef {Object} Page
- * @property {Fixation[]} fixations
- * @property {Word[]} text
- * @property {Rect} rect
- */
+// ts-check-only
+import Rect from '@/model/data/rect';
+import DataPage from '@/model/data/dataPage';
 
 /**
  * @external SGWM
- * @see {@link https://uta-gasp.github.com/sgwm/|SWGM}
+ * @see {@link https://uta-gasp.github.com/sgwm/}
  */
 
 const _SGWM = {};
@@ -165,7 +136,7 @@ export default class sgwmController {
   }
 
   static save() {
-    for(let name in _SGWM ) {
+    for ( let name in _SGWM ) {
       _SGWM[ name ].save();
     }
   }
@@ -178,7 +149,7 @@ export default class sgwmController {
   }
 
   /**
-   * @param {Page} page 
+   * @param {DataPage} page 
    */
   static map( page ) {
     const sgwmSession = {

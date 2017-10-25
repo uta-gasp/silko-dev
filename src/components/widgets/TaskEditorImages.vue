@@ -231,7 +231,7 @@ export default {
   methods: {
     listImages() {
       const images = [];
-      if (!this.task) {
+      if ( !this.task ) {
         return;
       }
 

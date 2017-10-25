@@ -213,13 +213,14 @@ export default class Task {
     this.pages.forEach( page => {
       page.images.forEach( image => {
         promises.push( db.deleteFile( image.src, _ => {} ) );
-      })
-    });
+      } );
+    } );
 
     Promise.all( promises ).then( _ => {
       cb();
-    });
+    } );
   }
+
 }
 
 Recordable.apply( Task );

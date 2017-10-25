@@ -17,16 +17,6 @@ import DataPageTextWord from '@/model/data/dataPageTextWord';
  * @property {Word} word
  */
 
-/**
- * @callback OnWordFixatedCallback
- * @param {SGWMWord} word
- * @param {number} duration
- */
-
-/**
- * @callback OnCompletedCallback
- */
-
 export class ReplayWord {
 
   /**

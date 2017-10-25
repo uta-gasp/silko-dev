@@ -1,11 +1,20 @@
 import { TextPageImage } from '@/model/task/textPageImage.js';
 
+// ts-check-only
+import DataImage from '@/model/data/image.js';
+
 export default class ImageController {
 
+  /**
+   * @param {{onShow: function, onHide: function}} param0 
+   * @param {DataImage[]} [images=[]] 
+   */
   constructor( { onShow, onHide }, images = [] ) {
     this.onShow = onShow;
     this.onHide = onHide;
     this.images = images;
+
+    this.prefetched = new Map();
 
     this.locations = {
       left: null,
@@ -36,6 +45,9 @@ export default class ImageController {
     this.timers.clear();
   }
 
+  /**
+   * @param {DataImage[]} images 
+   */
   setImages( images ) {
     this.shutdown();
 
@@ -57,8 +69,10 @@ export default class ImageController {
 
   _prefetch() {
     this.images.forEach( image => {
-      image.el = new Image();
-      image.el.src = image.src;
+      const el = new window.Image();
+      el.src = image.src;
+
+      this.prefetched.set( image, el );
     } );
   }
 
@@ -70,6 +84,9 @@ export default class ImageController {
     } );
   }
 
+  /**
+   * @param {DataImage} image 
+   */
   _show( image ) {
     // handle off = 'image' cases
     for ( let location in this.locations ) {
@@ -93,6 +110,9 @@ export default class ImageController {
     this.onShow( image );
   }
 
+  /**
+   * @param {DataImage} image 
+   */
   _hide( image ) {
     this.locations[ image.location ] = null;
     this.onHide( image );

@@ -15,7 +15,7 @@
  * @property {Boolean} isRegression
  */
 
- export default class Regressions {
+export default class Regressions {
 
   /**
    * Adds "isRegression: Boolean" to fixations that

@@ -1,12 +1,15 @@
+/**
+ * @typedef {Object} ParamArg
+ * @property {string} student
+ * @property {string} [session]
+ * @property {{name: string, studentCount: number}} [grade]
+ */
 export default class Params {
 
   /**
-   * @param {Object} [args]
-   * @param {string} [args.student] 
-   * @param {string} [args.session]
-   * @param {{name: string, studentCount: number}} [args.grade] 
+   * @param {ParamArg} args
    */
-  constructor( args = {} ) {
+  constructor( args ) {
     this.student = args.student;    // String
     this.session = args.session;    // String
     this.grade = args.grade;        // { name: String, studentCount: Number }

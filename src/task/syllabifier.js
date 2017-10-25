@@ -5,7 +5,6 @@ import loggerFactory from '@/utils/logger.js';
 // ts-check-only
 import WordFocus from './wordFocus.js';
 
-
 const logger = loggerFactory( 'syllabifier' );
 
 const RESTORE_INTERVAL = 3000;
@@ -85,43 +84,42 @@ export default class Syllabifier {
   }
 
   /**
-   * @param {string | string[]} text
-   * @returns {string | string[]} 
+   * @param {string} word
+   * @returns {string} 
    */
-  prepare( text ) {
-    if ( !this.rule || this.options.mode !== 'hyphen' ) {
-      return text;
+  prepareWord( word ) {
+    if ( !word || !this.rule || this.options.mode !== 'hyphen' ) {
+      return word;
     }
 
     logger.info( 'preparing' );
 
-    const prepareWord = word => {
-      if ( !word ) {
-        return word;
-      }
+    const syllabifiedWord = this.syllabifyWord( word, this.hyphen );
+    const hyphenCount = syllabifiedWord.length - word.length;
+    const halfHyphenCount = Math.round( hyphenCount / 2 );
 
-      const syllabifiedWord = this.syllabifyWord( word, this.hyphen );
-      const hyphenCount = syllabifiedWord.length - word.length;
-      const halfHyphenCount = Math.round( hyphenCount / 2 );
+    return '<span class="hyphens">' +
+                      ( Array( halfHyphenCount + 1 ).join( this.hyphen ) ) +
+                  '</span>' +
+                  word +
+                  '<span class="hyphens">' +
+                      ( Array( hyphenCount - halfHyphenCount + 1 ).join( this.hyphen ) ) +
+                  '</span>';
+  };
 
-      return '<span class="hyphens">' +
-                        ( Array( halfHyphenCount + 1 ).join( this.hyphen ) ) +
-                    '</span>' +
-                    word +
-                    '<span class="hyphens">' +
-                        ( Array( hyphenCount - halfHyphenCount + 1 ).join( this.hyphen ) ) +
-                    '</span>';
-    };
-
-    if ( text instanceof Array ) {
-      return text.map( line => {
-        const words = line.split( ' ' ).map( word => word.toLowerCase() );
-        return words.map( prepareWord ).join( ' ' );
-      } );
+  /**
+   * @param {string[]} text
+   * @returns {string[]} 
+   */
+  prepareText( text ) {
+    if ( !this.rule || this.options.mode !== 'hyphen' ) {
+      return text;
     }
-    else {
-      return prepareWord( text );
-    }
+
+    return text.map( line => {
+      const words = line.split( ' ' ).map( word => word.toLowerCase() );
+      return words.map( this.prepareWord ).join( ' ' );
+    } );
   }
 
   /**
@@ -390,7 +388,7 @@ const rules = {
         if ( i < word.length - 1 ) {
           const charPrevious = word[ i + 1 ];
           const typePrevious = getType( charPrevious );
-          if ( charPrevious !== char && 
+          if ( charPrevious !== char &&
                 typePrevious === type &&
                 !diftongs.includes( char + charPrevious ) ) {
             result.unshift( hyphen );

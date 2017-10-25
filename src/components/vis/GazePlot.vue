@@ -111,8 +111,8 @@ export default {
 
       if ( page.syllabifications ) {
         this.painter.drawSyllabifications( page.syllabifications, Object.assign( {
-          isSyllabified: this.record.session.feedbacks.mode === 'hyphen',
-          hyphen: this.record.session.feedbacks.hyphen,
+          isSyllabified: this.record.session.feedbacks.syllabification.mode === 'hyphen',
+          hyphen: this.record.session.feedbacks.syllabification.hyphen,
         }, UI.syllab ) );
       }
 

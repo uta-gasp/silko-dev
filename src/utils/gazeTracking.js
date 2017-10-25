@@ -1,7 +1,3 @@
-/**
- * @external GazeTargets
- */
-
 const RECONNECT_INTERVAL = 3000;
 
 const callbackLists = {
@@ -38,7 +34,7 @@ class GazeTracking {
   constructor() {
     this.serviceCheckTimer = null;
 
-    this.wsOK = GazeTargets.init( {
+    this.wsOK = window.GazeTargets.init( {
       etudPanel: {
         show: false,
       },
@@ -49,7 +45,7 @@ class GazeTracking {
         {
           selector: '.word',
           selection: {
-            type: GazeTargets.selection.types.none,
+            type: window.GazeTargets.selection.types.none,
           },
           mapping: {
             className: '',
@@ -57,8 +53,8 @@ class GazeTracking {
         },
       ],
       mapping: {
-        type: GazeTargets.mapping.types.expanded,
-        source: GazeTargets.mapping.sources.samples,
+        type: window.GazeTargets.mapping.types.expanded,
+        source: window.GazeTargets.mapping.sources.samples,
         expansion: 30,
       },
     }, {
@@ -132,27 +128,27 @@ class GazeTracking {
   }
 
   showOptions() {
-    GazeTargets.ETUDriver.showOptions();
+    window.GazeTargets.ETUDriver.showOptions();
   }
 
   calibrate() {
-    GazeTargets.ETUDriver.calibrate();
+    window.GazeTargets.ETUDriver.calibrate();
   }
 
   start() {
     if ( !lastState.isTracking ) {
-      GazeTargets.ETUDriver.toggleTracking();
+      window.GazeTargets.ETUDriver.toggleTracking();
     }
   }
 
   stop() {
     if ( lastState.isTracking ) {
-      GazeTargets.ETUDriver.toggleTracking();
+      window.GazeTargets.ETUDriver.toggleTracking();
     }
   }
 
   updateTargets() {
-    GazeTargets.updateTargets();
+    window.GazeTargets.updateTargets();
   }
 
   scheduleReconnection() {
@@ -163,7 +159,7 @@ class GazeTracking {
     this.serviceCheckTimer = setTimeout( () => {
       this.serviceCheckTimer = null;
       if ( !lastState.isServiceRunning ) {
-        this.wsOK = GazeTargets.reconnect();
+        this.wsOK = window.GazeTargets.reconnect();
       }
     }, RECONNECT_INTERVAL );
   }

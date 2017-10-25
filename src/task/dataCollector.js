@@ -11,6 +11,21 @@ import Image from '@/model/data/image.js';
 
 import db from '@/db/db.js';
 
+// ts-check-only
+import ModelTask from '@/model/task.js';
+import ModelStudent from '@/model/student.js';
+import Font from '@/model/session/font.js';
+import Feedbacks from '@/model/session/feedbacks.js';
+import { TextPageImage } from '@/model/task/textPageImage.js';
+
+/**
+ * @typedef ETUDFixation
+ * @property {number} ts
+ * @property {number} duration
+ * @property {number} x
+ * @property {number} y
+ */
+
 const MIN_FIXATION_DURATION = 80;
 
 class Timer {
@@ -25,10 +40,16 @@ class Timer {
     this._start = window.performance.now();
   }
 
+  /**
+   * @returns {number}
+   */
   get value() {
     return Math.round( window.performance.now() - this._start );
   }
 
+  /**
+   * @returns {string}
+   */
   get date() {
     return this._date;
   }
@@ -37,6 +58,9 @@ class Timer {
 
 class Page {
 
+  /**
+   * @param {boolean} isIntroPage 
+   */
   constructor( isIntroPage ) {
     this.words = new Map();
     this.data = new DataPage();
@@ -47,28 +71,48 @@ class Page {
 
 class Pages {
 
+  /**
+   * @param {boolean} hasIntroPage 
+   */
   constructor( hasIntroPage ) {
     this.hasIntroPage = hasIntroPage;
+    /** @type {Page[]} */
     this.items = [];
     this.pageIndex = -1;
   }
 
+  /**
+   * @param {number} index 
+   * @returns {Page}
+   */
   page( index ) {
     return this.items[ index ];
   }
 
+  /**
+   * @returns {Page}
+   */
   get current() {
     return this.items[ this.pageIndex ];
   }
 
+  /**
+   * @returns {Page}
+   */
   get last() {
     return this.items[ this.items.length - 1 ];
   }
 
+  /**
+   * @returns {boolean}
+   */
   get ready() {
     return this.pageIndex >= 0;
   }
 
+  /**
+   * @returns {Page}
+   */
   add() {
     const page = new Page( !this.items.length ? this.hasIntroPage : false );
     this.items.push( page );
@@ -84,6 +128,13 @@ class Pages {
 
 export default class DataCollector {
 
+  /**
+   * 
+   * @param {ModelTask} task 
+   * @param {ModelStudent} student 
+   * @param {Font} font 
+   * @param {Feedbacks} feedbacks 
+   */
   constructor( task, student, font, feedbacks ) {
     this.session = {
       date: ( new Date() ).toJSON(),
@@ -110,6 +161,9 @@ export default class DataCollector {
     this.timer.start();
   }
 
+  /**
+   * @param {function} cb 
+   */
   stop( cb ) {
     this.setFocusedWord( null );
     this.pages.done();
@@ -121,6 +175,10 @@ export default class DataCollector {
     this.pages.add();
   }
 
+  /**
+   * @param {number} threshold 
+   * @returns {string[]}
+   */
   longGazedWords( threshold ) {
     const result = [];
     const re = /\b([\w$%&]+\S*\b)/;
@@ -135,6 +193,9 @@ export default class DataCollector {
     return result;
   }
 
+  /**
+   * @returns {{text: string, duration: number}}
+   */
   get focusedWord() {
     if ( !this.currentWord ) {
       return null;
@@ -147,6 +208,9 @@ export default class DataCollector {
     }
   }
 
+  /**
+   * @returns {number}
+   */
   get wordReadingDuration() {
     const page = this.pages.current;
     if ( !page ) {
@@ -171,9 +235,11 @@ export default class DataCollector {
 
   // Loggers
 
-  // Propagates the highlighing if the focused word is the next after the current
-  // Arguments:
-  //        word:         - the focused word  (DOM element)
+  /**
+   * Propagates the highlighing if the focused word is the next after the current
+   * @param {HTMLElement} el 
+   * @returns {string}
+   */
   setFocusedWord( el ) {
     if ( this.focusedElem === el || !this.pages.ready ) {
       return null;
@@ -200,6 +266,10 @@ export default class DataCollector {
     return this.currentWord ? this.currentWord.text : null;
   }
 
+  /**
+   * 
+   * @param {ETUDFixation} gazePoint 
+   */
   addGazePoint( gazePoint ) {
     if ( !this.pages.ready ) {
       return;
@@ -208,6 +278,9 @@ export default class DataCollector {
     this.pages.current.data.fixations.push( Fixation.from( gazePoint, this.timer.value ) );
   }
 
+  /**
+   * @param {HTMLElement} el 
+   */
   syllabified( el ) {
     if ( !el || !this.pages.ready ) {
       return;
@@ -226,6 +299,9 @@ export default class DataCollector {
     }
   }
 
+  /**
+   * @param {HTMLElement} el 
+   */
   pronounced( el ) {
     if ( !el || !this.pages.ready ) {
       return;
@@ -244,13 +320,17 @@ export default class DataCollector {
     }
   }
 
-  // @image: TaskPageImage
+  /**
+   * @param {TextPageImage} image 
+   */
   imageShow( image ) {
     const page = this.pages.current;
     page.data.images.push( new Image( image, this.timer.value ) );
   }
 
-  // @image: TaskPageImage
+  /**
+   * @param {TextPageImage} image 
+   */
   imageHide( image ) {
     const page = this.pages.current || this.pages.last;
     const currentImage = page.data.images.find( img => img.src === image.src && img.isCurrent );
@@ -262,7 +342,7 @@ export default class DataCollector {
 
   _closeImages() {
     const page = this.pages.current || this.pages.last;
-    if (!page) {
+    if ( !page ) {
       return;
     }
 
@@ -273,6 +353,9 @@ export default class DataCollector {
     } );
   }
 
+  /**
+   * @param {function} cb 
+   */
   _save( cb ) {
     const data = {
       task: this.session.task,

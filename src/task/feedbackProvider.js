@@ -4,6 +4,10 @@ import Syllabifier from './syllabifier.js';
 import Speaker from './speaker.js';
 import WordFocus from './wordFocus.js';
 
+// ts-check-only
+import SyllabificationFeedback from '@/model/session/syllabificationFeedback';
+import SpeechFeedback from '@/model/session/speechFeedback';
+
 const FOCUS_THRESHOLD = 150;
 const REENTRY_THRESHOLD = 1000;
 const SAMPLE_DURATION = 30;
@@ -12,11 +16,15 @@ const HIGHLIGHT_CLASS = 'currentWord';
 
 export default class FeedbackProvider {
 
+  /**
+   * @param {SyllabificationFeedback} syllab 
+   * @param {SpeechFeedback} speech 
+   */
   constructor( syllab, speech ) {
     this.syllabifier = new Syllabifier( syllab );
     this.speaker = new Speaker( speech );
 
-    this.events = new EventEmitter();
+    this.events = new window.EventEmitter();
     this.timer = null;
     this.currentWord = null;
     this.lastFocusedWord = null;
@@ -24,6 +32,9 @@ export default class FeedbackProvider {
     this.words = null;  // map of el: WordFocus
   }
 
+  /**
+   * @returns {Feeback}
+   */
   get setup() {
     return new Feedbacks(
       this.speaker.setup,
@@ -55,6 +66,9 @@ export default class FeedbackProvider {
     }
   }
 
+  /**
+   * @param {number} avgWordReadingDuration 
+   */
   reset( avgWordReadingDuration ) {
     if ( avgWordReadingDuration ) {
       this.syllabifier.setAvgWordReadingDuration( avgWordReadingDuration );
@@ -66,9 +80,11 @@ export default class FeedbackProvider {
     this.lastFocusedWord = null;
   }
 
-  // Propagates / removed the highlighing
-  // Arguments:
-  //   el: - the focused word DOM element
+  /**
+   * Propagates / removes the highlighing
+   * @param {HTMLElement} [el]
+   * @returns {WordFocus}
+   */
   setFocusedWord( el ) {
     if ( this.currentWord !== el ) {
       // if (this.highlightingEnabled) {

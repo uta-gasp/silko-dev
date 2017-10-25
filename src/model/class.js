@@ -97,13 +97,13 @@ export default class Class {
     } );
 
     task.deleteAllImages( err => {
-      if (err) {
+      if ( err ) {
         console.error( err );
       }
-    });
+    } );
 
     db.delete( task, err => {
-      if (err) {
+      if ( err ) {
         console.error( err );
       }
     } );

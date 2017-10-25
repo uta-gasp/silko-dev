@@ -75,5 +75,6 @@ class Logger {
  * @param {string} module 
  */
 export default function( module ) {
-  return enabled ? new Logger( module ) : { info(...args) {}, ok(...args) {}, error(...args) {} };
+  /* eslint no-unused-vars: ["error", { "args": "none" } ] */
+  return enabled ? new Logger( module ) : { info( ...args ) {}, ok( ...args ) {}, error( ...args ) {} };
 };

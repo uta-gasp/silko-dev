@@ -3,12 +3,15 @@ import Syllabifier from '@/task/syllabifier.js';
 import Metric from '@/vis/metric.js';
 import Colors from '@/vis/colors.js';
 
+// ts-check-only
+import SyllabificationFeedback from '@/model/session/syllabificationFeedback.js';
+import Font from '@/model/session/font.js';
+
 /**
  * Point
  * @typedef {Object} Point
  * @property {number} x
  * @property {number} y
- * @property {number} [_x]
  * @property {boolean} [isRegression]
  */
 
@@ -33,7 +36,7 @@ import Colors from '@/vis/colors.js';
  * @property {number} width
  * @property {number} height
  */
- 
+
 /**
  * Event
  * @typedef {Object} Event
@@ -43,29 +46,29 @@ import Colors from '@/vis/colors.js';
  */
 
 /**
- * Settings
- * @typedef {Object} Settings
- * @property {boolean} [isSyllabified]
- * @property {string} [colorMetric]
- * @property {number} [alpha]
- * @property {string} [hyphen]
- * @property {string} [background]
- * @property {string} [wordColor]
+ * @typedef {Object} WordSettings
+ * @property {string} wordColor
+ * @property {string} wordHighlightColor
+ * @property {string} wordRectColor
  * @property {boolean} drawWordFrame
- * @property {{hyphen: string}} [syllab]
- * @property {boolean} [showSaccades]
- * @property {boolean} [showConnections]
- * @property {string} [color]
- * @property {number} [fontSize]
- * @property {string} [fontFamily]
- * @property {Point} [location]
- * @property {number} [nameSpacing]
- * @property {string} [reason]
- * @property {string} [wordRectColor]
- * @property {string} [regressionColor]
- * @property {string} [saccadeColor]
- * @property {string} [connectionColor]
- * @property {boolean} [showIDs]
+ */
+
+/**
+ * @typedef {Object} SyllabSettings
+ * @property {string} background
+ * @property {string} wordColor
+ */
+
+/**
+ * @typedef {Object} GazePathSettings
+ * @property {string} colorMetric
+ * @property {string} saccadeColor
+ * @property {string} regressionColor
+ * @property {boolean} showConnections
+ * @property {boolean} showSaccades
+ * @property {boolean} showFixations
+ * @property {SyllabSettings} syllab
+ * @property {string} connectionColor
  */
 
 /**
@@ -110,12 +113,12 @@ export default class Painter {
 
   /**
    * @param {HTMLCanvasElement} el 
-   * @param {Settings} settings 
+   * @param {{syllab: SyllabificationFeedback}} settings 
    */
   constructor( el, settings ) {
     this.width = document.body.offsetWidth;
     this.height = parseInt( window.getComputedStyle( el ).height );
-    el.setAttribute( 'width', this.width + '');
+    el.setAttribute( 'width', this.width + '' );
     el.setAttribute( 'height', this.height + '' );
 
     this.offsetX = 0;
@@ -143,15 +146,21 @@ export default class Painter {
   }
 
   /**
-   * @param {{style: string, weight: string, size: number | string, family: string}} font 
+   * @param {Font} font 
    */
   setFont( font ) {
     this.ctx.font = `${font.style} ${font.weight} ${font.size} ${font.family}`;
   }
 
   /**
+   * @typedef {Object} WordsSettings
+   * @implements {WordSettings}
+   * @property {string} colorMetric
+   * @property {string} showConnections
+   */
+  /**
    * @param {Word[]} words 
-   * @param {Settings} settings 
+   * @param {WordsSettings} settings 
    */
   drawWords( words, settings ) {
     const metricRange = Metric.computeRange( words, settings.colorMetric );
@@ -166,8 +175,14 @@ export default class Painter {
   }
 
   /**
+   * @typedef {Object} SyllabsSettings
+   * @implements {SyllabSettings}
+   * @property {boolean} isSyllabified
+   * @property {string} hyphen
+   */
+  /**
    * @param {Event[]} events 
-   * @param {Settings} settings 
+   * @param {SyllabsSettings} settings 
    */
   drawSyllabifications( events, settings ) {
     events.forEach( event => {
@@ -176,9 +191,8 @@ export default class Painter {
   }
 
   /**
-   * 
    * @param {Event} event 
-   * @param {Settings} settings 
+   * @param {SyllabsSettings} settings 
    */
   drawSyllabification( event, settings ) {
     const ctx = this.ctx;
@@ -187,19 +201,22 @@ export default class Painter {
     ctx.textBaseline = 'alphabetic';
 
     const rc = event.rect;
-    const word = this.settings.isSyllabified
-      ? this.syllabifier.syllabifyWord( event.text, this.settings.hyphen )
+    const word = settings.isSyllabified
+      ? this.syllabifier.syllabifyWord( event.text, settings.hyphen )
       : event.text;
 
+    var { x, y } = this._offset( rc );
     ctx.fillStyle = settings.background;
-    ctx.fillRect( ...this._offset( rc ), rc.width, rc.height );
+    ctx.fillRect( x, y, rc.width, rc.height );
+
+    var { x, y } = this._offset( rc, { dy: 0.8 * rc.height } );
     ctx.fillStyle = settings.wordColor;
-    ctx.fillText( word, ...this._offset( { x: rc.x, y: rc.y + 0.8 * rc.height } ) );
+    ctx.fillText( word, x, y );
   }
 
   /**
    * @param {Fixation[]} fixations 
-   * @param {Settings} settings 
+   * @param {GazePathSettings} settings 
    */
   drawFixations( fixations, settings ) {
     let prevFix;
@@ -224,8 +241,16 @@ export default class Painter {
   }
 
   /**
+   * @typedef {Object} NamesSettings
+   * @property {number} fontSize
+   * @property {string} fontFamily
+   * @property {Point} location
+   * @property {number} nameSpacing
+   * @property {string} [reason]
+   */
+  /**
    * @param {Name[]} names 
-   * @param {Settings} settings 
+   * @param {NamesSettings} settings 
    */
   drawNames( names, settings ) {
     const ctx = this.ctx;
@@ -247,7 +272,7 @@ export default class Painter {
 
   /**
    * @param {Name} names 
-   * @param {Settings} settings 
+   * @param {NamesSettings} settings 
    */
   checkName( name, settings ) {
     const ctx = this.ctx;
@@ -279,53 +304,63 @@ export default class Painter {
 
   /**
    * 
-   * @param {Point} point 
-   * @returns {[number, number]}
+   * @param {Point | Rect | Fixation} point 
+   * @param {{dx: number, dy: number}} [offset={dx: 0, dy: 0}] 
+   * @returns {Point}
    */
-  _offset( { x, y } ) {
-    return [ x + this.offsetX, y + this.offsetY ];
+  _offset( { x, y }, { dx = 0, dy = 0 } = { dx: 0, dy: 0 } ) {
+    return { x: x + this.offsetX + dx, y: y + this.offsetY + dy };
   }
 
   /**
+   * @typedef {Object} TransparentWordsSettings
+   * @implements {WordsSettings}
+   * @property {number} alpha
+   */
+  /**
    * @param {Word} word
-   * @param {Settings} settings 
+   * @param {TransparentWordsSettings} settings 
    */
   _drawWord( word, settings ) {
     const ctx = this.ctx;
     const rc = word.rect;
 
+    var { x, y } = this._offset( rc, { dy: 0.8 * rc.height } );
+
     ctx.textAlign = 'start';
     ctx.textBaseline = 'alphabetic';
     ctx.fillStyle = settings.wordColor;
-    ctx.fillText( word.text, ...this._offset( { x: rc.x, y: rc.y + 0.8 * rc.height } ) );
+    ctx.fillText( word.text, x, y );
 
     if ( settings.alpha > 0 ) {
       ctx.fillStyle = Colors.rgb2rgba( WORD_HIGHLIGHT_COLOR, settings.alpha );
-      ctx.fillText( word.text, ...this._offset( { x: rc.x, y: rc.y + 0.8 * rc.height } ) );
+      ctx.fillText( word.text, x, y );
     }
 
     // hide hyphens
     ctx.fillStyle = '#fff';
     let [prefix, suffix] = Syllabifier.getPrefixAndSuffix( word.text, this.settings.syllab.hyphen );
     if ( prefix ) {
-      ctx.fillText( prefix, ...this._offset( { x: rc.x, y: rc.y + 0.8 * rc.height } ) );
+      ctx.fillText( prefix, x, y );
     }
     if ( suffix ) {
+      var { x, y } = this._offset( rc, { dx: rc.width, dy: 0.8 * rc.height } );
       ctx.textAlign = 'end';
-      ctx.fillText( suffix, ...this._offset( { x: rc.x + rc.width, y: rc.y + 0.8 * rc.height } ) );
+      ctx.fillText( suffix, x, y );
     }
 
     if ( settings.showConnections || settings.drawWordFrame ) {
+      var { x, y } = this._offset( rc );
       ctx.strokeStyle = settings.wordRectColor;
       ctx.lineWidth = 1;
-      ctx.strokeRect( ...this._offset( rc ), rc.width, rc.height );
+      ctx.strokeRect( x, y, rc.width, rc.height );
     }
   }
 
   /**
-   * @param {Point} from 
-   * @param {Point} to 
-   * @param {Settings} settings 
+   * @param {Fixation} from 
+   * @param {Fixation} to 
+   * @param {GazePathSettings} settings 
    */
   _drawSaccade( from, to, settings ) {
     const ctx = this.ctx;
@@ -333,18 +368,20 @@ export default class Painter {
     ctx.strokeStyle = to.isRegression ? settings.regressionColor : settings.saccadeColor;
     ctx.beginPath();
 
-    let x = settings.showIDs ? ( from._x ? from._x : from.x ) : from.x;
-    ctx.moveTo( ...this._offset( { x, y: from.y } ) );
+    // let x = settings.showIDs ? ( from._x ? from._x : from.x ) : from.x;
+    var { x, y } = this._offset( from );
+    ctx.moveTo( x, y );
 
-    x = settings.showIDs ? ( to._x ? to._x : to.x ) : to.x;
-    ctx.lineTo( ...this._offset( { x, y: to.y } ) );
+    // x = settings.showIDs ? ( to._x ? to._x : to.x ) : to.x;
+    var { x, y } = this._offset( to );
+    ctx.lineTo( x, y );
     ctx.stroke();
   }
 
   /**
    * @param {Point} from 
    * @param {Point} to 
-   * @param {Settings} settings 
+   * @param {GazePathSettings} settings 
    */
   _drawConnection( from, to, settings ) {
     const ctx = this.ctx;
@@ -352,15 +389,18 @@ export default class Painter {
     ctx.strokeStyle = settings.connectionColor;
     ctx.beginPath();
 
-    const x = settings.showIDs ? ( from._x ? from._x : from.x ) : from.x;
-    ctx.moveTo( ...this._offset( { x, y: from.y } ) );
-    ctx.lineTo( ...this._offset( to ) );
+    // const x = settings.showIDs ? ( from._x ? from._x : from.x ) : from.x;
+    var { x, y } = this._offset( from );
+    ctx.moveTo( x, y );
+    var { x, y } = this._offset( to );
+    ctx.lineTo( x, y );
+
     ctx.stroke();
   };
 
   /**
    * @param {Fixation} fixation 
-   * @param {Settings} settings 
+   * @param {GazePathSettings} settings 
    */
   _drawFixation( fixation, settings ) {
     const ctx = this.ctx;
@@ -374,8 +414,9 @@ export default class Painter {
 
     const circleSize = Math.round( Math.sqrt( fixation.duration ) ) / 2;
 
+    var { x, y } = this._offset( fixation );
     ctx.beginPath();
-    ctx.arc( ...this._offset( fixation ), circleSize, 0, 2 * Math.PI );
+    ctx.arc( x, y, circleSize, 0, 2 * Math.PI );
     ctx.fill();
 
     if ( fixation.isRegression ) {
@@ -387,7 +428,7 @@ export default class Painter {
       ctx.strokeStyle = MERGED_FIXATION_BORDER_COLOR;
       ctx.lineWidth = 3;
       ctx.beginPath();
-      ctx.arc( ...this._offset( fixation ), circleSize + 3, 0, 2 * Math.PI );
+      ctx.arc( x, y, circleSize + 3, 0, 2 * Math.PI );
       ctx.stroke();
       ctx.lineWidth = 1;
     }

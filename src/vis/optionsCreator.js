@@ -19,7 +19,7 @@ export default class OptionsCreator {
  * @property {any[]} defaults
  */
 
- /**
+  /**
    * @param {OptionItems | OptionGroup[]} options 
    * @param {object} [receiver] 
    * @returns {object}
