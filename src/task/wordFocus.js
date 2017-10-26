@@ -4,13 +4,21 @@ export default class WordFocus {
    * @param {HTMLElement} el
    */
   constructor( el ) {
+    /** @type {number} */
     this.accumulatedTime = 0;
-    this.focusCount = 0;        // count of fixations > 150ms
+    /** @type {number} count of fixations > 150ms */
+    this.focusCount = 0;
+    /** @type {boolean} */
     this.focusRecorded = false;
+    /** @type {number} */
     this.entries = 1;
+    /** @type {number} */
     this.lastSample = window.performance.now();
+    /** @type {boolean} */
     this.syllabified = false;
+    /** @type {boolean} */
     this.pronounced = false;
+    /** @type {string} */
     this.word = this._getWordFromElement( el );
   }
 

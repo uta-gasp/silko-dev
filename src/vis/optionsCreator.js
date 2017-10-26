@@ -1,15 +1,15 @@
-export default class OptionsCreator {
-
 /**
  * @typedef OptionItem
  * @property {string} type - Array, String, Boolean, Number, or '#' for colors
  * @property {string} label
  * @property {string[]} [items] - if type === Array
- * @property {number} [step]  - if type === Number
+ * @property {number} [step] - if type === Number
+ * @property {object} [ref] - to be created
  */
 
 /**
  * @typedef OptionItems
+ * multiple keys, each of type OptionItem
  */
 
 /**
@@ -18,6 +18,8 @@ export default class OptionsCreator {
  * @property {OptionItems} options
  * @property {any[]} defaults
  */
+
+export default class OptionsCreator {
 
   /**
    * @param {OptionItems | OptionGroup[]} options 

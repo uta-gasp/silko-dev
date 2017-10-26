@@ -1,4 +1,7 @@
-import DBTask from '@/model/task.js';
+import ModelTask from '@/model/task.js';
+
+// ts-check-only
+import Session from './session.js';
 
 export default class Task {
 
@@ -7,18 +10,23 @@ export default class Task {
    * @param {string} name 
    */
   constructor( id, name ) {
+    /** @type {string} */
     this.id = id;
+    /** @type {string} */
     this.name = name;
-    this.students = new Set();  // ( ./Student )
-    this.sessions = [];         // [ ./Session ]
+    /** @type {Set} ./Student */
+    this.students = new Set();
+    /** @type {Session[]} */
+    this.sessions = [];
+    /** @type {boolean} */
     this.hasQuestionnaire = false;
 
-    DBTask.get( id, ( err, task ) => {
+    ModelTask.get( id, ( err, task ) => {
       if ( !err ) {
         this.hasQuestionnaire = task.questionnaire && task.questionnaire.length;
       }
       else {
-        console.error( '@/model/task.js/.ctor DBTask.get', err );
+        console.error( '@/vis/datal/task.js/.ctor model/Task.get', err );
       }
     } );
   }

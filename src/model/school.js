@@ -2,44 +2,71 @@ import Recordable from './commons/recordable.js';
 
 import Teacher from './teacher.js';
 import Student from './student.js';
-// import Session from './session.js';
-// import Data from './data.js';
 import Class from './class.js';
 
 import db from '@/db/db.js';
 
+// ts-check-only 
+import { StudentCreateParams } from './commons/createParams.js';
+
 export default class School {
 
-  constructor( id, email, name ) {
+  /**
+   * @param {string} [id]
+   */
+  constructor( id ) {
+    /** @type {string} ID */
     this.id = id;
-    this.name = name;   // ""
-    this.email = email; // ""
-    this.teachers = {}; // list of { id: name } of Teacher
-    this.students = {}; // list of { id: name } of Student
+    /** @type {string} */
+    this.name = '';
+    /** @type {string} */
+    this.email = '';
+    /** @type {object} {ID: name} */
+    this.teachers = {};
+    /** @type {object} {ID: name} */
+    this.students = {};
   }
 
+  /** @returns {string} */
   static get db() {
     return 'schools';
   }
 
+  /** @returns {boolean} */
   static get isLogged() {
     return db.user && db.user.isSchool;
   }
 
+  /** @returns {School} */
   static get instance() {
     return ( db.user && db.user.isSchool ) ? db.user.ref : null;
   }
 
+  /**
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   static list( cb ) {
     return db.getAll( School, cb );
   }
 
+  /**
+   * @param {string} ID
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   static get( id, cb ) {
     return db.get( School, id, cb );
   }
 
+  /**
+   * @param {string} name 
+   * @param {string} email 
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   createTeacher( name, email, cb ) {
-    db.add( Teacher, {
+    return db.add( Teacher, {
       name: name,
       email: email,
       school: this.id,
@@ -61,6 +88,10 @@ export default class School {
     } );
   }
 
+  /**
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   getTeachers( cb ) {
     return db.getFromIDs( Teacher, this.teachers, ( err, teachers ) => {
       if ( err ) {
@@ -71,8 +102,13 @@ export default class School {
     } );
   }
 
+  /**
+   * @param {StudentCreateParams} param0 
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   createStudent( {name, email, password, grade}, cb ) {
-    db.add( Student, {
+    return db.add( Student, {
       name: name,
       email: email,
       password: password,
@@ -97,6 +133,10 @@ export default class School {
     } );
   }
 
+  /**
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   getStudents( cb ) {
     return db.getFromIDs( Student, this.students, ( err, students ) => {
       if ( err ) {
@@ -107,6 +147,11 @@ export default class School {
     } );
   }
 
+  /**
+   * @param {Student} student
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   deleteStudent( student, cb ) {
     delete this.students[ student.id ];
 

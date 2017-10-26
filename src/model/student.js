@@ -7,43 +7,81 @@ import Data from './data.js';
 
 import db from '@/db/db.js';
 
+// ts-check-only
+import Question from '@/model/session/question';
+
+/**
+ * @typedef {Object} QuestionWithAnswer
+ * @implements {Question}
+ * @property {string} answer
+ */
+
 export default class Student {
 
-  constructor( id, name, school, grade ) {
+  /**
+   * @param {string} [id]
+   */
+  constructor( id ) {
+    /** @type {string} ID */
     this.id = id;
-    this.name = name;
-    this.school = school;
-    this.grade = grade;
+    /** @type {string} */
+    this.name = '';
+    /** @type {string} ID */
+    this.school = '';
+    /** @type {string} */
+    this.grade = '';
+    /** @type {object} {ID: name} */
     this.classes = {};
+    /** @type {object} {ID: class ID} */
     this.sessions = {};
+    /** @type {object} {task ID: class ID} */
     this.assignments = {};
   }
 
+  /** @returns {string} */
   static get db() {
     return 'students';
   }
 
+  /** @returns {boolean} */
   static get MULTICLASS() {
     return true;
   }
 
+  /** @returns {boolean} */
   static get isLogged() {
     return db.user && db.user.isStudent;
   }
 
+  /** @returns {Student} */
   static get instance() {
     return ( db.user && db.user.isStudent ) ? db.user.ref : null;
   }
 
+  /**
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   static list( cb ) {
     return db.getAll( Student, cb );
   }
 
+  /**
+   * @param {string} id 
+   * @param {string} name 
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   addClass( id, name, cb ) {
     this.classes[ id ] = name;
     return db.updateField( this, `classes/${id}`, name, cb );
   }
 
+  /**
+   * @param {string} id 
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   removeClass( id, cb ) {
     delete this.classes[ id ];
 
@@ -56,6 +94,12 @@ export default class Student {
     return db.deleteField( this, `classes/${id}`, cb );
   }
 
+  /**
+   * @param {string} task 
+   * @param {string} cls 
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   addAssignment( task, cls, cb ) {
     return db.setField( this, `assignments/${task}`, cls, err => {
       if ( err ) {
@@ -69,6 +113,11 @@ export default class Student {
     } );
   }
 
+  /**
+   * @param {string} task 
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   removeAssignment( task, cb ) {
     return db.deleteField( this, `assignments/${task}`, err => {
       if ( err ) {
@@ -82,6 +131,12 @@ export default class Student {
     } );
   }
 
+  /**
+   * @param {string} cls 
+   * @param {string} task 
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   setAssignment( cls, task, cb ) {
     const prevAssignment = this.assignments[ cls ];
     if ( !task ) {
@@ -108,6 +163,10 @@ export default class Student {
     }
   }
 
+  /**
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   loadAssignments( cb ) {
     const taskIDs = [];
     if ( Student.MULTICLASS ) {
@@ -120,6 +179,7 @@ export default class Student {
         taskIDs.push( this.assignments[ cls ] );
       }
     }
+
     return db.getFromIDs( Task, taskIDs, ( err, tasks ) => {
       if ( err ) {
         return cb( err );
@@ -142,6 +202,10 @@ export default class Student {
     } );
   }
 
+  /**
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   loadSessions( cb ) {
     const sessionIDs = [];
     for ( let id in this.sessions ) {
@@ -197,32 +261,49 @@ export default class Student {
     } );
   }
 
+  /**
+   * @param {string} task 
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   loadTask( task, cb ) {
     return db.get( Task, task, cb );
   }
 
+  /**
+   * @param {string} task 
+   * @param {string} session 
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   taskDone( task, session, cb ) {
     this.sessions[ session ] = task;
-    db.updateField( this, `sessions/${session}`, task, err => {
+    return db.updateField( this, `sessions/${session}`, task, err => {
       if ( err ) {
         return cb( err );
       }
 
       // TODO
-      // These lines is for in production mode
+      // These lines are for production mode
       if ( Student.MULTICLASS ) {
         this.removeAssignment( task, cb );
       }
       else {
         this.setAssignment( task, null, cb );
       }
-      // This line is for in dev mode
+      // This line is for dev mode
       // cb();
     } );
   }
 
-  addQuestionnaire( dataKey, questionnaire, cb ) {
-    db.update( `/${Data.db}/${dataKey}/questionnaire`, questionnaire, err => {
+  /**
+   * @param {string} dataID 
+   * @param {QuestionWithAnswer} questionnaire 
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
+  addQuestionnaire( dataID, questionnaire, cb ) {
+    return db.update( `/${Data.db}/${dataID}/questionnaire`, questionnaire, err => {
       if ( err ) {
         return cb( err );
       }
@@ -231,10 +312,19 @@ export default class Student {
     } );
   }
 
+  /**
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   getSessions( cb ) {
-    db.getFromIDs( Session, this.sessions, cb );
+    return db.getFromIDs( Session, this.sessions, cb );
   }
 
+  /**
+   * @param {string} id 
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   deleteSession( id, cb ) {
     const session = this.sessions[ id ];
     if ( !session ) {
@@ -243,7 +333,7 @@ export default class Student {
 
     delete this.sessions[ id ];
 
-    db.deleteField( this, `sessions/${id}`, err => {
+    return db.deleteField( this, `sessions/${id}`, err => {
       if ( err ) {
         return cb( err );
       }
@@ -264,8 +354,13 @@ export default class Student {
     } );
   }
 
+  /**
+   * @param {string[]} ids 
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   static getData( ids, cb ) {
-    db.getFromIDs( Data, ids, cb );
+    return db.getFromIDs( Data, ids, cb );
   }
 
 }

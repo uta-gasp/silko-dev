@@ -53,8 +53,8 @@ export default {
 
   props: {
     firstPage: {
-      type: String,
-      default: '',
+      type: Array,
+      default: null,
     },
     task: {
       type: Object,

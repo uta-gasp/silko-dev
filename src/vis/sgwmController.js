@@ -9,14 +9,24 @@ import DataPage from '@/model/data/dataPage';
  * @see {@link https://uta-gasp.github.com/sgwm/}
  */
 
+/**
+ * @typedef {Object} SGWMSettings
+ * @property {*} [FixationProcessorSettings]
+ * @property {*} [SplitToProgressionsSettings]
+ * @property {*} [ProgressionMergerSettings]
+ * @property {*} [WordMapperSettings]
+ */
+
+/** @type {SGWMSettings} */
 const _SGWM = {};
 
 export default class sgwmController {
 
+  /** @returns {SGWMSettings} */
   static initializeSettings() {
     let settings;
 
-    settings = new SGWM.FixationProcessorSettings();
+    settings = new window.SGWM.FixationProcessorSettings();
     _SGWM.FixationProcessorSettings = settings;
     if ( !settings.isInitialized ) {
       settings.location.enabled = true;
@@ -26,7 +36,7 @@ export default class sgwmController {
       settings.save();
     }
 
-    settings = new SGWM.SplitToProgressionsSettings();
+    settings = new window.SGWM.SplitToProgressionsSettings();
     _SGWM.SplitToProgressionsSettings = settings;
     if ( !settings.isInitialized ) {
       settings.bounds = { // in size of char height
@@ -39,7 +49,7 @@ export default class sgwmController {
       settings.save();
     }
 
-    settings = new SGWM.ProgressionMergerSettings();
+    settings = new window.SGWM.ProgressionMergerSettings();
     _SGWM.ProgressionMergerSettings = settings;
     if ( !settings.isInitialized ) {
       settings.minLongSetLength = 3;
@@ -53,7 +63,7 @@ export default class sgwmController {
       settings.save();
     }
 
-    settings = new SGWM.WordMapperSettings();
+    settings = new window.SGWM.WordMapperSettings();
     _SGWM.WordMapperSettings = settings;
     if ( !settings.isInitialized ) {
       settings.wordCharSkipStart = 3;
@@ -69,6 +79,7 @@ export default class sgwmController {
     return _SGWM;
   }
 
+  /** @returns {object} */
   static createOptions() {
     return {
       id: '_sgwm',
@@ -141,9 +152,7 @@ export default class sgwmController {
     }
   }
 
-  /**
-   * @returns {object}
-   */
+  /** @returns {object} */
   static get settings() {
     return _SGWM;
   }
@@ -166,7 +175,7 @@ export default class sgwmController {
       } ),
     };
 
-    const sgwm = new SGWM();
+    const sgwm = new window.SGWM();
     const result = sgwm.map( sgwmSession );
 
     return result;

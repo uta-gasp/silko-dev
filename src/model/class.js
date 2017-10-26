@@ -1,4 +1,5 @@
 import Recordable from './commons/recordable.js';
+import { TaskCreateParams } from './commons/createParams.js';
 
 import Task from './task.js';
 import Student from './student.js';
@@ -7,26 +8,50 @@ import db from '@/db/db.js';
 
 export default class Class {
 
-  constructor( id, name, owner ) {
+  /**
+   * @param {string} [id]
+   */
+  constructor( id ) {
+    /** @type {string} ID */
     this.id = id;
-    this.name = name;
-    this.owner = owner;
-    this.tasks = {};        // id: name
-    this.students = {};     // id: name
+    /** @type {string} */
+    this.name = '';
+    /** @type {string} teacher ID */
+    this.owner = '';
+    /** @type {object} {ID: name} */
+    this.tasks = {};
+    /** @type {object} {ID: name} */
+    this.students = {};
   }
 
+  /** @returns {string} */
   static get db() {
     return 'classes';
   }
 
+  /**
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   static list( cb ) {
     return db.getAll( Class, cb );
   }
 
+  /**
+   * @param {string} id
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   static get( id, cb ) {
     return db.get( Class, id, cb );
   }
 
+  /**
+   * @param {TaskCreateParams} task 
+   * @param {string} type 
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   createTask( task, type, cb ) {
     task.syllab.exceptions = Task.textToSyllabs( task.syllabExceptions );
 
@@ -45,7 +70,7 @@ export default class Class {
 
     Task.embedImagesIntoPages( taskObj.pages, task.images );
 
-    db.add( Task, taskObj, ( err, id ) => {
+    return db.add( Task, taskObj, ( err, id ) => {
       if ( err ) {
         return cb( err );
       }
@@ -61,10 +86,18 @@ export default class Class {
     } );
   }
 
+  /**
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   getTasks( cb ) {
-    db.getFromIDs( Task, this.tasks, cb );
+    return db.getFromIDs( Task, this.tasks, cb );
   }
 
+  /**
+   * @param {Task} task 
+   * @param {Callback} cb 
+   */
   deleteTask( task, cb ) {
     delete this.tasks[ task.id ];
     db.deleteField( this, `tasks/${task.id}`, cb );
@@ -109,14 +142,23 @@ export default class Class {
     } );
   }
 
+  /**
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   getStudents( cb ) {
-    db.getFromIDs( Student, this.students, cb );
+    return db.getFromIDs( Student, this.students, cb );
   }
 
+  /**
+   * @param {object} newStudents 
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   addStudents( newStudents, cb ) {
     const joinedStudents = { ...this.students, ...newStudents };
 
-    db.updateField( this, 'students', joinedStudents, err => {
+    return db.updateField( this, 'students', joinedStudents, err => {
       if ( !err ) {
         this.students = joinedStudents;
 
@@ -139,11 +181,16 @@ export default class Class {
     } );
   }
 
+  /**
+   * @param {Student} student 
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   removeStudent( student, cb ) {
     delete this.students[ student.id ];
     db.deleteField( this, `students/${student.id}`, cb );
 
-    db.get( Student, student.id, ( err, _ /* studnet */ ) => {
+    return db.get( Student, student.id, ( err, _ /* student */ ) => {
       if ( err ) {
         return console.error( err );
       }

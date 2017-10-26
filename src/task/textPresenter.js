@@ -1,3 +1,5 @@
+import TextPage from '@/model/task/textPage.js';
+
 // ts-check-only
 import ModelTask from '@/model/task.js';
 import Syllabifier from '@/task/syllabifier.js';
@@ -36,90 +38,84 @@ export default class TextPresenter {
    * @param {Syllabifier} syllabifier 
    */
   constructor( task, firstPage, container, syllabifier ) {
-    this.container = container;
-    this.syllabifier = syllabifier;
+    /** @type {HTMLElement} */
+    this._container = container;
+    /** @type {Syllabifier} */
+    this._syllabifier = syllabifier;
 
-    this.pages = task.pages;
-    this.alignment = task.alignment;
-    this.hasInstructionPage = !!( firstPage && firstPage.length );
+    /** @type {TextPage[]} */
+    this._pages = task.pages;
+    /** @type {boolean} */
+    this._hasInstructionPage = !!( firstPage && firstPage.length );
 
-    if ( this.hasInstructionPage ) {
-      this.pages.unshift( firstPage );
+    if ( this._hasInstructionPage ) {
+      const textPage = new TextPage( -1 );
+      textPage.lines = firstPage;
+      this._pages.unshift( textPage );
     }
 
     if ( task.alignment === 'left' ) {
-      this.container.classList.add( 'alignLeft' );
+      this._container.classList.add( 'alignLeft' );
     }
 
-    this.pageIndex = -1;
+    /** @type {number} */
+    this._pageIndex = -1;
   }
 
-  /**
-   * @returns {number}
-   */
+  /** @returns {number} */
   get page() {
-    return this.pageIndex;
+    return this._pageIndex;
   }
 
-  /**
-   * @returns {number}
-   */
+  /** @returns {number} */
   get originalPageIndex() {
-    return this.hasInstructionPage ? this.pageIndex - 1 : this.pageIndex;
+    return this._hasInstructionPage ? this._pageIndex - 1 : this._pageIndex;
   }
 
-  /**
-   * @returns {boolean}
-   */
+  /** @returns {boolean} */
   get isInstructionPage() {
-    return this.pageIndex === 0 && this.hasInstructionPage;
+    return this._pageIndex === 0 && this._hasInstructionPage;
   }
 
-  /**
-   * @returns {boolean}
-   */
+  /** @returns {boolean} */
   get hasNextPage() {
-    return ( this.pageIndex + 1 ) < this.pages.length;
+    return ( this._pageIndex + 1 ) < this._pages.length;
   }
 
-  /**
-   * @returns {boolean}
-   */
+  /** @returns {boolean} */
   get hasPrevPage() {
-    return ( this.pageIndex - 1 ) >= 0;
+    return ( this._pageIndex - 1 ) >= 0;
   }
 
   nextPage() {
-    const newPageIndex = this.pageIndex + 1;
-    if ( newPageIndex >= this.pages.length ) {
+    const newPageIndex = this._pageIndex + 1;
+    if ( newPageIndex >= this._pages.length ) {
       return;
     }
 
-    this.pageIndex = newPageIndex;
+    this._pageIndex = newPageIndex;
 
-    this._createLines( this.container );
+    this._createLines( this._container );
   }
 
   prevPage() {
-    const newPageIndex = this.pageIndex - 1;
+    const newPageIndex = this._pageIndex - 1;
     if ( newPageIndex < 0 ) {
       return;
     }
 
-    this.pageIndex = newPageIndex;
+    this._pageIndex = newPageIndex;
 
-    this._createLines( this.container );
+    this._createLines( this._container );
   }
 
-  /**
-   * @returns {Map}
-   */
+  /** @returns {Map} */
   get words() {
     const result = new Map();
 
     const els = document.querySelectorAll( '.' + WORD_CLASS );
     Array.from( els ).forEach( el => {
-      result.set( el, this.syllabifier.unprepare( el.textContent ) );
+      result.set( el, this._syllabifier.unprepare( el.textContent ) );
     } );
 
     return result;
@@ -133,8 +129,8 @@ export default class TextPresenter {
   _createLines( el ) {
     el.innerHTML = '';
 
-    const page = this.pages[ this.pageIndex ];
-    const lines = page.lines || page;   // backward compatibility with format where Task.pages=[[String]]
+    const page = this._pages[ this._pageIndex ];
+    const lines = page.lines; // || page;   // backward compatibility with format where Task.pages=[[String]]
 
     lines.forEach( line => {
       el.appendChild( this._lineToElement( line ) );
@@ -216,7 +212,7 @@ export default class TextPresenter {
     const re = /[^\s]+/gi;
 
     const nodeIterator = document.createNodeIterator(
-      this.container,
+      this._container,
       window.NodeFilter.SHOW_TEXT,
       { acceptNode: node => {
         if ( !/^\s*$/.test( node.nodeValue ) ) {
@@ -241,7 +237,7 @@ export default class TextPresenter {
           docFrag.appendChild( space );
         }
 
-        const wordText = this.syllabifier.prepareWord( word[ 0 ] );
+        const wordText = this._syllabifier.prepareWord( word[ 0 ] );
 
         const span = document.createElement( 'span' );
         span.classList.add( WORD_CLASS );

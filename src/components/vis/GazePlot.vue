@@ -107,6 +107,7 @@ export default {
       this.painter.drawWords( wordsWithGazingInfo, Object.assign( {
         colorMetric: UI.colorMetric,
         showConnections: UI.showConnections,
+        hyphen: this.defaultFeedback.syllabification.hyphen,
       }, this.commonUI ) );
 
       if ( page.syllabifications ) {

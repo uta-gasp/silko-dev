@@ -15,13 +15,16 @@ export default class Class {
    * @param {Task[]} tasks 
    */
   constructor( ref, tasks ) {
-    this.ref = ref;     // model/Class
-    this.tasks = tasks; // [ ./Task ]
-    this.students = null; // [ ./Student ]
+    /** @type {ModelClass} */
+    this.ref = ref;
+    /** @type {Task[]} */
+    this.tasks = tasks;
+    /** @type {Student[]} */
+    this.students = null;
   }
 
   /**
-   * @param {function} cb 
+   * @param {Callback} cb 
    */
   loadStudents( cb ) {
     this.ref.getStudents( ( err, students ) => {
@@ -40,7 +43,7 @@ export default class Class {
 
   /**
    * @param {ModelStudent} student 
-   * @param {function} cb 
+   * @param {Callback} cb 
    */
   _loadStudentSessions( student, cb ) {
     student.getSessions( ( err, sessions ) => {

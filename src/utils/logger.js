@@ -14,14 +14,18 @@ class Logger {
    * @param {string} name 
    */
   constructor( name ) {
-    this.name = name;
+    /** @type {boolean} */
     this.enabled = true;
-    this.format = [
+
+    /** @type {string} */
+    this._name = name;
+    /** @type {string} */
+    this._css = [
       `background: hsl( ${random( 360, 10 )}, ${random( 100, 20 )}%, ${random( 100, 20 )}% )`,
       'display: inline-block',
     ].join( ';' );
 
-    this.info( `${this.name}: __module_created___` );
+    this.info( `${this._name}: __module_created___` );
   }
 
   /**
@@ -30,7 +34,7 @@ class Logger {
   info( ...args ) {
     if ( this.enabled ) {
       const _args = this._stringify( args );
-      console.info( `%c  `, this.format, this._format( _args ) );
+      console.info( `%c  `, this._css, this._format( _args ) );
     }
   }
 
@@ -40,7 +44,7 @@ class Logger {
   ok( ...args ) {
     if ( this.enabled ) {
       const _args = this._stringify( args );
-      console.log( `%c  `, this.format, this._format( _args ) );
+      console.log( `%c  `, this._css, this._format( _args ) );
     }
   }
 
@@ -50,7 +54,7 @@ class Logger {
   error( ...args ) {
     if ( this.enabled ) {
       const _args = this._stringify( args );
-      console.error( `%c  `, this.format, this._format( _args ) );
+      console.error( `%c  `, this._css, this._format( _args ) );
     }
   }
 
@@ -66,7 +70,7 @@ class Logger {
    * @param {string} args 
    */
   _format( args ) {
-    return `${this.name}: ${args}`;
+    return `${this._name}: ${args}`;
   }
 
 }

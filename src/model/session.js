@@ -1,19 +1,37 @@
 import Recordable from './commons/recordable.js';
 
+// ts-check-only
+import Font from './session/font.js';
+import { Feedbacks } from './session/feedbacks.js';
+import ScreenSize from './session/screenSize.js';
+
 export default class Session {
 
+  /**
+   * @param {string} [id]
+   */
   constructor( id ) {
+    /** @type {string} ID */
     this.id = id;
+    /** @type {string} */
     this.date = ( new Date() ).toJSON();
-    this.student = '';          // id
-    this.cls = '';              // id
-    this.task = '';             // id
-    this.font = null;           // Font
-    this.feedbacks = null;      // Feedbacks
-    this.screen = null;         // ScreenSize
-    this.data = '';             // id
+    /** @type {string} ID */
+    this.student = '';
+    /** @type {string} ID */
+    this.cls = '';
+    /** @type {string} ID */
+    this.task = '';
+    /** @type {Font} */
+    this.font = null;
+    /** @type {Feedbacks} */
+    this.feedbacks = null;
+    /** @type {ScreenSize} */
+    this.screen = null;
+    /** @type {string} ID */
+    this.data = '';
   }
 
+  /** @returns {string} */
   static get db() {
     return 'sessions';
   }

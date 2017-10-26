@@ -1,6 +1,10 @@
 // ts-check-only
 import Session from './session.js';
+import Task from './task.js';
+import ModelClass from '@/model/class.js';
 import ModelData from '@/model/data.js';
+import ModelStudent from '@/model/student.js';
+import ModelSession from '@/model/session.js';
 
 export default class Record {
 
@@ -9,11 +13,16 @@ export default class Record {
    * @param {ModelData[]} data 
    */
   constructor( session, data ) {
-    this.student = session.student;     // model/Student
-    this.session = session.ref;         // model/Session
-    this.task = session.task;           // ./Task
-    this.cls = session.cls;             // ./Class
-    this.data = data.find( item => item.id === session.ref.data );  // model/Data
+    /** @type {ModelStudent} */
+    this.student = session.student;
+    /** @type {ModelSession} */
+    this.session = session.ref;
+    /** @type {Task} */
+    this.task = session.task;
+    /** @type {ModelClass} */
+    this.cls = session.cls;
+    /** @type {ModelData} */
+    this.data = data.find( item => item.id === session.ref.data );
   }
 
 };

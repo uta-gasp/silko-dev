@@ -1,57 +1,72 @@
 import Recordable from './commons/recordable.js';
 import TextPage from './task/textPage.js';
 import { TextPageImage } from './task/textPageImage.js';
+import { Threshold, SyllabOptions, SpeechOptions } from './session/feedbacks.js';
 
 import Intro from './intro.js';
 
 import db from '@/db/db.js';
 
-class Threshold {
-
-  constructor( value, smart, min, max, adjustForWordLength ) {
-    this.value = value;
-    this.smart = smart;
-    this.min = min;
-    this.max = max;
-    this.adjustForWordLength = adjustForWordLength;
-  }
-
-};
+// ts-check-only
+import Question from './session/question.js';
 
 export default class Task {
 
+  /**
+   * @param {string} [id]
+   */
   constructor( id ) {
+    /** @type {string} ID */
     this.id = id;
+    /** @type {string} */
     this.name = '';
+    /** @type {string} teacher ID */
     this.owner = '';
+    /** @type {string} ID */
     this.cls = '';
+    /** @type {string} 'text' */
     this.type = '';
+    /** @type {string} 'left' | 'right' */
     this.alignment = '';
+    /** @type {string} ID */
     this.intro = '';
-    this.pages = [];      // [TextPage]
+    /** @type {TextPage[]} */
+    this.pages = [];
+    /** @type {SyllabOptions} */
     this.syllab = Task.defaultSyllab;
+    /** @type {SpeechOptions} */
     this.speech = Task.defaultSpeech;
+    /** @type {Question[]} */
     this.questionnaire = [];
   }
 
+  /** @return {string} */
   static get db() {
     return 'tasks';
   }
 
+  /**
+   * @param {string} id 
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   static get( id, cb ) {
     return db.get( Task, id, cb );
   }
 
+  /** @returns {string} */
   static get wordSyllabSeparator() {
     return '=';
   }
 
+  /** @returns {string} */
   static get syllabSeparator() {
     return ' ';
   }
 
+  /** @returns {SyllabOptions} */
   static get defaultSyllab() {
-    return  {
+    return {
       language: '',
       exceptions: {},
       mode: 'colors',
@@ -60,6 +75,7 @@ export default class Task {
     };
   }
 
+  /** @returns {SpeechOptions} */
   static get defaultSpeech() {
     return {
       language: '',
@@ -67,6 +83,10 @@ export default class Task {
     };
   }
 
+  /**
+   * @param {string} text 
+   * @returns {TextPage[]}
+   */
   static textToPages( text ) {
     if ( !text ) {
       return [];
@@ -99,13 +119,21 @@ export default class Task {
     return pages;
   }
 
+  /**
+   * @param {TextPage[]} pages 
+   * @returns {string}
+   */
   static pagesToText( pages ) {
     return pages.map( page => {
-      const lines = page.lines || page;   // backward compatibility with format where Task.pages=[[String]]
+      const lines = page.lines; // || page;   // backward compatibility with format where Task.pages=[[String]]
       return lines.join( '\n' );
     } ).join( '\n\n' );
   }
 
+  /**
+   * @param {string} text 
+   * @returns {object} - 'original word' - 'syllabified word' pairs
+   */
   static textToSyllabs( text ) {
     if ( !text ) {
       return {};
@@ -135,6 +163,10 @@ export default class Task {
     return result;
   }
 
+  /**
+   * @param {object} syllabs 
+   * @returns {string}
+   */
   static syllabsToText( syllabs ) {
     const result = [];
     for ( let word in syllabs ) {
@@ -143,8 +175,11 @@ export default class Task {
     return result.join( '\n' );
   }
 
-  // pages: [model/task/TextPage]
-  // images: [model/task/TextPageImage || {src, page, location, on: TextPageImageEvent, off: TextPageImageEvent}]
+  /**
+   * 
+   * @param {TextPage[]} pages 
+   * @param {TextPageImage[]} images 
+   */
   static embedImagesIntoPages( pages, images ) {
     if ( !images ) {
       return;
@@ -171,6 +206,17 @@ export default class Task {
     } );
   }
 
+  /**
+   * @typedef TaskSource
+   * @implements {Task}
+   * @property {string} text
+   * @property {TextPageImage[]} images
+   */
+  /**
+   * @param {TaskSource} task 
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   update( task, cb ) {
     const _task = {
       alignment: task.alignment,
@@ -185,28 +231,48 @@ export default class Task {
 
     _task.syllab.exceptions = Task.textToSyllabs( task.syllab.exceptions );
 
-    db.updateFields( this, _task, cb );
+    return db.updateFields( this, _task, cb );
   }
 
+  /**
+   * @param {Callback} cb 
+   * @returns 
+   */
   getIntro( cb ) {
     if ( this.intro ) {
       return db.get( Intro, this.intro, cb );
     }
     else {
-      cb();
+      Promise.resolve( cb() );
     }
   }
 
+  /**
+   * 
+   * @param {File} file 
+   * @param {object} meta 
+   * @param {function} progressHandler 
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   static uploadImage( file, meta, progressHandler, cb ) {
-    const prefix = TextPageImage.getPrefix();
-    db.uploadFile( file, prefix, meta, progressHandler, cb );
+    const prefix = TextPageImage.generatePrefix();
+    return db.uploadFile( file, prefix, meta, progressHandler, cb );
   }
 
-  // @image: TaskPageImage
+  /**
+   * @param {TextPageImage} image 
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   static deleteImage( image, cb ) {
-    db.deleteFile( image.src, cb );
+    return db.deleteFile( image.src, cb );
   }
 
+  /**
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   deleteAllImages( cb ) {
     const promises = [];
 
@@ -216,7 +282,7 @@ export default class Task {
       } );
     } );
 
-    Promise.all( promises ).then( _ => {
+    return Promise.all( promises ).then( _ => {
       cb();
     } );
   }

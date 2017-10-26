@@ -17,13 +17,17 @@ import DataPageTextWord from '@/model/data/dataPageTextWord';
  * @property {Word} word
  */
 
+const DONE = 'done';
+
 export class ReplayWord {
 
   /**
    * @param {DataPageTextWord} ref 
    */
   constructor( ref ) {
+    /** @type {string} */
     this.id = ref.id;
+    /** @type {number} */
     this.totalDuration = 0;
   }
 
@@ -38,26 +42,79 @@ export class WordTrack {
    * @param {number} id 
    */
   constructor( root, userName, session, id ) {
-    this.root = root;
-    this.name = userName;
-    this.id = id;
+    /** @type {HTMLElement} */
+    this._root = root;
+    /** @type {string} */
+    this._name = userName;
+    /** @type {number} */
+    this._id = id;
 
-    this.doneMessage = 'done';
-    this.pointerSize = 8;
-    this.fixationTimer = null;
-    this.nextTimer = null;
+    /** @type {number} */
+    this._pointerSize = 8;
+    /** @type {HTMLElement} */
+    this._pointer = null;
 
-    this.session = session;
-    this.fixations = null;
-    this.words = null;
+    /** @type {NodeJS.Timer} */
+    this._fixationTimer = null;
+    /** @type {number} */
+    this._nextTimer = null;
 
-    this.fixationIndex = -1;
+    /** @type {DataPage[]} */
+    this._session = session;
+    /** @type {Fixation[]} */
+    this._fixations = null;
+    /** @type {ReplayWord[]} */
+    this._words = null;
 
-    this.onWordFixated = null;
-    this.onCompleted = null;
-    this.pointer = null;
+    /** @type {number} */
+    this._fixationIndex = -1;
+
+    /** @type {function} */
+    this._onWordFixated = null;
+    /** @type {function} */
+    this._onCompleted = null;
 
     this.__next = this._next.bind( this );
+  }
+
+  /** @returns {string} */
+  get name() {
+    return this._name;
+  }
+
+  /** @returns {number} */
+  get id() {
+    return this._id;
+  }
+
+  /** @returns {string} */
+  get doneMessage() {
+    return DONE;
+  }
+
+  /** @returns {number} */
+  get pointerSize() {
+    return this._pointerSize;
+  }
+
+  /** @returns {HTMLElement} */
+  get pointer() {
+    return this._pointer;
+  }
+
+  /** @returns {DataPage[]} */
+  get session() {
+    return this._session;
+  }
+
+  /** @returns {ReplayWord[]} */
+  get words() {
+    return this._words;
+  }
+
+  /** @returns {boolean} */
+  get hasData() {
+    return !!this._fixations;
   }
 
   /**
@@ -67,66 +124,64 @@ export class WordTrack {
    * @param {function} onCompleted 
    */
   start( fixations, words, onWordFixated, onCompleted ) {
-    this.onWordFixated = onWordFixated;
-    this.onCompleted = onCompleted;
+    this._onWordFixated = onWordFixated;
+    this._onCompleted = onCompleted;
 
-    this.fixations = fixations;
-    this.words = words.map( word => new ReplayWord( word ) );
+    this._fixations = fixations;
+    this._words = words.map( word => new ReplayWord( word ) );
 
-    this.words.forEach( word => {
+    this._words.forEach( word => {
       word.totalDuration = 0;
     } );
 
-    this.fixationIndex = 0;
+    this._fixationIndex = 0;
 
     if ( !fixations ) {
-      this.doneMessage = 'no data';
+      this._doneMessage = 'no data';
       onCompleted( 'no data' );
       return;
     }
 
-    this.pointer = document.createElement( 'div' );
-    this.pointer.classList.add( 'pointer' );
-    this.pointer.classList.add( 'invisible' );
-    this.root.appendChild( this.pointer );
+    this._pointer = document.createElement( 'div' );
+    this._pointer.classList.add( 'pointer' );
+    this._pointer.classList.add( 'invisible' );
+    this._root.appendChild( this._pointer );
 
-    this.nextTimer = setTimeout( this.__next, 1500 );
+    this._nextTimer = setTimeout( this.__next, 1500 );
   }
 
   stop() {
-    if ( this.nextTimer ) {
-      clearTimeout( this.nextTimer );
-      this.nextTimer = null;
+    if ( this._nextTimer ) {
+      clearTimeout( this._nextTimer );
+      this._nextTimer = null;
     }
 
-    if ( this.fixationTimer ) {
-      clearTimeout( this.fixationTimer );
-      this.fixationTimer = null;
+    if ( this._fixationTimer ) {
+      clearTimeout( this._fixationTimer );
+      this._fixationTimer = null;
     }
 
-    if ( this.pointer ) {
-      this.root.removeChild( this.pointer );
-      this.pointer = null;
+    if ( this._pointer ) {
+      this._root.removeChild( this._pointer );
+      this._pointer = null;
     }
   }
 
-  /**
-   * @returns {boolean}
-   */
+  /** @returns {boolean} */
   togglePause() {
-    if ( !this.pointer ) {
+    if ( !this._pointer ) {
       return false;
     }
 
-    if ( this.nextTimer ) {
-      clearTimeout( this.nextTimer );
-      this.nextTimer = null;
+    if ( this._nextTimer ) {
+      clearTimeout( this._nextTimer );
+      this._nextTimer = null;
 
       return true;
     }
     else {
-      this.nextTimer = setTimeout( this.__next, 500 );
-      // this._moveFixation( this.currentFixation );
+      this._nextTimer = setTimeout( this.__next, 500 );
+      // this._moveFixation( this._currentFixation );
 
       return false;
     }
@@ -135,48 +190,47 @@ export class WordTrack {
   // Private
 
   _next() {
-    const fixation = this.fixations[ this.fixationIndex ];
+    const fixation = this._fixations[ this._fixationIndex ];
 
     this._moveFixation( fixation.word, fixation.duration );
 
-    this.fixationIndex++;
-    if ( this.fixationIndex < this.fixations.length ) {
-      let pause = this.fixations[ this.fixationIndex ].ts - fixation.ts;
-      this.nextTimer = setTimeout( this.__next, pause );
+    this._fixationIndex++;
+    if ( this._fixationIndex < this._fixations.length ) {
+      let pause = this._fixations[ this._fixationIndex ].ts - fixation.ts;
+      this._nextTimer = setTimeout( this.__next, pause );
     }
     else {
-      this.onCompleted();
-      this.root.removeChild( this.pointer );
-      this.pointer = null;
-      this.nextTimer = null;
+      this._onCompleted();
+      this._root.removeChild( this._pointer );
+      this._pointer = null;
+      this._nextTimer = null;
     }
   };
 
   /**
-   * 
    * @param {Word} word 
    * @param {number} duration 
    */
   _moveFixation( word, duration ) {
-    if ( this.fixationTimer ) {
-      clearTimeout( this.fixationTimer );
-      this.fixationTimer = null;
+    if ( this._fixationTimer ) {
+      clearTimeout( this._fixationTimer );
+      this._fixationTimer = null;
     }
 
     if ( word ) {
-      this.onWordFixated( word, duration, this.pointer );
+      this._onWordFixated( word, duration, this._pointer );
 
-      this.pointer.classList.remove( 'invisible' );
+      this._pointer.classList.remove( 'invisible' );
 
-      this.fixationTimer = setTimeout( () => {
-        this.fixationTimer = null;
-        if ( this.pointer ) {
-          this.pointer.classList.add( 'invisible' );
+      this._fixationTimer = setTimeout( () => {
+        this._fixationTimer = null;
+        if ( this._pointer ) {
+          this._pointer.classList.add( 'invisible' );
         }
       }, duration );
     }
     else {
-      this.pointer.classList.add( 'invisible' );
+      this._pointer.classList.add( 'invisible' );
     }
   };
 

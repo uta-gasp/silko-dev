@@ -2,11 +2,20 @@ import Colors from '@/vis/colors.js';
 
 // ts-check-only
 import DataPage from '@/model/data/dataPage';
+import FeedbackEvent from '@/model/data/feedbackEvent';
+import Fixation from '@/model/data/fixation';
 
 /**
  * @typedef {Object} Point
  * @property {number} x
  * @property {number} y
+ */
+
+/**
+ * @typedef {Object} Callbacks
+ * @property {function} [fixation]
+ * @property {function} [completed]
+ * @property {function} [syllabification]
  */
 
 let colorIndex = 0;
@@ -22,88 +31,122 @@ export default class ReplayTrack {
    * @param {Point} offset 
    */
   constructor( root, userName, session, offset ) {
-    this.root = root;
-    this.name = userName;
-    this.session = session;
-    this.offset = offset;
-    this.color = Colors.colors[ colorIndex++ % Colors.colors.length ];
+    /** @type {HTMLElement} */
+    this._root = root;
+    /** @type {string} */
+    this._name = userName;
+    /** @type {DataPage[]} */
+    this._session = session;
+    /** @type {Point} */
+    this._offset = offset;
+    /** @type {string} */
+    this._color = Colors.colors[ colorIndex++ % Colors.colors.length ];
 
-    this.pointerSize = 8;
-    this.fixationEndTimer = null;
-    this.fixationGrowTimer = null;
-    this.nextTimer = null;
-    this.syllabTimer = null;
+    /** @type {number} */
+    this._pointerSize = 8;
+    /** @type {number} */
+    this._fixationEndTimer = null;
+    /** @type {NodeJS.Timer} */
+    this._fixationGrowTimer = null;
+    /** @type {number} */
+    this._nextTimer = null;
+    /** @type {NodeJS.Timer} */
+    this._syllabTimer = null;
 
-    this.fixations = null;
-    this.currentFixation = null;
-    this.currentDuration = 0;
-    this.fixationIndex = -1;
+    /** @type {Fixation[]} */
+    this._fixations = null;
+    /** @type {Fixation} */
+    this._currentFixation = null;
+    /** @type {number} */
+    this._currentDuration = 0;
+    /** @type {number} */
+    this._fixationIndex = -1;
 
-    this.callbacks = {};
-    this.syllabifications = null;
-    this.nextSyllabificationIndex = 0;
-    this.pointer = null;
+    /** @type {object} */
+    this._callbacks = {};
+    /** @type {FeedbackEvent[]} */
+    this._syllabifications = null;
+    /** @type {number} */
+    this._nextSyllabificationIndex = 0;
+    /** @type {HTMLElement} */
+    this._pointer = null;
 
+    /** @type {number} */
     this._lastPause = 0;
 
     this.__next = this._next.bind( this );
   }
 
-  start( pageIndex, callbacks ) {
-    this.callbacks = callbacks || {};
-    this.callbacks.fixation = this.callbacks.fixation || ( () => {} );
-    this.callbacks.completed = this.callbacks.completed || ( () => {} );
-    this.callbacks.syllabification = this.callbacks.syllabification || ( () => {} );
+  /** @return {string} */
+  get name() {
+    return this._name;
+  }
 
-    this.fixations = this.session[ pageIndex ].fixations;
-    if ( !this.fixations ) {
-      this.callbacks.completed( 'no data' );
+  /** @return {string} */
+  get color() {
+    return this._color;
+  }
+
+  /**
+   * @param {number} pageIndex 
+   * @param {Callbacks} callbacks 
+   */
+  start( pageIndex, callbacks ) {
+    this._callbacks = callbacks || {};
+    this._callbacks.fixation = this._callbacks.fixation || ( () => {} );
+    this._callbacks.completed = this._callbacks.completed || ( () => {} );
+    this._callbacks.syllabification = this._callbacks.syllabification || ( () => {} );
+
+    this._fixations = this._session[ pageIndex ].fixations;
+    if ( !this._fixations ) {
+      this._callbacks.completed( 'no data' );
       return;
     }
 
-    this.syllabifications = this.session[ pageIndex ].syllabifications;
-    this.nextSyllabificationIndex = this.syllabifications ? 0 : -1;
+    this._syllabifications = this._session[ pageIndex ].syllabifications;
+    this._nextSyllabificationIndex = this._syllabifications ? 0 : -1;
 
-    this.fixationIndex = 0;
+    this._fixationIndex = 0;
 
-    this.pointer = document.createElement( 'div' );
-    this.pointer.classList.add( 'track-pointer' );
-    this.pointer.classList.add( 'invisible' );
-    this.root.appendChild( this.pointer );
+    this._pointer = document.createElement( 'div' );
+    this._pointer.classList.add( 'track-pointer' );
+    this._pointer.classList.add( 'invisible' );
+    this._root.appendChild( this._pointer );
 
-    this.nextTimer = setTimeout( this.__next, 1500 );
+    this._nextTimer = setTimeout( this.__next, 1500 );
   };
 
   stop() {
     this._stopFixationTimers();
 
-    if ( this.nextTimer ) {
-      clearTimeout( this.nextTimer );
-      this.nextTimer = null;
+    if ( this._nextTimer ) {
+      clearTimeout( this._nextTimer );
+      this._nextTimer = null;
     }
 
-    if ( this.pointer ) {
-      this.root.removeChild( this.pointer );
-      this.pointer = null;
+    if ( this._pointer ) {
+      this._root.removeChild( this._pointer );
+      this._pointer = null;
     }
   };
 
+  /** @returns {boolean} - 'true' if paused */
   togglePause() {
-    if ( !this.pointer ) {
+    if ( !this._pointer ) {
       return false;
     }
 
-    if ( this.nextTimer ) {
+    if ( this._nextTimer ) {
       this._stopFixationTimers();
 
-      clearTimeout( this.nextTimer );
-      this.nextTimer = null;
+      clearTimeout( this._nextTimer );
+      this._nextTimer = null;
 
       return true;
     }
     else {
-      this.nextTimer = setTimeout( this.__next, this._lastPause );
-      this._moveFixation( this.currentFixation );
+      this._nextTimer = setTimeout( this.__next, this._lastPause );
+      this._moveFixation( this._currentFixation );
 
       return false;
     }
@@ -116,106 +159,109 @@ export default class ReplayTrack {
   // private
 
   _stopFixationTimers() {
-    if ( this.fixationEndTimer ) {
-      clearTimeout( this.fixationEndTimer );
-      this.fixationEndTimer = null;
+    if ( this._fixationEndTimer ) {
+      clearTimeout( this._fixationEndTimer );
+      this._fixationEndTimer = null;
     }
 
-    if ( this.fixationGrowTimer ) {
-      clearInterval( this.fixationGrowTimer );
-      this.fixationGrowTimer = null;
+    if ( this._fixationGrowTimer ) {
+      clearInterval( this._fixationGrowTimer );
+      this._fixationGrowTimer = null;
     }
 
-    if ( this.syllabTimer ) {
-      clearTimeout( this.syllabTimer );
-      this.syllabTimer = null;
+    if ( this._syllabTimer ) {
+      clearTimeout( this._syllabTimer );
+      this._syllabTimer = null;
     }
   };
 
   _next() {
-    let fixation = this.fixations[ this.fixationIndex ];
+    let fixation = this._fixations[ this._fixationIndex ];
 
     this._moveFixation( fixation );
 
-    this.fixationIndex++;
-    if ( this.fixationIndex < this.fixations.length ) {
-      this._lastPause = this.fixations[ this.fixationIndex ].ts - fixation.ts;
-      this.nextTimer = setTimeout( this.__next, this._lastPause );
+    this._fixationIndex++;
+    if ( this._fixationIndex < this._fixations.length ) {
+      this._lastPause = this._fixations[ this._fixationIndex ].ts - fixation.ts;
+      this._nextTimer = setTimeout( this.__next, this._lastPause );
     }
     else {
-      this.callbacks.completed();
-      this.root.removeChild( this.pointer );
-      this.pointer = null;
-      this.nextTimer = null;
+      this._callbacks.completed();
+      this._root.removeChild( this._pointer );
+      this._pointer = null;
+      this._nextTimer = null;
     }
   };
 
+  /**
+   * @param {Fixation} fixation 
+   */
   _moveFixation( fixation ) {
     this._stopFixationTimers();
 
     if ( fixation ) {
       this._checkSyllabification( fixation );
 
-      this.callbacks.fixation( fixation, this.pointer );
+      this._callbacks.fixation( fixation, this._pointer );
 
       if ( fixation.x > 0 && fixation.y > 0 ) {
-        this.currentDuration = 100;
+        this._currentDuration = 100;
         this._updatePointer();
-        this.pointer.classList.remove( 'invisible' );
+        this._pointer.classList.remove( 'invisible' );
       }
 
-      this.fixationEndTimer = setTimeout( () => {
+      this._fixationEndTimer = setTimeout( () => {
         this._stopFixationTimers();
-        if ( this.pointer ) {
-          this.pointer.classList.add( 'invisible' );
+        if ( this._pointer ) {
+          this._pointer.classList.add( 'invisible' );
         }
       }, fixation.duration );
 
-      this.fixationGrowTimer = setInterval( () => {
+      this._fixationGrowTimer = setInterval( () => {
         this._updatePointer();
       }, FIXATION_GROW_INTERVAL );
     }
     else {
-      this.pointer.classList.add( 'invisible' );
+      this._pointer.classList.add( 'invisible' );
     }
 
-    this.currentFixation = fixation;
+    this._currentFixation = fixation;
   };
 
   _updatePointer() {
-    if ( !this.currentFixation || !this.pointer ) {
+    if ( !this._currentFixation || !this._pointer ) {
       return;
     }
 
-    const size = Math.round( Math.sqrt( this.currentDuration ) );
-    this.pointer.setAttribute( 'style', `
-      left: ${this.currentFixation.x + this.offset.x - size / 2}px;
-      top: ${this.currentFixation.y + this.offset.y - size / 2}px;
+    const size = Math.round( Math.sqrt( this._currentDuration ) );
+    this._pointer.setAttribute( 'style', `
+      left: ${this._currentFixation.x + this._offset.x - size / 2}px;
+      top: ${this._currentFixation.y + this._offset.y - size / 2}px;
       width: ${size}px;
       height: ${size}px;
       border-radius: ${size / 2}px;
-      background-color: ${this.color};`
+      background-color: ${this._color};`
     );
 
-    this.currentDuration += FIXATION_GROW_INTERVAL;
+    this._currentDuration += FIXATION_GROW_INTERVAL;
   };
 
   _checkSyllabification( fixation ) {
-    if ( this.nextSyllabificationIndex < 0 ) {
+    if ( this._nextSyllabificationIndex < 0 ) {
       return;
     }
 
-    const syllabification = this.syllabifications[ this.nextSyllabificationIndex ];
+    const syllabification = this._syllabifications[ this._nextSyllabificationIndex ];
     const fixationEndsAt = fixation.tsSync + fixation.duration;
     if ( syllabification.ts < fixationEndsAt ) {
-      this.nextSyllabificationIndex++;
-      if ( this.nextSyllabificationIndex === this.syllabifications.length ) {
-        this.nextSyllabificationIndex = -1;
+      this._nextSyllabificationIndex++;
+      if ( this._nextSyllabificationIndex === this._syllabifications.length ) {
+        this._nextSyllabificationIndex = -1;
       }
 
-      this.syllabTimer = setTimeout( () => {
-        this.syllabTimer = null;
-        this.callbacks.syllabification( syllabification );
+      this._syllabTimer = setTimeout( () => {
+        this._syllabTimer = null;
+        this._callbacks.syllabification( syllabification );
       }, ( fixationEndsAt - syllabification.ts ) );
     }
   };

@@ -15,7 +15,7 @@ import db from '@/db/db.js';
 import ModelTask from '@/model/task.js';
 import ModelStudent from '@/model/student.js';
 import Font from '@/model/session/font.js';
-import Feedbacks from '@/model/session/feedbacks.js';
+import { Feedbacks } from '@/model/session/feedbacks.js';
 import { TextPageImage } from '@/model/task/textPageImage.js';
 
 /**
@@ -40,16 +40,12 @@ class Timer {
     this._start = window.performance.now();
   }
 
-  /**
-   * @returns {number}
-   */
+  /** @returns {number} */
   get value() {
     return Math.round( window.performance.now() - this._start );
   }
 
-  /**
-   * @returns {string}
-   */
+  /** @returns {string} */
   get date() {
     return this._date;
   }
@@ -62,8 +58,11 @@ class Page {
    * @param {boolean} isIntroPage 
    */
   constructor( isIntroPage ) {
+    /** @type {Map} */
     this.words = new Map();
+    /** @type {DataPage} */
     this.data = new DataPage();
+    /** @type {boolean} */
     this.data.isIntro = isIntroPage;
   }
 
@@ -75,9 +74,11 @@ class Pages {
    * @param {boolean} hasIntroPage 
    */
   constructor( hasIntroPage ) {
+    /** @type {boolean} */
     this.hasIntroPage = hasIntroPage;
     /** @type {Page[]} */
     this.items = [];
+    /** @type {number} */
     this.pageIndex = -1;
   }
 
@@ -89,30 +90,22 @@ class Pages {
     return this.items[ index ];
   }
 
-  /**
-   * @returns {Page}
-   */
+  /** @returns {Page} */
   get current() {
     return this.items[ this.pageIndex ];
   }
 
-  /**
-   * @returns {Page}
-   */
+  /** @returns {Page} */
   get last() {
     return this.items[ this.items.length - 1 ];
   }
 
-  /**
-   * @returns {boolean}
-   */
+  /** @returns {boolean} */
   get ready() {
     return this.pageIndex >= 0;
   }
 
-  /**
-   * @returns {Page}
-   */
+  /** @returns {Page} */
   add() {
     const page = new Page( !this.items.length ? this.hasIntroPage : false );
     this.items.push( page );
@@ -126,53 +119,71 @@ class Pages {
 
 };
 
+class DataCollectorSession {
+
+  constructor( student, task, font, feedbacks ) {
+    /** @type {string} */
+    this.date = ( new Date() ).toJSON();
+    /** @type {string} ID */
+    this.student = student.id;
+    /** @type {string} ID */
+    this.task = task.id;
+    /** @type {string} ID */
+    this.cls = task.cls;
+    /** @type {Font} */
+    this.font = font;
+    /** @type {Feedbacks} */
+    this.feedbacks = feedbacks;
+    /** @type {ScreenSize} */
+    this.screen = ScreenSize.full;
+    /** @type {string} */
+    this.data = null;
+  }
+
+}
+
 export default class DataCollector {
 
   /**
-   * 
    * @param {ModelTask} task 
    * @param {ModelStudent} student 
    * @param {Font} font 
    * @param {Feedbacks} feedbacks 
    */
   constructor( task, student, font, feedbacks ) {
-    this.session = {
-      date: ( new Date() ).toJSON(),
-      student: student.id,
-      task: task.id,
-      cls: task.cls,
-      font: font,
-      feedbacks: feedbacks,
-      screen: ScreenSize.full,
-      data: null,
-    };
+    /** @type {DataCollectorSession} */
+    this._session = new DataCollectorSession( task, student, font, feedbacks );
 
-    this.pages = new Pages( !!task.intro );
-    this.timer = new Timer();
+    /** @type {Pages} */
+    this._pages = new Pages( !!task.intro );
+    /** @type {Timer} */
+    this._timer = new Timer();
 
-    this.focusedElem = null;
-    this.currentWord = null;
+    /** @type {HTMLElement} */
+    this._focusedElem = null;
+    /** @type {DataPageFocusedWord} */
+    this._currentWord = null;
   }
 
   start() {
-    // if ( !this.pages.ready ) {
-    //   this.pages.add();
+    // if ( !this._pages.ready ) {
+    //   this._pages.add();
     // }
-    this.timer.start();
+    this._timer.start();
   }
 
   /**
-   * @param {function} cb 
+   * @param {Callback} cb 
    */
   stop( cb ) {
     this.setFocusedWord( null );
-    this.pages.done();
+    this._pages.done();
     this._save( cb );
   }
 
   nextPage() {
     this._closeImages();
-    this.pages.add();
+    this._pages.add();
   }
 
   /**
@@ -182,7 +193,7 @@ export default class DataCollector {
   longGazedWords( threshold ) {
     const result = [];
     const re = /\b([\w$%&]+\S*\b)/;
-    this.pages.items.forEach( page => {
+    this._pages.items.forEach( page => {
       page.words.forEach( word => {
         if ( word.focusing.duration >= threshold ) {
           result.push( re.exec( word.text )[0] );
@@ -193,26 +204,22 @@ export default class DataCollector {
     return result;
   }
 
-  /**
-   * @returns {{text: string, duration: number}}
-   */
+  /** @returns {{text: string, duration: number}} */
   get focusedWord() {
-    if ( !this.currentWord ) {
+    if ( !this._currentWord ) {
       return null;
     }
     else {
       return {
-        text: this.currentWord.text,
-        duration: this.currentWord.focusing.currentDuration( this.timer.value ),
+        text: this._currentWord.text,
+        duration: this._currentWord.focusing.currentDuration( this._timer.value ),
       };
     }
   }
 
-  /**
-   * @returns {number}
-   */
+  /** @returns {number} */
   get wordReadingDuration() {
-    const page = this.pages.current;
+    const page = this._pages.current;
     if ( !page ) {
       return null;
     }
@@ -241,58 +248,57 @@ export default class DataCollector {
    * @returns {string}
    */
   setFocusedWord( el ) {
-    if ( this.focusedElem === el || !this.pages.ready ) {
+    if ( this._focusedElem === el || !this._pages.ready ) {
       return null;
     }
 
-    if ( this.currentWord ) {
-      this.currentWord.focusing.stop( this.timer.value );
-      this.currentWord = null;
+    if ( this._currentWord ) {
+      this._currentWord.focusing.stop( this._timer.value );
+      this._currentWord = null;
     }
 
     if ( el ) {
-      const page = this.pages.current;
-      this.currentWord = page.words.get( el );
-      if ( !this.currentWord ) {
-        this.currentWord = new DataPageFocusedWord( el, this.pages.pageIndex );
-        page.words.set( el, this.currentWord );
+      const page = this._pages.current;
+      this._currentWord = page.words.get( el );
+      if ( !this._currentWord ) {
+        this._currentWord = new DataPageFocusedWord( el, this._pages.pageIndex );
+        page.words.set( el, this._currentWord );
       }
 
-      this.currentWord.focusing.start( this.timer.value );
+      this._currentWord.focusing.start( this._timer.value );
     }
 
-    this.focusedElem = el;
+    this._focusedElem = el;
 
-    return this.currentWord ? this.currentWord.text : null;
+    return this._currentWord ? this._currentWord.text : null;
   }
 
   /**
-   * 
    * @param {ETUDFixation} gazePoint 
    */
   addGazePoint( gazePoint ) {
-    if ( !this.pages.ready ) {
+    if ( !this._pages.ready ) {
       return;
     }
 
-    this.pages.current.data.fixations.push( Fixation.from( gazePoint, this.timer.value ) );
+    this._pages.current.data.fixations.push( Fixation.from( gazePoint, this._timer.value ) );
   }
 
   /**
    * @param {HTMLElement} el 
    */
   syllabified( el ) {
-    if ( !el || !this.pages.ready ) {
+    if ( !el || !this._pages.ready ) {
       return;
     }
 
-    const page = this.pages.current;
+    const page = this._pages.current;
     const word = page.words.get( el );
 
     if ( word ) {
       word.feedback.syllabified = true;
       page.data.syllabifications.push( new FeedbackEvent(
-        this.timer.value,
+        this._timer.value,
         word.text,
         word.rect
       ) );
@@ -303,17 +309,17 @@ export default class DataCollector {
    * @param {HTMLElement} el 
    */
   pronounced( el ) {
-    if ( !el || !this.pages.ready ) {
+    if ( !el || !this._pages.ready ) {
       return;
     }
 
-    const page = this.pages.current;
+    const page = this._pages.current;
     const word = page.words.get( el );
 
     if ( word ) {
       word.feedback.pronounced = true;
       page.data.speech.push( new FeedbackEvent(
-        this.timer.value,
+        this._timer.value,
         word.text,
         word.rect
       ) );
@@ -324,43 +330,43 @@ export default class DataCollector {
    * @param {TextPageImage} image 
    */
   imageShow( image ) {
-    const page = this.pages.current;
-    page.data.images.push( new Image( image, this.timer.value ) );
+    const page = this._pages.current;
+    page.data.images.push( new Image( image, this._timer.value ) );
   }
 
   /**
    * @param {TextPageImage} image 
    */
   imageHide( image ) {
-    const page = this.pages.current || this.pages.last;
+    const page = this._pages.current || this._pages.last;
     const currentImage = page.data.images.find( img => img.src === image.src && img.isCurrent );
 
     if ( currentImage ) {
-      currentImage.hide( this.timer.value );
+      currentImage.hide( this._timer.value );
     }
   }
 
   _closeImages() {
-    const page = this.pages.current || this.pages.last;
+    const page = this._pages.current || this._pages.last;
     if ( !page ) {
       return;
     }
 
     page.data.images.forEach( img => {
       if ( img.isCurrent ) {
-        img.hide( this.timer.value );
+        img.hide( this._timer.value );
       }
     } );
   }
 
   /**
-   * @param {function} cb 
+   * @param {Callback} cb 
    */
   _save( cb ) {
     const data = {
-      task: this.session.task,
-      student: this.session.student,
-      pages: this.pages.items.map( page => {
+      task: this._session.task,
+      student: this._session.student,
+      pages: this._pages.items.map( page => {
         page.data.filterFixations( MIN_FIXATION_DURATION );
         page.data.setWords( page.words );
         return page.data;
@@ -373,8 +379,8 @@ export default class DataCollector {
         return cb( err );
       }
 
-      this.session.data = dataKey;
-      db.add( Session, this.session, ( err, sessionKey ) => {
+      this._session.data = dataKey;
+      db.add( Session, this._session, ( err, sessionKey ) => {
         if ( err ) {
           return cb( err );
         }

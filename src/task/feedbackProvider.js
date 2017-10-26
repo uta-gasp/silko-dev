@@ -1,4 +1,4 @@
-import Feedbacks from '@/model/session/feedbacks.js';
+import { Feedbacks } from '@/model/session/feedbacks.js';
 
 import Syllabifier from './syllabifier.js';
 import Speaker from './speaker.js';
@@ -14,6 +14,10 @@ const SAMPLE_DURATION = 30;
 
 const HIGHLIGHT_CLASS = 'currentWord';
 
+/**
+ * @fires syllabified
+ * @fires pronounced
+ */
 export default class FeedbackProvider {
 
   /**
@@ -21,24 +25,44 @@ export default class FeedbackProvider {
    * @param {SpeechFeedback} speech 
    */
   constructor( syllab, speech ) {
-    this.syllabifier = new Syllabifier( syllab );
-    this.speaker = new Speaker( speech );
+    /** @type {Syllabifier} */
+    this._syllabifier = new Syllabifier( syllab );
+    /** @type {Speaker} */
+    this._speaker = new Speaker( speech );
 
-    this.events = new window.EventEmitter();
+    /** @type {EventEmitter} */
+    this._events = new window.EventEmitter();
+    /** @type {NodeJS.Timer} */
     this.timer = null;
+    /** @type {HTMLElement} */
     this.currentWord = null;
+    /** @type {HTMLElement} */
     this.lastFocusedWord = null;
 
-    this.words = null;  // map of el: WordFocus
+    /** @type {Map} {el: WordFocus} */
+    this.words = null;
   }
 
-  /**
-   * @returns {Feeback}
-   */
+  /** @returns {Syllabifier} */
+  get syllabifier() {
+    return this._syllabifier;
+  }
+
+  /** @returns {Speaker} */
+  get speaker() {
+    return this._speaker;
+  }
+
+  /** @returns {EventEmitter} */
+  get events() {
+    return this._events;
+  }
+
+  /** @returns {Feedbacks} */
   get setup() {
     return new Feedbacks(
-      this.speaker.setup,
-      this.syllabifier.setup
+      this._speaker.setup,
+      this._syllabifier.setup
     );
   }
 
@@ -59,7 +83,7 @@ export default class FeedbackProvider {
   init() {
     this.words = new Map();
 
-    if ( this.syllabifier.enabled || this.speaker.enabled ) {
+    if ( this._syllabifier.enabled || this._speaker.enabled ) {
       this.timer = setInterval( () => {
         this._tick();
       }, 30 );
@@ -71,8 +95,8 @@ export default class FeedbackProvider {
    */
   reset( avgWordReadingDuration ) {
     if ( avgWordReadingDuration ) {
-      this.syllabifier.setAvgWordReadingDuration( avgWordReadingDuration );
-      this.speaker.setAvgWordReadingDuration( avgWordReadingDuration );
+      this._syllabifier.setAvgWordReadingDuration( avgWordReadingDuration );
+      this._speaker.setAvgWordReadingDuration( avgWordReadingDuration );
     }
 
     this.words = new Map();
@@ -136,12 +160,12 @@ export default class FeedbackProvider {
         wordFocus.focusCount++;
       }
 
-      if ( this.syllabifier.inspect( key, wordFocus ) ) {
-        this.events.emitEvent( 'syllabified', [ key ] );
+      if ( this._syllabifier.inspect( key, wordFocus ) ) {
+        this._events.emitEvent( 'syllabified', [ key ] );
       }
 
-      if ( this.speaker.inspect( key, wordFocus ) ) {
-        this.events.emitEvent( 'pronounced', [ key ] );
+      if ( this._speaker.inspect( key, wordFocus ) ) {
+        this._events.emitEvent( 'pronounced', [ key ] );
       }
     }
   };

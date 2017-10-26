@@ -124,16 +124,12 @@ export default class Metric {
     return alphaComputers.get( metricType )( word, metricRange );
   }
 
-  /**
-   * @returns {object} list of metric types
-   */
+  /** @returns {object} list of metric types */
   static get Type() {
     return Type;
   }
 
-  /**
-   * @returns {string[]} list of metric types
-   */
+  /** @returns {string[]} list of metric types */
   static get Types() {
     const result = [];
     for ( let key in Type ) {

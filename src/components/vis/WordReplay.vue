@@ -212,8 +212,7 @@ export default {
     },
 
     hasNoData( trackIndex ) {
-      const hasFixations = this.tracks[ trackIndex ].fixations;
-      return !hasFixations;
+      return !this.tracks[ trackIndex ].hasData;
     },
 
     onWordFixated( track, rows ) {

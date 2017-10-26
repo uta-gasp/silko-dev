@@ -12,7 +12,6 @@ import Font from '@/model/session/font.js';
  * @typedef {Object} Point
  * @property {number} x
  * @property {number} y
- * @property {boolean} [isRegression]
  */
 
 /**
@@ -116,40 +115,38 @@ export default class Painter {
    * @param {{syllab: SyllabificationFeedback}} settings 
    */
   constructor( el, settings ) {
-    this.width = document.body.offsetWidth;
-    this.height = parseInt( window.getComputedStyle( el ).height );
-    el.setAttribute( 'width', this.width + '' );
-    el.setAttribute( 'height', this.height + '' );
+    this._width = document.body.offsetWidth;
+    this._height = parseInt( window.getComputedStyle( el ).height );
+    el.setAttribute( 'width', this._width + '' );
+    el.setAttribute( 'height', this._height + '' );
 
-    this.offsetX = 0;
-    this.offsetY = 0;
+    this._offsetX = 0;
+    this._offsetY = 0;
 
-    this.settings = settings;
-    this.syllabifier = new Syllabifier( settings.syllab );
+    this._syllabifier = new Syllabifier( settings.syllab );
 
-    this.ctx = el.getContext( '2d' );
+    this._ctx = el.getContext( '2d' );
+
     this.clean();
   }
 
-  /**
-   * @returns {{x: number, y: number}}
-   */
+  /** @returns {Point} */
   get offset() {
     return {
-      x: this.offsetX,
-      y: this.offsetY,
+      x: this._offsetX,
+      y: this._offsetY,
     };
   }
 
   clean() {
-    this.ctx.clearRect( 0, 0, this.width, this.height );
+    this._ctx.clearRect( 0, 0, this._width, this._height );
   }
 
   /**
    * @param {Font} font 
    */
   setFont( font ) {
-    this.ctx.font = `${font.style} ${font.weight} ${font.size} ${font.family}`;
+    this._ctx.font = `${font.style} ${font.weight} ${font.size} ${font.family}`;
   }
 
   /**
@@ -157,6 +154,7 @@ export default class Painter {
    * @implements {WordSettings}
    * @property {string} colorMetric
    * @property {string} showConnections
+   * @property {string} hyphen
    */
   /**
    * @param {Word[]} words 
@@ -195,20 +193,21 @@ export default class Painter {
    * @param {SyllabsSettings} settings 
    */
   drawSyllabification( event, settings ) {
-    const ctx = this.ctx;
+    const ctx = this._ctx;
 
     ctx.textAlign = 'start';
     ctx.textBaseline = 'alphabetic';
 
     const rc = event.rect;
     const word = settings.isSyllabified
-      ? this.syllabifier.syllabifyWord( event.text, settings.hyphen )
+      ? this._syllabifier.syllabifyWord( event.text, settings.hyphen )
       : event.text;
 
     var { x, y } = this._offset( rc );
     ctx.fillStyle = settings.background;
     ctx.fillRect( x, y, rc.width, rc.height );
 
+    /* eslint no-redeclare: "off" */
     var { x, y } = this._offset( rc, { dy: 0.8 * rc.height } );
     ctx.fillStyle = settings.wordColor;
     ctx.fillText( word, x, y );
@@ -253,7 +252,7 @@ export default class Painter {
    * @param {NamesSettings} settings 
    */
   drawNames( names, settings ) {
-    const ctx = this.ctx;
+    const ctx = this._ctx;
 
     names.forEach( ( name, index ) => {
       ctx.textAlign = 'left';
@@ -275,7 +274,7 @@ export default class Painter {
    * @param {NamesSettings} settings 
    */
   checkName( name, settings ) {
-    const ctx = this.ctx;
+    const ctx = this._ctx;
 
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
@@ -298,18 +297,17 @@ export default class Painter {
    * @param {{width: number, height: number}} screenSize 
    */
   setScreenSize( screenSize ) {
-    this.offsetX = ( this.width - screenSize.width ) / 2;
-    this.offsetY = ( this.height - screenSize.height ) / 2;
+    this._offsetX = ( this._width - screenSize.width ) / 2;
+    this._offsetY = ( this._height - screenSize.height ) / 2;
   }
 
   /**
-   * 
    * @param {Point | Rect | Fixation} point 
    * @param {{dx: number, dy: number}} [offset={dx: 0, dy: 0}] 
    * @returns {Point}
    */
   _offset( { x, y }, { dx = 0, dy = 0 } = { dx: 0, dy: 0 } ) {
-    return { x: x + this.offsetX + dx, y: y + this.offsetY + dy };
+    return { x: x + this._offsetX + dx, y: y + this._offsetY + dy };
   }
 
   /**
@@ -322,7 +320,7 @@ export default class Painter {
    * @param {TransparentWordsSettings} settings 
    */
   _drawWord( word, settings ) {
-    const ctx = this.ctx;
+    const ctx = this._ctx;
     const rc = word.rect;
 
     var { x, y } = this._offset( rc, { dy: 0.8 * rc.height } );
@@ -339,18 +337,18 @@ export default class Painter {
 
     // hide hyphens
     ctx.fillStyle = '#fff';
-    let [prefix, suffix] = Syllabifier.getPrefixAndSuffix( word.text, this.settings.syllab.hyphen );
+    let [prefix, suffix] = Syllabifier.getPrefixAndSuffix( word.text, settings.hyphen );
     if ( prefix ) {
       ctx.fillText( prefix, x, y );
     }
     if ( suffix ) {
-      var { x, y } = this._offset( rc, { dx: rc.width, dy: 0.8 * rc.height } );
+      const { x, y } = this._offset( rc, { dx: rc.width, dy: 0.8 * rc.height } );
       ctx.textAlign = 'end';
       ctx.fillText( suffix, x, y );
     }
 
     if ( settings.showConnections || settings.drawWordFrame ) {
-      var { x, y } = this._offset( rc );
+      const { x, y } = this._offset( rc );
       ctx.strokeStyle = settings.wordRectColor;
       ctx.lineWidth = 1;
       ctx.strokeRect( x, y, rc.width, rc.height );
@@ -363,7 +361,7 @@ export default class Painter {
    * @param {GazePathSettings} settings 
    */
   _drawSaccade( from, to, settings ) {
-    const ctx = this.ctx;
+    const ctx = this._ctx;
 
     ctx.strokeStyle = to.isRegression ? settings.regressionColor : settings.saccadeColor;
     ctx.beginPath();
@@ -373,6 +371,7 @@ export default class Painter {
     ctx.moveTo( x, y );
 
     // x = settings.showIDs ? ( to._x ? to._x : to.x ) : to.x;
+    /* eslint no-redeclare: "off" */
     var { x, y } = this._offset( to );
     ctx.lineTo( x, y );
     ctx.stroke();
@@ -384,7 +383,7 @@ export default class Painter {
    * @param {GazePathSettings} settings 
    */
   _drawConnection( from, to, settings ) {
-    const ctx = this.ctx;
+    const ctx = this._ctx;
 
     ctx.strokeStyle = settings.connectionColor;
     ctx.beginPath();
@@ -392,6 +391,7 @@ export default class Painter {
     // const x = settings.showIDs ? ( from._x ? from._x : from.x ) : from.x;
     var { x, y } = this._offset( from );
     ctx.moveTo( x, y );
+    /* eslint no-redeclare: "off" */
     var { x, y } = this._offset( to );
     ctx.lineTo( x, y );
 
@@ -403,7 +403,7 @@ export default class Painter {
    * @param {GazePathSettings} settings 
    */
   _drawFixation( fixation, settings ) {
-    const ctx = this.ctx;
+    const ctx = this._ctx;
 
     if ( fixation.line !== undefined ) {
       ctx.fillStyle = LINE_COLORS[ fixation.line % LINE_COLORS.length ];

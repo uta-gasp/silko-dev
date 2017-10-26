@@ -10,9 +10,12 @@ export default class Params {
    * @param {ParamArg} args
    */
   constructor( args ) {
-    this.student = args.student;    // String
-    this.session = args.session;    // String
-    this.grade = args.grade;        // { name: String, studentCount: Number }
+    /** @type {string} */
+    this.student = args.student;
+    /** @type {string} */
+    this.session = args.session;
+    /** @type {{ name: string, studentCount: number }} */
+    this.grade = args.grade;
   }
 
 };

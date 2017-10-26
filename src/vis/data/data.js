@@ -10,9 +10,12 @@ export default class Data {
    * @param {Params} params 
    */
   constructor( name, records, params ) {
-    this.name = name;           // String
-    this.records = records;     // [ ./Record ]
-    this.params = params;       // ./Params
+    /** @type {string} */
+    this.name = name;
+    /** @type {Record[]} */
+    this.records = records;
+    /** @type {Params} */
+    this.params = params;
   }
 
 };

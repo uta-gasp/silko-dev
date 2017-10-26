@@ -8,39 +8,67 @@ import Task from './task.js';
 
 import db from '@/db/db.js';
 
+// ts-check-only 
+import { StudentCreateParams, IntroCreateParams } from './commons/createParams.js';
+
 export default class Teacher {
 
-  constructor( id, name, email, school ) {
+  /**
+   * @param {string} [id]
+   */
+  constructor( id ) {
+    /** @type {string} ID */
     this.id = id;
-    this.name = name;       // ""
-    this.email = email;     // ""
-    this.school = school;   // id
-    this.intros = {};       // array of ids of Intro
-    this.classes = {};      // array of ids of Class
+    /** @type {string} */
+    this.name = '';
+    /** @type {string} */
+    this.email = '';
+    /** @type {string} ID */
+    this.school = '';
+    /** @type {object} {ID: name} */
+    this.intros = {};
+    /** @type {object} {ID: name} */
+    this.classes = {};
   }
 
+  /** @returns {string} */
   static get db() {
     return 'teachers';
   }
 
+  /** @returns {boolean} */
   static get isLogged() {
     return db.user && db.user.isTeacher;
   }
 
+  /** @returns {Teacher} */
   static get instance() {
     return ( db.user && db.user.isTeacher ) ? db.user.ref : null;
   }
 
+  /**
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   static list( cb ) {
     return db.getAll( Teacher, cb );
   }
 
+  /**
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   getSchool( cb ) {
     return db.get( School, this.school, cb );
   }
 
+  /**
+   * @param {StudentCreateParams} param0 
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   createStudent( {name, email, password, grade}, cb ) {
-    db.add( Student, {
+    return db.add( Student, {
       name: name,
       email: email,
       password: password,
@@ -70,10 +98,16 @@ export default class Teacher {
     } );
   }
 
+  /**
+   * @param {string} name 
+   * @param {IntroCreateParams} texts 
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   createIntro( name, texts, cb ) {
     const introTexts = Intro.validateTexts( texts );
 
-    db.add( Intro, {
+    return db.add( Intro, {
       name: name,
       owner: this.id,
       calibInstruction: introTexts.calibInstruction,
@@ -102,10 +136,18 @@ export default class Teacher {
     } );
   }
 
+  /**
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   getIntros( cb ) {
-    db.getFromIDs( Intro, this.intros, cb );
+    return db.getFromIDs( Intro, this.intros, cb );
   }
 
+  /**
+   * @param {Intro} intro 
+   * @param {Callback} cb 
+   */
   deleteIntro( intro, cb ) {
     delete this.intros[ intro.id ];
 
@@ -143,8 +185,13 @@ export default class Teacher {
     } );
   }
 
+  /**
+   * @param {string} name 
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   createClass( name, cb ) {
-    db.add( Class, {
+    return db.add( Class, {
       name: name,
       owner: this.id,
       tasks: {},
@@ -165,10 +212,18 @@ export default class Teacher {
     } );
   }
 
+  /**
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   getClasses( cb ) {
     return db.getFromIDs( Class, this.classes, cb );
   }
 
+  /**
+   * @param {Class} cls 
+   * @param {Callback} cb 
+   */
   deleteClass( cls, cb ) {
     delete this.classes[ cls.id ];
     db.deleteField( this, `classes/${cls.id}`, cb );

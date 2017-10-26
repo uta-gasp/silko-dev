@@ -5,7 +5,7 @@ export default class Image {
   /**
    * @param {TextPageImage} image 
    * @param {number} ts
-  */
+   */
   constructor( image, ts ) {
     this.src = image.src;
     this.location = image.location;
@@ -16,16 +16,14 @@ export default class Image {
     this.hidden = 0;
   }
 
-  /** 
-   * @returns {boolean} 
-   * */
+  /** @returns {boolean} */
   get isCurrent() {
     return !this.hidden;
   }
 
   /** 
    * @param {number} ts 
-   * */
+   */
   hide( ts ) {
     this.hidden = ts;
   }

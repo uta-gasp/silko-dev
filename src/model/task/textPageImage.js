@@ -1,8 +1,4 @@
 /**
- * @module TextPageImage
- */
-
-/**
  * @returns {string}
  */
 function uuidv4() {
@@ -24,9 +20,7 @@ export class TextPageImageEvent {
     this.name = name;       // string
   }
 
-  /**
-   * @returns {boolean}
-   */
+  /** @returns {boolean} */
   get isValid() {
     return true;
   }
@@ -83,9 +77,7 @@ export class TextPageImageFixationEvent extends TextPageImageEvent {
     this.duration = duration;
   }
 
-  /** 
-   * @returns {boolean} 
-   */
+  /** @returns {boolean} */
   get isValid() {
     return this.word && this._isGreaterThanInt( this.duration, 100 );
   }
@@ -103,9 +95,7 @@ export class TextPageImageDelayEvent extends TextPageImageEvent {
     this.duration = duration;
   }
 
-  /** 
-   * @returns {boolean} 
-   */
+  /** @returns {boolean} */
   get isValid() {
     return this._isGreaterThanInt( this.duration, 0 );
   }
@@ -129,9 +119,7 @@ export class TextPageImage {
     this.off = off;
   }
 
-  /** 
-   * @returns {object} - a dictionary of events
-   */
+  /** @returns {object} - a dictionary of events */
   static get EVENT() {
     return {
       none: 'none',
@@ -141,9 +129,7 @@ export class TextPageImage {
     };
   }
 
-  /** 
-   * @returns {object} - a dictionary of meta values
-   */
+  /** @returns {object} - a dictionary of meta values */
   get meta() {
     const result = {
       page: this.page,
@@ -166,10 +152,8 @@ export class TextPageImage {
     return parts.join( FILE_ID_SPLITTER ).split( '?' )[0];
   }
 
-  /**
-   * @returns {string}
-   */
-  static getPrefix() {
+  /** @returns {string} */
+  static generatePrefix() {
     const uuid = uuidv4();
     return `${uuid}${FILE_ID_SPLITTER}`;
   }

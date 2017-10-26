@@ -5,7 +5,7 @@ class Login {
   /**
    * @param {string} email 
    * @param {string} password 
-   * @param {function} cb 
+   * @param {Callback} cb 
    * @returns {Promise}
    */
   logIn( email, password, cb ) {
@@ -18,22 +18,18 @@ class Login {
 
   /**
    * @param {string} email 
-   * @param {function} cb 
+   * @param {Callback} cb 
    */
   resetPassword( email, cb ) {
     return db.resetPassword( email, cb );
   }
 
-  /**
-   * @returns {string}
-   */
+  /** @returns {string} */
   get user() {
     return db.user;
   }
 
-  /**
-   * @returns {string}
-   */
+  /** @returns {string} */
   get DEFAULT_EMAIL_DOMAIN() {
     return db.FAKE_EMAIL_DOMAIN;
   }

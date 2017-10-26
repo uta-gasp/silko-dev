@@ -32,9 +32,11 @@ let lastState = {};
 class GazeTracking {
 
   constructor() {
-    this.serviceCheckTimer = null;
+    /** @type {NodeJS.Timer} */
+    this._serviceCheckTimer = null;
 
-    this.wsOK = window.GazeTargets.init( {
+    /** @type {boolean} */
+    this._wsOK = window.GazeTargets.init( {
       etudPanel: {
         show: false,
       },
@@ -96,9 +98,17 @@ class GazeTracking {
     } );
   }
 
-  /**
-   * @returns {string[]}
-   */
+  /** @returns {boolean} */
+  get isWebSocketOK() {
+    return this._wsOK;
+  }
+
+  /** @returns {object} */
+  get state() {
+    return lastState;
+  }
+
+  /** @returns {string[]} */
   listCallbacks() {
     return Object.keys( callbacks );
   }
@@ -106,7 +116,7 @@ class GazeTracking {
   /**
    * @param {string} name 
    * @param {string} id 
-   * @param {function} cb 
+   * @param {function(string | HTMLElement | GTFixation | GTSample)} cb 
    */
   setCallback( name, id, cb ) {
     callbackLists[ name ][ id ] = cb;
@@ -118,13 +128,6 @@ class GazeTracking {
    */
   clearCallback( name, id ) {
     delete callbackLists[ name ][ id ];
-  }
-
-  /**
-   * @returns {object}
-   */
-  get state() {
-    return lastState;
   }
 
   showOptions() {
@@ -152,12 +155,12 @@ class GazeTracking {
   }
 
   scheduleReconnection() {
-    if ( this.serviceCheckTimer ) {
+    if ( this._serviceCheckTimer ) {
       return;
     }
 
-    this.serviceCheckTimer = setTimeout( () => {
-      this.serviceCheckTimer = null;
+    this._serviceCheckTimer = setTimeout( () => {
+      this._serviceCheckTimer = null;
       if ( !lastState.isServiceRunning ) {
         this.wsOK = window.GazeTargets.reconnect();
       }

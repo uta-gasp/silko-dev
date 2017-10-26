@@ -2,28 +2,51 @@ import Recordable from './commons/recordable.js';
 
 import db from '@/db/db.js';
 
+// ts-check-only 
+import { IntroCreateParams } from './commons/createParams.js';
+
 export default class Intro {
 
-  constructor( id, name, owner ) {
+  /**
+   * @param {string} [id]
+   */
+  constructor( id ) {
+    /** @type {string} ID */
     this.id = id;
-    this.owner = owner;
-    this.name = name;
+    /** @type {string} teacher ID */
+    this.owner = '';
+    /** @type {string} */
+    this.name = '';
+    /** @type {string} */
     this.calibInstruction = '';
+    /** @type {string} */
     this.calibStart = 'Calibrate';
+    /** @type {string} */
     this.calibSkip = 'Skip';
+    /** @type {string} */
     this.startInstruction = '';
+    /** @type {string} */
     this.startRun = 'Start';
+    /** @type {string} */
     this.startCancel = 'Cancel';
+    /** @type {string[]} */
     this.firstPage = [];
+    /** @type {string} */
     this.next = 'Next';
+    /** @type {string} */
     this.finish = 'Finish';
+    /** @type {string} */
     this.finished = 'Thank you!';
   }
 
+  /** @returns {string} */
   static get db() {
     return 'intros';
   }
 
+  /**
+   * @param {IntroCreateParams} texts 
+   */
   static validateTexts( texts ) {
     if ( !texts ) {
       return {
@@ -55,6 +78,7 @@ export default class Intro {
     }
   }
 
+  /** @returns {string} */
   textsSummary() {
     let result = [];
     const MAX_CHARS_START = 40;
@@ -87,10 +111,17 @@ export default class Intro {
     return result.join( '\n' );
   }
 
+  /** @returns {string} */
   firstPageAsText() {
     return this.firstPage ? this.firstPage.join( '\n' ) : '';
   }
 
+  /**
+   * @param {string} name 
+   * @param {IntroCreateParams} texts 
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   update( name, texts, cb ) {
     this.name = name;
 
@@ -108,7 +139,7 @@ export default class Intro {
 
     fields.name = name;
 
-    db.updateFields( this, fields, cb );
+    return db.updateFields( this, fields, cb );
   }
 
 }

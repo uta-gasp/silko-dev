@@ -345,7 +345,7 @@ class DB {
       cb( null, uploadTask.snapshot.downloadURL );
     } );
 
-    return uploadTask;
+    return uploadTask.then();
   }
 
   deleteFile( url, cb ) {

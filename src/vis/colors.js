@@ -73,7 +73,6 @@ function cmyk2rgb( color ) {
 }
 
 /**
- * 
  * @param {number} value
  * @param {number} [n=2] 
  * @returns {string} n-digit hex value
@@ -170,7 +169,6 @@ export default class Colors {
   };
 
   /**
-   * 
    * @param {string} color - a string of #XXX or #XXXXXX}
    * @param {number | string} alpha 
    * @returns {string} 'rgba(...)'
@@ -187,9 +185,7 @@ export default class Colors {
     return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
   };
 
-  /**
-   * @returns {string[]}
-   */
+  /** @returns {string[]} */
   static get colors() {
     return COLORS;
   }
@@ -230,7 +226,6 @@ export default class Colors {
   }
 
   /**
-   * 
    * @param {string} rgb - color in '#XXXXXX' 
    * @param {number} a - alpha value
    */

@@ -20,31 +20,27 @@ export default class Speaker {
    * @param {SpeechFeedback} options 
    */
   constructor( options ) {
-    this.options = { ...options };
-    this.options.threshold.factor = 4;
+    /** @type {SpeechFeedback} */
+    this._options = { ...options };
+    this._options.threshold.factor = 4;
 
-    this.voice = voices[ this.options.language ];
+    /** @type {function( string )} */
+    this.voice = voices[ this._options.language ];
   }
 
-  /**
-   * @returns {string[]}
-   */
+  /** @returns {string[]} */
   static get LANGS() {
     return Object.keys( voices );
   }
 
-  /**
-   * @returns {boolean}
-   */
+  /** @returns {boolean} */
   get enabled() {
     return !!this.voice;
   }
 
-  /**
-   * @returns {SpeechFeedback}
-   */
+  /** @returns {SpeechFeedback} */
   get setup() {
-    return new SpeechFeedback( { ...this.options, enabled: !!this.voice } );
+    return new SpeechFeedback( { ...this._options, enabled: !!this.voice } );
   }
 
   /**
@@ -57,8 +53,8 @@ export default class Speaker {
       return false;
     }
 
-    let threshold = this.options.threshold.value;
-    if ( this.options.threshold.adjustForWordLength ) {
+    let threshold = this._options.threshold.value;
+    if ( this._options.threshold.adjustForWordLength ) {
       threshold *= Math.max( 1, 1 + ( wordFocus.word.length - LONG_WORD_MIN_LENGTH ) * EXTRA_THRESHOLD_FOR_CHAR );
     }
 
@@ -92,15 +88,12 @@ export default class Speaker {
    * @param {number} wordReadingDuration 
    */
   setAvgWordReadingDuration( wordReadingDuration ) {
-    if ( !this.options.threshold.smart || !wordReadingDuration ) {
+    if ( !this._options.threshold.smart || !wordReadingDuration ) {
       return;
     }
 
-    this.options.threshold.value =
-            Math.max( this.options.threshold.min,
-              Math.min( this.options.threshold.max,
-                wordReadingDuration * this.options.threshold.factor
-              ) );
+    const threshold = this._options.threshold;
+    threshold.value = Math.max( threshold.min, Math.min( threshold.max, wordReadingDuration * threshold.factor ) );
   }
 
 };
