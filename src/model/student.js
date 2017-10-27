@@ -16,14 +16,14 @@ import Question from '@/model/session/question';
  * @property {string} answer
  */
 
-export default class Student {
+export default class Student extends Recordable {
 
   /**
    * @param {string} [id]
    */
   constructor( id ) {
-    /** @type {string} ID */
-    this.id = id;
+    super( id );
+
     /** @type {string} */
     this.name = '';
     /** @type {string} ID */

@@ -2,11 +2,18 @@ import Feedback from './feedback.js';
 
 export default class SyllabificationFeedback extends Feedback {
 
+  /**
+   * @param {object} options 
+   */
   constructor( options ) {
     super( options );
-    this.hyphen = options.hyphen;       // string
-    this.mode = options.mode;           // string, a key from Syllabifier.MODES
-    this.temporary = options.temporary; // boolean
+    /** @type {string} */
+    this.hyphen = options.hyphen;
+    /** @type {string} - a key from Syllabifier.MODES */
+    this.mode = options.mode;
+    /** @type {boolean} */
+    this.temporary = options.temporary;
+    /** @type {object} - { 'original word': 'syllabified word' } */
     this.exceptions = {};
   }
 

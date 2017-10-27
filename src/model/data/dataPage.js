@@ -1,24 +1,40 @@
 import DataPageTextWord from './dataPageTextWord.js';
 
+// ts-check-only
+import DataPageFocusedWord from './dataPageFocusedWord';
+import Fixation from './fixation';
+import FeedbackEvent from './feedbackEvent';
+import Image from './image';
+
 const WORD_SELECTOR = '.word';
 
 export default class DataPage {
 
-  constructor( text, words, fixations, syllabifications, speech, images ) {
-    this.text = text || DataPageTextWord.fromAll( WORD_SELECTOR );  // [DataPageTextWord]
-    this.words = words || [];                          // [DataPageFocusedWord]
-    this.fixations = fixations || [];                  // [Fixation]
-    this.syllabifications = syllabifications || [];    // [FeedbackEvent]
-    this.speech = speech || [];                        // [FeedbackEvent]
-    this.images = images || [];                        // [Image]
+  constructor() {
+    /** @type {DataPageTextWord[]} */
+    this.text = DataPageTextWord.fromAll( WORD_SELECTOR );
+    /** @type {DataPageFocusedWord[]} */
+    this.words = [];
+    /** @type {Fixation[]} - history of fixations updates before 'filterFixations' is called, final fixations after */
+    this.fixations = [];
+    /** @type {FeedbackEvent[]} */
+    this.syllabifications = [];
+    /** @type {FeedbackEvent[]} */
+    this.speech = [];
+    /** @type {Image[]} */
+    this.images = [];
+    /** @type {boolean} */
     this.isIntro = false;
   }
 
-  // this.fixations contain samples, as GazeTracking configures GazeTargets to stream samples :),
-  // so this function must be called after the tracking stops
+  /**
+   * This function must be called after the tracking stops
+   * @param {number} threshold - min fixation duration
+   */
   filterFixations( threshold ) {
     const result = [];
 
+    /** @type {Fixation} */
     let lastFix = null;
     let fixTimestamp = 0;
     let fixTimestampSync = 0;
@@ -36,7 +52,7 @@ export default class DataPage {
         lastFix = fixation;
       }
 
-      // tsSync chnages with every sample, we have to memorize the first in the fixation
+      // tsSync changes with every update, we have to memorize the first in the fixation
       if ( fixTimestamp !== fixation.ts ) {
         if ( fixation.duration < threshold ) {
           ignoreTheEntranceFIxation = false;
@@ -55,7 +71,9 @@ export default class DataPage {
     this.fixations = result;
   }
 
-  // words - Map object of { el: DataPageFocusedWord }
+  /**
+   * @param {Map} words - { el: DataPageFocusedWord }
+   */
   setWords( words ) {
     const focusedWords = [];
     for ( let word of words.values() ) {

@@ -4,14 +4,14 @@ import Recordable from './commons/recordable.js';
 import DataPage from './data/dataPage.js';
 import Question from './session/question.js';
 
-export default class Data {
+export default class Data extends Recordable {
 
   /**
    * @param {string} [id]
    */
   constructor( id ) {
-    /** @type {string} ID */
-    this.id = id;
+    super( id );
+
     /** @type {string} ID */
     this.task = null;
     /** @type {string} ID */

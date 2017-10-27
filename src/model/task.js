@@ -1,4 +1,5 @@
 import Recordable from './commons/recordable.js';
+
 import TextPage from './task/textPage.js';
 import { TextPageImage } from './task/textPageImage.js';
 import { Threshold, SyllabOptions, SpeechOptions } from './session/feedbacks.js';
@@ -10,14 +11,14 @@ import db from '@/db/db.js';
 // ts-check-only
 import Question from './session/question.js';
 
-export default class Task {
+export default class Task extends Recordable {
 
   /**
    * @param {string} [id]
    */
   constructor( id ) {
-    /** @type {string} ID */
-    this.id = id;
+    super( id );
+
     /** @type {string} */
     this.name = '';
     /** @type {string} teacher ID */

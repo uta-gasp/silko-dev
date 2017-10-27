@@ -9,14 +9,14 @@ import db from '@/db/db.js';
 // ts-check-only 
 import { StudentCreateParams } from './commons/createParams.js';
 
-export default class School {
+export default class School extends Recordable {
 
   /**
    * @param {string} [id]
    */
   constructor( id ) {
-    /** @type {string} ID */
-    this.id = id;
+    super( id );
+
     /** @type {string} */
     this.name = '';
     /** @type {string} */

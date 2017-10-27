@@ -7,33 +7,59 @@ const path = `https://us-central1-${config.projectId}.cloudfunctions.net/`;
 
 export default class DBUtils {
 
+  /**
+   * @param {string} id - ID
+   * @param {Callback} cb 
+   */
   static isTaskLocked( id, cb ) {
     DBUtils._call( 'isTaskLocked', { id }, cb );
   }
 
+  /**
+   * @param {string[]} ids - IDs
+   * @param {Callback} cb 
+   */
   static areTasksLocked( ids, cb ) {
     DBUtils._call( 'areTasksLocked', { ids: ids.join( ',' ) }, cb );
   }
 
+  /**
+   * @param {string} id - ID
+   * @param {Callback} cb 
+   */
   static deleteTaskSessions( id, cb ) {
     DBUtils._get( 'deleteTaskSessions', { id }, cb );
   }
 
+  /**
+   * @param {string} id - ID
+   * @param {Callback} cb 
+   */
   static deleteStudentTaskSessions( id, cb ) {
     DBUtils._get( 'deleteStudentTaskSessions', { id }, cb );
   }
 
   // Private
 
+  /**
+   * @param {string} fnc 
+   * @param {object} params 
+   * @param {Callback} cb 
+   */
   static _get( fnc, params, cb ) {
     const headers = new window.Headers();
     headers.append( 'Content-Type', 'text/json' );
 
+    /** @type {RequestMode} */
+    const mode = 'cors';
+    /** @type {RequestCache} */
+    const cache = 'no-cache';
+
     const init = {
       method: 'GET',
       headers: headers,
-      mode: 'cors',
-      cache: 'no-cache',
+      mode,
+      cache,
     };
 
     const query = [];
@@ -60,6 +86,10 @@ export default class DBUtils {
     }
   }
 
+  /**
+   * @param {string} json 
+   * @returns {{err: string, response: any}}
+   */
   static _parseResponse( json ) {
     let err = null;
     let response = null;
@@ -81,10 +111,16 @@ export default class DBUtils {
     return { err, response };
   }
 
+  /**
+   * 
+   * @param {string} name 
+   * @param {object} params 
+   * @param {Callback} cb 
+   */
   static _call( name, params, cb ) {
     DBUtils._get( name, params, ( error, json ) => {
       if ( error ) {
-        return cb( error.message );
+        return cb( error );
       }
 
       const { err, response } = DBUtils._parseResponse( json );

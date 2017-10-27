@@ -1,5 +1,8 @@
 import db from '@/db/db.js';
 
+// ts-check-only
+import UserBase from '@/db/userBase';
+
 class Login {
 
   /**
@@ -24,7 +27,7 @@ class Login {
     return db.resetPassword( email, cb );
   }
 
-  /** @returns {string} */
+  /** @returns {UserBase} */
   get user() {
     return db.user;
   }

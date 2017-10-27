@@ -5,14 +5,14 @@ import db from '@/db/db.js';
 // ts-check-only 
 import { IntroCreateParams } from './commons/createParams.js';
 
-export default class Intro {
+export default class Intro extends Recordable {
 
   /**
    * @param {string} [id]
    */
   constructor( id ) {
-    /** @type {string} ID */
-    this.id = id;
+    super( id );
+
     /** @type {string} teacher ID */
     this.owner = '';
     /** @type {string} */

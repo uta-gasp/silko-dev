@@ -1,12 +1,17 @@
+// ts-check-only
+import { TextPageImage } from './textPageImage';
+
 export default class TextPage {
 
   /**
-   * @param {number | string} id 
+   * @param {number} id 
    */
   constructor( id ) {
-    this.id = id;       // index
-    this.lines = [];    // [String]
-    this.images = [];   // [TextPageImage]
+    this.id = id;
+    /** @type {string[]} */
+    this.lines = [];
+    /** @type {TextPageImage[]} */
+    this.images = [];
   }
 
 };

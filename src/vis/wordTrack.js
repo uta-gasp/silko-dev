@@ -25,7 +25,7 @@ export class ReplayWord {
    * @param {DataPageTextWord} ref 
    */
   constructor( ref ) {
-    /** @type {string} */
+    /** @type {number} */
     this.id = ref.id;
     /** @type {number} */
     this.totalDuration = 0;

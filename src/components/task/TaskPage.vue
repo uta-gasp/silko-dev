@@ -80,12 +80,11 @@ export default {
         return [];
       }
 
-      const pageIndex = this.textPresenter.originalPageIndex;
-      if ( pageIndex < 0 ) {
+      if ( this.textPresenter.isInstructionPage ) {
         return [];
       }
 
-      return this.task.pages[ pageIndex ].images;
+      return this.task.pages[ this.textPresenter.page ].images;
     },
   },
 

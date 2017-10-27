@@ -29,7 +29,7 @@
                   :ref="currentClass.id+student.id"
                   v-show="availableTasks( student ).length")
                 .dropdown-trigger(@click.stop="")
-                  button.button(aria-haspopup="true" aria-controls="dropdown-menu" @click="toggleTaskList()")
+                  button.button(aria-haspopup="true" aria-controls="dropdown-menu" @click="toggleTaskList( currentClass.id+student.id )")
                     span Add an assignment
                     span.icon.is-small
                       i.fa.fa-angle-down(aria-hidden="true")
@@ -300,12 +300,12 @@ export default {
       return this.tasks.filter( task => !student.assignments[ task.id ] );
     },
 
-    toggleTaskList() {
+    toggleTaskList( id ) {
       if ( this.activeMenu ) {
         this.hideTaskList();
       }
       else {
-        this.showTaskList();
+        this.showTaskList( id );
       }
     },
 

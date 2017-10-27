@@ -18,14 +18,6 @@ import Font from '@/model/session/font.js';
 import { Feedbacks } from '@/model/session/feedbacks.js';
 import { TextPageImage } from '@/model/task/textPageImage.js';
 
-/**
- * @typedef ETUDFixation
- * @property {number} ts
- * @property {number} duration
- * @property {number} x
- * @property {number} y
- */
-
 const MIN_FIXATION_DURATION = 80;
 
 class Timer {
@@ -274,14 +266,16 @@ export default class DataCollector {
   }
 
   /**
-   * @param {ETUDFixation} gazePoint 
+   * @param {GTFixation} gazePoint 
    */
   addGazePoint( gazePoint ) {
     if ( !this._pages.ready ) {
       return;
     }
 
-    this._pages.current.data.fixations.push( Fixation.from( gazePoint, this._timer.value ) );
+    this._pages.current.data.fixations.push(
+      Fixation.from( gazePoint, this._timer.value )
+    );
   }
 
   /**

@@ -1,12 +1,25 @@
+// ts-check-only
+import { Threshold } from './feedbacks';
+
+/**
+ * @typedef {Object} FeedbackOptions
+ * @property {boolean} enabled
+ * @property {string} language
+ * @property {Threshold} threshold
+ */
+
 export default class Feedback {
 
+  /**
+   * @param {FeedbackOptions} options 
+   */
   constructor( options ) {
-    this.enabled = options.enabled;         // boolean
-    this.language = options.language;       // boolean
+    this.enabled = options.enabled;
+    this.language = options.language;
     this.threshold = {
-      value: options.threshold.value,     // int
-      smart: options.threshold.smart,     // boolean
-      adjustForWordLength: options.threshold.adjustForWordLength, // boolean
+      value: options.threshold.value,
+      smart: options.threshold.smart,
+      adjustForWordLength: options.threshold.adjustForWordLength,
     };
   }
 

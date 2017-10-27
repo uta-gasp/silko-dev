@@ -105,7 +105,6 @@ export default {
             this.errorText = err;
             return;
           }
-
           this.task = task;
         } ).then( _ => {
           this.task.getIntro( ( err, intro ) => {

@@ -44,7 +44,7 @@ export default class ReplayTrack {
 
     /** @type {number} */
     this._pointerSize = 8;
-    /** @type {number} */
+    /** @type {NodeJS.Timer} */
     this._fixationEndTimer = null;
     /** @type {NodeJS.Timer} */
     this._fixationGrowTimer = null;

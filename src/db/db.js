@@ -1,6 +1,18 @@
 import UserCreator from './user-creator.js';
+import User from '@/model/user.js';
 
 import eventBus from '@/utils/event-bus.js';
+
+// ts-check-only
+import UserBase from './userBase.js';
+import Recordable from '@/model/commons/recordable.js';
+
+/**
+ * @typedef {Object} RecordableClass
+ * @implements {Function}
+ * @property {function(obj: any): boolean} validate
+ * @property {function(obj: any): any} from
+ */
 
 // TODO remove the first line, uncomment the other
 // const config = require( `@/config/db.development.js` ).config;
@@ -8,10 +20,14 @@ const configName = process.env.IS_DEV ? 'development' : process.env.NODE_ENV;
 const config = require( `@/config/db.${configName}.js` ).config;
 console.log( `Connecting to ${config.projectId}` );
 
+const DEFAULT_PASSWORD = 'gdfvgdfv';
 const ADMIN_UID = configName === 'development'
   ? 'd1wjPNPQ0CVOssWFwqSm1r1inC62'
   : 'sp4j975g5uWGUozTRhpHKgyaG8m2';  // 'DKhFYCK9Z2RBhJ4whW8ujJm0s6c2'
 
+/**
+ * @param {any} obj 
+ */
 function ctor( obj ) {
   return Object.getPrototypeOf( obj ).constructor;
 }
@@ -21,7 +37,8 @@ class DB {
   // Constructor
   constructor() {
     if ( !window['firebase'] ) {
-      return window.alert( 'Cannot access Firebase' );
+      window.alert( 'Cannot access Firebase' );
+      return;
     }
 
     if ( !firebase.apps.length ) {
@@ -36,33 +53,39 @@ class DB {
     }
   }
 
+  /** @returns {string} */
   get FAKE_EMAIL_DOMAIN() {
     return '@fake.com';
   }
 
+  /**
+   * @param {any} app 
+   */
   _init( app ) {
     this.fb = firebase.database( app ).ref();
     this.storage = firebase.storage().ref();
-
     this.auth = firebase.auth();
+
+    /** @type {UserBase} */
     this._user = null;
     this.ignoreUserSwitch = false;
     this.currentPassword = '';
 
-    // this.r = (new Date()).toString().match(/\s(\d+:\d+:\d+)\s/)[1];
-
     this.auth.onAuthStateChanged( this._onUserChanged.bind( this ) );
   }
 
-  // Returns current user
+  /** @returns {UserBase} - current user */
   get user() {
     return this._user;
   }
 
-  // Signs in with email and password
-  // @param email - email
-  // @param password - password
-  // @param cb - callback( err, user )
+  /**
+   * Signs in with email and password
+   * @param {string} email 
+   * @param {string} password 
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   logIn( email, password, cb ) {
     if ( !this.fb ) {
       cb( new Error( 'Not connected to the database' ) );
@@ -89,19 +112,25 @@ class DB {
     this.auth.signOut();
   }
 
+  /**
+   * @param {string} email 
+   * @param {Callback} cb 
+   * @returns {Promise}
+   */
   resetPassword( email, cb ) {
-    this.auth.sendPasswordResetEmail( email ).then( _ => {
+    return this.auth.sendPasswordResetEmail( email ).then( _ => {
       cb( null );
     } ).catch( err => {
       cb( err );
     } );
   }
 
-  // Adds a new record
-  // @param cls - class
-  // @param obj - object to store
-  // @param cb - callback( err )
-  // @return - id of the created record
+  /**
+   * Adds a new record
+   * @param {RecordableClass} cls - class
+   * @param {any} obj - object to store
+   * @param {Callback} cb - id of the created record
+   */
   add( cls, obj, cb ) {
     if ( cls.validate && !cls.validate( obj ) ) {
       let objString = JSON.stringify( obj );
@@ -115,7 +144,7 @@ class DB {
       // 3. log in back to the current user
       this.ignoreUserSwitch = true;
 
-      const password = obj.password || 'gdfvgdfv';
+      const password = obj.password || DEFAULT_PASSWORD;
       delete obj.password;
 
       this.auth.createUserWithEmailAndPassword( obj.email, password ).then( user => {
@@ -135,7 +164,7 @@ class DB {
           path: cls.db,
           id: ref.key,
         };
-        this.fb.child( 'users' ).update( userRecord );
+        this.fb.child( 'users' ).update( userRecord ); // TODO - replace by this.update
 
         cb( null, ref.key );
       } ).catch( err => {
@@ -148,34 +177,40 @@ class DB {
     }
   }
 
-  // Update record
-  // @param path - db path
-  // @param value - value to store
-  // @param cb - callback( err )
-  // @return - Promose
+  /**
+   * Update an object located at a direct path
+   * @param {string} path - db path
+   * @param {any} value - value to store
+   * @param {Callback} cb
+   * @return {Promise}
+   */
   update( path, value, cb ) {
     const updates = {};
     updates[ path ] = value;
     return this.fb.update( updates, cb );
   }
 
-  // Update a record
-  // @param obj - instance of a class to update
-  // @param field - field to update
-  // @param value - value to store
-  // @param cb - callback( err )
-  // @return - Promose
+  /**
+   * Update an inner object's field
+   * @param {Recordable} obj - instance of a class to update
+   * @param {string} field - field to update
+   * @param {any} value - value to store
+   * @param {Callback} cb 
+   * @return {Promise}
+   */
   updateField( obj, field, value, cb ) {
     const updates = {};
     updates[ `/${ctor( obj ).db}/${obj.id}/${field}` ] = value;
     return this.fb.update( updates, cb );
   }
 
-  // Update a record
-  // @param obj - instance of a class to update
-  // @param upd - [ { field, value } ]
-  // @param cb - callback( err )
-  // @return - Promose
+  /**
+   * 
+   * @param {Recordable} obj - instance of a class to update
+   * @param {Array | object} upd - [ { field, value } ] | { field, value }
+   * @param {Callback} cb 
+   * @return {Promise}
+   */
   updateFields( obj, upd, cb ) {
     const updates = {};
 
@@ -193,22 +228,26 @@ class DB {
     return this.fb.update( updates, cb );
   }
 
-  // Sets a new value for a field
-  // @param obj - instance of a class to update
-  // @param field - field to update
-  // @param value - value to store
-  // @param cb - callback( err )
-  // @return - Promose
+  /**
+   * Sets a new value for a field
+   * @param {Recordable} obj - instance of a class to update
+   * @param {string} field - field to update
+   * @param {any} value - value to store
+   * @param {Callback} cb 
+   * @return {Promise}
+   */
   setField( obj, field, value, cb ) {
     const ref = this.fb.child( `/${ctor( obj ).db}/${obj.id}` );
     return ref.child( field ).set( value, cb );
   }
 
-  // Gets a record to DB
-  // @param cls - class
-  // @param id - object id
-  // @param cb - callback( err, obj )
-  // @return - Promise
+  /**
+   * Gets a record from DB
+   * @param {RecordableClass} cls 
+   * @param {string} id - ID
+   * @param {Callback} cb - 'obj' retrieved object
+   * @return {Promise}
+   */
   get( cls, id, cb ) {
     const ref = this.fb.child( `${cls.db}/${id}` );
     return ref.once( 'value', snapshot => {
@@ -222,11 +261,13 @@ class DB {
     } );
   }
 
-  // Gets several items from DB
-  // @param cls - class
-  // @param ids - array of ids
-  // @param cb - callback( err, obj )
-  // @return - Promise
+  /**
+   * Gets several items from DB
+   * @param {RecordableClass} cls 
+   * @param {string[]} ids - IDs
+   * @param {Callback} cb - 'object[]' retrieved objects
+   * @return {Promise}
+   */
   getFromIDs( cls, ids, cb ) {
     const results = [];
     const promises = [];
@@ -250,11 +291,13 @@ class DB {
     } );
   }
 
-  // Gets an array of objects
-  // @param path - path in DB
-  // @param cls - class
-  // @param cb - callback( err, obj )
-  // @return - Promise
+  /**
+   * Gets an array of objects
+   * @param {string} path path in DB
+   * @param {RecordableClass} cls 
+   * @param {Callback} cb - 'object[]' retrieved objects
+   * @return {Promise}
+   */
   getFieldAll( path, cls, cb ) {
     const ref = this.fb.child( path ); // `${cls.db}/${id}/${field}`
     return ref.once( 'value', snapshot => {
@@ -270,10 +313,12 @@ class DB {
     } );
   }
 
-  // Returns all records of the given class
-  // @param cls - class
-  // @param cb - callback( err, arr ), where arr is an array of the records
-  // @return - Promise
+  /**
+   * Returns all records of the given class
+   * @param {RecordableClass} cls 
+   * @param {Callback} cb - 'object[]' retrieved objects
+   * @return {Promise}
+   */
   getAll( cls, cb ) {
     const ref = this.fb.child( cls.db );
     return ref.once( 'value', snapshot => {
@@ -294,6 +339,12 @@ class DB {
     } );
   }
 
+  /**
+   * Delete multiple records on the given class
+   * @param {RecordableClass} cls 
+   * @param {string[]} ids 
+   * @return {Promise}
+   */
   deleteItems( cls, ids ) {
     const promises = [];
 
@@ -305,16 +356,34 @@ class DB {
     return Promise.all( promises );
   }
 
+  /**
+   * Delete a given recordable instance
+   * @param {Recordable} obj 
+   * @param {Callback} cb 
+   * @return {Promise}
+   */
   delete( obj, cb ) {
     const ref = this.fb.child( `${ctor( obj ).db}/${obj.id}` );
     return ref.remove().then( () => cb() ).catch( err => cb( err ) );
   }
 
+  /**
+   * Delete a field
+   * @param {Recordable} obj 
+   * @param {string} field 
+   * @param {Callback} cb 
+   * @return {Promise}
+   */
   deleteField( obj, field, cb ) {
     const ref = this.fb.child( `${ctor( obj ).db}/${obj.id}/${field}` );
     return ref.remove().then( () => cb() ).catch( err => cb( err ) );
   }
 
+  /**
+   * Delete user record
+   * @param {string} id 
+   * @return {Promise}
+   */
   deleteUser( id ) {
     const query = this.fb.child( 'users' ).orderByChild( 'id' ).equalTo( id );
     return query.once( 'value', snapshot => {
@@ -328,6 +397,14 @@ class DB {
     } );
   }
 
+  /**
+   * @param {File} file 
+   * @param {string} prefix 
+   * @param {object} meta 
+   * @param {function(number)} progressHandler 
+   * @param {Callback} cb 
+   * @return {Promise}
+   */
   uploadFile( file, prefix, meta, progressHandler, cb ) {
     const folder = /image\//.test( file.type ) ? 'image' : 'file';
     const metadata = {
@@ -348,6 +425,11 @@ class DB {
     return uploadTask.then();
   }
 
+  /**
+   * @param {string} url 
+   * @param {Callback} cb 
+   * @return {Promise}
+   */
   deleteFile( url, cb ) {
     const pathParts = new window.URL( url ).pathname.split( '/' );
     const filename = pathParts[ pathParts.length - 1 ];
@@ -362,6 +444,9 @@ class DB {
       .catch( err => cb( err ) );
   }
 
+  /**
+   * @param {FBUser} user 
+   */
   _onUserChanged( user ) {
     if ( user ) {
       // switch user back if needed
@@ -378,12 +463,8 @@ class DB {
       }
 
       // otherwise get the user record, if it exists
-      this.fb.child( `users/${user.uid}` ).once( 'value', snapshot => {
-        let userRef = snapshot.val();
-        if ( !userRef && user.uid === ADMIN_UID ) {
-          userRef = 'admin';
-        }
-
+      this.fb.child( `users/${user.uid}` ).once( 'value', snapshot => {             // TODO - replace by this.get
+        const userRef = new User( snapshot.val(), user.uid === ADMIN_UID );
         UserCreator.create( user, userRef, ( err, result ) => {
           if ( err ) {
             this.logOut();
@@ -400,6 +481,10 @@ class DB {
     }
   }
 
+  /**
+   * @param {any} obj 
+   * @returns {Array}
+   */
   _toArray( obj ) {
     let result;
     if ( obj instanceof Array ) {

@@ -116,7 +116,7 @@ class GazeTracking {
   /**
    * @param {string} name 
    * @param {string} id 
-   * @param {function(string | HTMLElement | GTFixation | GTSample)} cb 
+   * @param {function(string | HTMLElement | GTFixation )} cb 
    */
   setCallback( name, id, cb ) {
     callbackLists[ name ][ id ] = cb;

@@ -1,7 +1,39 @@
-// Stores the functionality required for classes holding data to be stored in a database
+/**
+ * @description Stores the functionality required for classes holding data to be stored in a database
+ */
 export default class Recordable {
 
-  // Extends classes to be upload/downloaded into/from a database
+  /**
+   * @param {string} [id] - ID
+   */
+  constructor( id ) {
+    this.id = id;
+  }
+
+  // to be overriden by descendants
+
+  /** @returns {string} */
+  static get db() { return ''; }
+
+  // to be overriden using Recordable.apply()
+
+  /**
+   * @param {any} _ - object, whose properties should match this class properties (except 'id')
+   * @return {boolean}
+   */
+  static validate( _ ) { return false; }
+
+  /**
+   * @param {any} _ - snapshot 
+   * @return {any}
+   */
+  static from( _ ) { return null; }
+
+  /**
+   * Extends classes to be upload/downloaded into/from a database
+   * Must be called after the class definition
+   * @param {object} cls 
+   */
   static apply( cls ) {
     // Check whether the object hold all data fields defined in the target class
     cls.validate = function( obj ) {

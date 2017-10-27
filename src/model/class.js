@@ -1,4 +1,5 @@
 import Recordable from './commons/recordable.js';
+
 import { TaskCreateParams } from './commons/createParams.js';
 
 import Task from './task.js';
@@ -6,14 +7,14 @@ import Student from './student.js';
 
 import db from '@/db/db.js';
 
-export default class Class {
+export default class Class extends Recordable {
 
   /**
    * @param {string} [id]
    */
   constructor( id ) {
-    /** @type {string} ID */
-    this.id = id;
+    super( id );
+
     /** @type {string} */
     this.name = '';
     /** @type {string} teacher ID */

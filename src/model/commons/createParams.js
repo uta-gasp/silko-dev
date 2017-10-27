@@ -1,3 +1,4 @@
+// ts-check-only
 import { SyllabOptions, SpeechOptions } from '@/model/session/feedbacks.js';
 import { TextPageImage } from '@/model/task/textPageImage.js';
 

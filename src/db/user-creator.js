@@ -5,15 +5,23 @@ import School from '@/model/school.js';
 import Teacher from '@/model/teacher.js';
 import Student from '@/model/student.js';
 
-import AdminUser from './admin.js';
-import SchoolUser from './school.js';
-import TeacherUser from './teacher.js';
-import StudentUser from './student.js';
+import AdminUser from './adminUser.js';
+import SchoolUser from './schoolUser.js';
+import TeacherUser from './teacherUser.js';
+import StudentUser from './studentUser.js';
+
+// ts-check-only
+import User from '@/model/user.js';
 
 export default class UserCreator {
 
+  /**
+   * @param {FBUser} user 
+   * @param {User} ref 
+   * @param {Callback} cb 
+   */
   static create( user, ref, cb ) {
-    if ( ref === 'admin' ) {
+    if ( ref.id === 'admin' ) {
       console.log( 'logged as admin' );
       return cb( null, new AdminUser( user, new Admin() ) );
     }

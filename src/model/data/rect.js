@@ -1,20 +1,32 @@
 export default class Rect {
 
+  /**
+   * @param {number} x - px
+   * @param {number} y - px
+   * @param {number} width - px
+   * @param {number} height - px
+   */
   constructor( x, y, width, height ) {
-    this.x = x;             // px
-    this.y = y;             // px
-    this.width = width;     // px
-    this.height = height;   // px
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
   }
 
+  /**
+   * @param {Element} el 
+   * @returns {Rect}
+   */
   static from( el ) {
     if ( !el ) {
       return null;
     }
 
     const rect = el.getBoundingClientRect();
-    return new Rect( Math.round( rect.x ), Math.round( rect.y ),
-      Math.round( rect.width ), Math.round( rect.height ) );
+    return new Rect(
+      Math.round( rect.left ), Math.round( rect.top ),
+      Math.round( rect.width ), Math.round( rect.height )
+    );
   }
 
 }

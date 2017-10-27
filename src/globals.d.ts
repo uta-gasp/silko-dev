@@ -15,10 +15,14 @@ interface Node {
 }
 
 interface Window {
+  // global
+  Image: any;
   Node: any;
   NodeFilter: any;
+  Headers: any;
+  Request: any;
+
   EventEmitter: any;
-  Image: any;
   GazeTargets: GazeTargets;
   SGWM: SGWM;
   responsiveVoice: ResponsiveVoice
@@ -45,12 +49,6 @@ interface ETUDriver {
 interface GTFixation {
   ts: number;
   duration: number;
-  x: number;
-  y: number;
-}
-
-interface GTSample {
-  ts: number;
   x: number;
   y: number;
 }
@@ -96,3 +94,20 @@ interface SGWM {
   ProgressionMergerSettings: function(): void;
   WordMapperSettings: function(): void;
 }
+
+interface FBUser {
+  name: string;
+  displayName: string;
+  email: string;
+  uid: string;
+}
+
+interface Firebase {
+  apps: Array;
+  initializeApp: function;
+  database: function;
+  storage: function;
+  auth: function;
+}
+
+declare var firebase: Firebase;

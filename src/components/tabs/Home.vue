@@ -201,8 +201,6 @@ export default {
     },
 
     sendPasswordResetRequest( e ) {
-      // TODO: send registration email
-
       if ( this.schoolToRegester ) {
         this.setSuccess( `The registration request for "${this.email}" has been sent.` );
         this.schoolToRegester = null;

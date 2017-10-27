@@ -5,14 +5,14 @@ import Font from './session/font.js';
 import { Feedbacks } from './session/feedbacks.js';
 import ScreenSize from './session/screenSize.js';
 
-export default class Session {
+export default class Session extends Recordable {
 
   /**
    * @param {string} [id]
    */
   constructor( id ) {
-    /** @type {string} ID */
-    this.id = id;
+    super( id );
+
     /** @type {string} */
     this.date = ( new Date() ).toJSON();
     /** @type {string} ID */

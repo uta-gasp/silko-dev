@@ -1,6 +1,13 @@
 /**
- * @returns {string}
+ * @typedef {Object} ImageCreateParams
+ * @property {string} src - URL string
+ * @property {number} page - -1 for all pages, <n> for a certain page
+ * @property {string} location:-'left', 'right', 'bottom'
+ * @property {TextPageImageEvent} on
+ * @property {TextPageImageEvent} off
  */
+
+/** @returns {string} */
 function uuidv4() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace( /[xy]/g, c => {
     const r = Math.random() * 16 | 0;
@@ -20,7 +27,10 @@ export class TextPageImageEvent {
     this.name = name;       // string
   }
 
-  /** @returns {boolean} */
+  /** 
+   * @virtual
+   * @returns {boolean} 
+   */
   get isValid() {
     return true;
   }
@@ -77,7 +87,10 @@ export class TextPageImageFixationEvent extends TextPageImageEvent {
     this.duration = duration;
   }
 
-  /** @returns {boolean} */
+  /** 
+   * @override
+   * @returns {boolean} 
+   */
   get isValid() {
     return this.word && this._isGreaterThanInt( this.duration, 100 );
   }
@@ -95,7 +108,10 @@ export class TextPageImageDelayEvent extends TextPageImageEvent {
     this.duration = duration;
   }
 
-  /** @returns {boolean} */
+  /** 
+   * @override
+   * @returns {boolean} 
+   */
   get isValid() {
     return this._isGreaterThanInt( this.duration, 0 );
   }
@@ -104,18 +120,19 @@ export class TextPageImageDelayEvent extends TextPageImageEvent {
 
 export class TextPageImage {
 
-  /**
-   * @param {string} src - URL string
-   * @param {number} page - -1 for all pages, <n> for a certain page
-   * @param {string} location:-'left', 'right', 'bottom'
-   * @param {TextPageImageEvent} on
-   * @param {TextPageImageEvent} off
+  /** 
+   * @param {ImageCreateParams} param0
    */
   constructor( { src, page, location, on, off } ) {
+    /** @type {string} */
     this.src = src;
+    /** @type {number} */
     this.page = page;
+    /** @type {string} */
     this.location = location;
+    /** @type {TextPageImageEvent & TextPageImageFixationEvent} */
     this.on = on;
+    /** @type {TextPageImageEvent & TextPageImageDelayEvent} */
     this.off = off;
   }
 

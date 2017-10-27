@@ -1,12 +1,22 @@
 export default class Font {
 
+  /**
+   * @param {string} family 
+   * @param {string} size 
+   * @param {string} style 
+   * @param {string} weight 
+   */
   constructor( family, size, style, weight ) {
-    this.family = family;   // string
-    this.size = size;       // string
-    this.style = style;     // string
-    this.weight = weight;   // number | string
+    this.family = family;
+    this.size = size;
+    this.style = style;
+    this.weight = weight;
   }
 
+  /**
+   * @param {string[]} style 
+   * @returns {Font}
+   */
   static from( style ) {
     return new Font(
       style['font-family'],

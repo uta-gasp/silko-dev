@@ -1,8 +1,5 @@
 import { TextPageImage } from '@/model/task/textPageImage.js';
 
-// ts-check-only
-import DataImage from '@/model/data/image.js';
-
 export default class ImageController {
 
   /**
@@ -11,14 +8,14 @@ export default class ImageController {
    */
   /**
    * @param {{onShow: ImageEventHandler, onHide: ImageEventHandler}} eventHandlers 
-   * @param {DataImage[]} [images=[]] 
+   * @param {TextPageImage[]} [images=[]] 
    */
   constructor( { onShow, onHide }, images = [] ) {
     /** @type {ImageEventHandler} */
     this._onShow = onShow;
     /** @type {ImageEventHandler} */
     this._onHide = onHide;
-    /** @type {DataImage[]} */
+    /** @type {TextPageImage[]} */
     this._images = images;
 
     /** @type {object} - list of image locations */
@@ -55,7 +52,7 @@ export default class ImageController {
   }
 
   /**
-   * @param {DataImage[]} images 
+   * @param {TextPageImage[]} images 
    */
   setImages( images ) {
     this.shutdown();
@@ -98,7 +95,7 @@ export default class ImageController {
   }
 
   /**
-   * @param {DataImage} image 
+   * @param {TextPageImage} image 
    */
   _show( image ) {
     // handle off = 'image' cases
@@ -124,7 +121,7 @@ export default class ImageController {
   }
 
   /**
-   * @param {DataImage} image 
+   * @param {TextPageImage} image 
    */
   _hide( image ) {
     this._locations[ image.location ] = null;

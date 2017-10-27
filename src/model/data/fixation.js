@@ -1,20 +1,32 @@
 export default class Fixation {
 
+  /**
+   * @param {number} ts - ms
+   * @param {number} tsSync - ms
+   * @param {number} x - px
+   * @param {number} y - px
+   * @param {number} duration - ms
+   */
   constructor( ts, tsSync, x, y, duration ) {
-    this.ts = ts;               // ms
-    this.tsSync = tsSync;       // ms
-    this.x = x;                 // px
-    this.y = y;                 // px
-    this.duration = duration;   // ms
+    this.ts = ts;
+    this.tsSync = tsSync;
+    this.x = x;
+    this.y = y;
+    this.duration = duration;
   }
 
-  static from( etudFixation, ts ) {
+  /**
+   * @param {GTFixation} gazePoint 
+   * @param {number} ts - own Silko timestamp
+   * @returns {Fixation}
+   */
+  static from( gazePoint, ts ) {
     return new Fixation(
-      etudFixation.ts,
+      gazePoint.ts,
       ts,
-      Math.round( etudFixation.x ),
-      Math.round( etudFixation.y ),
-      etudFixation.duration
+      Math.round( gazePoint.x ),
+      Math.round( gazePoint.y ),
+      gazePoint.duration
     );
   }
 
