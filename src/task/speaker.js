@@ -1,15 +1,12 @@
-// Dependecy:
-//      responsiveVoice
+/**
+ * @external responsiveVoice
+ * @see {@link https://responsivevoice.org/}
+ */
 
 import SpeechFeedback from '@/model/session/speechFeedback.js';
 
 // ts-check-only
 import WordFocus from './wordFocus.js';
-
-/**
- * @external responsiveVoice
- * @see {@link https://responsivevoice.org}
- */
 
 const LONG_WORD_MIN_LENGTH = 7;
 const EXTRA_THRESHOLD_FOR_CHAR = 0.05;
@@ -103,13 +100,13 @@ const voices = {
    * @param {string} word 
    */
   Finnish( word ) {
-    window.responsiveVoice.speak( word, 'Finnish Female' );
+    responsiveVoice.speak( word, 'Finnish Female' );
   },
 
   /**
    * @param {string} word 
    */
   English( word ) {
-    window.responsiveVoice.speak( word, 'US English Female' );
+    responsiveVoice.speak( word, 'US English Female' );
   },
 };

@@ -67,7 +67,7 @@ export default class Teacher extends Recordable {
    * @param {Callback} cb 
    * @returns {Promise}
    */
-  createStudent( {name, email, password, grade}, cb ) {
+  createStudent( {name = '', email = '', password = '', grade = ''}, cb ) {
     return db.add( Student, {
       name: name,
       email: email,
@@ -153,13 +153,13 @@ export default class Teacher extends Recordable {
 
     db.deleteField( this, `intros/${intro.id}`, cb );
 
-    db.getFromIDs( Class, this.classes, ( err, classes ) => {
+    db.getFromIDs( Class, this.classes, /** @param {Class[]} classes */ ( err, classes ) => {
       if ( err ) {
         return console.error( err );
       }
 
       classes.forEach( cls => {
-        db.getFromIDs( Task, cls.tasks, ( err, tasks ) => {
+        db.getFromIDs( Task, cls.tasks, /** @param {Task[]} tasks */( err, tasks ) => {
           if ( err ) {
             return console.error( err );
           }
@@ -230,7 +230,7 @@ export default class Teacher extends Recordable {
 
     db.deleteItems( Task, cls.tasks );
 
-    db.getFromIDs( Student, cls.students, ( err, students ) => {
+    db.getFromIDs( Student, cls.students, /** @param {Student[]} students */ ( err, students ) => {
       if ( err ) {
         return console.error( err );
       }

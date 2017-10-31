@@ -1,4 +1,4 @@
-import Feedback from './feedback.js';
+import { Feedback, FeedbackOptions } from './feedback.js';
 
 export default class SyllabificationFeedback extends Feedback {
 

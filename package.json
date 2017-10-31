@@ -1,13 +1,13 @@
 {
-  "name": "eyeschool",
+  "name": "silko",
   "version": "0.0.1",
-  "description": "Reading aid for schools",
+  "description": "Reading aid for teachers and students",
   "author": "oleg.spakov <oleg.spakov@uta.fi>",
   "private": false,
   "scripts": {
     "dev": "node build/dev-server.js",
     "build": "node build/build.js",
-    "lint": "clear & clear & eslint --ext .js,.vue src",
+    "lint": "clear & clear & eslint --fix --ext .js,.vue src",
     "test": "./node_modules/.bin/jest"
   },
   "dependencies": {

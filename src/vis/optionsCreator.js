@@ -1,5 +1,5 @@
 /**
- * @typedef OptionItem
+ * @typedef {Object} OptionItem
  * @property {string} type - Array, String, Boolean, Number, or '#' for colors
  * @property {string} label
  * @property {string[]} [items] - if type === Array
@@ -8,12 +8,12 @@
  */
 
 /**
- * @typedef OptionItems
+ * @typedef {any} OptionItems
  * multiple keys, each of type OptionItem
  */
 
 /**
- * @typedef OptionGroup
+ * @typedef {Object} OptionGroup
  * @property {string} title
  * @property {OptionItems} options
  * @property {any[]} defaults
@@ -102,7 +102,7 @@ export default class OptionsCreator {
  * @returns {function}
  */
 function createOptionReference( id, receiver ) {
-  return value => {
+  return /** @param {any} value */ value => {
     const ids = id.split( '.' );
     if ( value === undefined ) {
       let v = receiver;

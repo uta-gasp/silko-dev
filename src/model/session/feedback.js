@@ -1,14 +1,22 @@
 // ts-check-only
 import { Threshold } from './feedbacks';
 
-/**
- * @typedef {Object} FeedbackOptions
- * @property {boolean} enabled
- * @property {string} language
- * @property {Threshold} threshold
- */
+export class FeedbackOptions {
 
-export default class Feedback {
+  /** 
+   * @param {boolean} enabled
+   * @param {string} language
+   * @param {Threshold} threshold
+   */
+  constructor( enabled = false, language = '', threshold = null ) {
+    this.enabled = enabled;
+    this.language = language;
+    this.threshold = threshold;
+  }
+
+}
+
+export class Feedback {
 
   /**
    * @param {FeedbackOptions} options 

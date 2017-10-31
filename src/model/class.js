@@ -103,7 +103,7 @@ export default class Class extends Recordable {
     delete this.tasks[ task.id ];
     db.deleteField( this, `tasks/${task.id}`, cb );
 
-    db.getFromIDs( Student, this.students, ( err, students ) => {
+    db.getFromIDs( Student, this.students, /** @param {Student[]} students */ ( err, students ) => {
       if ( err ) {
         return console.error( err );
       }
@@ -163,7 +163,7 @@ export default class Class extends Recordable {
       if ( !err ) {
         this.students = joinedStudents;
 
-        db.getFromIDs( Student, newStudents, ( err, students ) => {
+        db.getFromIDs( Student, newStudents, /** @param {Student[]} students */ ( err, students ) => {
           if ( err ) {
             return console.error( err );
           }

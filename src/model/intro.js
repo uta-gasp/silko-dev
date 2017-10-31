@@ -85,6 +85,9 @@ export default class Intro extends Recordable {
     const MAX_CHARS_END = 20;
     const MAX_CHARS = MAX_CHARS_START + MAX_CHARS_END;
 
+    /**
+     * @param {string} text 
+     */
     function copressText( text ) {
       text = text.replace( /\n/g, ' ' );
       const length = text.length;

@@ -246,6 +246,9 @@ export default class ReplayTrack {
     this._currentDuration += FIXATION_GROW_INTERVAL;
   };
 
+  /**
+   * @param {Fixation} fixation 
+   */
   _checkSyllabification( fixation ) {
     if ( this._nextSyllabificationIndex < 0 ) {
       return;

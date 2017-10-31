@@ -17,6 +17,7 @@ import ModelStudent from '@/model/student.js';
 import Font from '@/model/session/font.js';
 import { Feedbacks } from '@/model/session/feedbacks.js';
 import { TextPageImage } from '@/model/task/textPageImage.js';
+import Question from '@/model/session/question.js';
 
 const MIN_FIXATION_DURATION = 80;
 
@@ -113,7 +114,13 @@ class Pages {
 
 class DataCollectorSession {
 
-  constructor( student, task, font, feedbacks ) {
+  /**
+   * @param {ModelStudent} student 
+   * @param {ModelTask} task 
+   * @param {Font} font 
+   * @param {Feedbacks} feedbacks 
+   */
+  constructor( task, student, font, feedbacks ) {
     /** @type {string} */
     this.date = ( new Date() ).toJSON();
     /** @type {string} ID */
@@ -183,6 +190,7 @@ export default class DataCollector {
    * @returns {string[]}
    */
   longGazedWords( threshold ) {
+    /** @type {string[]} */
     const result = [];
     const re = /\b([\w$%&]+\S*\b)/;
     this._pages.items.forEach( page => {
@@ -365,6 +373,7 @@ export default class DataCollector {
         page.data.setWords( page.words );
         return page.data;
       } ),
+      /** @type {Question[]} */
       questionnaire: null,
     };
 

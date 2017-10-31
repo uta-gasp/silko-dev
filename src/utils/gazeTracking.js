@@ -1,3 +1,12 @@
+/**
+ * @external GazeTargets
+ * @see {@link https://lexasss.github.com/etudriver-web/}
+ */
+
+/**
+ * @typedef {Function} GTCallback
+ * @param {any} arg
+ */
 const RECONNECT_INTERVAL = 3000;
 
 const callbackLists = {
@@ -10,16 +19,22 @@ const callbackLists = {
 };
 
 const callbacks = {
+  /** @type {GTCallback} */
   started: null,
+  /** @type {GTCallback} */
   stopped: null,
+  /** @type {GTCallback} */
   stateUpdated: null,
+  /** @type {GTCallback} */
   wordFocused: null,
+  /** @type {GTCallback} */
   wordLeft: null,
+  /** @type {GTCallback} */
   gazePoint: null,
 };
 
 for ( let name in callbacks ) {
-  callbacks[ name ] = arg => {
+  callbacks[ name ] = /** @param {any} arg */ arg => {
     for ( let id in callbackLists[ name ] ) {
       callbackLists[ name ][ id ]( arg );
     }
@@ -36,7 +51,7 @@ class GazeTracking {
     this._serviceCheckTimer = null;
 
     /** @type {boolean} */
-    this._wsOK = window.GazeTargets.init( {
+    this._wsOK = GazeTargets.init( {
       etudPanel: {
         show: false,
       },
@@ -47,7 +62,7 @@ class GazeTracking {
         {
           selector: '.word',
           selection: {
-            type: window.GazeTargets.selection.types.none,
+            type: GazeTargets.selection.types.none,
           },
           mapping: {
             className: '',
@@ -55,12 +70,12 @@ class GazeTracking {
         },
       ],
       mapping: {
-        type: window.GazeTargets.mapping.types.expanded,
-        source: window.GazeTargets.mapping.sources.samples,
+        type: GazeTargets.mapping.types.expanded,
+        source: GazeTargets.mapping.sources.samples,
         expansion: 30,
       },
     }, {
-      state: state => {
+      state: /** @param {any} state */ state => {
         lastState = state;
         // if ( state.device ) {
         //   device = state.device;
@@ -83,15 +98,23 @@ class GazeTracking {
         }
       },
 
-      target: ( event, target ) => {
-        if ( event === 'focused' ) {
-          callbacks.wordFocused( target );
-        }
-        else if ( event === 'left' ) {
-          callbacks.wordLeft( target );
-        }
-      },
+      target:
+        /** 
+         * @param {string} event
+         * @param {Element} target 
+         * */ 
+        ( event, target ) => {
+          if ( event === 'focused' ) {
+            callbacks.wordFocused( target );
+          }
+          else if ( event === 'left' ) {
+            callbacks.wordLeft( target );
+          }
+        },
 
+      /**
+       * @param {GTFixation} fix
+       */
       fixation: fix => {
         callbacks.gazePoint( fix );
       },
@@ -131,27 +154,27 @@ class GazeTracking {
   }
 
   showOptions() {
-    window.GazeTargets.ETUDriver.showOptions();
+    GazeTargets.ETUDriver.showOptions();
   }
 
   calibrate() {
-    window.GazeTargets.ETUDriver.calibrate();
+    GazeTargets.ETUDriver.calibrate();
   }
 
   start() {
     if ( !lastState.isTracking ) {
-      window.GazeTargets.ETUDriver.toggleTracking();
+      GazeTargets.ETUDriver.toggleTracking();
     }
   }
 
   stop() {
     if ( lastState.isTracking ) {
-      window.GazeTargets.ETUDriver.toggleTracking();
+      GazeTargets.ETUDriver.toggleTracking();
     }
   }
 
   updateTargets() {
-    window.GazeTargets.updateTargets();
+    GazeTargets.updateTargets();
   }
 
   scheduleReconnection() {
@@ -162,7 +185,7 @@ class GazeTracking {
     this._serviceCheckTimer = setTimeout( () => {
       this._serviceCheckTimer = null;
       if ( !lastState.isServiceRunning ) {
-        this.wsOK = window.GazeTargets.reconnect();
+        this.wsOK = GazeTargets.reconnect();
       }
     }, RECONNECT_INTERVAL );
   }

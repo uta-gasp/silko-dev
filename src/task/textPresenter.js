@@ -1,6 +1,7 @@
 import TextPage from '@/model/task/textPage.js';
 
 // ts-check-only
+/* eslint-disable no-unused-vars */ // TODO this should be redundant, but eslint has some bug when parsing this file
 import ModelTask from '@/model/task.js';
 import Syllabifier from '@/task/syllabifier.js';
 
@@ -167,11 +168,22 @@ export default class TextPresenter {
     }
 
     /* eslint no-unused-vars: ["error", { "args": "none" } ] */
+    /**
+     * @param {string} match 
+     * @param {string} [p1] 
+     * @param {string} [p2] 
+     * @param {string} [p3] 
+     * @param {number} [offset]
+     * @param {string} [string]
+     * @param {boolean} [addSpace]
+     */
     function applyStyle( match, p1, p2, p3, offset, string, addSpace ) {
       const text = p1;
       const styles = p3;
 
+      /** @type {string[]} */
       const css = [];
+      /** @type {string[]} */
       const classes = [];
       styles.split( ',' ).forEach( style => {
         const styleAsNumber = Number.parseInt( style );
@@ -213,12 +225,12 @@ export default class TextPresenter {
 
     const nodeIterator = document.createNodeIterator(
       this._container,
-      window.NodeFilter.SHOW_TEXT,
+      NodeFilter.SHOW_TEXT,
       { acceptNode: node => {
         if ( !/^\s*$/.test( node.nodeValue ) ) {
-          return window.NodeFilter.FILTER_ACCEPT;
+          return NodeFilter.FILTER_ACCEPT;
         }
-        return window.NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_REJECT;
       }}
     );
 

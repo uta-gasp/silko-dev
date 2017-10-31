@@ -235,7 +235,7 @@ export default class Syllabifier {
 
     logger.info( 'counting syllab' );
 
-    const countWordSyllabs = ( acc, word ) => {
+    const countWordSyllabs = /** @param {number} acc; @param {string} word */ ( acc, word ) => {
       if ( !word ) {
         return acc;
       }
@@ -361,7 +361,7 @@ const rules = {
     const diftongs = [ 'ai', 'ei', 'oi', 'ui', 'yi', 'äi', 'öi', 'au', 'eu',
       'iu', 'ou', 'ey', 'iy', 'äy', 'öy', 'ie', 'uo', 'yö' ];
 
-    const getType = c => vowels.includes( c ) ? 'V' : ( consonants.includes( c ) ? 'C' : '_' );
+    const getType = /** @param {string} c */ c => vowels.includes( c ) ? 'V' : ( consonants.includes( c ) ? 'C' : '_' );
 
     const result = [];
 

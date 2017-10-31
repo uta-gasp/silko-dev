@@ -1,3 +1,7 @@
+/**
+ * @external EventEmitter
+ */
+
 import { Feedbacks } from '@/model/session/feedbacks.js';
 
 import Syllabifier from './syllabifier.js';
@@ -31,7 +35,7 @@ export default class FeedbackProvider {
     this._speaker = new Speaker( speech );
 
     /** @type {EventEmitter} */
-    this._events = new window.EventEmitter();
+    this._events = new EventEmitter();
     /** @type {NodeJS.Timer} */
     this.timer = null;
     /** @type {HTMLElement} */

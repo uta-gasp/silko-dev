@@ -4,13 +4,17 @@ export default class ImageController {
 
   /**
    * @typedef {Function} ImageEventHandler
-   * @param {DataImage} image
+   * @param {TextPageImage} image
    */
   /**
    * @param {{onShow: ImageEventHandler, onHide: ImageEventHandler}} eventHandlers 
    * @param {TextPageImage[]} [images=[]] 
    */
-  constructor( { onShow, onHide }, images = [] ) {
+  constructor( {
+    onShow = /** @param {TextPageImage} _ */_ => {}, 
+    onHide = /** @param {TextPageImage} _ */ _ => {} }, 
+  images = []
+  ) {
     /** @type {ImageEventHandler} */
     this._onShow = onShow;
     /** @type {ImageEventHandler} */
@@ -79,7 +83,7 @@ export default class ImageController {
 
   _prefetch() {
     this._images.forEach( image => {
-      const el = new window.Image();
+      const el = new Image();
       el.src = image.src;
 
       this._prefetched.set( image, el );

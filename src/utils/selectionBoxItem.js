@@ -11,7 +11,7 @@ export default class SelectionBoxItem {
   /**
    * @param {SelectionBoxItemArg} param0 
    */
-  constructor( { id, text, selected, group } ) {
+  constructor( { id = '', text = '', selected = false, group = '' } ) {
     /** @type {string} */
     this.id = id;
     /** @type {string} */

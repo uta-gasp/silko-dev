@@ -28,10 +28,10 @@ export default class WordFocus {
    */
   _getWordFromElement( el ) {
     const textNodes = Array.from( el.childNodes ).filter( node => {
-      if ( node.nodeType === window.Node.TEXT_NODE ) {
+      if ( node.nodeType === Node.TEXT_NODE ) {
         return true;
       }
-      if ( node.nodeType === window.Node.ELEMENT_NODE ) {
+      if ( node.nodeType === Node.ELEMENT_NODE ) {
         return !node.classList.contains( 'hyphens' );
       }
       return false;

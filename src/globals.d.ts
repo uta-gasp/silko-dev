@@ -4,35 +4,12 @@ interface Callback {
   ( err?: string | Error, data?: any );
 }
 
-// Extensions of build-in types
-
-interface Array<T> {
-  includes( elem: T );
-}
-
-interface Node {
-  classList: any;
-}
-
-interface Window {
-  // global
-  Image: any;
-  Node: any;
-  NodeFilter: any;
-  Headers: any;
-  Request: any;
-
-  EventEmitter: any;
-  GazeTargets: GazeTargets;
-  SGWM: SGWM;
-  responsiveVoice: ResponsiveVoice
-}
-
 // External libraries
 
 interface EventEmitter {
-  addListener( event: string, handler: function );
-  removeListener( event: string, handler: function );
+  new ();
+  addListener( event: string, handler: Function );
+  removeListener( event: string, handler: Function );
   emitEvent( event: string, data: any );
 }
 
@@ -65,9 +42,9 @@ interface GTState {
 }
 
 interface GTEvents {
-  state: function( GTState );
-  target: function( string, HTMLElement );
-  fixation: function( GTFixation );
+  state( GTState );
+  target( string, HTMLElement );
+  fixation( GTFixation );
 }
 
 interface GazeTargets {
@@ -82,32 +59,119 @@ interface GazeTargets {
 
   ETUDriver: ETUDriver;
 
-  init( settings: object, eventHandler: GTEvents ): boolean;
+  init( object, GTEvents ): boolean;
   updateTargets();
   reconnect();
 }
 
+interface SGWMSettings {
+  save();
+  isInitialized: boolean;
+}
+
+interface SGWMFixationProcessorSettings extends SGWMSettings {
+  new (): SGWMFixationProcessorSettings;
+  duration: {
+    enabled: boolean
+  };
+  location: {
+    enabled: boolean;
+    marginX: number;
+    marginY: number;
+  };
+}
+
+interface SGWMSplitToProgressionsSettings extends SGWMSettings {
+  new (): SGWMSplitToProgressionsSettings;
+  bounds: {
+    left: number;
+    right: number;
+    verticalChar: number;
+    verticalLine: number;
+  };
+  angle: number;
+}
+
+interface SGWMProgressionMergerSettings extends SGWMSettings {
+  new (): SGWMProgressionMergerSettings;
+  minLongSetLength: number;
+  fitThreshold: number;
+  maxLinearGradient: number;
+  removeSingleFixationLines: boolean;
+  correctForEmptyLines: boolean;
+  currentLineSupportInCorrection: number;
+  emptyLineDetectorFactor: number;
+  intelligentFirstLineMapping: boolean;
+}
+
+interface SGWMWordMapperSettings extends SGWMSettings {
+  new (): SGWMWordMapperSettings;
+  wordCharSkipStart: numner;
+  wordCharSkipEnd: numner;
+  scalingDiffLimit: numner;
+  rescaleFixationX: boolean;
+  partialLengthMaxWordLength: numner;
+  effectiveLengthFactor: numner;
+  ignoreTransitions: boolean;
+}
+
 interface SGWM {
-  (): void;
-  FixationProcessorSettings: function(): void;
-  SplitToProgressionsSettings: function(): void;
-  ProgressionMergerSettings: function(): void;
-  WordMapperSettings: function(): void;
+  new ();
+  FixationProcessorSettings: SGWMFixationProcessorSettings;
+  SplitToProgressionsSettings: SGWMSplitToProgressionsSettings;
+  ProgressionMergerSettings: SGWMProgressionMergerSettings;
+  WordMapperSettings: SGWMWordMapperSettings;
+  map( object );
+}
+
+interface FBStorage {
+  (): any;
+  readonly TaskState: any;
 }
 
 interface FBUser {
-  name: string;
-  displayName: string;
-  email: string;
-  uid: string;
+  readonly name: string;
+  readonly displayName: string;
+  readonly email: string;
+  readonly uid: string;
+}
+
+interface FBAuth {
+  onAuthStateChanged( cb: function );
+  signInWithEmailAndPassword( email: string, password: string ): Promise;
+  sendPasswordResetEmail( email: string ): Promise;
+  createUserWithEmailAndPassword( email: string, password: string ): Promise;
+  signOut();
+}
+
+interface FirebaseDataSnapshot {
+  readonly state: any;
+  readonly bytesTransferred: number;
+  readonly totalBytes: number;
+  readonly ref: Firebase;
 }
 
 interface Firebase {
-  apps: Array;
-  initializeApp: function;
-  database: function;
-  storage: function;
-  auth: function;
+  readonly apps: Array<any>;
+  initializeApp( object );
+  database( object );
+  readonly storage: FBStorage;
+	auth( authToken?: string ): FBAuth;
 }
 
+declare var EventEmitter: EventEmitter;
+declare var GazeTargets: GazeTargets;
+declare var SGWM: SGWM;
+declare var responsiveVoice: ResponsiveVoice;
 declare var firebase: Firebase;
+
+
+// Extensions of build-in types
+
+interface Array<T> {
+  includes( elem: T );
+}
+
+interface Node {
+  classList: any;
+}

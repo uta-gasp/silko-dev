@@ -88,6 +88,7 @@ import Font from '@/model/session/font.js';
  * @typedef {Object} Name
  * @property {string} text
  * @property {string} color
+ * @property {*} index
  */
 
 const WORD_HIGHLIGHT_COLOR = '#A06';
@@ -218,6 +219,7 @@ export default class Painter {
    * @param {GazePathSettings} settings 
    */
   drawFixations( fixations, settings ) {
+    /** @type {Fixation} */
     let prevFix;
 
     fixations.forEach( fix => {
@@ -270,7 +272,7 @@ export default class Painter {
   }
 
   /**
-   * @param {Name} names 
+   * @param {Name} name
    * @param {NamesSettings} settings 
    */
   checkName( name, settings ) {
@@ -306,7 +308,7 @@ export default class Painter {
    * @param {{dx: number, dy: number}} [offset={dx: 0, dy: 0}] 
    * @returns {Point}
    */
-  _offset( { x, y }, { dx = 0, dy = 0 } = { dx: 0, dy: 0 } ) {
+  _offset( { x = 0, y = 0 }, { dx = 0, dy = 0 } = { dx: 0, dy: 0 } ) {
     return { x: x + this._offsetX + dx, y: y + this._offsetY + dy };
   }
 

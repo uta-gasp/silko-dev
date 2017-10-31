@@ -123,7 +123,8 @@ export class TextPageImage {
   /** 
    * @param {ImageCreateParams} param0
    */
-  constructor( { src, page, location, on, off } ) {
+  constructor( /** @type {{src: string, page: number, location: string, on: TextPageImageEvent & TextPageImageFixationEvent, off: TextPageImageEvent & TextPageImageDelayEvent}} */ 
+    { src, page, location, on, off } ) {
     /** @type {string} */
     this.src = src;
     /** @type {number} */

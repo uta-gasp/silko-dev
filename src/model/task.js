@@ -237,14 +237,14 @@ export default class Task extends Recordable {
 
   /**
    * @param {Callback} cb 
-   * @returns 
+   * @returns {Promise}
    */
   getIntro( cb ) {
     if ( this.intro ) {
       return db.get( Intro, this.intro, cb );
     }
     else {
-      Promise.resolve( cb() );
+      return Promise.resolve( cb() );
     }
   }
 
@@ -252,7 +252,7 @@ export default class Task extends Recordable {
    * 
    * @param {File} file 
    * @param {object} meta 
-   * @param {function} progressHandler 
+   * @param {function(number)} progressHandler 
    * @param {Callback} cb 
    * @returns {Promise}
    */
@@ -275,6 +275,7 @@ export default class Task extends Recordable {
    * @returns {Promise}
    */
   deleteAllImages( cb ) {
+    /** @type {Promise[]} */
     const promises = [];
 
     this.pages.forEach( page => {

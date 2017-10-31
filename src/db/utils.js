@@ -47,7 +47,7 @@ export default class DBUtils {
    * @param {Callback} cb 
    */
   static _get( fnc, params, cb ) {
-    const headers = new window.Headers();
+    const headers = new Headers();
     headers.append( 'Content-Type', 'text/json' );
 
     /** @type {RequestMode} */
@@ -67,7 +67,7 @@ export default class DBUtils {
       query.push( `${name}=${params[name]}` );
     }
 
-    const request = new window.Request( path + fnc + '?' + query.join( '&' ) );
+    const request = new Request( path + fnc + '?' + query.join( '&' ) );
 
     if ( window.fetch ) {
       window.fetch( request, init ).then( response => {

@@ -1,3 +1,8 @@
+/**
+ * @external SGWM
+ * @see {@link https://uta-gasp.github.com/sgwm/}
+ */
+
 import OptionsCreator from '@/vis/optionsCreator.js';
 
 // ts-check-only
@@ -5,28 +10,23 @@ import Rect from '@/model/data/rect';
 import DataPage from '@/model/data/dataPage';
 
 /**
- * @external SGWM
- * @see {@link https://uta-gasp.github.com/sgwm/}
+ * @typedef {Object} _SGWMSettings
+ * @property {SGWMFixationProcessorSettings} [FixationProcessorSettings]
+ * @property {SGWMSplitToProgressionsSettings} [SplitToProgressionsSettings]
+ * @property {SGWMProgressionMergerSettings} [ProgressionMergerSettings]
+ * @property {SGWMWordMapperSettings} [WordMapperSettings]
  */
 
-/**
- * @typedef {Object} SGWMSettings
- * @property {*} [FixationProcessorSettings]
- * @property {*} [SplitToProgressionsSettings]
- * @property {*} [ProgressionMergerSettings]
- * @property {*} [WordMapperSettings]
- */
-
-/** @type {SGWMSettings} */
+/** @type {_SGWMSettings} */
 const _SGWM = {};
 
 export default class sgwmController {
 
-  /** @returns {SGWMSettings} */
+  /** @returns {_SGWMSettings} */
   static initializeSettings() {
     let settings;
 
-    settings = new window.SGWM.FixationProcessorSettings();
+    settings = new SGWM.FixationProcessorSettings();
     _SGWM.FixationProcessorSettings = settings;
     if ( !settings.isInitialized ) {
       settings.location.enabled = true;
@@ -36,7 +36,7 @@ export default class sgwmController {
       settings.save();
     }
 
-    settings = new window.SGWM.SplitToProgressionsSettings();
+    settings = new SGWM.SplitToProgressionsSettings();
     _SGWM.SplitToProgressionsSettings = settings;
     if ( !settings.isInitialized ) {
       settings.bounds = { // in size of char height
@@ -49,7 +49,7 @@ export default class sgwmController {
       settings.save();
     }
 
-    settings = new window.SGWM.ProgressionMergerSettings();
+    settings = new SGWM.ProgressionMergerSettings();
     _SGWM.ProgressionMergerSettings = settings;
     if ( !settings.isInitialized ) {
       settings.minLongSetLength = 3;
@@ -63,7 +63,7 @@ export default class sgwmController {
       settings.save();
     }
 
-    settings = new window.SGWM.WordMapperSettings();
+    settings = new SGWM.WordMapperSettings();
     _SGWM.WordMapperSettings = settings;
     if ( !settings.isInitialized ) {
       settings.wordCharSkipStart = 3;
@@ -148,11 +148,13 @@ export default class sgwmController {
 
   static save() {
     for ( let name in _SGWM ) {
-      _SGWM[ name ].save();
+      /** @type {SGWMSettings} */
+      const settings = _SGWM[ name ];
+      settings.save();
     }
   }
 
-  /** @returns {object} */
+  /** @returns {_SGWMSettings} */
   static get settings() {
     return _SGWM;
   }
@@ -175,7 +177,7 @@ export default class sgwmController {
       } ),
     };
 
-    const sgwm = new window.SGWM();
+    const sgwm = new SGWM();
     const result = sgwm.map( sgwmSession );
 
     return result;

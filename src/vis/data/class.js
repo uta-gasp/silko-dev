@@ -6,6 +6,7 @@ import dataUtils from '@/utils/data-utils.js';
 // ts-check-only
 import ModelClass from '@/model/class.js';
 import ModelStudent from '@/model/student.js';
+import ModelSession from '@/model/session.js';
 import Task from './task.js';
 
 export default class Class {
@@ -35,7 +36,7 @@ export default class Class {
 
       students.sort( dataUtils.byName );
 
-      students.forEach( student => {
+      students.forEach( /** @param {ModelStudent} student */ student => {
         this._loadStudentSessions( student, cb );
       } );
     } );
@@ -53,7 +54,7 @@ export default class Class {
 
       const _student = new Student( student );
 
-      sessions.forEach( session => {
+      sessions.forEach( /** @param {ModelSession} session */ session => {
         const task = this.tasks.find( task => task.id === session.task );
         if ( !task ) {
           return;

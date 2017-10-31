@@ -1,4 +1,4 @@
-module.exports = {
+{
     "extends": "standard",
     "parser": "vue-eslint-parser",
     "globals": {
@@ -7,6 +7,11 @@ module.exports = {
         "GazeTargets": true,
         "responsiveVoice": true,
         "EventEmitter": true,
+        "Headers": true,
+        "Request": true,
+        "Image": true,
+        "Node": true,
+        "NodeFilter": true
     },
     "rules": {
         "space-in-parens": ["error", "always", { "exceptions": ["empty"] }],
@@ -25,4 +30,4 @@ module.exports = {
             "ignoreRestSiblings": true
         }]
     }
-};
+}

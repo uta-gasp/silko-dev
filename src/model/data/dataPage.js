@@ -32,6 +32,7 @@ export default class DataPage {
    * @param {number} threshold - min fixation duration
    */
   filterFixations( threshold ) {
+    /** @type {Fixation[]} */
     const result = [];
 
     /** @type {Fixation} */

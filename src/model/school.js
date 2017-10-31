@@ -51,7 +51,7 @@ export default class School extends Recordable {
   }
 
   /**
-   * @param {string} ID
+   * @param {string} id - ID
    * @param {Callback} cb 
    * @returns {Promise}
    */
@@ -107,7 +107,7 @@ export default class School extends Recordable {
    * @param {Callback} cb 
    * @returns {Promise}
    */
-  createStudent( {name, email, password, grade}, cb ) {
+  createStudent( {name = '', email = '', password = '', grade = ''}, cb ) {
     return db.add( Student, {
       name: name,
       email: email,
@@ -156,7 +156,7 @@ export default class School extends Recordable {
     delete this.students[ student.id ];
 
     // TODO is just logging error enough?
-    const errorHandler = err => { if ( err ) console.log( '@/model/school.js/.deleteStudent db.updateField', err ); };
+    const errorHandler = /** @param {string} err */ err => { if ( err ) console.log( '@/model/school.js/.deleteStudent db.updateField', err ); };
 
     return db.updateField( this, 'students', this.students, err => {
       if ( err ) {
@@ -171,6 +171,7 @@ export default class School extends Recordable {
       }
 
       if ( student.classes ) {
+        /** @type {Promise[]} */
         const promises = [];
         Object.keys( student.classes ).map( id => {
           promises.push( Class.get( id, ( err, cls ) => {

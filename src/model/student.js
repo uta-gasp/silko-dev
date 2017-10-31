@@ -146,7 +146,7 @@ export default class Student extends Recordable {
       this.assignments[ cls ] = task;
     }
 
-    const onDone = err => {
+    const onDone = /** @param {string} err */ err => {
       if ( err ) {
         this.assignments[ cls ] = prevAssignment;
         console.error( '@/model/student.js/.setAssignment', err );
@@ -180,15 +180,17 @@ export default class Student extends Recordable {
       }
     }
 
-    return db.getFromIDs( Task, taskIDs, ( err, tasks ) => {
+    return db.getFromIDs( Task, taskIDs, /** @param {Task[]} tasks */ ( err, tasks ) => {
       if ( err ) {
         return cb( err );
       }
 
+      /** @type {{cls: Class, task: Task}[]} */
       const result = [];
+      /** @type {Promise[]} */
       const promises = [];
       tasks.forEach( task => {
-        promises.push( db.get( Class, task.cls, ( err, cls ) => {
+        promises.push( db.get( Class, task.cls, /** @param {Class} cls */ ( err, cls ) => {
           if ( err ) {
             return console.error( '@/model/student.js/.loadAssignments db.get Class', err ); // TODO is just logging error enough?
           }
@@ -212,7 +214,7 @@ export default class Student extends Recordable {
       sessionIDs.push( id );
     }
 
-    return db.getFromIDs( Session, sessionIDs, ( err, sessions ) => {
+    return db.getFromIDs( Session, sessionIDs, /** @param {Session[]} sessions */ ( err, sessions ) => {
       if ( err ) {
         return cb( err );
       }
@@ -227,6 +229,7 @@ export default class Student extends Recordable {
         } );
       } );
 
+      /** @type {Promise[]} */
       const promises = [];
       sessions.forEach( session => {
         promises.push( db.get( Class, session.cls, ( err, cls ) => {
@@ -250,6 +253,7 @@ export default class Student extends Recordable {
       } );
 
       Promise.all( promises ).then( _ => {
+      /** @type {object[]} */
         const arr = [];
         result.forEach( ( obj, session ) => {
           obj.session = session;

@@ -1,6 +1,7 @@
+/** @type {boolean} */
 const enabled = !!window[ 'webpackHotUpdate' ];
 
-function random( max, step = 1, min = 0 ) {
+function random( max = 100, step = 1, min = 0 ) {
   min = Math.ceil( min );
   max = Math.floor( max );
   let result = Math.round( Math.random() * ( max - min ) );
@@ -80,5 +81,12 @@ class Logger {
  */
 export default function( module ) {
   /* eslint no-unused-vars: ["error", { "args": "none" } ] */
-  return enabled ? new Logger( module ) : { info( ...args ) {}, ok( ...args ) {}, error( ...args ) {} };
+  return enabled ? new Logger( module ) : {
+    /** @param {...any} args */
+    info( ...args ) {},
+    /** @param {...any} args */
+    ok( ...args ) {},
+    /** @param {...any} args */
+    error( ...args ) {},
+  };
 };
