@@ -7,6 +7,7 @@
  * @typedef {Function} GTCallback
  * @param {any} arg
  */
+
 const RECONNECT_INTERVAL = 3000;
 
 const callbackLists = {
@@ -16,6 +17,7 @@ const callbackLists = {
   wordFocused: {},
   wordLeft: {},
   gazePoint: {},
+  customValue: {}
 };
 
 const callbacks = {
@@ -31,6 +33,8 @@ const callbacks = {
   wordLeft: null,
   /** @type {GTCallback} */
   gazePoint: null,
+  /** @type {GTCallback} */
+  customValue: null,
 };
 
 for ( let name in callbacks ) {
@@ -75,7 +79,10 @@ class GazeTracking {
         expansion: 30,
       },
     }, {
-      state: /** @param {any} state */ state => {
+      /** 
+       * @param {any} state 
+       * */ 
+      state: state => {
         lastState = state;
         // if ( state.device ) {
         //   device = state.device;
@@ -98,25 +105,32 @@ class GazeTracking {
         }
       },
 
-      target:
-        /** 
-         * @param {string} event
-         * @param {Element} target 
-         * */ 
-        ( event, target ) => {
-          if ( event === 'focused' ) {
-            callbacks.wordFocused( target );
-          }
-          else if ( event === 'left' ) {
-            callbacks.wordLeft( target );
-          }
-        },
+      /** 
+       * @param {string} event
+       * @param {Element} target 
+       * */ 
+      target: ( event, target ) => {
+        if ( event === 'focused' ) {
+          callbacks.wordFocused( target );
+        }
+        else if ( event === 'left' ) {
+          callbacks.wordLeft( target );
+        }
+      },
 
       /**
        * @param {GTFixation} fix
        */
       fixation: fix => {
         callbacks.gazePoint( fix );
+      },
+
+      /**
+       * @param {number} code
+       * @param {any} value
+       */
+      customValue: (code, value) => {
+        callbacks.customValue( { code, value } );
       },
     } );
   }
@@ -188,6 +202,33 @@ class GazeTracking {
         this.wsOK = GazeTargets.reconnect();
       }
     }, RECONNECT_INTERVAL );
+  }
+
+  /**
+   * @param {ETUDCustomValueType} customValueType 
+   * @param {Callback} cb
+   */
+  getCustomValue( customValueType, cb ) {
+    const tempID = '' + Math.random();
+    callbackLists[ 'customValue' ][ tempID ] = /** @param {ETUDCustomValueCallbackArg} e */ e => {
+      delete callbackLists[ 'customValue' ][ tempID ];
+      cb( null, e );
+    };
+
+    GazeTargets.ETUDriver.getCustomValue( customValueType );
+  }
+
+  /**
+   * @param {ETUDCustomValueType} customValueType 
+   * @param {any} value
+   */
+  setCustomValue( customValueType, value ) {
+    GazeTargets.ETUDriver.setCustomValue( customValueType, value );
+  }
+
+  /** @returns {Record<string, ETUDCustomValueType>} */
+  listCustomValueTypes() {
+    return GazeTargets.ETUDriver.listAvailableCustomValue();
   }
 
 }

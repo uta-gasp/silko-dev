@@ -2367,6 +2367,39 @@
                 isTracking: state.isTracking,
                 device: state.device
             };
+        },
+
+        // 'customValueType' is on of customValues
+        getCustomValue: function (customValueType) {
+            const code = getCustomValueCode( customValueType, true );
+            if (code) {
+                send(request.passValue + ' ' + code);
+            }
+            else {
+                console.error( '[ETUDriver.getCustomValue] not valid code for', JSON.stringify(customValueType) );
+            }
+        },
+
+        // 'customValueType' is on of customValues
+        setCustomValue: function (customValueType, value) {
+            const code = getCustomValueCode( customValueType, false );
+            if (code) {
+                send(request.passValue + ' ' + code + ' ' + value);
+            }
+            else {
+                console.error( '[ETUDriver.getCustomValue] not valid code for', JSON.stringify(customValueType) );
+            }
+        },
+
+        listAvailableCustomValue: function () {
+            const result = {};
+            for (let key in customValues) {
+                const cv = customValues[ key ];
+                if (cv.device === currentDevice) {
+                    result[ key.split('__')[1] ] = Object.assign( {}, cv );
+                }
+            }
+            return result;
         }
     };
 
@@ -2384,14 +2417,16 @@
         showOptions: 'SHOW_OPTIONS',
         calibrate: 'CALIBRATE',
         toggleTracking: 'TOGGLE_TRACKING',
-        setDevice: 'SET_DEVICE'
+        setDevice: 'SET_DEVICE',
+        passValue: 'PASS_VALUE'
     };
 
     // respond types receved from ETU-Driver Service application
     var respondType = {
         sample: 'sample',
         state: 'state',
-        device: 'device'
+        device: 'device',
+        custom: 'custom'
     };
 
     var stateFlags = {
@@ -2402,6 +2437,23 @@
         busy: 8             // the service is temporally unavailable (calibration is in progress, 'Options' window is shown, etc.)
     };
 
+    var customValues = {
+        MY_GAZE__totalScore: { id: 1, type: Number, device: 'myGaze n' },
+        MY_GAZE__lastScore: { id: 2, type: Number, device: 'myGaze n' },
+        MY_GAZE__bestScore: { id: 3, type: Number, device: 'myGaze n' },
+        MY_GAZE__name: { id: 4, type: String, device: 'myGaze n' },
+        MOUSE__name: { id: 4, type: String, device: 'Mouse' },
+    };
+
+    var customValueTypeFlags = new Map();
+    customValueTypeFlags.set( Number, 0x0800 );
+    customValueTypeFlags.set( String, 0x0400 );
+    customValueTypeFlags.set( Boolean, 0x0200 );
+
+    var customValueDeviceIDs = new Map();
+    customValueDeviceIDs.set( 'Mouse', 0x010000 );
+    customValueDeviceIDs.set( 'myGaze n', 0x020000 );
+    
     // callbacks
     var callbacks = {
         data: function (ts, x, y, pupil, ec) { },
@@ -2432,6 +2484,28 @@
         utils.debug('ETUDriver', 'WebSocket sent: ' + message);
         websocket.send(message);
     };
+
+    // 'customValueType' is one of 'customValues'
+    var getCustomValueCode = function( customValueType, isGetter ) {
+        var result = 0;
+
+        if (!currentDevice || !customValueType.device) {
+            return 0;
+        }
+        else {
+            const deviceID = customValueDeviceIDs.get( customValueType.device );
+            if (!deviceID) {
+                return 0;
+            }
+            result |= deviceID;                                     // device
+        }
+
+        result |= customValueTypeFlags.get( customValueType.type ); // type
+        result |= isGetter ? 0x0100 : 0;                            // getter
+        result |= customValueType.id;                               // value id
+
+        return result;
+    }
 
     var onWebSocketOpen = function (evt) {
         utils.debug('ETUDriver', 'WebSocket opened');
@@ -2489,6 +2563,11 @@
                 }
                 state = getState(undefined, ge.name);
                 respondToStateChange(state);
+            } else if (ge.type === respondType.custom) {
+                utils.debug('ETUDriver', 'WebSocket got custom value: ' + evt.data);
+                if (callbacks.customValue) {
+                    callbacks.customValue( ge.code, ge.value );
+                }
             }/*
         } catch (e) {
             utils.exception('onWebSocketMessage', e);
@@ -4444,7 +4523,13 @@
         // arguments:
         //   keyboard - the keyboard
         //   visible - the visibility flag
-        keyboard: null
+        keyboard: null,
+
+        // Passes to the ETUDriver
+        // arguments:
+        //   code - the value code (uint)
+        //   value - the value
+        customValue: null,
     };
 
     // variable to store in browser's storage
@@ -4487,7 +4572,8 @@
         // initialize ETUDriver
         return root.GazeTargets.ETUDriver.init(settings.etudriver, {
                 data: onDataReceived,
-                state: onStateChanged
+                state: onStateChanged,
+                customValue: customCallbacks.customValue,
             },
             storage.etudriver);
     };
