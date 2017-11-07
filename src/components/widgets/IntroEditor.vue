@@ -47,6 +47,9 @@
 </template>
 
 <script>
+/**
+ * @fires save
+ */
 export default {
   name: 'intro-editor',
 
@@ -104,22 +107,27 @@ export default {
 
   computed: {
 
+    /** @returns {boolean} */
     isNameValid() {
       return this.name.length > 1;
     },
 
+    /** @returns {boolean} */
     isFirstPageValid() {
       return this.firstPage.length > 14;
     },
 
+    /** @returns {boolean} */
     isCalibInstructionValid() {
       return this.calib.length > 4;
     },
 
+    /** @returns {boolean} */
     isStartInstructionValid() {
       return this.start.length > 4;
     },
 
+    /** @returns {boolean} */
     canSave() {
       return this.isNameValid && (
         this.isCalibInstructionValid ||

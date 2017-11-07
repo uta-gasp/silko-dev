@@ -41,12 +41,37 @@
 </template>
 
 <script>
+// ts-check-only
+import Subitem from '@/utils/SelectionBoxItem.js';
+
+/**
+ * @typedef Item
+ * @property {string} id 
+ * @property {string} text 
+ * @property {Subitem[]} subitems 
+ */
+
+/**
+ * @typedef Group
+ * @property {Item[]} items 
+ * @property {boolean} hidden
+ */
+
+/**
+ * @typedef {Record<string, Group>} Groups
+ */
+
+/**
+ * @fires accept
+ */
 export default {
   name: 'item-select-box',
 
   data() {
     return {
+      /** @type {Item} */
       currentItem: null,
+      /** @type {Groups} */
       groups: null,
 
       lastSelectionIndex: -1,
@@ -78,12 +103,14 @@ export default {
   },
 
   computed: {
+    /** @returns {boolean} */
     hasItemsSelected() {
       return this.items.some( item => item.subitems.some( subitem => subitem.selected ) );
     },
   },
 
   methods: {
+    /** @returns {Groups} */
     groupedSubitems() {
       if ( !this.currentItem ) {
         return null;
@@ -106,11 +133,18 @@ export default {
       return groups;
     },
 
+    /** 
+     * @param {Item} item 
+     */
     selectItem( item, e ) {
       this.currentItem = item;
       this.groups = this.groupedSubitems();
     },
 
+    /** 
+     * @param {Item} item 
+     * @returns {boolean}
+     */
     isItemSelected( item ) {
       if ( !this.currentItem ) {
         return false;
@@ -119,21 +153,35 @@ export default {
       return item ? this.currentItem.id === item.id : !!this.currentItem;
     },
 
+    /** 
+     * @param {Item} item 
+     * @returns {boolean}
+     */
     hasSubitems( item ) {
       item = item || this.currentItem;
       return item && item.subitems ? !!item.subitems.length : false;
     },
 
+    /** 
+     * @param {Group} group 
+     * @returns {boolean}
+     */
     isGroupVisible( group ) {
       return !group.hidden;
     },
 
+    /** 
+     * @param {Group} group 
+     */
     toggleItemsVisibility( group, e ) {
       group.hidden = !group.hidden;
     },
 
-    selectMultipleSubitems( subitem, event ) {
-      if ( event.shiftKey ) {
+    /** 
+     * @param {Subitem} subitem 
+     */
+    selectMultipleSubitems( subitem, e ) {
+      if ( e.shiftKey ) {
         const index = this.currentItem.subitems.indexOf( subitem );
         const delta = this.lastSelectionIndex < index ? -1 : 1;
         const edge = this.lastSelectionIndex < index ? -1 : this.currentItem.subitems.length;
@@ -149,6 +197,10 @@ export default {
       }
     },
 
+    /** 
+     * @param {Subitem} subitem 
+     * @param {number} index 
+     */
     selectSubitem( subitem, index, e ) {
       if ( !this.multiple ) {
         this.items.forEach( item => {

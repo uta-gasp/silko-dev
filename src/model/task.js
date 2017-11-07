@@ -9,7 +9,7 @@ import Intro from './intro.js';
 import db from '@/db/db.js';
 
 // ts-check-only
-import Question from './session/question.js';
+import { Question } from './session/question.js';
 
 export default class Task extends Recordable {
 

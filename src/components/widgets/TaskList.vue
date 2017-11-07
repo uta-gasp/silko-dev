@@ -48,12 +48,20 @@ import DBUtils from '@/db/utils.js';
 import ActionError from '@/components/mixins/actionError';
 import ActionSuccess from '@/components/mixins/actionSuccess';
 
-import Loading from '@/components/widgets/Loading';
-import TemporalNotification from '@/components/widgets/TemporalNotification';
-import ModalContainer from '@/components/widgets/ModalContainer';
-import TaskEditor from '@/components/widgets/TaskEditor';
-import RemoveWarning from '@/components/widgets/RemoveWarning';
+import Loading from '@/components/widgets/Loading.vue';
+import TemporalNotification from '@/components/widgets/TemporalNotification.vue';
+import ModalContainer from '@/components/widgets/ModalContainer.vue';
+import TaskEditor from '@/components/widgets/TaskEditor.vue';
+import RemoveWarning from '@/components/widgets/RemoveWarning.vue';
 
+// ts-check-only
+import Task from '@/model/task.js';
+
+/**
+ * @fires saved
+ * @fires created
+ * @fires deleted
+ */
 export default {
   name: 'task-list',
 
@@ -70,13 +78,18 @@ export default {
   data() {
     return {
       parent: this.cls,
+      /** @type {Task[]} */
       tasks: null,
+      /** @type {Task[]} */
       locked: null,
 
+      /** @type {Task} */
       toEdit: null,
+      /** @type {Task} */
       toCopy: null,
-      isCreating: false,
+      /** @type {Task} */
       toDelete: null,
+      isCreating: false,
     };
   },
 
@@ -93,14 +106,17 @@ export default {
 
   computed: {
 
+    /** @returns {boolean} */
     isEditing() {
       return this.toEdit || this.isCreating;
     },
 
+    /** @returns {string} */
     toDeleteName() {
       return this.toDelete ? this.toDelete.name : '';
     },
 
+    /** @returns {string} */
     action() {
       if ( this.isCreating ) {
         return 'Create';
@@ -112,10 +128,12 @@ export default {
       return '';
     },
 
+    /** @returns {string} */
     actionType() {
       return this.toEdit ? 'edit' : 'create new';
     },
 
+    /** @returns {string} */
     taskEditorTitle() {
       return 'Task editor' + ( this.toEdit ? ` - ${this.toEdit.name}` : '' );
     },
@@ -142,18 +160,33 @@ export default {
       } );
     },
 
+    /**
+     * @param {any[]} arr
+     * @param {string} name
+     * @returns {string}
+     */
     displayCount( arr, name ) {
       return dataUtils.displayCount( arr, name );
     },
 
+    /** 
+     * @param {{name: string}} newTask
+     * @returns {boolean}
+     */
     canCreate( newTask ) {
       return this.tasks.every( task => task.name.toLowerCase() !== newTask.name.toLowerCase() );
     },
 
+    /** 
+     * @param {Task} task
+     */
     edit( task, e ) {
       this.toEdit = task;
     },
 
+    /** 
+     * @param {Task} task
+     */
     copy( task, e ) {
       this.toCopy = task;
       this.isCreating = true;
@@ -191,10 +224,17 @@ export default {
       this.isCreating = false;
     },
 
+    /** 
+     * @param {Task} task
+     */
     remove( task, e ) {
       this.toDelete = task;
     },
 
+    /** 
+     * @param {string} id
+     * @returns {boolean}
+     */
     isLocked( id, e ) {
       return this.locked === null || this.locked.indexOf( id ) >= 0;
     },

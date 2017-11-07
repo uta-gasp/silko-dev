@@ -77,6 +77,12 @@
 <script>
 import Task from '@/model/task.js';
 
+// ts-check-only
+import Intro from '@/model/intro.js';
+
+/**
+ * @fires input
+ */
 export default {
   name: 'task-editor-text',
 
@@ -102,10 +108,12 @@ export default {
 
   computed: {
 
+    /** @returns {boolean} */
     isNewTask() {
       return !( this.task && this.task.name );
     },
 
+    /** @returns {{name: string, alignment: string, intro: Intro, text: string}} */
     currentModel() {
       return {
         name: this.name,

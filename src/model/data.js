@@ -2,7 +2,7 @@ import Recordable from './commons/recordable.js';
 
 // ts-check-only
 import DataPage from './data/dataPage.js';
-import Question from './session/question.js';
+import { Question } from './session/question.js';
 
 export default class Data extends Recordable {
 

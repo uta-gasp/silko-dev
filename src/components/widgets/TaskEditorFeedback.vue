@@ -31,9 +31,15 @@ import Task from '@/model/task.js';
 import Syllabifier from '@/task/syllabifier.js';
 import Speaker from '@/task/speaker.js';
 
-import FeedbackEditor from '@/components/widgets/feedbackEditor';
-import BulmaCheckbox from '@/components/widgets/bulmaCheckbox';
+import FeedbackEditor from '@/components/widgets/feedbackEditor.vue';
+import BulmaCheckbox from '@/components/widgets/bulmaCheckbox.vue';
 
+// ts-check-only
+import { SyllabOptions, SpeechOptions } from '@/model/session/feedbacks.js';
+
+/**
+ * @fires input
+ */
 export default {
   name: 'task-editor-feedback',
 
@@ -67,6 +73,7 @@ export default {
   },
 
   computed: {
+    /** @returns {{syllab: SyllabOptions, speech: SpeechOptions, syllabExceptions: string[]}} */
     model() {
       const result = {
         syllab: this.syllab,

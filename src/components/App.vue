@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import NavBar from '@/components/navbar.vue';
+import NavBar from '@/components/Navbar.vue';
 
 import eventBus from '@/utils/event-bus.js';
 import login from '@/utils/login.js';

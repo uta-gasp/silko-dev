@@ -8,6 +8,10 @@
 </template>
 
 <script>
+/**
+ * @fires restart
+ * @fires toggle
+ */
 export default {
   name: 'player',
 

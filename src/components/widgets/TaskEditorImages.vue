@@ -129,12 +129,20 @@ import { TextPageImage,
 
 import ActionError from '@/components/mixins/actionError';
 
-import TemporalNotification from '@/components/widgets/TemporalNotification';
+import TemporalNotification from '@/components/widgets/TemporalNotification.vue';
 
+/** 
+ * @param {string} text
+ * @returns {string[]}
+ */
 function getPages( text ) {
   return text.split( '\n\n' ).filter( page => !!page.trim() );
 }
 
+/** 
+ * @param {string} text
+ * @returns {string[]}
+ */
 function getUniqueWords( text ) {
   return Array.from(
     new Set( text.trim()
@@ -146,6 +154,11 @@ function getUniqueWords( text ) {
   );
 }
 
+/** 
+ * @param {string} text
+ * @param {number} pageIndex
+ * @returns {string[]}
+ */
 function getPageUniqueWords( text, pageIndex ) {
   const page = getPages( text )[ pageIndex ];
   if ( !page ) {
@@ -155,6 +168,9 @@ function getPageUniqueWords( text, pageIndex ) {
   return getUniqueWords( page );
 }
 
+/** 
+ * @fires input
+ */
 export default {
   name: 'task-editor-images',
 
@@ -166,8 +182,10 @@ export default {
 
   data() {
     return {
+      /** @type {TextPageImage} */
       images: [],
 
+      /** @type {File} */
       selectedFile: null,
       uploadProgress: -1,
 
@@ -208,20 +226,24 @@ export default {
   },
 
   computed: {
+    /** @returns {number} */
     pageCount() {
       return getPages( this.currentText ).length;
     },
 
+    /** @returns {string[]} */
     currentWords() {
       return +this.page < 0
         ? getUniqueWords( this.currentText )
         : getPageUniqueWords( this.currentText, +this.page );
     },
 
+    /** @returns {boolean} */
     isUploading() {
       return this.uploadProgress >= 0;
     },
 
+    /** @returns {boolean} */
     hasValidParams() {
       return this.constructImageEvent( this.on ).isValid &&
              this.constructImageEvent( this.off ).isValid;
@@ -250,6 +272,9 @@ export default {
       this.images = images;
     },
 
+    /** 
+     * @param {number} index 
+     */
     remove( index ) {
       const deletedImage = this.images.splice( index, 1 )[0];
       Task.deleteImage( deletedImage, err => {
@@ -260,18 +285,34 @@ export default {
       this.$emit( 'input', { images: this.images } );
     },
 
+    /** 
+     * @param {string} file 
+     * @returns {string}
+     */
     getImageURL( file ) {
       return window.URL.createObjectURL( file );
     },
 
+    /** 
+     * @param {TextPageImage & {file: HTMLImageElement}} image 
+     * @returns {boolean}
+     */
     canShow( image ) {
       return !!image.file || !!image.src;
     },
 
+    /** 
+     * @param {TextPageImage & {file: HTMLImageElement}} image 
+     * @returns {string}
+     */
     getCSSBackgroundImage( image ) {
       return `background-image: url('${image.file ? this.getImageURL( image.file ) : image.src}')`;
     },
 
+    /** 
+     * @param {TextPageImage & {file: HTMLImageElement}} image 
+     * @returns {string}
+     */
     getImageName( image ) {
       if ( image.file ) {
         return image.file.name;
@@ -284,14 +325,26 @@ export default {
       }
     },
 
+    /** 
+     * @param {TextPageImage & {file: HTMLImageElement}} image 
+     * @returns {string | number}
+     */
     getImagePage( image ) {
       return image.page < 0 ? 'any' : ( image.page + 1 );
     },
 
+    /** 
+     * @param {TextPageImageEvent} imageShowEvent
+     * @returns {boolean}
+     */
     hasParameters( imageShowEvent ) {
       return TextPageImageEvent.hasParameters( imageShowEvent );
     },
 
+    /** 
+     * @param {TextPageImageEvent} imageShowEvent
+     * @returns {string}
+     */
     formatEventName( event ) {
       if ( event.name === TextPageImage.EVENT.none ) {
         return '-';
@@ -304,6 +357,10 @@ export default {
       }
     },
 
+    /** 
+     * @param {TextPageImageEvent} imageShowEvent
+     * @returns {string}
+     */
     formatEventParams( event ) {
       if ( event.name === TextPageImage.EVENT.fixation ) {
         return `"${event.word}"\nlonger than ${event.duration} ms`;
@@ -376,6 +433,10 @@ export default {
       this.selectedFile = null;
     },
 
+    /** 
+     * @param {string} name
+     * @returns {TextPageImageEvent}
+     */
     constructImageEvent( name ) {
       if ( name === TextPageImage.EVENT.fixation ) {
         return new TextPageImageFixationEvent( this.fixationWord, this.fixationDuration );

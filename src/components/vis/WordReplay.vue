@@ -38,12 +38,12 @@
 <script>
 import Vue from 'vue';
 
-import OptionsCreator from '@/vis/optionsCreator.js';
+import { OptionsCreator, OptionGroup, OptionItem } from '@/vis/optionsCreator.js';
 import sgwmController from '@/vis/sgwmController.js';
 import { WordTrack } from '@/vis/wordTrack.js';
 
-import ControlPanel from '@/components/vis/controlPanel';
-import Options from '@/components/vis/Options';
+import ControlPanel from '@/components/vis/controlPanel.vue';
+import Options from '@/components/vis/Options.vue';
 
 sgwmController.initializeSettings();
 
@@ -51,6 +51,9 @@ const UI = {
   levelDuration: 500,
 };
 
+/**
+ * @fires close
+ */
 export default {
   name: 'word-replay',
 
@@ -68,19 +71,21 @@ export default {
       defaultText: this.data.records[0].data.pages.map( page => page.text ),
       defaultFeedback: this.data.records[0].session.feedbacks,
 
+      /** @type {{text: string, durations: number[], key: number}[]} */
       words: [],
+      /** @type {WordTrack[]} */
       tracks: null,
 
       // options representation for editor
       options: {
-        wordReplay: {
+        wordReplay: new OptionGroup({
           id: 'wordReplay',
           title: 'Word replay',
           options: OptionsCreator.createOptions( {
-            levelDuration: { type: Number, step: 50, label: 'Level duration, ms' },
+            levelDuration: new OptionItem({ type: Number, step: 50, label: 'Level duration, ms' }),
           }, UI ),
           defaults: OptionsCreator.createDefaults( UI ),
-        },
+        }),
         _sgwm: sgwmController.createOptions(),
       },
     };
@@ -94,10 +99,12 @@ export default {
   },
 
   computed: {
+    /** @returns {number} */
     textLength() {
       return this.defaultText.length;
     },
 
+    /** @returns {string} */
     title() {
       const r = this.data.records[0];
       const student = this.data.params.student ? ` for ${this.data.params.student}` : '';
@@ -204,6 +211,10 @@ export default {
       this.tracks.forEach( track => track.stop() );
     },
 
+    /**
+     * @param {Element} cell
+     * @param {number} duration
+     */
     colorizeCell( cell, duration ) {
       const levels = ( duration ? 1 : 0 ) + Math.floor( duration / UI.levelDuration );
       const tone = 255 - 24 * Math.min( 10, levels );
@@ -211,10 +222,18 @@ export default {
       cell.style.backgroundColor = rgb;
     },
 
+    /**
+     * @param {number} trackIndex
+     * @returns {boolean}
+     */
     hasNoData( trackIndex ) {
       return !this.tracks[ trackIndex ].hasData;
     },
 
+    /**
+     * @param {WordTrack} track
+     * @param {Element[]} rows
+     */
     onWordFixated( track, rows ) {
       return ( word, duration ) => {
         const rawWord = track.words[ word.id ];

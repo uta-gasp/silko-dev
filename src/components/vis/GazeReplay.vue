@@ -1,12 +1,12 @@
 <script>
 import dataUtils from '@/utils/data-utils.js';
 
-import OptionsCreator from '@/vis/optionsCreator.js';
+import { OptionsCreator, OptionGroup, OptionItem } from '@/vis/optionsCreator.js';
 import Painter from '@/vis/painter.js';
 import Metric from '@/vis/metric.js';
 import ReplayTrack from '@/vis/replayTrack.js';
 
-import VisPlot from '@/components/vis/VisPlot';
+import VisPlot from '@/components/vis/VisPlot.vue';
 
 const LEGEND_LOCATION = {
   x: 2,
@@ -35,29 +35,32 @@ export default {
     return {
       // options representation for editor
       options: {
-        gazeReplay: {
+        gazeReplay: new OptionGroup({
           id: 'gazeReplay',
           title: 'Gaze Replay',
           options: OptionsCreator.createOptions( {
-            colorMetric: { type: Array, items: ['none', 'duration', 'char speed', 'syllable speed'], label: 'Word color metric' },
+            colorMetric: new OptionItem({ type: Array, items: ['none', 'duration', 'char speed', 'syllable speed'], label: 'Word color metric' }),
 
-            nameFontFamily: { type: String, label: 'Name font' },
-            nameFontSize: { type: Number, step: 1, label: 'Name font size' },
-            nameSpacing: { type: Number, step: 0.1, label: 'Name spacing' },
+            nameFontFamily: new OptionItem({ type: String, label: 'Name font' }),
+            nameFontSize: new OptionItem({ type: Number, step: 1, label: 'Name font size' }),
+            nameSpacing: new OptionItem({ type: Number, step: 0.1, label: 'Name spacing' }),
 
-            'syllab.background': { type: '#', label: 'Syllabification background' },
-            'syllab.wordColor': { type: '#', label: 'Syllabification word color' },
+            'syllab.background': new OptionItem({ type: '#', label: 'Syllabification background' }),
+            'syllab.wordColor': new OptionItem({ type: '#', label: 'Syllabification word color' }),
           }, UI ),
           defaults: OptionsCreator.createDefaults( UI ),
-        },
+        }),
       },
 
+      /** @type {Painter} */
       painter: null,
+      /** @type {ReplayTrack[]} */
       tracks: [],
     };
   },
 
   computed: {
+    /** @returns {string} */
     title() {
       const r = this.data.records[0];
       const student = this.data.params.student ? ` for ${this.data.params.student}` : '';
@@ -165,7 +168,7 @@ export default {
     },
 
     drawNames() {
-      const names = this.tracks.map( track => {
+      const names = this.tracks.map( /** @param {ReplayTrack} track */ track => {
         return {
           text: track.name,
           color: track.color,

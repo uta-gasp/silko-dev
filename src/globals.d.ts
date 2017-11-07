@@ -17,10 +17,24 @@ interface ResponsiveVoice {
   speak( word: string, voice: string );
 }
 
+interface ETUDCustomValueType {
+  id: number;
+  type: function;
+  device: string;
+}
+
+interface ETUDCustomValueCallbackArg {
+  code: number;
+  value: any;
+}
+
 interface ETUDriver {
   showOptions();
   calibrate();
   toggleTracking();
+  getCustomValue( type: ETUDCustomValueType );
+  setCustomValue( type: ETUDCustomValueType, value: any );
+  listAvailableCustomValue(): Record<string, ETUDCustomValueType>;
 }
 
 interface GTFixation {
@@ -115,13 +129,19 @@ interface SGWMWordMapperSettings extends SGWMSettings {
   ignoreTransitions: boolean;
 }
 
+interface SGWMFixation {
+}
+
+interface SGWMWord {
+}
+
 interface SGWM {
   new ();
   FixationProcessorSettings: SGWMFixationProcessorSettings;
   SplitToProgressionsSettings: SGWMSplitToProgressionsSettings;
   ProgressionMergerSettings: SGWMProgressionMergerSettings;
   WordMapperSettings: SGWMWordMapperSettings;
-  map( object );
+  map( object ): {fixations: SGWMFixation[], words: SGWMWord[]};
 }
 
 interface FBStorage {

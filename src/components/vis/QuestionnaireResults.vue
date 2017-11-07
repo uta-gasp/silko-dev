@@ -18,16 +18,6 @@
               .answer(:class="getAnswerClass( answers, question )") {{ getAnswerText( answers, question ) }}
             td.is-narrow
               .total {{ getTotal( answers ) }}
-          //- tr(v-for="(answers, question) in questions")
-          //-   td
-          //-     .question {{ question }}
-          //-   td(v-for="answer in answers")
-          //-     .answer(:class="{ isOK: answer.isCorrect }") {{ answer.text }}
-
-        //- tfoot
-        //-   tr
-        //-     td
-        //-     td(v-for="question in questionnaire.questions")
 
     control-panel(
       :title="title"
@@ -38,8 +28,25 @@
 <script>
 import DataUtils from '@/utils/data-utils.js';
 
-import ControlPanel from '@/components/vis/controlPanel';
+import ControlPanel from '@/components/vis/controlPanel.vue';
 
+// ts=check-onlt
+import { AnswerCandidate } from '@/model/session/question.js';
+import VisDataRecord from '@/vis/data/record.js';
+
+/**
+ * @typedef {Record<string, AnswerCandidate>} Answers
+ */
+
+/**
+ * @typedef {Object} Questionnaire
+ * @property {Record<string, Answers>} sessions
+ * @property {string[]} questions
+ */
+
+/**
+ * @fires close
+ */
 export default {
   name: 'questionnaire-results',
 
@@ -49,7 +56,7 @@ export default {
 
   data() {
     return {
-      // questions: {},
+      /** @type {Questionnaire} */
       questionnaire: {},
     };
   },
@@ -62,10 +69,12 @@ export default {
   },
 
   computed: {
+    /** @returns {number} */
     textLength() {
       return this.defaultText.length;
     },
 
+    /** @returns {string} */
     title() {
       const r = this.data.records[0];
       return `Questionnaire results in "${r.task.name}"`;
@@ -73,10 +82,18 @@ export default {
   },
 
   filters: {
+    /**
+     * @param {id} string 
+     * @returns {number} 
+     */
     name( id ) {
       return id.split( ',' )[0];
     },
 
+    /**
+     * @param {id} string 
+     * @returns {number} 
+     */
     date( id ) {
       return id.split( ',' )[1];
     },
@@ -87,6 +104,11 @@ export default {
       this.$emit( 'close' );
     },
 
+    /**
+     * @param {Answers} answers 
+     * @param {string} question 
+     * @returns {{isCorrect?: boolean, isIncorrect?: boolean}}
+     */
     getAnswerClass( answers, question ) {
       if ( answers[ question ] ) {
         const isCorrect = answers[ question ].isCorrect;
@@ -100,6 +122,11 @@ export default {
       }
     },
 
+    /**
+     * @param {Answers} answers 
+     * @param {string} question 
+     * @returns {string}
+     */
     getAnswerText( answers, question ) {
       if ( answers[ question ] ) {
         return answers[ question ].text;
@@ -109,12 +136,16 @@ export default {
       }
     },
 
+    /**
+     * @param {Answers} answers 
+     * @returns {string}
+     */
     getTotal( answers ) {
       let correct = 0;
       let total = 0;
       for ( let question in answers ) {
         if ( !answers[ question ] ) {
-          return;
+          continue;
         }
 
         total++;
@@ -124,10 +155,15 @@ export default {
       return ( correct / total * 100 ).toFixed( 1 );
     },
 
+    /**
+     * @param {VisDataRecord} record 
+     * @returns {string}
+     */
     getRecordName( record ) {
       return `${record.student.name},${DataUtils.sessionDate( record.session.date )}`;
     },
 
+    /** @returns {Questionnaire} */
     createQuestionnaire() {
       const sessions = {};
       const _questions = new Set();
@@ -155,26 +191,6 @@ export default {
 
       return { sessions, questions };
     },
-
-    // createList() {
-    //   const result = {};
-
-    //   this.data.records.forEach( record => {
-    //     if (!record.data.questionnaire) {
-    //       return;
-    //     }
-
-    //     const id = this.getRecordName( record );
-
-    //     record.data.questionnaire.forEach( question => {
-    //       const q = result[ question.question ] || {};
-    //       q[ id ] = question.answer;
-    //       result[ question.question ] = q;
-    //     });
-    //   });
-
-    //   return result;
-    // },
   },
 
   mounted() {

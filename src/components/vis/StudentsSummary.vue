@@ -26,15 +26,20 @@
 <script>
 import Regressions from '@/vis/regressions.js';
 import sgwmController from '@/vis/sgwmController.js';
-// import OptionsCreator from '@/vis/optionsCreator.js';
 
 import Syllabifier from '@/task/syllabifier.js';
 
-import ControlPanel from '@/components/vis/controlPanel';
-import Options from '@/components/vis/Options';
+import ControlPanel from '@/components/vis/controlPanel.vue';
+import Options from '@/components/vis/Options.vue';
+
+// ts-check-only
+import Student from '@/model/student.js';
 
 sgwmController.initializeSettings();
 
+/**
+ * @fires close
+ */
 export default {
   name: 'student-summary',
 
@@ -47,6 +52,7 @@ export default {
     return {
       isOptionsDisplayed: false,
 
+      /** @type {Student[]} */
       students: [],
 
       // options representation for editor
@@ -78,6 +84,7 @@ export default {
   },
 
   computed: {
+    /** @returns {{sorted: boolean, up: boolean, down: boolean}} */
     headerNameClass() {
       return {
         sorted: this.sortedStatIndex < 0,
@@ -86,6 +93,7 @@ export default {
       };
     },
 
+    /** @returns {string} */
     title() {
       const grade = this.data.params.grade;
       return `${grade.studentCount} ${grade.name}`;
@@ -110,6 +118,11 @@ export default {
       this.isOptionsDisplayed = false;
     },
 
+    /**
+     * @param {{sortDir: number}} stat
+     * @param {number} index
+     * @returns {{sorted: boolean, up: boolean, down: boolean}}
+     */
     statNameClass( stat, index ) {
       return {
         sorted: this.sortedStatIndex === index,
@@ -152,6 +165,10 @@ export default {
       this.sort( this.sortedStatIndex );
     },
 
+    /**
+     * @param {Student} student
+     * @returns {(string | number)[]}
+     */
     calculateStatistics( student ) {
       const result = [];
 
@@ -243,6 +260,10 @@ export default {
       return result;
     },
 
+    /** 
+     * @param {number} seconds
+     * @returns {string}
+     */
     secondsToString( seconds ) {
       let text = '' + seconds;
       if ( text.length < 2 ) {
@@ -251,6 +272,9 @@ export default {
       return text;
     },
 
+    /** 
+     * @param {number} statIndex
+     */
     sort( statIndex ) {
       const newSortDirection = this.computeSortDirection();
 
@@ -276,6 +300,10 @@ export default {
       return currentSortDirection < 1 ? 1 : -1;
     },
 
+    /** 
+     * @param {number} statIndex
+     * @param {number} sortDirection
+     */
     sortData( statIndex, sortDirection ) {
       const students = this.students.map( student => student );
 
@@ -292,27 +320,6 @@ export default {
 
       this.students = students;
     },
-
-    // map( session ) {
-    //   const sgwmSession = {
-    //     fixations: session.fixations,
-    //     words: session.words.map( word => {
-    //       return {
-    //         id: word.id,
-    //         x: word.rect.x,
-    //         y: word.rect.y,
-    //         width: word.rect.width,
-    //         height: word.rect.height,
-    //         text: word.text,
-    //       };
-    //     } ),
-    //   };
-
-    //   const sgwm = new SGWM();
-    //   const result = sgwm.map( sgwmSession );
-
-    //   return result;
-    // },
   },
 
   mounted() {

@@ -49,8 +49,11 @@
 </template>
 
 <script>
-import Question from '@/model/session/question.js';
+import { Question, AnswerCandidate } from '@/model/session/question.js';
 
+/**
+ * @fires input
+ */
 export default {
   name: 'task-editor-questionnaire',
 
@@ -59,8 +62,10 @@ export default {
       type: '',
       word: '',
       question: '',
+      /** @type {AnswerCandidate} */
       answers: [],
 
+      /** @type {Question[]} */
       questions: this.task && this.task.questionnaire ? Array.from( this.task.questionnaire ) : [],
 
       types: Question.types,
@@ -75,12 +80,14 @@ export default {
   },
 
   computed: {
+    /** @returns {boolean} */
     canAdd() {
       return this.type === this.types.word ? this.word.length > 0 : true &&
           this.question.length > 5 &&
           this.answers.every( answer => answer.text.length );
     },
 
+    /** @returns {{questionnaire: Question[]}} */
     model() {
       return {
         questionnaire: this.questions,
@@ -95,10 +102,15 @@ export default {
   },
 
   methods: {
+    /**
+     * @param {Question} question
+     * @returns {string}
+     */
     answersToString( question ) {
       return question.answers.map( answer => answer.text ).join( ', ' );
     },
 
+    /** @returns {AnswerCandidate[]} */
     getEmptyAnswers() {
       return ['', '', '', ''].map( ( _, index ) => ( { text: '', isCorrect: index === 0 } ) );
     },
@@ -116,10 +128,16 @@ export default {
       this.answers = this.getEmptyAnswers();
     },
 
+    /**
+     * @param {Question} question
+     */
     remove( question ) {
       this.questions = this.questions.filter( item => item !== question );
     },
 
+    /**
+     * @param {AnswerCandidate} answer
+     */
     selectCorrect( answer ) {
       this.answers.forEach( answer => { answer.isCorrect = false; } );
       answer.isCorrect = true;

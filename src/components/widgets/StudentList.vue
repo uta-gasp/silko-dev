@@ -64,10 +64,29 @@ import dataUtils from '@/utils/data-utils.js';
 import ActionError from '@/components/mixins/actionError';
 import ActionSuccess from '@/components/mixins/actionSuccess';
 
-import Loading from '@/components/widgets/Loading';
-import ModalContainer from '@/components/widgets/ModalContainer';
-import ItemSelectionBox from '@/components/widgets/ItemSelectionBox';
-import TemporalNotification from '@/components/widgets/TemporalNotification';
+import Loading from '@/components/widgets/Loading.vue';
+import ModalContainer from '@/components/widgets/ModalContainer.vue';
+import ItemSelectionBox from '@/components/widgets/ItemSelectionBox.vue';
+import TemporalNotification from '@/components/widgets/TemporalNotification.vue';
+
+// ts-check-only
+import Class from '@/model/class.js';
+import Student from '@/model/student.js';
+import Task from '@/model/task.js';
+
+/**
+ * @typedef GradeSubItem
+ * @property {string} id
+ * @property {string} text
+ * @property {boolean} selected
+ */
+
+/**
+ * @typedef Grade
+ * @property {number} id
+ * @property {string} text
+ * @property {GradeSubItem[]} subitems
+ */
 
 export default {
   name: 'student-list',
@@ -83,15 +102,21 @@ export default {
 
   data() {
     return {
+      /** @type {Class} */
       currentClass: this.cls,
+      /** @type {Student[]} */
       students: null,
+      /** @type {Student[]} */
       schoolStudents: null,
+      /** @type {Task[]} */
       tasks: [],
+      /** @type {Grade[]} */
       schoolGrades: [],
 
       isEditing: false,
       currentGrade: null,
 
+      /** @type {Element} */
       activeMenu: null,
 
       onBodyClick: () => {
@@ -165,6 +190,7 @@ export default {
       } );
     },
 
+    /** @returns {Grade[]} */
     makeGrades( students ) {
       const grades = [];
       students.forEach( student => {
@@ -211,6 +237,11 @@ export default {
       } );
     },
 
+    /**
+     * @param {any[]} arr
+     * @param {string} name
+     * @returns {string}
+     */
     displayCount( arr, name ) {
       return dataUtils.displayCount( arr, name );
     },
@@ -244,6 +275,10 @@ export default {
       this.isEditing = false;
     },
 
+    /**
+     * @param {Student} student
+     * @param {string} taskID
+     */
     addAssignment( student, taskID, e ) {
       student.addAssignment( taskID, this.currentClass.id, err => {
         if ( err ) {
@@ -255,6 +290,10 @@ export default {
       } );
     },
 
+    /**
+     * @param {Student} student
+     * @param {string} taskID
+     */
     removeAssignment( student, taskID, e ) {
       student.removeAssignment( taskID, err => {
         if ( err ) {
@@ -283,6 +322,9 @@ export default {
     //   } );
     // },
 
+    /**
+     * @param {Student} student
+     */
     remove( student, e ) {
       this.currentClass.removeStudent( student, err => {
         if ( err ) {
@@ -296,10 +338,16 @@ export default {
       } );
     },
 
+    /**
+     * @param {Student} student
+     */
     availableTasks( student ) {
       return this.tasks.filter( task => !student.assignments[ task.id ] );
     },
 
+    /**
+     * @param {string} id
+     */
     toggleTaskList( id ) {
       if ( this.activeMenu ) {
         this.hideTaskList();
@@ -309,6 +357,9 @@ export default {
       }
     },
 
+    /**
+     * @param {string} id
+     */
     showTaskList( id ) {
       this.hideTaskList();
 
@@ -323,10 +374,16 @@ export default {
       }
     },
 
+    /**
+     * @param {string} id
+     */
     doesTaskBelongsToClass( id ) {
       return this.tasks.some( task => task.id === id );
     },
 
+    /**
+     * @param {string} id
+     */
     getAssignmentName( id ) {
       return this.tasks.find( task => task.id === id ).name;
     },

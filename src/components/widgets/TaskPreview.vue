@@ -29,12 +29,18 @@
 </template>
 
 <script>
-import TaskText from '@/components/widgets/TaskText';
-import TaskImages from '@/components/widgets/TaskImages';
+import TaskText from '@/components/widgets/TaskText.vue';
+import TaskImages from '@/components/widgets/TaskImages.vue';
 
 import TextPresenter from '@/task/textPresenter.js';
 import FeedbackProvider from '@/task/feedbackProvider.js';
 
+// ts-check-only
+import DataPageFocusedWord from '@/model/data/dataPageFocusedWord.js';
+
+/**
+ * @fires close
+ */
 export default {
   name: 'task-preview',
 
@@ -45,7 +51,9 @@ export default {
 
   data() {
     return {
+      /** @type {TextPresenter} */
       textPresenter: null,
+      /** @type {FeedbackProvider} */
       feedbackProvider: null,
       fixatedWord: '',
     };
@@ -63,14 +71,17 @@ export default {
 
   computed: {
 
+    /** @returns {boolean} */
     hasNextPage() {
       return this.textPresenter ? this.textPresenter.hasNextPage : false;
     },
 
+    /** @returns {boolean} */
     hasPrevPage() {
       return this.textPresenter ? this.textPresenter.hasPrevPage : false;
     },
 
+    /** @returns {TextPageImage[]} */
     images() {
       if ( !this.textPresenter ) {
         return [];
@@ -84,6 +95,7 @@ export default {
       return this.task.pages[ pageIndex ].images;
     },
 
+    /** @returns {{word: DataPageFocusedWord, duration: number}} */
     fixation() {
       return { word: this.fixatedWord, duration: 999999 };
     },

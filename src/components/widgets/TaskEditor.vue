@@ -38,14 +38,26 @@ import Task from '@/model/task.js';
 
 import fullscreen from '@/components/mixins/fullscreen.js';
 
-import TaskPreview from '@/components/widgets/taskPreview';
-import TaskEditorText from '@/components/widgets/taskEditorText';
-import TaskEditorFeedback from '@/components/widgets/taskEditorFeedback';
-import TaskEditorImages from '@/components/widgets/taskEditorImages';
-import TaskEditorQuestionnaire from '@/components/widgets/taskEditorQuestionnaire';
+import TaskPreview from '@/components/widgets/taskPreview.vue';
+import TaskEditorText from '@/components/widgets/taskEditorText.vue';
+import TaskEditorFeedback from '@/components/widgets/taskEditorFeedback.vue';
+import TaskEditorImages from '@/components/widgets/taskEditorImages.vue';
+import TaskEditorQuestionnaire from '@/components/widgets/taskEditorQuestionnaire.vue';
+
+// ts-check-only
+import { TextPageImage } from '@/model/task/textPageImage.js';
+import { Question } from '@/model/session/question.js';
+
+/**
+ * @typedef Tab
+ * @property {string} name
+ */
 
 const TASK_DEFAULTS = 'task-defaults';
 
+/**
+ * @fires save
+ */
 export default {
   name: 'task-editor',
 
@@ -61,6 +73,7 @@ export default {
 
   data() {
     return {
+      /** @type {Task} */
       ref: this.task || this.source || JSON.parse( window.localStorage.getItem( TASK_DEFAULTS ) ),
 
       name: '',
@@ -72,8 +85,10 @@ export default {
       speech: Task.defaultSpeech,
       syllabExceptions: '',
 
+      /** @type {TextPageImage[]} */
       images: [],
 
+      /** @type {Question[]} */
       questionnaire: [],
 
       inPreview: false,
@@ -92,6 +107,8 @@ export default {
           name: 'Questionnaire',
         },
       },
+
+      /** @type {Tab} */
       currentTab: null,
     };
   },
@@ -118,19 +135,23 @@ export default {
 
   computed: {
 
+    /** @returns {boolean} */
     isNameValid() {
       return this.name.length > 1;
     },
 
+    /** @returns {boolean} */
     isTextValid() {
       return this.text.length > 14;
     },
 
+    /** @returns {boolean} */
     canSave() {
       return this.isNameValid &&
           this.isTextValid;
     },
 
+    /** @returns {Task} */
     currentTask() {
       let result = new Task();
       result = Object.assign( result, {
@@ -196,10 +217,17 @@ export default {
       }
     },
 
+    /**
+     * @param {Tab} tab 
+     * @returns {boolean}
+     */
     isCurrentTab( tab ) {
       return tab === this.currentTab;
     },
 
+    /**
+     * @param {Tab} tab 
+     */
     selectTab( tab ) {
       this.currentTab = tab;
     },

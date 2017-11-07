@@ -68,6 +68,7 @@ export default {
   },
 
   computed: {
+    /** @returns {boolean} */
     isEmailValid() {
       if ( !this.email ) {
         return checkValues.UNKNOWN;
@@ -80,6 +81,7 @@ export default {
       }
     },
 
+    /** @returns {boolean} */
     isPasswordValid() {
       if ( !this.password ) {
         return checkValues.UNKNOWN;
@@ -89,6 +91,7 @@ export default {
       }
     },
 
+    /** @returns {boolean} */
     canLogIn() {
       return !this.inProgress &&
         this.isEmailValid === checkValues.VALID &&

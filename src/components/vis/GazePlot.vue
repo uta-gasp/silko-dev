@@ -1,12 +1,21 @@
 <script>
 import dataUtils from '@/utils/data-utils.js';
 
-import VisPlot from '@/components/vis/VisPlot';
+import VisPlot from '@/components/vis/VisPlot.vue';
 
-import OptionsCreator from '@/vis/optionsCreator.js';
+import { OptionsCreator, OptionGroup, OptionItem } from '@/vis/optionsCreator.js';
 import Painter from '@/vis/painter.js';
 import Metric from '@/vis/metric.js';
 import Regressions from '@/vis/regressions.js';
+
+// ts-check-only
+import DataPageTextWord from '@/model/data/dataPageTextWord.js';
+
+/** 
+ * @typedef {DataPageTextWord} FixatedWord
+ * @property {number} count
+ * @property {number} duration
+ */
 
 const UI = {
   colorMetric: Metric.Type.DURATION,
@@ -39,35 +48,33 @@ export default {
 
       // options representation for editor
       options: {
-        gazePlot: {
+        gazePlot: new OptionGroup({
           id: 'gazePlot',
           title: 'Gaze Plot',
           options: OptionsCreator.createOptions( {
-            colorMetric: { type: Array, items: Metric.Types, label: 'Word color metric' },
+            colorMetric: new OptionItem({ type: Array, items: Metric.Types, label: 'Word color metric' }),
 
-            saccadeColor: { type: '#', label: 'Saccade color' },
-            regressionColor: { type: '#', label: 'Regressive saccade color' },
+            saccadeColor: new OptionItem({ type: '#', label: 'Saccade color' }),
+            regressionColor: new OptionItem({ type: '#', label: 'Regressive saccade color' }),
 
-            // showIDs: { type: Boolean, label: 'Show IDs' },
-            showConnections: { type: Boolean, label: 'Show word-fixation connections' },
-            showSaccades: { type: Boolean, label: 'Show saccades' },
-            showFixations: { type: Boolean, label: 'Show fixations' },
+            showConnections: new OptionItem({ type: Boolean, label: 'Show word-fixation connections' }),
+            showSaccades: new OptionItem({ type: Boolean, label: 'Show saccades' }),
+            showFixations: new OptionItem({ type: Boolean, label: 'Show fixations' }),
 
-            // fixationNumberSize: { type: Number, step: 1, label: 'ID font size' },
-            // fixationNumberColor: { type: '#', label: 'ID color' },
-
-            'syllab.background': { type: '#', label: 'Syllabification background' },
-            'syllab.wordColor': { type: '#', label: 'Syllabification word color' },
+            'syllab.background': new OptionItem({ type: '#', label: 'Syllabification background' }),
+            'syllab.wordColor': new OptionItem({ type: '#', label: 'Syllabification word color' }),
           }, UI ),
           defaults: OptionsCreator.createDefaults( UI ),
-        },
+        }),
       },
 
+      /** @type {Painter} */
       painter: null,
     };
   },
 
   computed: {
+    /** @returns {string} */
     title() {
       return `${this.record.student.name} reading "${this.record.task.name}" at ${dataUtils.sessionDate( this.record.session.date )}`;
     },
@@ -131,37 +138,13 @@ export default {
       }
     },
 
-    // isMatchingWord( word, info ) {
-    //   return Math.abs( word.rect.x - info.rect.x ) < 1 && Math.abs( word.rect.y - info.rect.y ) < 1;
-    // },
-
-    // combineWordsAndGazeInfo( words, wordsWithGazeInfo ) {
-    //   const result = [];
-    //   const gazeInfo = new Set( wordsWithGazeInfo );
-
-    //   words.forEach( word => {
-    //     const iterator = gazeInfo.values();
-    //     let item = iterator.next();
-    //     while ( !item.done ) {
-    //       if ( this.isMatchingWord( word, item.value ) ) {
-    //         const { feedback, focusing } = item.value;
-    //         result.push( Object.assign( { feedback, focusing }, word ) );
-    //         gazeInfo.delete( item.value );
-    //         break;
-    //       }
-
-    //       item = iterator.next();
-    //     }
-
-    //     if (item.done) {
-    //       result.push( word );
-    //     }
-    //   });
-
-    //   return result;
-    // },
-
+    /** 
+     * @param {DataPageTextWord[]} words
+     * @param {SGWMFixation[]} fixations
+     * @returns {FixatedWord[]}
+     */
     addGazeInfoToWords( words, fixations ) {
+      /** @type {FixatedWord[]} */
       const result = [];
 
       words.forEach( word => {

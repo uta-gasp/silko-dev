@@ -24,10 +24,13 @@
 </template>
 
 <script>
-import OptionsCreator from '@/vis/optionsCreator.js';
+import { OptionsCreator, OptionGroup, OptionItem } from '@/vis/optionsCreator.js';
 
-import ControlPanel from '@/components/vis/controlPanel';
-import Options from '@/components/vis/Options';
+import ControlPanel from '@/components/vis/controlPanel.vue';
+import Options from '@/components/vis/Options.vue';
+
+// ts-check-pnly
+import DataPageFocusedWord from '@/model/data/dataPageFocusedWord.js';
 
 const UNITS = {
   SECONDS: 'seconds',
@@ -38,6 +41,9 @@ const UI = {
   units: UNITS.SECONDS,
 };
 
+/**
+ * @fires close
+ */
 export default {
   name: 'durations',
 
@@ -53,18 +59,19 @@ export default {
 
       defaultFeedback: this.data.records[0].session.feedbacks,
 
+      /** @type {{text: string, value: string}[]} */
       words: [],
 
       // options representation for editor
       options: {
-        gazePlot: {
+        gazePlot: new OptionGroup({
           id: 'durations',
           title: 'Durations',
           options: OptionsCreator.createOptions( {
-            units: { type: Array, items: Object.values( UNITS ), label: 'Units' },
+            units: new OptionItem({ type: Array, items: Object.values( UNITS ), label: 'Units' }),
           }, UI ),
           defaults: OptionsCreator.createDefaults( UI ),
-        },
+        }),
       },
     };
   },
@@ -77,10 +84,12 @@ export default {
   },
 
   computed: {
+    /** @returns {number} */
     textLength() {
       return this.data.records[0].data.pages.length;
     },
 
+    /** @returns {string} */
     title() {
       const r = this.data.records[0];
       const student = this.data.params.student ? ` for ${this.data.params.student}` : '';
@@ -124,13 +133,15 @@ export default {
       this.words = this.compute( new Map( [...words.entries()].sort( descending ) ), totalDuration );
     },
 
+    /**
+     * @param {Map<string, DataPageFocusedWord>} words
+     * @param {DataPageFocusedWord} word
+     * @returns {number}
+     */
     appendWord( words, word ) {
       const hyphenRegExp = new RegExp( `${this.defaultFeedback.syllabification.hyphen}`, 'g' );
 
-      let id = word.id;
-      if ( id === undefined ) {
-        id = '' + Math.floor( word.rect.x / 10 ) + '_' + Math.floor( word.rect.y / 10 );
-      }
+      let id = '' + Math.floor( word.rect.x / 10 ) + '_' + Math.floor( word.rect.y / 10 );
 
       let w = words.get( id );
       if ( !w ) {
@@ -145,16 +156,23 @@ export default {
       return w.focusing.duration;
     },
 
+    /**
+     * @param {DataPageFocusedWord[]} words
+     * @param {number} totalDuration
+     * @returns {{text: string, value: string}[]}
+     */
     compute( words, totalDuration ) {
+      /** @type {{text: string, value: string}[]} */
       const result = [];
 
-      words.forEach( word => {
-        let value = word.focusing.duration;
+      words.forEach( /** @param {DataPageFocusedWord} word */ word => {
+        let value = '';
+        const duration = word.focusing.duration;
         if ( UI.units === UNITS.SECONDS ) {
-          value = ( Math.round( value ) / 1000 ).toFixed( 2 );
+          value = ( Math.round( duration ) / 1000 ).toFixed( 2 );
         }
         else if ( UI.units === UNITS.PERCENTAGE ) {
-          value = ( 100 * value / totalDuration ).toFixed( 1 ) + '%';
+          value = ( 100 * duration / totalDuration ).toFixed( 1 ) + '%';
         }
 
         result.push( { text: word.text, value } );

@@ -9,12 +9,20 @@ const TYPES = {
   word: { name: 'word', text: 'long-gazed word' },
 };
 
-/**
- * @typedef {Object} AnswerCandidate
- * @property {string} text
- * @property {boolean} isCorrect
- */
-export default class Question {
+export class AnswerCandidate {
+
+  /**
+   * @param {string} text 
+   * @param {boolean} isCorrect 
+   */
+  constructor( text, isCorrect ) {
+    this.text = text;
+    this.isCorrect = isCorrect;
+  }
+
+}
+
+export class Question {
 
   /**
    * @param {string} type - a key from 'Question.types'
@@ -29,7 +37,7 @@ export default class Question {
     this.answers = answers;
   }
 
-  /** @returns {object} - QuestionType */
+  /** @returns {Record<string, QuestionType>} */
   static get types() {
     return TYPES;
   }

@@ -26,11 +26,14 @@
 </template>
 
 <script>
-import OptionsCreator from '@/vis/optionsCreator.js';
+import { OptionsCreator, OptionGroup, OptionItem } from '@/vis/optionsCreator.js';
 import sgwmController from '@/vis/sgwmController.js';
 
-import ControlPanel from '@/components/vis/controlPanel';
-import Options from '@/components/vis/Options';
+import ControlPanel from '@/components/vis/controlPanel.vue';
+import Options from '@/components/vis/Options.vue';
+
+// ts-check-only
+import DataPage from '@/model/data/dataPage.js';
 
 const COMMON_UI = {
   wordColor: '#666',
@@ -45,6 +48,9 @@ sgwmController.initializeSettings();
 // - changePage
 // - redraw
 
+/**
+ * @fires close
+ */
 export default {
   components: {
     'control-panel': ControlPanel,
@@ -62,6 +68,7 @@ export default {
       commonUI: COMMON_UI,
 
       pageIndex: -1,
+      /** @type {DataPage[]} */
       currentPages: [],
       defaultSession: this.data.records[0].session,
       defaultPages: this.data.records[0].data.pages,
@@ -81,32 +88,36 @@ export default {
   },
 
   computed: {
+    /** @returns {number} */
     textLength() {
       return this.defaultPages.length;
     },
 
+    /** @returns {number} */
     initialPageIndex() {
       return this.defaultPages[0].isIntro ? 1 : 0;
     },
 
+    /** @returns {string} */
     title() {
       return '';
     },
   },
 
   methods: {
+    /** @returns {OptionGroup} */
     createCommonOptions() {
-      return {
+      return new OptionGroup({
         id: '_common',
         title: 'Common',
         options: OptionsCreator.createOptions( {
-          wordColor: { type: '#', label: 'Text color' },
-          wordHighlightColor: { type: '#', label: 'Highlighting color' },
-          wordRectColor: { type: '#', label: 'Word frame color' },
-          drawWordFrame: { type: Boolean, label: 'Draw word frame' },
+          wordColor: new OptionItem({ type: '#', label: 'Text color' }),
+          wordHighlightColor: new OptionItem({ type: '#', label: 'Highlighting color' }),
+          wordRectColor: new OptionItem({ type: '#', label: 'Word frame color' }),
+          drawWordFrame: new OptionItem({ type: Boolean, label: 'Draw word frame' }),
         }, COMMON_UI ),
         defaults: OptionsCreator.createDefaults( COMMON_UI ),
-      };
+      });
     },
 
     setPage( e ) {
@@ -140,6 +151,10 @@ export default {
 
     },
 
+    /** 
+     * @param {DataPage} page 
+     * @returns {{fixations: SGWMFixation[], words: SGWMWord[]}}
+     * */
     map( page ) {
       return sgwmController.map( page );
     },

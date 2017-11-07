@@ -31,9 +31,16 @@
 </template>
 
 <script>
-import Player from '@/components/vis/Player';
-import VisTitle from '@/components/vis/VisTitle';
+import Player from '@/components/vis/Player.vue';
+import VisTitle from '@/components/vis/VisTitle.vue';
 
+/**
+ * @fires show-options
+ * @fires restart-player
+ * @fires toggle-player
+ * @fires page-changed
+ * @fires close
+ */
 export default {
   name: 'control-panel',
 
@@ -91,6 +98,7 @@ export default {
   },
 
   computed: {
+    /** @returns {string} */
     dispPage() {
       const hasIntroPage = this.initialPageIndex > 0;
       const introPageIndex = hasIntroPage ? 0 : -1;
@@ -99,6 +107,7 @@ export default {
       return this.pageIndex === introPageIndex ? 'int' : `${this.pageIndex + delta}/${textPageCount}`;
     },
 
+    /** @returns {string} */
     correctAnswers() {
       if ( !this.questionnaire || !this.questionnaire.length ) {
         return '-';
@@ -140,6 +149,9 @@ export default {
       this.$emit( 'close' );
     },
 
+    /**
+     * @param {number} index
+     */
     setPage( index ) {
       this.pageIndex = index;
       this.$emit( 'page-changed', { index } );

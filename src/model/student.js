@@ -8,7 +8,7 @@ import Data from './data.js';
 import db from '@/db/db.js';
 
 // ts-check-only
-import Question from '@/model/session/question';
+import { Question } from '@/model/session/question';
 
 /**
  * @typedef {Object} QuestionWithAnswer

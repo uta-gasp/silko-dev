@@ -1,40 +1,57 @@
-/**
- * @typedef {Object} OptionItem
- * @property {string} type - Array, String, Boolean, Number, or '#' for colors
- * @property {string} label
- * @property {string[]} [items] - if type === Array
- * @property {number} [step] - if type === Number
- * @property {object} [ref] - to be created
- */
+export class OptionItem {
+  /**
+   * @param {Object} p
+   * @param {Function | string} p.type
+   * @param {string} p.label 
+   * @param {string[]} [p.items] 
+   * @param {number} [p.step] 
+   */
+  constructor( { type = {}, label = '', items = [''], step = 0 } ) {
+    this.type = type;
+    this.label = label;
+    this.items = items;
+    this.step = step;
+    /** @type {object} */
+    this.ref = undefined;
+  }
+}
 
 /**
- * @typedef {any} OptionItems
- * multiple keys, each of type OptionItem
+ * @typedef {Record<string, OptionItem>} OptionItems
  */
 
-/**
- * @typedef {Object} OptionGroup
- * @property {string} title
- * @property {OptionItems} options
- * @property {any[]} defaults
- */
+export class OptionGroup {
+  /**
+   * @param {Object} p
+   * @param {string} [p.id]
+   * @param {string} p.title 
+   * @param {OptionItems | OptionGroup[]} p.options 
+   * @param {any[]} [p.defaults] 
+   */
+  constructor( { id = '', title = '', options = {}, defaults = [{}] } ) {
+    this.title = title;
+    this.options = options;
+    this.defaults = defaults;
+    this.id = id;
+  }
+}
 
-export default class OptionsCreator {
+export class OptionsCreator {
 
   /**
    * @param {OptionItems | OptionGroup[]} options 
    * @param {object} [receiver] 
-   * @returns {object}
+   * @returns {OptionItems | OptionGroup[]}
    */
   static createOptions( options, receiver ) {
     let result;
     if ( options instanceof Array ) {
       result = options.map( item => {
-        return {
+        return new OptionGroup({
           title: item.title,
           options: OptionsCreator.createOptions( item.options, receiver ),
           defaults: item.defaults,
-        };
+        });
       } );
       // result = options.map( item => Object.assign( {}, item,
       //     { options: OptionsCreator.createOptions( item.options, receiver ) }
@@ -52,7 +69,7 @@ export default class OptionsCreator {
   }
 
   /**
-   * @param {object} source - list of name-value pairs
+   * @param {Record<string, any>} source - list of name-value pairs
    * @param {string[]} [subKeys] 
    * @param {string} [header] 
    * @returns {object}
@@ -80,7 +97,7 @@ export default class OptionsCreator {
   }
 
   /**
-   * @param {OptionGroup | OptionItems} chapters 
+   * @param {Record<string, OptionGroup>} chapters 
    */
   static restoreDefaults( chapters ) {
     for ( let id in chapters ) {

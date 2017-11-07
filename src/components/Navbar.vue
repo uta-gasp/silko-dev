@@ -54,22 +54,27 @@ export default {
 
   computed: {
 
+    /** @returns {boolean} */
     isAdmin() {
       return this.user ? this.user.isAdmin : false;
     },
 
+    /** @returns {boolean} */
     isSchool() {
       return this.user ? this.user.isSchool : false;
     },
 
+    /** @returns {boolean} */
     isTeacher() {
       return this.user ? this.user.isTeacher : false;
     },
 
+    /** @returns {boolean} */
     isStudent() {
       return this.user ? this.user.isStudent : false;
     },
 
+    /** @returns {boolean} */
     isAssignment() {
       return this.$route.path.indexOf( '/assignment/' ) >= 0;
     },

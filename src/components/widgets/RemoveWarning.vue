@@ -34,6 +34,9 @@
 </template>
 
 <script>
+/**
+ * @fires close
+ */
 export default {
   name: 'remove-warning',
 

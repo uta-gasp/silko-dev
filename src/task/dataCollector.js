@@ -17,7 +17,7 @@ import ModelStudent from '@/model/student.js';
 import Font from '@/model/session/font.js';
 import { Feedbacks } from '@/model/session/feedbacks.js';
 import { TextPageImage } from '@/model/task/textPageImage.js';
-import Question from '@/model/session/question.js';
+import { Question } from '@/model/session/question.js';
 
 const MIN_FIXATION_DURATION = 80;
 

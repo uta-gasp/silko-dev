@@ -18,10 +18,13 @@
 <script>
 import dataUtils from '@/utils/data-utils.js';
 
-import ActionError from '@/components/mixins/actionError';
+import ActionError from '@/components/mixins/actionError.js';
 
-import TemporalNotification from '@/components/widgets/TemporalNotification';
-import RemoveWarning from '@/components/widgets/RemoveWarning';
+import TemporalNotification from '@/components/widgets/TemporalNotification.vue';
+import RemoveWarning from '@/components/widgets/RemoveWarning.vue';
+
+// ts-check-only
+import Session from '@/model/session.js';
 
 export default {
   name: 'session-edit-box',
@@ -35,6 +38,7 @@ export default {
 
   data() {
     return {
+      /** @type {Session} */
       sessionToDelete: null,
     };
   },
@@ -47,12 +51,17 @@ export default {
   },
 
   computed: {
+    /** @returns {string} */
     toDeleteName() {
       return this.sessionToString( this.sessionToDelete );
     },
   },
 
   methods: {
+    /**
+     * @param {Session} session
+     * @returns {string}
+     */
     sessionToString( session ) {
       if ( !session ) {
         return '';
@@ -61,6 +70,9 @@ export default {
       return `${session.task.name} at ${dataUtils.sessionDate( session.ref.date )}`;
     },
 
+    /**
+     * @param {Session} session
+     */
     showDeleteWarning( session ) {
       this.sessionToDelete = session;
     },

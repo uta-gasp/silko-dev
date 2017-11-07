@@ -7,6 +7,9 @@
 </template>
 
 <script>
+/**
+ * @fires input
+ */
 export default {
   name: 'bulma-checkbox',
 

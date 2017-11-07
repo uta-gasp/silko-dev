@@ -22,10 +22,14 @@
 
 <script>
 import Colors from '@/vis/colors.js';
-import OptionsCreator from '@/vis/optionsCreator.js';
+import { OptionsCreator, OptionGroup, OptionItem } from '@/vis/optionsCreator.js';
 
 const ID = 'silko';
 
+/**
+ * @fires close
+ * @fires apply
+ */
 export default {
   name: 'options',
 
@@ -130,6 +134,9 @@ export default {
       }
     },
 
+    /** 
+     * @param {string} activeVisID
+     */
     show( activeVisID ) {
       const container = this.$refs.container;
       const groups = container.querySelectorAll( '.group' );
@@ -177,6 +184,11 @@ export default {
       }
     },
 
+    /** 
+     * @param {OptionGroup} sub
+     * @param {string} visID
+     * @returns {Element}
+     */
     createSubGroup( sub, visID ) {
       const subgroup = document.createElement( 'div' );
       subgroup.classList.add( 'subgroup' );
@@ -195,6 +207,11 @@ export default {
       return subgroup;
     },
 
+    /** 
+     * @param {OptionItem} option
+     * @param {string} id
+     * @returns {Element}
+     */
     createRow( option, id ) {
       const row = document.createElement( 'div' );
       row.classList.add( 'row' );
@@ -223,13 +240,18 @@ export default {
       return row;
     },
 
+    /** 
+     * @param {OptionItem} option
+     * @param {string} id
+     * @returns {HTMLSelectElement}
+     */
     createSelect( option, id ) {
       const select = document.createElement( 'select' );
       select.classList.add( 'value' );
       select.classList.add( id );
 
       const currentValue = option.ref();
-      option.items.forEach( itemName => {
+      option.items.forEach( /** @param {string} itemName */ itemName => {
         const item = document.createElement( 'option' );
         item.value = itemName;
         item.textContent = itemName;
@@ -246,6 +268,11 @@ export default {
       return select;
     },
 
+    /** 
+     * @param {OptionItem} option
+     * @param {string} id
+     * @returns {HTMLSpanElement}
+     */
     createCheckbox( option, id ) {
       const container = document.createElement( 'span' );
 
@@ -269,6 +296,11 @@ export default {
       return container;
     },
 
+    /** 
+     * @param {OptionItem} option
+     * @param {string} id
+     * @returns {HTMLInputElement}
+     */
     createTextInput( option, id ) {
       const input = document.createElement( 'input' );
       input.type = 'text';
@@ -284,6 +316,11 @@ export default {
       return input;
     },
 
+    /** 
+     * @param {OptionItem} option
+     * @param {string} id
+     * @returns {HTMLInputElement}
+     */
     createColorbox( option, id ) {
       const input = document.createElement( 'input' );
       input.type = 'color';
@@ -309,6 +346,11 @@ export default {
       return input;
     },
 
+    /** 
+     * @param {OptionItem} option
+     * @param {string} id
+     * @returns {HTMLInputElement}
+     */
     createNumberInput( option, id ) {
       const number = document.createElement( 'input' );
       number.type = 'number';

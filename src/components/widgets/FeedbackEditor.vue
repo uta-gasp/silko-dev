@@ -27,6 +27,9 @@
 </template>
 
 <script>
+/**
+ * @fires input
+ */
 export default {
   name: 'feedback-editor',
 
@@ -56,14 +59,17 @@ export default {
   },
 
   computed: {
+    /** @returns {boolean} */
     canEditCalibThresholdParams() {
       return this.language && this.thresholdIsSmart;
     },
 
+    /** @returns {boolean} */
     isLanguageSelected() {
       return !!this.language;
     },
 
+    /** @returns {{language: string, threshold: {smart: boolean, min: number, max: number, value: number}}} */
     model() {
       return {
         language: this.language,

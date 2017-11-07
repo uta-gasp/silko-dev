@@ -9,6 +9,9 @@
 </template>
 
 <script>
+/**
+ * @fires close
+ */
 export default {
   name: 'assignments',
 

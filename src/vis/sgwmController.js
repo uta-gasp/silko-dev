@@ -3,7 +3,7 @@
  * @see {@link https://uta-gasp.github.com/sgwm/}
  */
 
-import OptionsCreator from '@/vis/optionsCreator.js';
+import { OptionsCreator, OptionGroup, OptionItem } from '@/vis/optionsCreator.js';
 
 // ts-check-only
 import Rect from '@/model/data/rect';
@@ -79,71 +79,71 @@ export default class sgwmController {
     return _SGWM;
   }
 
-  /** @returns {object} */
+  /** @returns {OptionGroup} */
   static createOptions() {
-    return {
+    return new OptionGroup({
       id: '_sgwm',
       title: 'Data mapping',
       options: OptionsCreator.createOptions( [
-        {
+        new OptionGroup({
           title: 'Fixation processing',
           options: OptionsCreator.createOptions( {
-            'FixationProcessorSettings.location.enabled': { type: Boolean, label: 'By location' },
-            'FixationProcessorSettings.location.marginX': { type: Number, step: 10, label: '\tmargin X, px' },
-            'FixationProcessorSettings.location.marginY': { type: Number, label: '\tmargin Y, px' },
-            'FixationProcessorSettings.duration.enabled': { type: Boolean, label: 'By duration' },
-            'FixationProcessorSettings.duration.mergingDurationThreshold': { type: Number, label: '\tmerging threshold, ms' },
-            'FixationProcessorSettings.duration.mergingDistanceThreshold': { type: Number, label: '\tmerging distance, px' },
-            'FixationProcessorSettings.duration.removingDurationThreshold': { type: Number, label: '\tmin duration, ms' },
+            'FixationProcessorSettings.location.enabled': new OptionItem({ type: Boolean, label: 'By location' }),
+            'FixationProcessorSettings.location.marginX': new OptionItem({ type: Number, step: 10, label: '\tmargin X, px' }),
+            'FixationProcessorSettings.location.marginY': new OptionItem({ type: Number, label: '\tmargin Y, px' }),
+            'FixationProcessorSettings.duration.enabled': new OptionItem({ type: Boolean, label: 'By duration' }),
+            'FixationProcessorSettings.duration.mergingDurationThreshold': new OptionItem({ type: Number, label: '\tmerging threshold, ms' }),
+            'FixationProcessorSettings.duration.mergingDistanceThreshold': new OptionItem({ type: Number, label: '\tmerging distance, px' }),
+            'FixationProcessorSettings.duration.removingDurationThreshold': new OptionItem({ type: Number, label: '\tmin duration, ms' }),
           } ),
           defaults: OptionsCreator.createDefaults( _SGWM.FixationProcessorSettings, [ 'location', 'duration' ], 'FixationProcessorSettings' ),
-        },
-        {
+        }),
+        new OptionGroup({
           title: 'Splitter',
           options: OptionsCreator.createOptions( {
-            'SplitToProgressionsSettings.bounds.left': { type: Number, step: 0.1, label: 'Left margin, chars' },
-            'SplitToProgressionsSettings.bounds.right': { type: Number, step: 0.1, label: 'Right margin, chars' },
-            'SplitToProgressionsSettings.bounds.verticalChar': { type: Number, step: 0.1, label: 'Vertical margin, chars' },
-            'SplitToProgressionsSettings.bounds.verticalLine': { type: Number, step: 0.1, label: 'Vertical margin, lines' },
-            'SplitToProgressionsSettings.angle': { type: Number, step: 0.1, label: 'Max incline, rad' },
+            'SplitToProgressionsSettings.bounds.left': new OptionItem({ type: Number, step: 0.1, label: 'Left margin, chars' }),
+            'SplitToProgressionsSettings.bounds.right': new OptionItem({ type: Number, step: 0.1, label: 'Right margin, chars' }),
+            'SplitToProgressionsSettings.bounds.verticalChar': new OptionItem({ type: Number, step: 0.1, label: 'Vertical margin, chars' }),
+            'SplitToProgressionsSettings.bounds.verticalLine': new OptionItem({ type: Number, step: 0.1, label: 'Vertical margin, lines' }),
+            'SplitToProgressionsSettings.angle': new OptionItem({ type: Number, step: 0.1, label: 'Max incline, rad' }),
           } ),
           defaults: OptionsCreator.createDefaults( _SGWM.SplitToProgressionsSettings, [ 'bounds', 'angle' ], 'SplitToProgressionsSettings' ),
-        },
-        {
+        }),
+        new OptionGroup({
           title: 'Merger',
           options: OptionsCreator.createOptions( {
-            'ProgressionMergerSettings.minLongSetLength': { type: Number, label: 'Shortest progression, fixations' },
-            'ProgressionMergerSettings.fitThreshold': { type: Number, step: 0.01, label: 'Line separation threshold, lines' },
-            'ProgressionMergerSettings.maxLinearGradient': { type: Number, step: 0.01, label: 'Max line incline, rad' },
-            'ProgressionMergerSettings.removeSingleFixationLines': { type: Boolean, label: 'Remove unmerged single fixations' },
-            'ProgressionMergerSettings.correctForEmptyLines': { type: Boolean, label: 'Account for empty lines' },
-            'ProgressionMergerSettings.currentLineSupportInCorrection': { type: Number, step: 0.05, label: '\tsupport current line by' },
-            'ProgressionMergerSettings.emptyLineDetectorFactor': { type: Number, step: 0.05, label: '\tempty line factor, lines' },
-            'ProgressionMergerSettings.intelligentFirstLineMapping': { type: Boolean, label: 'Intelligent first reading line search' },
+            'ProgressionMergerSettings.minLongSetLength': new OptionItem({ type: Number, label: 'Shortest progression, fixations' }),
+            'ProgressionMergerSettings.fitThreshold': new OptionItem({ type: Number, step: 0.01, label: 'Line separation threshold, lines' }),
+            'ProgressionMergerSettings.maxLinearGradient': new OptionItem({ type: Number, step: 0.01, label: 'Max line incline, rad' }),
+            'ProgressionMergerSettings.removeSingleFixationLines': new OptionItem({ type: Boolean, label: 'Remove unmerged single fixations' }),
+            'ProgressionMergerSettings.correctForEmptyLines': new OptionItem({ type: Boolean, label: 'Account for empty lines' }),
+            'ProgressionMergerSettings.currentLineSupportInCorrection': new OptionItem({ type: Number, step: 0.05, label: '\tsupport current line by' }),
+            'ProgressionMergerSettings.emptyLineDetectorFactor': new OptionItem({ type: Number, step: 0.05, label: '\tempty line factor, lines' }),
+            'ProgressionMergerSettings.intelligentFirstLineMapping': new OptionItem({ type: Boolean, label: 'Intelligent first reading line search' }),
           } ),
           defaults: OptionsCreator.createDefaults( _SGWM.ProgressionMergerSettings, [
             'minLongSetLength', 'fitThreshold', 'maxLinearGradient', 'removeSingleFixationLines',
             'correctForEmptyLines', 'currentLineSupportInCorrection', 'emptyLineDetectorFactor',
             'intelligentFirstLineMapping' ], 'ProgressionMergerSettings' ),
-        },
-        {
+        }),
+        new OptionGroup({
           title: 'Word mapper',
           options: OptionsCreator.createOptions( {
-            'WordMapperSettings.wordCharSkipStart': { type: Number, label: 'Skip from start, chars' },
-            'WordMapperSettings.wordCharSkipEnd': { type: Number, label: 'Skip from end, chars' },
-            'WordMapperSettings.scalingDiffLimit': { type: Number, step: 0.1, label: 'Scaling diff limit' },
-            'WordMapperSettings.rescaleFixationX': { type: Boolean, label: 'Rescale fixations horizontally' },
-            'WordMapperSettings.partialLengthMaxWordLength': { type: Number, label: '\tshort word, chars' },
-            'WordMapperSettings.effectiveLengthFactor': { type: Number, step: 0.1, label: '\tlimit to' },
-            'WordMapperSettings.ignoreTransitions': { type: Boolean, label: 'Ignore transitions' },
+            'WordMapperSettings.wordCharSkipStart': new OptionItem({ type: Number, label: 'Skip from start, chars' }),
+            'WordMapperSettings.wordCharSkipEnd': new OptionItem({ type: Number, label: 'Skip from end, chars' }),
+            'WordMapperSettings.scalingDiffLimit': new OptionItem({ type: Number, step: 0.1, label: 'Scaling diff limit' }),
+            'WordMapperSettings.rescaleFixationX': new OptionItem({ type: Boolean, label: 'Rescale fixations horizontally' }),
+            'WordMapperSettings.partialLengthMaxWordLength': new OptionItem({ type: Number, label: '\tshort word, chars' }),
+            'WordMapperSettings.effectiveLengthFactor': new OptionItem({ type: Number, step: 0.1, label: '\tlimit to' }),
+            'WordMapperSettings.ignoreTransitions': new OptionItem({ type: Boolean, label: 'Ignore transitions' }),
           } ),
           defaults: OptionsCreator.createDefaults( _SGWM.WordMapperSettings, [
             'wordCharSkipStart', 'wordCharSkipEnd', 'scalingDiffLimit',
             'rescaleFixationX', 'partialLengthMaxWordLength',
             'effectiveLengthFactor', 'ignoreTransitions' ], 'WordMapperSettings' ),
-        },
+        }),
       ], _SGWM ),
-    };
+    });
   }
 
   static save() {
@@ -161,6 +161,7 @@ export default class sgwmController {
 
   /**
    * @param {DataPage} page 
+   * @returns {{fixations: SGWMFixation[], words: SGWMWord[]}}
    */
   static map( page ) {
     const sgwmSession = {

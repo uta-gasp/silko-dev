@@ -8,6 +8,9 @@
 <script>
 import ImageController from '@/task/imageController.js';
 
+// ts-check-onlu
+import TextPageImage from '@/model/task/textPageImage.js';
+
 export default {
   name: 'task-images',
 
@@ -44,6 +47,10 @@ export default {
   },
 
   methods: {
+    /**
+     * @param {string} location
+     * @returns {boolean}
+     */
     hasImageAt( location ) {
       const images = this.images;
       if ( !images ) {
@@ -55,10 +62,16 @@ export default {
   },
 
   watch: {
+    /**
+     * @param {TextPageImage[]} images
+     */
     images( images ) {
       this.imageController.setImages( images );
     },
 
+    /**
+     * @param {{word: string, duration: number}} fixation
+     */
     fixation( fixation ) {
       this.imageController.fixate( fixation.word, fixation.duration );
     },

@@ -10,6 +10,10 @@
 </template>
 
 <script>
+/**
+ * @fires close
+ * @fires mounted
+ */
 export default {
   name: 'modal-container',
 

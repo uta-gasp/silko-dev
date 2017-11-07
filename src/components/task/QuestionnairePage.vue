@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import Question from '@/model/session/question.js';
+import { Question } from '@/model/session/question.js';
 
 export default {
   name: 'questionnaire-page',

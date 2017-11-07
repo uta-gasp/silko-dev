@@ -16,6 +16,7 @@ export default {
   data() {
     return {
       showState: false,
+      /** @type {NodeJS.Timer} */
       timer: null,
     };
   },
@@ -41,12 +42,17 @@ export default {
   },
 
   computed: {
+    /** @returns {string} */
     notificationClass() {
       return 'is-' + this.type;
     },
   },
 
   methods: {
+    /**
+     * @param {{text: string, children?: string[] }} item
+     * @returns {string}
+     */
     getSlotItemText( item ) {
       let result = '';
 
@@ -62,6 +68,7 @@ export default {
       return result;
     },
 
+    /** @returns {string} */
     getSlotText() {
       return this.$slots.default.reduce( ( acc, slot ) => {
         return acc + this.getSlotItemText( slot );
