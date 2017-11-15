@@ -15,12 +15,21 @@
 <script>
 import { Question } from '@/model/session/question.js';
 
+/**
+ * @typedef {Question} AnsweredQuestion
+ * @property {string} answer
+ */
+
+/**
+ * @fires finished
+ */
 export default {
   name: 'questionnaire-page',
 
   data() {
     return {
       questionIndex: 0,
+      /** @type {AnsweredQuestion[]} */
       questions: this.questionnaire
         .map( question => Object.assign( { answer: null }, question ) )
         .filter( question => question.type === Question.types.text.name || this.longGazedWords.includes( question.word ) ),
@@ -40,6 +49,7 @@ export default {
   },
 
   computed: {
+    /** @returns {AnsweredQuestion} */
     question() {
       return this.questionIndex >= 0 && this.questionIndex < this.questions.length
         ? this.questions[ this.questionIndex ] : {};
@@ -47,6 +57,10 @@ export default {
   },
 
   methods: {
+    /** 
+     * @param {string} answer
+     * @returns {object} 
+     */
     asnwerRevealedClass( answer ) {
       return {
         'is-success': this.question.answer && this.question.answer.text === answer.text && answer.isCorrect,
@@ -54,6 +68,9 @@ export default {
       };
     },
 
+    /** 
+     * @param {string} answer
+     */
     reply( answer ) {
       if ( this.question.answer ) {
         return;

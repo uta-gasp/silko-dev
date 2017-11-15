@@ -9,6 +9,11 @@ function formatTimeComponent( timeComponent ) {
   return formattedTimeComponent;
 }
 
+/**
+ * @typedef {Object.<any>} ObjectWithName
+ * @property {string} name
+ */
+
 export default class DataUtils {
 
   /**
@@ -27,8 +32,8 @@ export default class DataUtils {
   }
 
   /**
-   * @param {{name: string}} a 
-   * @param {{name: string}} b 
+   * @param {ObjectWithName} a 
+   * @param {ObjectWithName} b 
    * @returns {boolean}
    */
   static byName( a, b ) {

@@ -30,12 +30,21 @@ import Intro from '@/model/intro.js';
 import gazeTracking from '@/utils/gazeTracking.js';
 import eventBus from '@/utils/event-bus.js';
 
-import ModalError from '@/components/widgets/ModalError';
+import ModalError from '@/components/widgets/ModalError.vue';
 
-import CalibPage from '@/components/task/CalibPage';
-import StartPage from '@/components/task/StartPage';
-import QuestionnairePage from '@/components/task/QuestionnairePage';
-import FinishedPage from '@/components/task/FinishedPage';
+import CalibPage from '@/components/task/CalibPage.vue';
+import StartPage from '@/components/task/StartPage.vue';
+import QuestionnairePage from '@/components/task/QuestionnairePage.vue';
+import FinishedPage from '@/components/task/FinishedPage.vue';
+
+// ts-check-only
+import Task from '@/model/task.js';
+import Question from '@/model/session/question.js';
+
+/**
+ * @typedef {Question} AnsweredQuestion
+ * @property {string} answer
+ */
 
 const STATES = {
   calibrate: { },
@@ -57,17 +66,24 @@ export default {
 
   data() {
     return {
+      /** @type {Student} */
       student: null,
+      /** @type {Task} */
       task: null,
+      /** @type {Intro} */
       intro: null,
 
       state: STATES.calibrate,
       isDataSaved: false,
 
+      /** @type {string?} */
       errorText: null,
 
+      /** @type {{data: string, session: string}} */
       keys: null,
+      /** @type {AnsweredQuestion[]} */
       questionnaire: null,
+      /** @type {string[]} */
       longGazedWords: [],
 
       STATES,
@@ -75,7 +91,7 @@ export default {
   },
 
   computed: {
-
+    /** @returns {Intro | any} */
     introTexts() {
       return this.intro ? this.intro : {};
     },

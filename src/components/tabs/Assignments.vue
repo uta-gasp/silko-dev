@@ -59,8 +59,25 @@ import Student from '@/model/student.js';
 
 import ActionError from '@/components/mixins/actionError';
 
-import Loading from '@/components/widgets/Loading';
-import TemporalNotification from '@/components/widgets/TemporalNotification';
+import Loading from '@/components/widgets/Loading.vue';
+import TemporalNotification from '@/components/widgets/TemporalNotification.vue';
+
+// ts-check-only
+import Data from '@/model/data.js';
+import DataPage from '@/model/data/dataPage.js';
+
+/**
+ * @typedef Assignment
+ * @param {Class} cls
+ * @param {Task} task
+ */
+
+/**
+ * @typedef Session
+ * @param {Class} cls
+ * @param {Task} task
+ * @param {string} session
+ */
 
 export default {
   name: 'assignments',
@@ -74,14 +91,21 @@ export default {
 
   data() {
     return {
+      /** @type {Student}  */
       student: null,
+      /** @type {Assignment[]}  */
       assignments: null,  // [{cls, task}]
+      /** @type {Session[]}  */
       sessions: null,     // [{cls, task, session}]
       assignment: '',
     };
   },
 
   filters: {
+    /** 
+     * @param {string} value
+     * @returns {string}
+     */
     prettifyDate( value ) {
       return dataUtils.sessionDate( value );
     },
@@ -97,7 +121,7 @@ export default {
     },
 
     loadAssignments() {
-      this.student.loadAssignments( ( err, assignments ) => {
+      this.student.loadAssignments( /** @param {Error} err, @param {Assignment[]} assignments */ ( err, assignments ) => {
         this.assignments = [];
         if ( err ) {
           return this.setError( err, 'Failed to load assignments' );
@@ -108,7 +132,7 @@ export default {
     },
 
     loadSessions() {
-      this.student.loadSessions( ( err, sessions ) => {
+      this.student.loadSessions( /** @param {Error} err, @param {Session[]} sessions */ ( err, sessions ) => {
         this.sessions = [];
         if ( err ) {
           return this.setError( err, 'Failed to load sessions' );
@@ -124,6 +148,9 @@ export default {
       }
     },
 
+    /** 
+     * @param {Assignment} assignment
+     */
     start( assignment, e ) {
       if ( Student.MULTICLASS ) {
         this.$router.replace( `/assignment/${assignment.task.id}` );
@@ -133,14 +160,18 @@ export default {
       }
     },
 
+    /** 
+     * @param {Data} data
+     */
     getWPM( data ) {
       // TODO: same piece of code as in components/vis/StudentSummary.vue:calculateStatistics
       const pages = data.pages;
 
+      /** @type {DataPage} */
       let firstPage;
       let lastPage;
       let wordCount = 0;
-      pages.forEach( page => {
+      pages.forEach( /** @param {DataPage} page */ page => {
         if ( !firstPage && page.fixations ) {
           firstPage = page;
         }

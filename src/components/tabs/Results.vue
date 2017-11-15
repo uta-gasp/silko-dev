@@ -110,7 +110,7 @@ import dataUtils from '@/utils/data-utils.js';
 import SelectionBoxItem from '@/utils/selectionBoxItem.js';
 
 import Teacher from '@/model/teacher.js';
-import Student from '@/model/student.js';
+import ModelStudent from '@/model/student.js';
 
 import Data from '@/vis/data/data.js';
 import Record from '@/vis/data/record.js';
@@ -120,21 +120,30 @@ import Params from '@/vis/data/params.js';
 
 import ActionError from '@/components/mixins/actionError';
 
-import Loading from '@/components/widgets/Loading';
-import TemporalNotification from '@/components/widgets/TemporalNotification';
-import ModalContainer from '@/components/widgets/ModalContainer';
-import SessionEditBox from '@/components/widgets/SessionEditBox';
-import ItemSelectionBox from '@/components/widgets/ItemSelectionBox';
+import Loading from '@/components/widgets/Loading.vue';
+import TemporalNotification from '@/components/widgets/TemporalNotification.vue';
+import ModalContainer from '@/components/widgets/ModalContainer.vue';
+import SessionEditBox from '@/components/widgets/SessionEditBox.vue';
+import ItemSelectionBox from '@/components/widgets/ItemSelectionBox.vue';
 
-import GazePlot from '@/components/vis/GazePlot';
-import Durations from '@/components/vis/Durations';
-import GazeReplay from '@/components/vis/GazeReplay';
-import WordReplay from '@/components/vis/WordReplay';
-import StudentsSummary from '@/components/vis/StudentsSummary';
-import QuestionnaireResults from '@/components/vis/QuestionnaireResults';
+import GazePlot from '@/components/vis/GazePlot.vue';
+import Durations from '@/components/vis/Durations.vue';
+import GazeReplay from '@/components/vis/GazeReplay.vue';
+import WordReplay from '@/components/vis/WordReplay.vue';
+import StudentsSummary from '@/components/vis/StudentsSummary.vue';
+import QuestionnaireResults from '@/components/vis/QuestionnaireResults.vue';
+
+// ts-check-onlu
+import ModelData from '@/model/data.js';
+import Session from '@/vis/data/session.js';
+import Student from '@/vis/data/student.js';
 
 class _VisualizationInitialData {
 
+  /**
+   * @param {string} name
+   * @param {Session[]} sessions
+   */
   constructor( name, sessions ) {
     this.name = name;
     this.sessions = sessions; // [ vis/data/Session ]
@@ -163,18 +172,26 @@ export default {
 
   data() {
     return {
+      /** @type {Teacher} */
       teacher: null,
       isLoaded: false,
+      /** @type {_VisualizationInitialData} */
       deferredVisualization: null,
 
+      /** @type {Student} */
       editingStudent: null,
       reloadAfterEditing: false,
 
+      /** @type {{text: string, subitems: SelectionBoxItem[]}[]} */
       gradeWithStudents: null,
+      /** @type {{text: string, subitems: SelectionBoxItem[], multigroup?: boolean}[]} */
       studentWithSessions: null,
+      /** @type {Data} */
       visualization: null,    // vis/data/Data
 
+      /** @type {Class} */
       classes: null,  // [ vis/data/Class ]
+      /** @type {Student[]} */
       students: [],  // [ vis/data/Student ]
 
       VISUALIZATIONS: {
@@ -189,6 +206,7 @@ export default {
   },
 
   computed: {
+    /** @returns {boolean} */
     isGazePlot() {
       return this.deferredVisualization ? this.deferredVisualization.name === this.VISUALIZATIONS.gazePlot : false;
     },
@@ -210,6 +228,9 @@ export default {
       }
     },
 
+    /**
+     * @param {Callback} cb 
+     */
     loadClasses( cb ) {
       this.teacher.getClasses( ( err, classes ) => {
         if ( err ) {
@@ -266,16 +287,24 @@ export default {
       this.reloadAfterEditing = false;
     },
 
+    /**
+     * @param {Student} student 
+     */
     editSessions( student, e ) {
       this.editingStudent = student;
     },
 
+    /**
+     * @param {Task} task 
+     * @param {string} visualizationName 
+     */
     selectTaskStudents( task, visualizationName ) {
       this.deferredVisualization = new _VisualizationInitialData( visualizationName, task.sessions );
 
       const grade = {
         text: `Students completed "${task.name}"`,
         multiGroup: true,
+        /** @type {SelectionBoxItem[]} */
         subitems: [],
       };
 
@@ -290,22 +319,17 @@ export default {
             } ) );
           }
         } );
-
-        // No sessions, just student names
-        // grade.subitems.push( new SelectionBoxItem( {
-        //   id: student.ref.id,
-        //   text: student.ref.name,
-        //   selected: true,
-        // } ) );
       } );
 
       this.studentWithSessions = [ grade ];
-
-      // No sessions, just student names
-      // this.gradeWithStudents = [ grade ];
     },
 
+    /**
+     * @param {Class} cls 
+     * @param {string} visualizationName 
+     */
     selectClassStudents( cls, visualizationName ) {
+      /** @type {Session[]} */
       const sessions = [];
       cls.students.forEach( student => {
         sessions.push( ...student.sessions );
@@ -315,6 +339,7 @@ export default {
 
       const grade = {
         text: `students of "${cls.ref.name}"`,
+        /** @type {SelectionBoxItem[]} */
         subitems: [],
       };
 
@@ -329,6 +354,10 @@ export default {
       this.gradeWithStudents = [ grade ];
     },
 
+    /**
+     * @param {Student} student 
+     * @param {string} visualizationName 
+     */
     selectSession( student, visualizationName ) {
       if ( student.sessions.length === 1 ) {
         this.visualizeSessions( student.sessions, visualizationName, new Params( {
@@ -341,6 +370,7 @@ export default {
 
       const studentWithSessions = {
         text: `Sessions by ${student.ref.name}`,
+        /** @type {SelectionBoxItem[]} */
         subitems: [],
       };
 
@@ -391,16 +421,18 @@ export default {
       this.reloadAfterEditing = true;
     },
 
-    // sessions: [ vis/data/Session ]
-    // name: String
-    // params: vis/data/DataParams
+    /**
+     * @param {Session[]} sessions
+     * @param {string} name
+     * @param {Params} params
+     */
     visualizeSessions( sessions, name, params ) {
       if ( !sessions || !sessions.length ) {
         return;
       }
 
       const dataIDs = sessions.map( session => session.ref.data );
-      Student.getData( dataIDs, ( err, data ) => {
+      ModelStudent.getData( dataIDs, /** @param {Error} err, @param {ModelData[]} data */( err, data ) => {
         if ( err ) {
           return this.setError( err, 'Failed to load student data' );
         }
@@ -410,6 +442,10 @@ export default {
       } );
     },
 
+    /** 
+     * @param {string} visualizationName
+     * @returns {boolean}
+     */
     isShowing( visualizationName ) {
       return this.visualization ? this.visualization.name === visualizationName : false;
     },

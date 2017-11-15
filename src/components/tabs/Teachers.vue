@@ -55,8 +55,8 @@ import Teacher from '@/model/teacher.js';
 import ActionError from '@/components/mixins/actionError';
 import ActionSuccess from '@/components/mixins/actionSuccess';
 
-import Loading from '@/components/widgets/Loading';
-import TemporalNotification from '@/components/widgets/TemporalNotification';
+import Loading from '@/components/widgets/Loading.vue';
+import TemporalNotification from '@/components/widgets/TemporalNotification.vue';
 
 export default {
   name: 'teachers',
@@ -70,6 +70,7 @@ export default {
 
   data() {
     return {
+      /** @type {School} */
       school: null,
 
       newName: '',
@@ -78,25 +79,31 @@ export default {
 
       isCreating: false,
 
+      /** @type {School[]} */
       schools: [],
+      /** @type {Teacher[]} */
       teachers: null,
     };
   },
 
   computed: {
 
+    /** @returns {boolean} */
     isNewNameValid() {
       return this.newName.trim().length > 2;
     },
 
+    /** @returns {boolean} */
     isNewEmailValid() {
       return /(.{2,})@(\w{2,}\.\w{2,})/.test( this.newEmail.trim() );
     },
 
+    /** @returns {boolean} */
     isSchoolValid() {
       return !this.isAdmin || this.newSchool;
     },
 
+    /** @returns {boolean} */
     canCreate() {
       return !this.isCreating &&
           this.isNewNameValid &&
@@ -104,10 +111,12 @@ export default {
           this.isSchoolValid;
     },
 
+    /** @returns {boolean} */
     isAdmin() {
       return Admin.isLogged;
     },
 
+    /** @returns {{value: string, text: string}[]} */
     schoolItems() {
       if ( !this.schools ) {
         return [];
@@ -135,6 +144,7 @@ export default {
       }
     },
 
+    /** @returns {Promise} */
     loadSchools() {
       return School.list( ( err, schools ) => {
         if ( err ) {
@@ -145,6 +155,7 @@ export default {
       } );
     },
 
+    /** @returns {Promise} */
     loadTeachers() {
       const onDone = ( err, teachers ) => {
         if ( err ) {
@@ -224,6 +235,9 @@ export default {
       }
     },
 
+    /** 
+     * @param {Teacher} teacher
+     */
     moveTeacher( teacher, e ) {
       Admin.moveTeacher( teacher, e.target.value, this.schools, err => {
         if ( err ) {
@@ -235,6 +249,10 @@ export default {
       } );
     },
 
+    /** 
+     * @param {Teacher} teacher
+     * @returns {string}
+     */
     getListOfTeacherClasses( teacher ) {
       const classes = [];
       for ( let id in teacher.classes ) {

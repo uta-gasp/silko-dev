@@ -15,6 +15,7 @@ export default {
   },
 
   computed: {
+    /** @returns {string} */
     titleFinished() {
       return this.texts.finished || 'Thank you!';
     },

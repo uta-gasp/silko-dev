@@ -46,8 +46,8 @@ import School from '@/model/school.js';
 import ActionError from '@/components/mixins/actionError';
 import ActionSuccess from '@/components/mixins/actionSuccess';
 
-import Loading from '@/components/widgets/Loading';
-import TemporalNotification from '@/components/widgets/TemporalNotification';
+import Loading from '@/components/widgets/Loading.vue';
+import TemporalNotification from '@/components/widgets/TemporalNotification.vue';
 
 export default {
   name: 'schools',
@@ -66,20 +66,24 @@ export default {
 
       isCreating: false,
 
+      /** @type {School[]} */
       schools: null,
     };
   },
 
   computed: {
 
+    /** @returns {boolean} */
     isNewNameValid() {
       return this.newName.trim().length > 2;
     },
 
+    /** @returns {boolean} */
     isNewEmailValid() {
       return /(.{2,})@(\w{2,}\.\w{2,})/.test( this.newEmail.trim() );
     },
 
+    /** @returns {boolean} */
     canCreate() {
       return !this.isCreating &&
           this.isNewNameValid &&
@@ -147,11 +151,6 @@ export default {
   filters: {
     count( obj ) {
       return Object.keys( obj ).length;
-      // let result = 0;
-      // for ( let _ in obj ) {
-      //   result++;
-      // }
-      // return result;
     },
   },
 

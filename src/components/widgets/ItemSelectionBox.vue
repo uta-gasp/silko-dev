@@ -42,7 +42,7 @@
 
 <script>
 // ts-check-only
-import Subitem from '@/utils/SelectionBoxItem.js';
+import Subitem from '@/utils/selectionBoxItem.js';
 
 /**
  * @typedef Item

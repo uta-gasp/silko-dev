@@ -50,11 +50,15 @@ import Teacher from '@/model/teacher.js';
 import ActionError from '@/components/mixins/actionError';
 import ActionSuccess from '@/components/mixins/actionSuccess';
 
-import Loading from '@/components/widgets/Loading';
-import TemporalNotification from '@/components/widgets/TemporalNotification';
-import TaskList from '@/components/widgets/TaskList';
-import StudentList from '@/components/widgets/StudentList';
-import RemoveWarning from '@/components/widgets/RemoveWarning';
+import Loading from '@/components/widgets/Loading.vue';
+import TemporalNotification from '@/components/widgets/TemporalNotification.vue';
+import TaskList from '@/components/widgets/TaskList.vue';
+import StudentList from '@/components/widgets/StudentList.vue';
+import RemoveWarning from '@/components/widgets/RemoveWarning.vue';
+
+// ts-check-only
+import Class from '@/model/class.js';
+import Intro from '@/model/intro.js';
 
 export default {
   name: 'classes',
@@ -71,6 +75,7 @@ export default {
 
   data() {
     return {
+      /** @type {Teacher} */
       teacher: null,
 
       newName: '',
@@ -78,19 +83,23 @@ export default {
       isCreating: false,
       refreshStudents: 0,
 
+      /** @type {Class[]} */
       classes: null,
+      /** @type {Intro[]} */
       intros: [],
 
+      /** @type {Class} */
       toDelete: null,
     };
   },
 
   computed: {
-
+    /** @returns {boolean} */
     canCreate() {
       return this.newName.length > 2;
     },
 
+    /** @returns {string} */
     toDeleteName() {
       return this.toDelete ? this.toDelete.name : '';
     },
@@ -107,7 +116,7 @@ export default {
     },
 
     loadClasses() {
-      this.teacher.getClasses( ( err, classes ) => {
+      this.teacher.getClasses( /** @param {Error} err, @param {Class[]} classes */ ( err, classes ) => {
         if ( err ) {
           this.classed = [];
           return this.setError( err, 'Failed to load classes' );
@@ -118,7 +127,7 @@ export default {
     },
 
     loadIntros() {
-      this.teacher.getIntros( ( err, intros ) => {
+      this.teacher.getIntros( /** @param {Error} err, @param {Intro[]} intro */ ( err, intros ) => {
         if ( err ) {
           return this.setError( err, 'Failed to load introductions' );
         }
@@ -138,7 +147,7 @@ export default {
         return;
       }
 
-      const exists = this.classes.some( cls => {
+      const exists = this.classes.some( /** @param {Class} cls */ cls => {
         return cls.name.toLowerCase() === this.newName.toLowerCase();
       } );
 
@@ -150,10 +159,13 @@ export default {
       }
     },
 
+    /** 
+     * @param {string} name 
+     */
     createClass( name ) {
       this.isCreating = true;
 
-      this.teacher.createClass( name, ( err, _ ) => {
+      this.teacher.createClass( name, /** @param {Error} err, @param {any} _ */ ( err, _ ) => {
         this.isCreating = false;
 
         if ( err ) {
@@ -169,13 +181,16 @@ export default {
       } );
     },
 
+    /**
+     * @param {Class} item
+     */
     removeClass( item, e ) {
       this.toDelete = item;
     },
 
     removeWarningClosed( e ) {
       if ( e.confirm ) {
-        this.teacher.deleteClass( this.toDelete, err => {
+        this.teacher.deleteClass( this.toDelete, /** @param {Error} err */ err => {
           if ( err ) {
             this.setError( err, 'Failed to delete the class' );
           }

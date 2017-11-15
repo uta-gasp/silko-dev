@@ -7,6 +7,10 @@ export default {
   },
 
   methods: {
+    /**
+     * @param {Error | string} err 
+     * @param {string} pre 
+     */
     setError( err, pre ) {
       if ( err.message ) {
         err = err.message;

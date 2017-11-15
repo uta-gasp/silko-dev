@@ -71,9 +71,12 @@ import Teacher from '@/model/teacher.js';
 import ActionError from '@/components/mixins/actionError';
 import ActionSuccess from '@/components/mixins/actionSuccess';
 
-import Loading from '@/components/widgets/Loading';
-import TemporalNotification from '@/components/widgets/TemporalNotification';
-import RemoveWarning from '@/components/widgets/RemoveWarning';
+import Loading from '@/components/widgets/Loading.vue';
+import TemporalNotification from '@/components/widgets/TemporalNotification.vue';
+import RemoveWarning from '@/components/widgets/RemoveWarning.vue';
+
+// ts-check-only
+import Class from '@/model/class.js';
 
 export default {
   name: 'students',
@@ -88,7 +91,9 @@ export default {
 
   data() {
     return {
+      /** @type {Teacher} */
       teacher: null,
+      /** @type {School} */
       school: null,
 
       newName: '',
@@ -98,24 +103,31 @@ export default {
       newSchool: '',
 
       isCreating: false,
+      /** @type {Student} */
       toDelete: null,
 
+      /** @type {School[]} */
       schools: [],
+      /** @type {Student[]} */
       students: null,
+      /** @type {Class[]} */
       classes: [],
     };
   },
 
   computed: {
 
+    /** @returns {boolean} */
     isAdmin() {
       return Admin.isLogged;
     },
 
+    /** @returns {boolean} */
     isNewNameValid() {
       return this.newName.trim().length > 2;
     },
 
+    /** @returns {boolean} */
     isNewEmailValid() {
       // allow plain IDs, not emails
       if ( this.newEmail.indexOf( '@' ) > 0 ) {
@@ -126,22 +138,27 @@ export default {
       }
     },
 
+    /** @returns {boolean} */
     isNewPasswordValid() {
       return this.newPassword.length >= 6 || this.isRealEmail;
     },
 
+    /** @returns {boolean} */
     isNewGradeValid() {
       return this.newGrade.trim().length;
     },
 
+    /** @returns {boolean} */
     isSchoolValid() {
       return !Admin.isLogged || this.newSchool;
     },
 
+    /** @returns {boolean} */
     isRealEmail() {
       return this.newEmail.indexOf( '@' ) > 0 && this.newEmail.indexOf( login.DEFAULT_EMAIL_DOMAIN ) < 0;
     },
 
+    /** @returns {boolean} */
     canCreateStudent() {
       return !this.isCreating &&
           this.isNewNameValid &&
@@ -151,6 +168,7 @@ export default {
           this.isSchoolValid;
     },
 
+    /** @returns {{value: string, text: string}[]} */
     schoolItems() {
       if ( !this.schools ) {
         return [];
@@ -163,6 +181,7 @@ export default {
       } );
     },
 
+    /** @returns {string} */
     toDeleteName() {
       return this.toDelete ? this.toDelete.name : '';
     },
@@ -186,6 +205,7 @@ export default {
       }
     },
 
+    /** @returns {Promise} */
     loadSchools() {
       return School.list( ( err, schools ) => {
         if ( err ) {
@@ -260,6 +280,9 @@ export default {
       }
     },
 
+    /** 
+     * @param {string} email
+     */
     createStudent( email ) {
       this.isCreating = true;
 
@@ -305,6 +328,9 @@ export default {
       }
     },
 
+    /** 
+     * @param {Student} student
+     */
     moveStudent( student, e ) {
       Admin.moveStudent( student, e.target.value, this.schools, err => {
         if ( err ) {
@@ -316,6 +342,10 @@ export default {
       } );
     },
 
+    /** 
+     * @param {Student} student
+     * @returns {string}
+     */
     getListOfStudentClasses( student ) {
       const classes = [];
       for ( let id in student.classes ) {
@@ -324,8 +354,11 @@ export default {
       return classes.join( ', ' );
     },
 
-    remove( item ) {
-      this.toDelete = item;
+    /** 
+     * @param {Student} student
+     */
+    remove( student ) {
+      this.toDelete = student;
     },
 
     removeWarningClosed( e ) {

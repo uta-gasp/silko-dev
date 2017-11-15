@@ -57,11 +57,14 @@ import Teacher from '@/model/teacher.js';
 import ActionError from '@/components/mixins/actionError';
 import ActionSuccess from '@/components/mixins/actionSuccess';
 
-import Loading from '@/components/widgets/Loading';
-import TemporalNotification from '@/components/widgets/TemporalNotification';
-import ModalContainer from '@/components/widgets/ModalContainer';
-import IntroEditor from '@/components/widgets/IntroEditor';
-import RemoveWarning from '@/components/widgets/RemoveWarning';
+import Loading from '@/components/widgets/Loading.vue';
+import TemporalNotification from '@/components/widgets/TemporalNotification.vue';
+import ModalContainer from '@/components/widgets/ModalContainer.vue';
+import IntroEditor from '@/components/widgets/IntroEditor.vue';
+import RemoveWarning from '@/components/widgets/RemoveWarning.vue';
+
+// ts-check-only
+import Intro from '@/model/intro.js';
 
 export default {
   name: 'instructions',
@@ -78,15 +81,19 @@ export default {
 
   data() {
     return {
+      /** @type {Teacher} */
       teacher: null,
 
       resetNew: 0, // random value to trigger the field reset in TextEditor
 
       isCreating: false,
 
+      /** @type {Intro[]} */
       intros: null,
 
+      /** @type {Intro} */
       toDelete: null,
+      /** @type {Intro} */
       toEdit: null,
     };
   },
@@ -107,7 +114,7 @@ export default {
     },
 
     loadIntros() {
-      this.teacher.getIntros( ( err, intros ) => {
+      this.teacher.getIntros( /** @param {Error} err, @param {Intro[]} intros */( err, intros ) => {
         if ( err ) {
           this.intros = [];
           return this.setError( err, 'Failed to load introductions' );
@@ -136,6 +143,9 @@ export default {
       }
     },
 
+    /**
+     * @param {any} newIntro
+     */
     createIntro( newIntro ) {
       this.isCreating = true;
 
@@ -153,16 +163,22 @@ export default {
       } );
     },
 
+    /**
+     * @param {Intro} item
+     */
     remove( item, e ) {
       this.toDelete = item;
     },
 
+    /**
+     * @param {Intro} item
+     */
     edit( item, e ) {
       this.toEdit = item;
     },
 
     saveEdited( e ) {
-      this.toEdit.update( e.name, e.texts, err => {
+      this.toEdit.update( e.name, e.texts, /** @param {Error} err */ err => {
         if ( err ) {
           this.setError( err, 'Failed to save updates' );
         }
@@ -218,8 +234,5 @@ export default {
 <style lang="less" scoped>
   .keep-lines {
     white-space: pre-line;
-    // text-overflow: ellipsis;
-    // overflow-x: hidden;
-    // display: grid;
   }
 </style>

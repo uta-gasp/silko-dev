@@ -104,9 +104,13 @@ import gazeTracking from '@/utils/gazeTracking.js';
 import ActionError from '@/components/mixins/actionError';
 import ActionSuccess from '@/components/mixins/actionSuccess';
 
-import Login from '@/components/widgets/Login';
-import ModalContainer from '@/components/widgets/ModalContainer';
-import TemporalNotification from '@/components/widgets/TemporalNotification';
+import Login from '@/components/widgets/Login.vue';
+import ModalContainer from '@/components/widgets/ModalContainer.vue';
+import TemporalNotification from '@/components/widgets/TemporalNotification.vue';
+
+// ts-check-only
+import UserBase from '@/db/userBase.js';
+import School from '@/model/school.js';
 
 export default {
   name: 'home',
@@ -124,9 +128,12 @@ export default {
       showWsSecurityError: !gazeTracking.isWebSocketOK,
 
       isLoginVisible: true,
+      /** @type {UserBase} */
       user: null,
 
+      /** @type {School[]} */
       schools: null,
+      /** @type {School} */
       schoolToRegester: null,
 
       isGettingEmail: false,
@@ -135,10 +142,15 @@ export default {
   },
 
   computed: {
+    /** @returns {boolean} */
     isAdmin() { return this.user && this.user.isAdmin; },
+    /** @returns {boolean} */
     isSchool() { return this.user && this.user.isSchool; },
+    /** @returns {boolean} */
     isTeacher() { return this.user && this.user.isTeacher; },
+    /** @returns {boolean} */
     isStudent() { return this.user && this.user.isStudent; },
+    /** @returns {string} */
     userTitle() {
       if ( this.isAdmin ) { return 'an admin'; }
       else if ( this.isSchool ) { return 'a school'; }
@@ -147,10 +159,12 @@ export default {
       else { return 'an anonym'; }
     },
 
+    /** @returns {boolean} */
     isEmailValid() {
       return !this.email || /(.{2,})@(\w{2,}\.\w{2,})/.test( this.email );
     },
 
+    /** @returns {boolean} */
     isFirefox() {
       const ua = ( window.navigator && window.navigator.userAgent ) || '';
       return ua.indexOf( 'Mozilla' ) >= 0;

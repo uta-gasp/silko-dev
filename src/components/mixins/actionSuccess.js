@@ -7,6 +7,9 @@ export default {
   },
 
   methods: {
+    /**
+     * @param {string} message 
+     */
     setSuccess( message ) {
       this.successMessage = message;
       this.showSuccess = Math.random();

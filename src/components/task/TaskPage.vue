@@ -18,8 +18,8 @@
 </template>
 
 <script>
-import TaskText from '@/components/widgets/TaskText';
-import TaskImages from '@/components/widgets/TaskImages';
+import TaskText from '@/components/widgets/TaskText.vue';
+import TaskImages from '@/components/widgets/TaskImages.vue';
 
 import TextPresenter from '@/task/textPresenter.js';
 import FeedbackProvider from '@/task/feedbackProvider.js';
@@ -29,8 +29,15 @@ import gazeTracking from '@/utils/gazeTracking.js';
 
 import Font from '@/model/session/font.js';
 
+// ts-check-only
+import DataImage from '@/model/data/image.js';
+
 const FIX_UPDATE_INTERVAL = 25;
 
+/**
+ * @fires finished
+ * @fires saved
+ */
 export default {
   name: 'task-page',
 
@@ -41,8 +48,11 @@ export default {
 
   data() {
     return {
+      /** @type {TextPresenter} */
       textPresenter: null,
+      /** @type {FeedbackProvider} */
       feedbackProvider: null,
+      /** @type {DataCollector} */
       collector: null,
 
       font: Font.from( TaskText.data().textStyle ),
@@ -52,7 +62,7 @@ export default {
         duration: 0,
       },
 
-      fixationUpdateTimer: null,
+      fixationUpdateTimer: 0,
     };
   },
 
@@ -63,18 +73,22 @@ export default {
   },
 
   computed: {
+    /** @returns {boolean} */
     hasNextPage() {
       return this.textPresenter ? this.textPresenter.hasNextPage : false;
     },
 
+    /** @returns {string} */
     titleNext() {
       return this.texts.next || 'Next';
     },
 
+    /** @returns {string} */
     titleFinish() {
       return this.texts.finish || 'Finish';
     },
 
+    /** @returns {DataImage[]} */
     images() {
       if ( !this.textPresenter ) {
         return [];
@@ -105,12 +119,12 @@ export default {
 
     finish( e ) {
       this.$emit( 'finished', { longGazedWords: this.collector.longGazedWords( this.task.syllab.threshold.value ) } );
-      this.collector.stop( ( err, keys ) => {
+      this.collector.stop( /** @param {Error} err; @param {{data: string, session: string}} keys */( err, keys ) => {
         this.$emit( 'saved', { err, keys } );
       } );
 
       window.clearInterval( this.fixationUpdateTimer );
-      this.fixationUpdateTimer = null;
+      this.fixationUpdateTimer = 0;
     },
 
     onImageShow( e ) {

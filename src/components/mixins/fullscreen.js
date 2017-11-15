@@ -2,6 +2,9 @@ export default {
 
   methods: {
 
+    /**
+     * @param {Element} element 
+     */
     makeFullscreen( element ) {
       if ( element.requestFullscreen ) {
         element.requestFullscreen();
@@ -32,8 +35,11 @@ export default {
       }
     },
 
+    /**
+     * @param {function(boolean)} cb 
+     */
     onFullscreenChanges( cb ) {
-      const handler = e => {
+      const handler = /** @param {any} e */ e => {
         /* eslint-disable standard/no-callback-literal */
         if ( document.fullscreenElement ) {
           return cb( !!document.fullscreenElement );

@@ -29,6 +29,9 @@
 <script>
 import gazeTracking from '@/utils/gazeTracking.js';
 
+/**
+ * @fires close
+ */
 export default {
   name: 'calib-page',
 
@@ -45,18 +48,22 @@ export default {
   },
 
   computed: {
+    /** @returns {string} */
     calibInstruction() {
       return this.texts.calibInstruction ? this.texts.calibInstruction.split( '\n' ) : '';
     },
 
+    /** @returns {string} */
     titleStart() {
       return this.texts.calibStart || 'Start';
     },
 
+    /** @returns {string} */
     titleSkip() {
       return this.texts.calibSkip || 'Skip';
     },
 
+    /** @returns {string} */
     titleCancel() {
       return this.texts.startCancel || 'Cancel';
     },

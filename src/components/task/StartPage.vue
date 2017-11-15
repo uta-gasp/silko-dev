@@ -29,10 +29,14 @@
 <script>
 import gazeTracking from '@/utils/gazeTracking.js';
 
-import TaskPage from '@/components/task/TaskPage';
+import TaskPage from '@/components/task/TaskPage.vue';
 
 import fullscreen from '@/components/mixins/fullscreen.js';
 
+/**
+ * @fires close
+ * @fires saved
+ */
 export default {
   name: 'start-page',
 
@@ -59,14 +63,17 @@ export default {
   },
 
   computed: {
+    /** @returns {string} */
     startInstruction() {
       return this.texts.startInstruction ? this.texts.startInstruction.split( '\n' ) : '';
     },
 
+    /** @returns {string} */
     titleStart() {
       return this.texts.startRun || 'Start';
     },
 
+    /** @returns {string} */
     titleCancel() {
       return this.texts.startCancel || 'Cancel';
     },
@@ -97,6 +104,7 @@ export default {
   },
 
   watch: {
+    /** @param {boolean} value */
     isRunning( value ) {
       if ( !value && this.isFullscreen && this.isReading ) {
         setTimeout( () => {
