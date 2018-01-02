@@ -135,6 +135,8 @@ export class TextPageImage {
     this.on = on;
     /** @type {TextPageImageEvent & TextPageImageDelayEvent} */
     this.off = off;
+
+    this.file = null;
   }
 
   /** @returns {object} - a dictionary of events */

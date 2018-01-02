@@ -57,6 +57,7 @@ const TASK_DEFAULTS = 'task-defaults';
 
 /**
  * @fires save
+ * @fires edited
  */
 export default {
   name: 'task-editor',
@@ -253,16 +254,22 @@ export default {
       this.fontname = e.fontname;
       this.intro = e.intro;
       this.text = e.text;
+
+      this.$emit( 'modified' );
     },
 
     setFeedbackInput( e ) {
       this.syllab = e.syllab;
       this.speech = e.speech;
       this.syllabExceptions = e.syllabExceptions;
+
+      this.$emit( 'modified' );
     },
 
     setImagesInput( e ) {
       this.images = e.images;
+
+      this.$emit( 'modified' );
     },
 
     setDefaultFeedback( e ) {
@@ -275,6 +282,8 @@ export default {
 
     setQuestionnaireInput( e ) {
       this.questionnaire = e.questionnaire;
+
+      this.$emit( 'modified' );
     },
 
     save( e ) {

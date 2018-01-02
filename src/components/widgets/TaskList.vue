@@ -32,7 +32,7 @@
                 i.fa.fa-remove
 
     modal-container(v-if="isEditing" :title="taskEditorTitle" @close="closeEditor")
-      task-editor(:action="action" :task="toEdit" :source="toCopy" :intros="intros" @save="save")
+      task-editor(:action="action" :task="toEdit" :source="toCopy" :intros="intros" @save="save" @modified="onTaskModified")
 
     remove-warning(v-if="toDelete" object="task" :name="toDeleteName" @close="removeWarningClosed")
       span All students assignments completed on this task will be deleted as well.&nbsp;
@@ -90,6 +90,8 @@ export default {
       /** @type {Task} */
       toDelete: null,
       isCreating: false,
+
+      isTaskModified: false,
     };
   },
 
@@ -182,6 +184,7 @@ export default {
      */
     edit( task, e ) {
       this.toEdit = task;
+      this.isTaskModified = false;
     },
 
     /** 
@@ -190,6 +193,7 @@ export default {
     copy( task, e ) {
       this.toCopy = task;
       this.isCreating = true;
+      this.isTaskModified = false;
     },
 
     save( e ) {
@@ -215,13 +219,28 @@ export default {
         } );
       }
 
+      this.isTaskModified = false;
       this.closeEditor();
     },
 
+    onTaskModified( e ) {
+      this.isTaskModified = true;
+    },
+
     closeEditor( e ) {
-      this.toEdit = null;
-      this.toCopy = null;
-      this.isCreating = false;
+      let canClose = true;
+      if (e && this.isTaskModified) {
+        canClose = window.confirm( 'All changes will be lost. OK to continue?' );
+      }
+
+      if (canClose) {
+        this.toEdit = null;
+        this.toCopy = null;
+        this.isCreating = false;
+      } 
+      else if (e) {
+        e.cancelled = true;
+      }
     },
 
     /** 
@@ -272,6 +291,7 @@ export default {
 
     openNewTextBox( e ) {
       this.isCreating = true;
+      this.isTaskModified = false;
     },
   },
 

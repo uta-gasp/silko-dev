@@ -400,6 +400,7 @@ export default {
       this.uploadProgress = 0;
 
       const image = new TextPageImage( {
+        src: null,
         page: this.page,
         location: this.location,
         on: this.constructImageEvent( this.on ),

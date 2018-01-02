@@ -62,7 +62,7 @@ export default {
       type: '',
       word: '',
       question: '',
-      /** @type {AnswerCandidate} */
+      /** @type {AnswerCandidate[]} */
       answers: [],
 
       /** @type {Question[]} */
