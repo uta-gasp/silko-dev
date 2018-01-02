@@ -12,6 +12,11 @@
               option(value="center") center
               option(value="left") left
         .column.is-narrow
+          label.label Font
+          .select
+            select(v-model="fontname")
+              option(v-for="name in FONTS" :key="name") {{ name }}
+        .column.is-narrow
           label.label Introduction
           span.select
             select(v-model="intro")
@@ -90,8 +95,28 @@ export default {
     return {
       name: this.task && this.task.name ? this.task.name : '',
       alignment: this.task && this.task.alignment ? this.task.alignment : 'center',
+      fontname: this.task && this.task.fontname ? this.task.fontname : 'Calibri',
       intro: this.task && this.task.intro ? this.task.intro : '',
       text: this.task && this.task.pages ? Task.pagesToText( this.task.pages ) : '',
+
+      FONTS: [
+        'Arial',
+        'Arial Black',
+        'Bookman',
+        'Calibri',
+        'Comic Sans MS',
+        'Courier',
+        'Courier New',
+        'Garamond',
+        'Georgia',
+        'Helvetica',
+        'Impact',
+        'Palatino',
+        'Times New Roman',
+        'Times',
+        'Trebuchet MS',
+        'Verdana',
+      ],
     };
   },
 
@@ -113,11 +138,12 @@ export default {
       return !( this.task && this.task.name );
     },
 
-    /** @returns {{name: string, alignment: string, intro: Intro, text: string}} */
+    /** @returns {{name: string, alignment: string, fontname: string, intro: Intro, text: string}} */
     currentModel() {
       return {
         name: this.name,
         alignment: this.alignment,
+        fontname: this.fontname,
         intro: this.intro,
         text: this.text,
       };
@@ -130,6 +156,10 @@ export default {
     },
 
     alignment() {
+      this.$emit( 'input', this.currentModel );
+    },
+
+    fontname() {
       this.$emit( 'input', this.currentModel );
     },
 

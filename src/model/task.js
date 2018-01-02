@@ -29,6 +29,8 @@ export default class Task extends Recordable {
     this.type = '';
     /** @type {string} 'left' | 'right' */
     this.alignment = '';
+    /** @type {string} */
+    this.fontname = 'Calibri';
     /** @type {string} ID */
     this.intro = '';
     /** @type {TextPage[]} */
@@ -221,6 +223,7 @@ export default class Task extends Recordable {
   update( task, cb ) {
     const _task = {
       alignment: task.alignment,
+      fontname: task.fontname,
       intro: task.intro,
       pages: Task.textToPages( task.text ),
       syllab: task.syllab,

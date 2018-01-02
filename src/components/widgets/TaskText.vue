@@ -11,12 +11,19 @@ export default {
     return {
       textStyle: {
         'color': '#775',
-        'font-family': 'Calibri, Arial, sans-serif',
+        'font-family': this.fontname + ', Arial, sans-serif',
         'font-size': '20pt',
         'font-style': 'normal',
         'font-weight': 'bold',
       },
     };
+  },
+
+  props: {
+    fontname: {
+      type: String,
+      default: 'Calibri',
+    },
   },
 };
 </script>

@@ -78,6 +78,7 @@ export default {
 
       name: '',
       alignment: '',
+      fontname: '',
       text: '',
       intro: '',
 
@@ -158,6 +159,7 @@ export default {
         name: this.name.trim(),
         type: 'text',
         alignment: this.alignment,
+        fontname: this.fontname,
         pages: Task.textToPages( this.text ),
         syllab: { ...this.syllab },
         speech: { ...this.speech },
@@ -185,6 +187,9 @@ export default {
       }
       if ( this.ref.alignment ) {
         this.alignment = this.ref.alignment;
+      }
+      if ( this.ref.fontname ) {
+        this.fontname = this.ref.fontname;
       }
       if ( this.ref.intro ) {
         this.intro = this.ref.intro;
@@ -245,6 +250,7 @@ export default {
     setTextInput( e ) {
       this.name = e.name;
       this.alignment = e.alignment;
+      this.fontname = e.fontname;
       this.intro = e.intro;
       this.text = e.text;
     },
@@ -278,6 +284,7 @@ export default {
         name: this.name.trim(),
         text: this.text,
         alignment: this.alignment,
+        fontname: this.fontname,
         intro: this.intro,
         syllab: this.syllab,
         speech: this.speech,

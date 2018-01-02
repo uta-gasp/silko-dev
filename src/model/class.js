@@ -62,6 +62,7 @@ export default class Class extends Recordable {
       cls: this.id,
       type: type,
       alignment: task.alignment,
+      fontname: task.fontname,
       intro: task.intro,
       pages: Task.textToPages( task.text ),
       syllab: task.syllab,

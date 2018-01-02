@@ -59,6 +59,10 @@ export default class TextPresenter {
       this._container.classList.add( 'alignLeft' );
     }
 
+    if ( task.fontname ) {
+      this._container.style.fontFamily = `"${task.fontname}", Calibri, sans-serif`;
+    }
+
     /** @type {number} */
     this._pageIndex = -1;
   }

@@ -10,6 +10,8 @@ export class TaskCreateParams {
     /** @type {string} */
     this.alignment = '';
     /** @type {string} */
+    this.fontname = '';
+    /** @type {string} */
     this.intro = '';
     /** @type {string} */
     this.text = '';
