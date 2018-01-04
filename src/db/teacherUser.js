@@ -2,15 +2,17 @@ import UserBase from './userBase.js';
 
 // ts-check-only
 import Teacher from '@/model/teacher.js';
+import { User } from '@/model/user.js';
 
-class TeacherUser extends UserBase {
+export default class TeacherUser extends UserBase {
 
   /**
    * @param {FBUser} user 
    * @param {Teacher} teacher 
+   * @param {User} _user
    */
-  constructor( user, teacher ) {
-    super( user );
+  constructor( user, teacher, _user ) {
+    super( user, _user );
 
     this._ref = teacher;
   }
@@ -24,5 +26,3 @@ class TeacherUser extends UserBase {
   }
 
 }
-
-export default TeacherUser;

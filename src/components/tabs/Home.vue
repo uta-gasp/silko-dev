@@ -17,45 +17,45 @@
     section.section(v-else)
       .message.is-info
         .message-header
-          p As {{ userTitle }}, you can
+          p {{ tokens[ 'info_title' ]( userTitle ) }}
         .message-body.is-paddingless
           .panel
-            .panel-block(v-if="isAdmin || isSchool") Add and list teachers
-            .panel-block(v-if="isAdmin") Move teachers to other school
-            .panel-block(v-if="isAdmin || isSchool || isTeacher") Add and list students
-            .panel-block(v-if="isAdmin") Move students to other school
-            .panel-block(v-if="isTeacher") Add, list, edit and remove instructions
-            .panel-block(v-if="isTeacher") Add, list, edit and remove classes
-            .panel-block(v-if="isTeacher") Add, list, edit and remove tasks
-            .panel-block(v-if="isTeacher") Add students to classes, list them and remove
-            .panel-block(v-if="isTeacher") Assign tasks to students
-            .panel-block(v-if="isTeacher") Create visalizations from data of tasks completed by students
-            .panel-block(v-if="isStudent") List tasks assigned to complete
-            .panel-block(v-if="isStudent") Complete a task
-            .panel-block(v-if="isStudent") Create visualizations from data of the tasks you completed
+            .panel-block(v-if="isAdmin || isSchool") {{ tokens[ 'info_adm_1' ] }}
+            .panel-block(v-if="isAdmin") {{ tokens[ 'info_adm_2' ] }}
+            .panel-block(v-if="isAdmin || isSchool || isTeacher") {{ tokens[ 'info_adm_3' ] }}
+            .panel-block(v-if="isAdmin") {{ tokens[ 'info_adm_3' ] }}
+            .panel-block(v-if="isTeacher") {{ tokens[ 'info_tch_1' ] }}
+            .panel-block(v-if="isTeacher") {{ tokens[ 'info_tch_2' ] }}
+            .panel-block(v-if="isTeacher") {{ tokens[ 'info_tch_3' ] }}
+            .panel-block(v-if="isTeacher") {{ tokens[ 'info_tch_4' ] }}
+            .panel-block(v-if="isTeacher") {{ tokens[ 'info_tch_5' ] }}
+            .panel-block(v-if="isTeacher") {{ tokens[ 'info_tch_6' ] }}
+            .panel-block(v-if="isStudent") {{ tokens[ 'info_std_1' ] }}
+            .panel-block(v-if="isStudent") {{ tokens[ 'info_std_2' ] }}
+            .panel-block(v-if="isStudent") {{ tokens[ 'info_std_3' ] }}
 
     footer.footer(v-if="!user")
       .columns.is-32
         .column
-          div TAUCHI, COMS, University of Tampere
+          div TAUCHI, COMS, {{ tokens[ 'contact_uta' ] }}
         .column.is-narrow
-          a.manual(href="https://uta-gasp.gitbooks.io/silko/") Manual
+          a.manual(href="https://uta-gasp.gitbooks.io/silko/") {{ tokens[ 'manual' ] }}
         .column
-          .browser-info Tested with
+          .browser-info {{ tokens[ 'test_info' ] }}
           .is-inline-block
             .browser-name.chrome Chrome 55+
             .browser-name.firefox Firefox 47+
 
     modal-container(v-if="schools" title="Registration" @close="closeSelectionBox")
       .has-text-centered
-        div School rectors and teachers, please contact us directly.
-        div Oleg Špakov @ University of Tampere
+        div {{ tokens[ 'contact_info' ] }}
+        div Oleg Špakov @ {{ tokens[ 'contact_uta' ] }}
         div oleg.spakov@uta.fi
 
     modal-container(v-if="isGettingEmail" title="Password reset" @close="closeEmailBox" @mounted="passwordResetAppeared")
       .field(v-if="!schoolToRegester")
         p.control
-          span Send password reset notification to this email:
+          span {{ tokens[ 'message_password_reset' ] }}
 
       .field
         p.control.has-icons-left.has-icons-right
@@ -67,7 +67,7 @@
 
       p.control
         .has-text-centered
-          button.button.is-primary(@click="sendPasswordResetRequest") Send
+          button.button.is-primary(@click="sendPasswordResetRequest") {{ tokens[ 'button_password_reset' ] }}
 
     temporal-notification(type="success" :show="showSuccess")
       span {{ successMessage }}
@@ -79,21 +79,21 @@
       .modal-background
       .modal-content
         .notification.is-danger
-          h3.title.is-3 Communication with gaze tracker is blocked by the browser
-          .subtitle Please enable the communication and reload the page
+          h3.title.is-3 {{ tokens[ 'ws_err_title' ] }}
+          .subtitle {{ tokens[ 'ws_err_subtitle' ] }}
           ul.unblock-ws-instruction(v-if="isFirefox")
-            li.step - Navigate to "
+            li.step - {{ tokens[ 'ws_unblock_1' ][0] }} "
               span.code about:config
-              | " page. Agree to be careful if the browsers asks you to be so.
-            li.step - Type "
+              | " {{ tokens[ 'ws_unblock_1' ][1] }}
+            li.step - {{ tokens[ 'ws_unblock_2' ][0] }} "
               span.code network.websocket.allowInsecureFromHTTPS
-              | " in the search box.
-            li.step - If the value of this parameter is "
+              | " {{ tokens[ 'ws_unblock_2' ][1] }}
+            li.step - {{ tokens[ 'ws_unblock_3' ][0] }} "
               span.code false
-              | ", then double-click on it to change it to "
+              | ", {{ tokens[ 'ws_unblock_3' ][1] }} "
               span.code true
-              | ".
-          .unblock-ws-instruction(v-else) (search "how to enable websocket over https" for you browser)
+              | "{{ tokens[ 'ws_unblock_3' ][2] }}
+          .unblock-ws-instruction(v-else) {{ tokens[ 'ws_unblock_4' ] }}
 </template>
 
 <script>
@@ -107,6 +107,8 @@ import ActionSuccess from '@/components/mixins/actionSuccess';
 import Login from '@/components/widgets/Login.vue';
 import ModalContainer from '@/components/widgets/ModalContainer.vue';
 import TemporalNotification from '@/components/widgets/TemporalNotification.vue';
+
+import { i10n } from '@/utils/i10n.js';
 
 // ts-check-only
 import UserBase from '@/db/userBase.js';
@@ -138,6 +140,8 @@ export default {
 
       isGettingEmail: false,
       email: '',
+
+      tokens: i10n( 'home' ),
     };
   },
 
@@ -152,11 +156,11 @@ export default {
     isStudent() { return this.user && this.user.isStudent; },
     /** @returns {string} */
     userTitle() {
-      if ( this.isAdmin ) { return 'an admin'; }
-      else if ( this.isSchool ) { return 'a school'; }
-      else if ( this.isTeacher ) { return 'a teacher'; }
-      else if ( this.isStudent ) { return 'a student'; }
-      else { return 'an anonym'; }
+      if ( this.isAdmin ) { return this.tokens[ 'acc_admin' ]; }
+      else if ( this.isSchool ) { return this.tokens[ 'acc_school' ]; }
+      else if ( this.isTeacher ) { return this.tokens[ 'acc_teacher' ]; }
+      else if ( this.isStudent ) { return this.tokens[ 'acc_student' ]; }
+      else { return ''; }
     },
 
     /** @returns {boolean} */
@@ -241,10 +245,14 @@ export default {
 
   created() {
     eventBus.$on( 'login', _ => {
+      this.tokens = i10n( 'home' );
       this.user = login.user;
     } );
     eventBus.$on( 'logout', _ => {
       this.user = null;
+    } );
+    eventBus.$on( 'lang', () => {
+      this.tokens = i10n( 'home' );
     } );
 
     this.user = login.user;

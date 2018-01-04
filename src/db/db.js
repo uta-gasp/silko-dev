@@ -1,5 +1,5 @@
 import UserCreator from './user-creator.js';
-import User from '@/model/user.js';
+import { User, UserPrefs } from '@/model/user.js';
 
 import eventBus from '@/utils/event-bus.js';
 
@@ -163,6 +163,7 @@ class DB {
         userRecord[ user.uid ] = {
           path: cls.db,
           id: ref.key,
+          prefs: new UserPrefs(),
         };
         this.fb.child( 'users' ).update( userRecord ); // TODO - replace by this.update
 
@@ -472,8 +473,8 @@ class DB {
 
       // otherwise get the user record, if it exists
       this.fb.child( `users/${user.uid}` ).once( 'value', /** @param {FirebaseDataSnapshot} snapshot */ snapshot => {             // TODO - replace by this.get
-        const userRef = new User( snapshot.val(), user.uid === ADMIN_UID );
-        UserCreator.create( user, userRef, ( err, result ) => {
+        const userRef = new User( snapshot.val(), user.uid, user.uid === ADMIN_UID );
+        UserCreator.create( user, userRef, /** @param {Error} err; @param {UserBase} result*/ ( err, result ) => {
           if ( err ) {
             this.logOut();
           }

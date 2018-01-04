@@ -11,7 +11,7 @@ import TeacherUser from './teacherUser.js';
 import StudentUser from './studentUser.js';
 
 // ts-check-only
-import User from '@/model/user.js';
+import { User } from '@/model/user.js';
 
 export default class UserCreator {
 
@@ -23,7 +23,7 @@ export default class UserCreator {
   static create( user, ref, cb ) {
     if ( ref.id === 'admin' ) {
       console.log( 'logged as admin' );
-      return cb( null, new AdminUser( user, new Admin() ) );
+      return cb( null, new AdminUser( user, new Admin(), ref ) );
     }
     else if ( ref && ref.path ) {
       // for each type of user get the corresponding object
@@ -31,7 +31,7 @@ export default class UserCreator {
         console.log( 'logged as school' );
         return db.get( School, ref.id, ( err, school ) => {
           if ( !err ) {
-            return cb( null, new SchoolUser( user, school ) );
+            return cb( null, new SchoolUser( user, school, ref ) );
           }
           cb( err );
         } );
@@ -40,7 +40,7 @@ export default class UserCreator {
         console.log( 'logged as teacher' );
         return db.get( Teacher, ref.id, ( err, teacher ) => {
           if ( !err ) {
-            return cb( null, new TeacherUser( user, teacher ) );
+            return cb( null, new TeacherUser( user, teacher, ref ) );
           }
           cb( err );
         } );
@@ -49,7 +49,7 @@ export default class UserCreator {
         console.log( 'logged as student' );
         return db.get( Student, ref.id, ( err, student ) => {
           if ( !err ) {
-            return cb( null, new StudentUser( user, student ) );
+            return cb( null, new StudentUser( user, student, ref ) );
           }
           cb( err );
         } );

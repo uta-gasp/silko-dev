@@ -6,36 +6,42 @@
         //- img(src="../assets/icon-32.png")
       router-link.nav-item.is-tab(to="/schools" v-if="isAdmin")
         i.fa.fa-university
-        span Schools
+        span {{ tokens[ 'link_schools' ] }}
       router-link.nav-item.is-tab(to="/teachers" v-if="isAdmin || isSchool")
         i.fa.fa-users
-        span Teachers
+        span {{ tokens[ 'link_teachers' ] }}
       router-link.nav-item.is-tab(to="/students" v-if="isAdmin || isSchool || isTeacher")
         i.fa.fa-child
-        span Students
+        span {{ tokens[ 'link_students' ] }}
       router-link.nav-item.is-tab(to="/instructions" v-if="isTeacher")
         i.fa.fa-info
-        span Instructions
+        span {{ tokens[ 'link_instructions' ] }}
       router-link.nav-item.is-tab(to="/classes" v-if="isTeacher")
         i.fa.fa-database
-        span Classes
+        span {{ tokens[ 'link_classes' ] }}
       router-link.nav-item.is-tab(to="/results" v-if="isTeacher")
         i.fa.fa-pie-chart
-        span Results
+        span {{ tokens[ 'link_results' ] }}
       router-link.nav-item.is-tab(to="/assignments" v-if="isStudent")
         i.fa.fa-tasks
-        span Assignments
+        span {{ tokens[ 'link_assignments' ] }}
     .nav-right(v-if="user")
+      span.lang
+        .select
+          select(:value="user.prefs.lang" @input="updateLanguage")
+            option(v-for="lang in langs" :key="lang") {{ lang }}
+        
       .user-block.is-small
         //- span.user {{ user.name }}
         span.user {{ user.ref.name }}
       span.nav-item
-        a.button(v-on:click="logOut()") Logout
+        a.button(v-on:click="logOut()") {{ tokens[ 'user_logout' ] }}
 </template>
 
 <script>
 import eventBus from '@/utils/event-bus.js';
 import login from '@/utils/login.js';
+import { i10n, langs } from '@/utils/i10n.js';
 
 export default {
   name: 'navbar',
@@ -43,12 +49,21 @@ export default {
   data() {
     return {
       user: null,
+      langs,
+      tokens: i10n( 'navbar' ),
     };
   },
 
   methods: {
     logOut() {
       login.logOut();
+    },
+
+    updateLanguage( e ) {
+      this.user.prefs.lang = e.target.value;
+      this.user.update( err => {
+        eventBus.$emit( 'lang' );
+      });
     },
   },
 
@@ -81,11 +96,17 @@ export default {
   },
 
   created() {
+    this.user = login.user;
+    
     eventBus.$on( 'login', () => {
+      this.tokens = i10n( 'navbar' );
       this.user = login.user;
     } );
     eventBus.$on( 'logout', () => {
       this.user = null;
+    } );
+    eventBus.$on( 'lang', () => {
+      this.tokens = i10n( 'navbar' );
     } );
   },
 };
@@ -108,6 +129,11 @@ export default {
   .user {
     display: inline-block;
     margin: auto 0;
+  }
+
+  .lang {
+    display: inline-block;
+    margin: auto 1em;
   }
 
   .logo {

@@ -1,15 +1,15 @@
 <template lang="pug">
   #assignments.section
     article.message.is-danger(v-if="student && student.deleted")
-      .message-body This student account was removed from all schools and is considered as frozen. No tasks will be assigned to this account in future.
+      .message-body {{ tokens[ 'message_removed_account' ] }}
 
     nav.panel(v-else)
-      p.panel-heading Tasks waiting to be completed
+      p.panel-heading {{ tokens[ 'assignments_title' ] }}
       .panel-block
         .container(v-if="assignments === null")
           loading
         .container(v-else-if="!assignments.length")
-          i No assigned tasks yet
+          i {{ tokens[ 'assignments_0' ] }}
         .tile.is-ancestor(v-else)
           .tile.is-parent(v-for="assignment in assignments")
             .tile.is-child
@@ -24,22 +24,22 @@
                 .card-content
                   .content {{ assignment.task.name }}
                 .card-footer
-                  a.card-footer-item(@click="start( assignment )") Start
+                  a.card-footer-item(@click="start( assignment )") {{ tokens[ 'assignments_start' ] }}
 
     nav.panel
-      p.panel-heading Completed tasks
+      p.panel-heading {{ tokens[ 'completed_title' ] }}
       .panel-block
         .container(v-if="sessions === null")
           loading
         .container(v-else-if="!sessions.length")
-          i No completed tasks yet
+          i {{ tokens[ 'completed_0' ] }} 
         table.table(v-else)
           thead
             tr
-              th Class
-              th Task
-              th WPM
-              th Date
+              th {{ tokens[ 'completed_col_class' ] }}
+              th {{ tokens[ 'completed_col_task' ] }}
+              th {{ tokens[ 'completed_col_wpm' ] }}
+              th {{ tokens[ 'completed_col_date' ] }}
           tbody
             tr(v-for="session in sessions")
               td {{ session.cls.name }}
@@ -61,6 +61,8 @@ import ActionError from '@/components/mixins/actionError';
 
 import Loading from '@/components/widgets/Loading.vue';
 import TemporalNotification from '@/components/widgets/TemporalNotification.vue';
+
+import { i10n } from '@/utils/i10n.js';
 
 // ts-check-only
 import Data from '@/model/data.js';
@@ -98,6 +100,8 @@ export default {
       /** @type {Session[]}  */
       sessions: null,     // [{cls, task, session}]
       assignment: '',
+
+      tokens: i10n( 'assignments' ),
     };
   },
 
@@ -124,7 +128,7 @@ export default {
       this.student.loadAssignments( /** @param {Error} err, @param {Assignment[]} assignments */ ( err, assignments ) => {
         this.assignments = [];
         if ( err ) {
-          return this.setError( err, 'Failed to load assignments' );
+          return this.setError( err, this.tokens[ 'message_failed_assignments' ] );
         }
 
         this.assignments = assignments;
@@ -135,7 +139,7 @@ export default {
       this.student.loadSessions( /** @param {Error} err, @param {Session[]} sessions */ ( err, sessions ) => {
         this.sessions = [];
         if ( err ) {
-          return this.setError( err, 'Failed to load sessions' );
+          return this.setError( err, this.tokens[ 'message_failed_sessions' ] );
         }
 
         this.sessions = sessions;
@@ -169,6 +173,7 @@ export default {
 
       /** @type {DataPage} */
       let firstPage;
+      /** @type {DataPage} */
       let lastPage;
       let wordCount = 0;
       pages.forEach( /** @param {DataPage} page */ page => {
@@ -200,6 +205,9 @@ export default {
     } );
     eventBus.$on( 'login', () => {
       this.init();
+    } );
+    eventBus.$on( 'lang', () => {
+      this.tokens = i10n( 'assignments' );
     } );
 
     this.checkAccess();
