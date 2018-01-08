@@ -26,16 +26,27 @@
         i.fa.fa-tasks
         span {{ tokens[ 'link_assignments' ] }}
     .nav-right(v-if="user")
-      span.lang
-        .select
-          select(:value="user.prefs.lang" @input="updateLanguage")
-            option(v-for="lang in langs" :key="lang") {{ lang }}
-        
-      .user-block.is-small
-        //- span.user {{ user.name }}
-        span.user {{ user.ref.name }}
-      span.nav-item
-        a.button(v-on:click="logOut()") {{ tokens[ 'user_logout' ] }}
+      #usermenu.dropdown.is-right(:class="{ 'is-active': isUsermenuDropped }")
+        .dropdown-trigger
+          button.button(
+            aria-haspopup="true" 
+            aria-controls="dropdown-menu" 
+            @click.stop="isUsermenuDropped = !isUsermenuDropped" 
+            @mouseover="isUsermenuHover = true"
+            @mouseleave="isUsermenuHover = false"
+            :class="{ 'is-primary': isUsermenuDropped }"
+          )
+            span {{ user.ref.name }}
+            span.icon.is-small(:style="{ 'color': (isUsermenuHover && !isUsermenuDropped) ? 'hsl(171, 100%, 41%)' : 'inherit', 'transform': 'translateY(0.1em)' }")
+              i.fa.fa-cog(aria-hidden="true")
+        .dropdown-menu(role="menu")
+          .dropdown-content
+            .select(@click.stop="")
+              select(:value="user.prefs.lang" @input="updateLanguage")
+                option(v-for="lang in langs" :key="lang") {{ lang }}
+            hr.dropdown-divider
+            .nav-item
+              a(v-on:click="logOut") {{ tokens[ 'user_logout' ] }}
 </template>
 
 <script>
@@ -51,11 +62,13 @@ export default {
       user: null,
       langs,
       tokens: i10n( 'navbar' ),
+      isUsermenuDropped: false,
+      isUsermenuHover: false,
     };
   },
 
   methods: {
-    logOut() {
+    logOut( e ) {
       login.logOut();
     },
 
@@ -108,6 +121,10 @@ export default {
     eventBus.$on( 'lang', () => {
       this.tokens = i10n( 'navbar' );
     } );
+
+    document.addEventListener( 'click', e => {
+      this.isUsermenuDropped = false;
+    });
   },
 };
 </script>
@@ -121,19 +138,36 @@ export default {
     margin-right: 8px;
   }
 
-  .user-block {
-    display: flex;
-    flex-direction: column;
+  .nav-right {
+    overflow: unset;
+    padding: 0.5em;
   }
 
-  .user {
-    display: inline-block;
-    margin: auto 0;
-  }
+  #usermenu {
+    .dropdown-menu {
+      min-width: unset;
+    }
 
-  .lang {
-    display: inline-block;
-    margin: auto 1em;
+    .dropdown-content {
+      min-width: unset;
+      padding: 0.2em 0.5em;
+    }
+
+    .button,
+    .select select {
+      border-width: 0;
+    }
+
+    .button.is-focused:not(:active), 
+    .button:focus:not(:active) {
+      -webkit-box-shadow: inherit !important;
+      box-shadow: inherit !important;
+    }  
+
+    .lang {
+      display: inline-block;
+      margin: auto 1em;
+    }
   }
 
   .logo {
