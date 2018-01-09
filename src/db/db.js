@@ -72,11 +72,23 @@ class DB {
     this.currentPassword = '';
 
     this.auth.onAuthStateChanged( this._onUserChanged.bind( this ) );
+
+    this._events = new EventEmitter();
+  }
+
+  /** @returns {EventEmitter} */
+  get events() {
+    return this._events;
   }
 
   /** @returns {UserBase} - current user */
   get user() {
     return this._user;
+  }
+
+  /** @returns {boolean} */
+  get isConnected() {
+    return this._connected;
   }
 
   /**
@@ -456,6 +468,8 @@ class DB {
    * @param {FBUser} user 
    */
   _onUserChanged( user ) {
+    this._events.emitEvent( 'connected', [ { user } ] );
+
     if ( user ) {
       // switch user back if needed
       if ( this.ignoreUserSwitch ) {

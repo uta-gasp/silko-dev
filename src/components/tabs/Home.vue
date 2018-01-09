@@ -6,7 +6,12 @@
           //-img(src="../assets/icon-32.png")
           h1.title.logo Silko
           h2.subtitle A reading aid for students and teachers
-    section(v-if="!user")
+
+    section.connecting(v-if="isConnecting")
+      div Connecting to database...
+      loading 
+
+    section(v-else-if="!user")
       login
 
       p.control.extra-tools
@@ -107,6 +112,7 @@ import ActionSuccess from '@/components/mixins/actionSuccess';
 import Login from '@/components/widgets/Login.vue';
 import ModalContainer from '@/components/widgets/ModalContainer.vue';
 import TemporalNotification from '@/components/widgets/TemporalNotification.vue';
+import Loading from '@/components/widgets/Loading.vue';
 
 import { i10n } from '@/utils/i10n.js';
 
@@ -121,6 +127,7 @@ export default {
     'login': Login,
     'modal-container': ModalContainer,
     'temporal-notification': TemporalNotification,
+    'loading': Loading,
   },
 
   mixins: [ ActionError, ActionSuccess ],
@@ -128,6 +135,7 @@ export default {
   data() {
     return {
       showWsSecurityError: !gazeTracking.isWebSocketOK,
+      isConnecting: true,
 
       isLoginVisible: true,
       /** @type {UserBase} */
@@ -247,6 +255,7 @@ export default {
     eventBus.$on( 'login', _ => {
       this.tokens = i10n( 'home' );
       this.user = login.user;
+      this.isConnecting = false;
     } );
     eventBus.$on( 'logout', _ => {
       this.user = null;
@@ -256,6 +265,17 @@ export default {
     } );
 
     this.user = login.user;
+    if (this.user) {
+      this.isConnecting = false;
+    }
+    else {
+      login.events.addListener( 'connected', e => {
+        this.isConnecting = false;
+        if (e.user) {
+          this.user = e.user;
+        }
+      });
+    }
   },
 };
 </script>
@@ -333,5 +353,13 @@ export default {
       color: #ff4;
       font-family: Consolas, Courier, monospace;
     }
+  }
+
+  .connecting {
+    background-color: royalblue;
+    padding: 2.5em 3em;
+    color: white;
+    font-family: 'Gloria', Arial, sens-serif;
+    font-size: 1.5rem;
   }
 </style>
