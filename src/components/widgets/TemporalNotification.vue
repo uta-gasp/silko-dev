@@ -8,6 +8,9 @@
 </template>
 
 <script>
+// ts-check-only
+import { VNode } from "vue";
+
 const MSG_SHOW_DURATION = 4000;
 
 export default {
@@ -50,13 +53,13 @@ export default {
 
   methods: {
     /**
-     * @param {{text: string, children?: string[] }} item
+     * @param {VNode} item
      * @returns {string}
      */
     getSlotItemText( item ) {
       let result = '';
 
-      if ( item.text ) {
+      if ( item.text ) {  
         result += item.text;
       }
       if ( item.children ) {

@@ -54,11 +54,15 @@ import eventBus from '@/utils/event-bus.js';
 import login from '@/utils/login.js';
 import { i10n, langs } from '@/utils/i10n.js';
 
+// ts-check-only
+import UserBase from '@/db/userBase';
+
 export default {
   name: 'navbar',
 
   data() {
     return {
+      /** @type {UserBase} */
       user: null,
       langs,
       tokens: i10n( 'navbar' ),

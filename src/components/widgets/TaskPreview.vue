@@ -36,7 +36,7 @@ import TextPresenter from '@/task/textPresenter.js';
 import FeedbackProvider from '@/task/feedbackProvider.js';
 
 // ts-check-only
-import DataPageFocusedWord from '@/model/data/dataPageFocusedWord.js';
+import { TextPageImage } from '@/model/task/textPageImage.js';
 
 /**
  * @fires close
@@ -95,7 +95,7 @@ export default {
       return this.task.pages[ pageIndex ].images;
     },
 
-    /** @returns {{word: DataPageFocusedWord, duration: number}} */
+    /** @returns {{word: string, duration: number}} */
     fixation() {
       return { word: this.fixatedWord, duration: 999999 };
     },
@@ -123,6 +123,7 @@ export default {
       this.$emit( 'close' );
     },
 
+    /** @param {Event} e */
     syllabify( e ) {
       if ( e.target.classList.contains( 'word' ) ) {
         const text = this.feedbackProvider.syllabifier.unprepare( e.target.textContent );
@@ -132,6 +133,7 @@ export default {
       }
     },
 
+    /** @param {Event} e */
     pronounce( e ) {
       if ( e.target.classList.contains( 'word' ) ) {
         const text = this.feedbackProvider.syllabifier.unprepare( e.target.textContent );
@@ -141,6 +143,7 @@ export default {
       }
     },
 
+    /** @param {Event} e */
     fixate( e ) {
       if ( e.target.classList.contains( 'word' ) ) {
         const text = this.feedbackProvider.syllabifier.unprepare( e.target.textContent );

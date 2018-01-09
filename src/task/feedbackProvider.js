@@ -95,7 +95,7 @@ export default class FeedbackProvider {
   }
 
   /**
-   * @param {number} avgWordReadingDuration 
+   * @param {number} [avgWordReadingDuration]
    */
   reset( avgWordReadingDuration ) {
     if ( avgWordReadingDuration ) {
