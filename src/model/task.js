@@ -123,14 +123,26 @@ export default class Task extends Recordable {
   }
 
   /**
-   * @param {TextPage[]} pages 
+   * @param {(TextPage | string[])[]} pages 
    * @returns {string}
    */
   static pagesToText( pages ) {
-    return pages.map( page => {
-      const lines = page.lines; // || page;   // backward compatibility with format where Task.pages=[[String]]
-      return lines.join( '\n' );
-    } ).join( '\n\n' );
+    if (!pages.length) {
+      return '';
+    }
+
+    /** @type {string[]} */
+    let result;
+    if ('lines' in pages[0]) {
+      const source = /** @type {TextPage[]} */ (pages);
+      result = source.map( page => page.lines.join( '\n' ) );
+    }
+    else {   // backward compatibility with format where Task.pages=[[String]]
+      const source = /** @type {string[][]} */ (pages);
+      result = source.map( page => page.join( '\n' ) );
+    }
+
+    return result.join( '\n\n' );
   }
 
   /**

@@ -122,7 +122,7 @@ export default {
 
   props: {
     task: {
-      type: Object,
+      type: Task,
       default: () => { return {}; },
     },
     intros: {
