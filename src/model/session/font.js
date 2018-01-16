@@ -14,10 +14,11 @@ export default class Font {
   }
 
   /**
-   * @param {string[]} style 
+   * @param {Object.<string,string>} style 
    * @returns {Font}
    */
   static from( style ) {
+    console.log(style);
     return new Font(
       style['font-family'],
       style['font-size'],

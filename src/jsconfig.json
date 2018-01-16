@@ -1,7 +1,4 @@
 {
-  "files": [
-    "./globals.d.ts"
-  ],
   "compilerOptions": {
     "alwaysStrict": true,
     "checkJs": true,
@@ -19,7 +16,8 @@
     "enable": true,
     "include": [
       "firebase",
-      "vue-router"
+      "vue-router",
+      "./globals.d.ts"
     ]
   },
   "include": [

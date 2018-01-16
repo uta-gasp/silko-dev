@@ -176,7 +176,7 @@ export default {
       }
     },
 
-    /** @param {{err: string, keys: {data: string, session: string}[]}} e */
+    /** @param {{err: string, keys: {data: string, session: string}}} e */
     gazeDataSaved( e ) {
       if ( !e.err ) {
         this.keys = e.keys;

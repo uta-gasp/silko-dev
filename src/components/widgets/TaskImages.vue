@@ -11,6 +11,10 @@ import ImageController from '@/task/imageController.js';
 // ts-check-onlu
 import TextPageImage from '@/model/task/textPageImage.js';
 
+/**
+ * @fires show
+ * @fires hide
+ */
 export default {
   name: 'task-images',
 
@@ -25,11 +29,11 @@ export default {
       imageController: new ImageController( {
         onShow: image => {
           this.image[ image.location ] = image.src;
-          this.$emit( 'show', image );
+          this.$emit( 'show', { image } );
         },
         onHide: image => {
           this.image[ image.location ] = '';
-          this.$emit( 'hide', image );
+          this.$emit( 'hide', { image } );
         },
       } ),
     };
@@ -39,6 +43,7 @@ export default {
     images: {
       type: Array,
       required: true,
+      default: () => []
     },
 
     fixation: {

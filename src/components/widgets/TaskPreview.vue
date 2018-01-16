@@ -37,6 +37,7 @@ import FeedbackProvider from '@/task/feedbackProvider.js';
 
 // ts-check-only
 import { TextPageImage } from '@/model/task/textPageImage.js';
+import Vue from 'vue';
 
 /**
  * @fires close
@@ -102,41 +103,44 @@ export default {
   },
 
   methods: {
-
+    /** @param {Event} e */
     syllabifyAll( e ) {
       this.textPresenter.words.forEach( ( text, el ) => {
         this.feedbackProvider.syllabifier.syllabifyElementText( el, text );
       } );
     },
 
+    /** @param {Event} e */
     next( e ) {
       this.textPresenter.nextPage();
       this.feedbackProvider.reset();
     },
 
+    /** @param {Event} e */
     prev( e ) {
       this.textPresenter.prevPage();
       this.feedbackProvider.reset();
     },
 
+    /** @param {Event} e */
     close( e ) {
       this.$emit( 'close' );
     },
 
     /** @param {Event} e */
     syllabify( e ) {
-      if ( e.target.classList.contains( 'word' ) ) {
-        const text = this.feedbackProvider.syllabifier.unprepare( e.target.textContent );
+      if ( /** @type {Element} */ (e.target).classList.contains( 'word' ) ) {
+        const text = this.feedbackProvider.syllabifier.unprepare( /** @type {Element} */ (e.target).textContent );
         if ( text ) {
-          this.feedbackProvider.syllabifier.syllabifyElementText( e.target, text );
+          this.feedbackProvider.syllabifier.syllabifyElementText( /** @type {HTMLElement} */ (e.target), text );
         }
       }
     },
 
     /** @param {Event} e */
     pronounce( e ) {
-      if ( e.target.classList.contains( 'word' ) ) {
-        const text = this.feedbackProvider.syllabifier.unprepare( e.target.textContent );
+      if ( /** @type {Element} */ (e.target).classList.contains( 'word' ) ) {
+        const text = this.feedbackProvider.syllabifier.unprepare( /** @type {Element} */ (e.target).textContent );
         if ( text ) {
           this.feedbackProvider.speaker.say( text );
         }
@@ -145,8 +149,8 @@ export default {
 
     /** @param {Event} e */
     fixate( e ) {
-      if ( e.target.classList.contains( 'word' ) ) {
-        const text = this.feedbackProvider.syllabifier.unprepare( e.target.textContent );
+      if ( /** @type {Element} */ (e.target).classList.contains( 'word' ) ) {
+        const text = this.feedbackProvider.syllabifier.unprepare( /** @type {Element} */ (e.target).textContent );
         if ( text ) {
           this.fixatedWord = text;
         }
@@ -158,10 +162,10 @@ export default {
     this.feedbackProvider = new FeedbackProvider( this.task.syllab, this.task.speech );
     this.feedbackProvider.init();
 
-    const textEl = this.$refs.container.$refs.text;
-    this.textPresenter = new TextPresenter( this.task, this.firstPage, textEl, this.feedbackProvider.syllabifier );
+    const textEl = /** @type {Vue} */ (this.$refs.container).$refs.text;
+    this.textPresenter = new TextPresenter( this.task, this.firstPage, /** @type {HTMLElement} */ (textEl), this.feedbackProvider.syllabifier );
 
-    this.next();
+    this.next( null );
   },
 
   beforeDestroy() {

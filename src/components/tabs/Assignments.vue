@@ -67,6 +67,8 @@ import { i10n } from '@/utils/i10n.js';
 // ts-check-only
 import Data from '@/model/data.js';
 import DataPage from '@/model/data/dataPage.js';
+import Class from '@/model/class.js';
+import Task from '@/model/task.js';
 
 /**
  * @typedef Assignment
@@ -80,6 +82,11 @@ import DataPage from '@/model/data/dataPage.js';
  * @property {Task} task
  * @property {string} session
  */
+
+ /** @type {Assignment} */
+const __needed_only_to_make_vscode_happy_about_Assignment__ = null;
+ /** @type {Session} */
+const __needed_only_to_make_vscode_happy_about_Session__ = null;
 
 export default {
   name: 'assignments',
@@ -154,7 +161,7 @@ export default {
 
     /** 
      * @param {Assignment} assignment
-     * @param {Evebt} e
+     * @param {Event} e
      */
     start( assignment, e ) {
       if ( Student.MULTICLASS ) {

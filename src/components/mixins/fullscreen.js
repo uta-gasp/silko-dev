@@ -39,7 +39,7 @@ export default {
      * @param {function(boolean)} cb 
      */
     onFullscreenChanges( cb ) {
-      const handler = /** @param {any} e */ e => {
+      const handler = /** @param {Event} e */ e => {
         /* eslint-disable standard/no-callback-literal */
         if ( document.fullscreenElement ) {
           return cb( !!document.fullscreenElement );

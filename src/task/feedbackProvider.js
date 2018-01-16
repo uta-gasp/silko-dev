@@ -43,7 +43,7 @@ export default class FeedbackProvider {
     /** @type {HTMLElement} */
     this.lastFocusedWord = null;
 
-    /** @type {Map} {el: WordFocus} */
+    /** @type {Map<HTMLElement,WordFocus>} {el: WordFocus} */
     this.words = null;
   }
 
@@ -111,7 +111,7 @@ export default class FeedbackProvider {
   /**
    * Propagates / removes the highlighing
    * @param {HTMLElement} [el]
-   * @returns {WordFocus}
+   * @returns {string}
    */
   setFocusedWord( el ) {
     if ( this.currentWord !== el ) {

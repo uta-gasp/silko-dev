@@ -4,6 +4,7 @@
     task-text(ref="container")
 
     task-images(
+      v-if="images"
       :images="images"
       :fixation="fixation"
       @show="onImageShow"
@@ -31,6 +32,8 @@ import Font from '@/model/session/font.js';
 
 // ts-check-only
 import DataImage from '@/model/data/image.js';
+import { TextPageImage } from '@/model/task/textPageImage.js';
+import Vue from 'vue';
 
 const FIX_UPDATE_INTERVAL = 25;
 
@@ -103,7 +106,7 @@ export default {
   },
 
   methods: {
-
+    /** @param {Event} e */
     next( e ) {
       let wordReadingDuration;
       if ( this.textPresenter.page === 0 && this.texts.firstPage && this.texts.firstPage.length ) {
@@ -117,6 +120,7 @@ export default {
       gazeTracking.updateTargets();
     },
 
+    /** @param {Event} e */
     finish( e ) {
       this.$emit( 'finished', { longGazedWords: this.collector.longGazedWords( this.task.syllab.threshold.value ) } );
       this.collector.stop( /** @param {Error} err; @param {{data: string, session: string}} keys */( err, keys ) => {
@@ -127,12 +131,14 @@ export default {
       this.fixationUpdateTimer = 0;
     },
 
+    /** @param {{image: TextPageImage}} e */
     onImageShow( e ) {
-      this.collector.imageShow( e );
+      this.collector.imageShow( e.image );
     },
 
+    /** @param {{image: TextPageImage}} e */
     onImageHide( e ) {
-      this.collector.imageHide( e );
+      this.collector.imageHide( e.image );
     },
   },
 
@@ -140,12 +146,12 @@ export default {
     this.feedbackProvider = new FeedbackProvider( this.task.syllab, this.task.speech );
     this.feedbackProvider.init();
 
-    const textEl = this.$refs.container.$refs.text;
-    this.textPresenter = new TextPresenter( this.task, this.texts.firstPage, textEl, this.feedbackProvider.syllabifier );
+    const textEl = /** @type {Vue} */ (this.$refs.container).$refs.text;
+    this.textPresenter = new TextPresenter( this.task, this.texts.firstPage, /** @type {HTMLElement}*/ (textEl), this.feedbackProvider.syllabifier );
 
     this.collector = new DataCollector( this.task, this.student, this.font, this.feedbackProvider.setup );
-    this.feedbackProvider.events.addListener( 'syllabified', data => this.collector.syllabified( data ) );
-    this.feedbackProvider.events.addListener( 'pronounced', data => this.collector.pronounced( data ) );
+    this.feedbackProvider.events.addListener( 'syllabified', /** @param {HTMLElement} el */ el => this.collector.syllabified( el ) );
+    this.feedbackProvider.events.addListener( 'pronounced', /** @param {HTMLElement} el */ el => this.collector.pronounced( el ) );
 
     //     gazeTracking.setCallback( 'stateUpdated', 'task-page', state => {
     //       if ( state.isConnected && state.isTracking && !state.isBusy ) {
@@ -158,7 +164,7 @@ export default {
       if ( !this.textPresenter.isInstructionPage ) {
         wordText = this.feedbackProvider.setFocusedWord( word );
       }
-      this.collector.setFocusedWord( word, this.textPresenter.page );
+      this.collector.setFocusedWord( word );
       this.fixation = { word: wordText, duration: 0 };
     } );
 
@@ -171,7 +177,7 @@ export default {
     } );
 
     gazeTracking.setCallback( 'gazePoint', 'task-page', gazePoint => {
-      this.collector.addGazePoint( gazePoint, this.textPresenter.page );
+      this.collector.addGazePoint( gazePoint );
     } );
 
     this.collector.start();
@@ -187,7 +193,7 @@ export default {
       }
     }, FIX_UPDATE_INTERVAL );
 
-    this.next();
+    this.next( null );
   },
 
   beforeDestroy() {

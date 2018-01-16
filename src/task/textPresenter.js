@@ -135,7 +135,7 @@ export default class TextPresenter {
     el.innerHTML = '';
 
     const page = this._pages[ this._pageIndex ];
-    const lines = page.lines; // || page;   // backward compatibility with format where Task.pages=[[String]]
+    const lines = page.lines || page;   // backward compatibility with format where Task.pages=[[String]]
 
     lines.forEach( line => {
       el.appendChild( this._lineToElement( line ) );
