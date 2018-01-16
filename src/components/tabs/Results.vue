@@ -135,6 +135,7 @@ import QuestionnaireResults from '@/components/vis/QuestionnaireResults.vue';
 
 // ts-check-onlu
 import ModelData from '@/model/data.js';
+import ModelClass from '@/model/class.js';
 import Session from '@/vis/data/session.js';
 import Student from '@/vis/data/student.js';
 
@@ -189,7 +190,7 @@ export default {
       /** @type {Data} */
       visualization: null,    // vis/data/Data
 
-      /** @type {Class} */
+      /** @type {Class[]} */
       classes: null,  // [ vis/data/Class ]
       /** @type {Student[]} */
       students: [],  // [ vis/data/Student ]
@@ -217,7 +218,7 @@ export default {
     init() {
       this.teacher = Teacher.instance;
       if ( this.teacher ) {
-        this.loadClasses( err => {
+        this.loadClasses( /** @param {Error | string} err */ err => {
           if ( err ) {
             this.classes = [];
             return this.setError( err, 'Failed to load classes' );
@@ -228,15 +229,14 @@ export default {
       }
     },
 
-    /**
-     * @param {Callback} cb 
-     */
+    /** @param {Callback} cb */
     loadClasses( cb ) {
-      this.teacher.getClasses( ( err, classes ) => {
+      this.teacher.getClasses( /** @param {Error | string} err; @param {ModelClass[]} classes */ ( err, classes ) => {
         if ( err ) {
           return cb( err );
         }
 
+        /** @type {Class[]} */
         const _classes = [];
 
         classes.sort( dataUtils.byName );
@@ -267,16 +267,19 @@ export default {
       }
     },
 
+    /** @param {Event} e */
     closeStudentSelectionBox( e ) {
       this.gradeWithStudents = null;
       this.deferredVisualization = null;
     },
 
+    /** @param {Event} e */
     closeSessionSelectionBox( e ) {
       this.studentWithSessions = null;
       this.deferredVisualization = null;
     },
 
+    /** @param {Event} e */
     closeSessionEditingBox( e ) {
       this.editingStudent = null;
 
@@ -289,6 +292,7 @@ export default {
 
     /**
      * @param {Student} student 
+     * @param {Event} e
      */
     editSessions( student, e ) {
       this.editingStudent = student;
@@ -386,6 +390,7 @@ export default {
       this.studentWithSessions = [ studentWithSessions ];
     },
 
+    /** @param {{subitems: Object.<string>}} e */
     continueDeferredWithStudents( e ) {
       const sessions = this.deferredVisualization.sessions.filter( session =>
         e.subitems[ session.student.id ]
@@ -401,9 +406,10 @@ export default {
         grade,
       } ) );
 
-      this.closeStudentSelectionBox();
+      this.closeStudentSelectionBox( null );
     },
 
+    /** @param {{subitems: Object.<string>}} e */
     continueDeferredWithSessions( e ) {
       const sessions = this.deferredVisualization.sessions.filter( session =>
         e.subitems[ session.ref.id ]
@@ -414,9 +420,10 @@ export default {
         session: e.subitems.length === 1 ? e.subitems[0] : null,
       } ) );
 
-      this.closeSessionSelectionBox();
+      this.closeSessionSelectionBox( null );
     },
 
+    /** @param {Event} e */
     sessionDeleted( e ) {
       this.reloadAfterEditing = true;
     },
@@ -450,6 +457,7 @@ export default {
       return this.visualization ? this.visualization.name === visualizationName : false;
     },
 
+    /** @param {Event} e */
     closeVisualization( e ) {
       this.visualization = null;
     },

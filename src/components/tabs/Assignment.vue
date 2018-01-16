@@ -99,6 +99,7 @@ export default {
 
   methods: {
 
+    /** @returns {*} */
     init() {
       this.student = Student.instance;
       if ( this.student ) {
@@ -116,14 +117,14 @@ export default {
           }
         }
 
-        this.student.loadTask( taskID, ( err, task ) => {
+        this.student.loadTask( taskID, /** @param {Error} err, @param {Task} task */ ( err, task ) => {
           if ( err ) {
             this.errorText = err;
             return;
           }
           this.task = task;
         } ).then( _ => {
-          this.task.getIntro( ( err, intro ) => {
+          this.task.getIntro( /** @param {Error} err, @param {Intro} intro */ ( err, intro ) => {
             if ( err ) {
               this.errorText = err.message ? err.message : err;
             }
@@ -144,11 +145,13 @@ export default {
       }
     },
 
+    /** @param {Event} e */
     exit( e ) {
       this.errorText = null;
       this.$router.replace( '/assignments' );
     },
 
+    /** @param {{skip: boolean}} e */
     calibrate( e ) {
       if ( !e.skip ) {
         gazeTracking.calibrate();
@@ -157,6 +160,7 @@ export default {
       this.state = STATES.start;
     },
 
+    /** @param {{finished: boolean, cancelled: boolean, longGazedWords: string[]}} e */
     startPageClosed( e ) {
       if ( e.finished ) {
         if ( this.task.questionnaire && this.task.questionnaire.length ) {
@@ -172,6 +176,7 @@ export default {
       }
     },
 
+    /** @param {{err: string, keys: {data: string, session: string}[]}} e */
     gazeDataSaved( e ) {
       if ( !e.err ) {
         this.keys = e.keys;
@@ -186,6 +191,7 @@ export default {
       this.isDataSaved = true;
     },
 
+    /** @param {{questionnaire: AnsweredQuestion[]}} e */
     questionnaireDone( e ) {
       this.questionnaire = e.questionnaire;
       this.state = STATES.finished;
@@ -199,7 +205,7 @@ export default {
       }
 
       if ( this.questionnaire ) {
-        this.student.addQuestionnaire( this.keys.data, this.questionnaire, err => {
+        this.student.addQuestionnaire( this.keys.data, this.questionnaire, /** @param {Error | string} err */ err => {
           if ( err ) {
             this.errorText = err;
           }
@@ -207,7 +213,7 @@ export default {
       }
 
       const id = Student.MULTICLASS ? this.task.id : this.task.cls;
-      this.student.taskDone( id, this.keys.session, err => {
+      this.student.taskDone( id, this.keys.session, /** @param {Error | string} err */ err => {
         if ( err ) {
           this.errorText = err;
         }

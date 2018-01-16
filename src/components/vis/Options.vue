@@ -46,12 +46,14 @@ export default {
   },
 
   methods: {
+    /** @param {Event} e */
     close( e ) {
       if ( e.target === this.$el ) {
         this.$emit( 'close' );
       }
     },
 
+    /** @param {Event} e */
     save( e ) {
       this.saveSettings();
       this.update();
@@ -60,12 +62,14 @@ export default {
       this.$emit( 'close' );
     },
 
+    /** @param {Event} e */
     apply( e ) {
       this.update();
 
       this.$emit( 'apply' );
     },
 
+    /** @param {Event} e */
     reset( e ) {
       window.localStorage.removeItem( ID );
 
@@ -73,7 +77,7 @@ export default {
 
       this.$emit( 'apply' );
 
-      const container = this.$refs.container;
+      const container = /** @type {Element} */ (this.$refs.container);
       container.innerHTML = '';
       this.bind();
     },
@@ -84,7 +88,7 @@ export default {
         return;
       }
 
-      const pop = ( storage, values ) => {
+      const pop = /** @param {Object.<string>} storage; @param {Object.<string>} values */ ( storage, values ) => {
         for ( let name in storage ) {
           const value = values[ name ];
           const saved = storage[ name ];
@@ -107,7 +111,7 @@ export default {
     saveSettings() {
       const options = {};
 
-      const push = ( storage, values ) => {
+      const push = /** @param {Object.<string>} storage; @param {Object.<string>} values */ ( storage, values ) => {
         for ( let name in values ) {
           const value = values[ name ];
           if ( typeof value.ref === 'function' ) {
@@ -138,8 +142,8 @@ export default {
      * @param {string} activeVisID
      */
     show( activeVisID ) {
-      const container = this.$refs.container;
-      const groups = container.querySelectorAll( '.group' );
+      const container = /** @type {Element} */ (this.$refs.container);
+      const groups = Array.from( container.querySelectorAll( '.group' ) );
       groups.forEach( group => {
         const id = group.id;
         if ( id[0] === '_' || !activeVisID || id.indexOf( activeVisID ) === 0 ) {
@@ -152,10 +156,10 @@ export default {
     },
 
     bind() {
-      const container = this.$refs.container;
+      const container = /** @type {Element} */ (this.$refs.container);
 
       for ( let visID in this.values ) {
-        const vis = this.values[ visID ];
+        const vis = /** @type {OptionGroup} */ (this.values[ visID ]);
 
         const group = document.createElement( 'div' );
         group.classList.add( 'group' );
@@ -199,7 +203,7 @@ export default {
       subgroup.appendChild( name );
 
       for ( let optionID in sub.options ) {
-        const option = sub.options[ optionID ];
+        const option = /** @type {Record<string, OptionItem>} */ (sub.options)[ optionID ];
         const row = this.createRow( option, visID + '_' + optionID );
         subgroup.appendChild( row );
       }
@@ -251,7 +255,7 @@ export default {
       select.classList.add( id );
 
       const currentValue = option.ref();
-      option.items.forEach( /** @param {string} itemName */ itemName => {
+      option.items.forEach( itemName => {
         const item = document.createElement( 'option' );
         item.value = itemName;
         item.textContent = itemName;
@@ -262,7 +266,7 @@ export default {
       } );
 
       select.addEventListener( 'change', e => {
-        option.ref( option.items[ e.target.selectedIndex ] );
+        option.ref( option.items[ /** @type {HTMLSelectElement} */ (e.target).selectedIndex ] );
       } );
 
       return select;
@@ -282,7 +286,7 @@ export default {
 
       checkbox.checked = option.ref();
       checkbox.addEventListener( 'click', e => {
-        option.ref( e.target.checked );
+        option.ref( /** @type {HTMLInputElement} */ (e.target).checked );
       } );
 
       const label = document.createElement( 'label' );
@@ -310,7 +314,7 @@ export default {
       const val = option.ref();
       input.value = val;
       input.addEventListener( 'click', e => {
-        option.ref( e.target.value );
+        option.ref( /** @type {HTMLInputElement} */ (e.target).value );
       } );
 
       return input;
@@ -331,15 +335,19 @@ export default {
       if ( val[0] === '#' ) {
         input.value = Colors.validateColor( val );
         input.addEventListener( 'change', e => {
-          option.ref( e.target.value );
+          option.ref( /** @type {HTMLInputElement} */ (e.target).value );
         } );
       }
       else {
         const color = Colors.cssColorToHex( val );
         input.value = color.hex;
-        input.alpha = color.a;
+        input.setAttribute( 'alpha', color.a + '' );
+        //input.alpha = color.a;
         input.addEventListener( 'change', e => {
-          option.ref( Colors.hexToRgba( e.target.value, e.target.alpha ) );
+          option.ref( Colors.hexToRgba( 
+            /** @type {HTMLInputElement} */ (e.target).value, 
+            +(/** @type {HTMLInputElement} */ (e.target).getAttribute( 'alpha' ) ) 
+          ) );
         } );
       }
 
@@ -355,7 +363,7 @@ export default {
       const number = document.createElement( 'input' );
       number.type = 'number';
       if ( option.step !== undefined ) {
-        number.step = option.step;
+        number.step = option.step + '';
       }
       if ( option.min !== undefined ) {
         number.min = option.min;
@@ -368,7 +376,7 @@ export default {
 
       number.value = option.ref();
       number.addEventListener( 'change', e => {
-        option.ref( +e.target.value );
+        option.ref( +(/** @type {HTMLInputElement} */ (e.target).value) );
       } );
 
       return number;

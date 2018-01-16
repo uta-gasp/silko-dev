@@ -29,6 +29,8 @@ export default class Student extends Recordable {
     /** @type {string} ID */
     this.school = '';
     /** @type {string} */
+    this.email = '';
+    /** @type {string} */
     this.grade = '';
     /** @type {object} {ID: name} */
     this.classes = {};

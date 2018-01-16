@@ -23,10 +23,12 @@ export default {
   },
 
   methods: {
+    /** @param {Event} e */
     restart( e ) {
       this.$emit( 'restart' );
     },
 
+    /** @param {Event} e */
     toggle( e ) {
       this.$emit( 'toggle' );
     },

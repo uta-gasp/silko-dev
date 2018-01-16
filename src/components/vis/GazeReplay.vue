@@ -69,12 +69,13 @@ export default {
   },
 
   methods: {
-
+    /** @param {Event} e */
     restartPlayer( e ) {
       this.stopAll();
       this.start();
     },
 
+    /** @param {Event} e */
     togglePlayer( e ) {
       this.isPlayerPaused = !this.isPlayerPaused;
       this.tracks.forEach( track => track.togglePause() );

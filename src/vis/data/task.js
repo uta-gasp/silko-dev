@@ -2,6 +2,7 @@ import ModelTask from '@/model/task.js';
 
 // ts-check-only
 import Session from './session.js';
+import Student from './student.js';
 
 export default class Task {
 
@@ -14,7 +15,7 @@ export default class Task {
     this.id = id;
     /** @type {string} */
     this.name = name;
-    /** @type {Set} ./Student */
+    /** @type {Set<Student>} */
     this.students = new Set();
     /** @type {Session[]} */
     this.sessions = [];

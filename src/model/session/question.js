@@ -35,6 +35,8 @@ export class Question {
     this.word = word;
     this.question = question;
     this.answers = answers;
+    /** @type {string} */
+    this.answer = null;
   }
 
   /** @returns {Record<string, QuestionType>} */

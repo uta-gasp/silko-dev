@@ -100,7 +100,7 @@ export default {
 
     /** @returns {boolean} */
     isSchoolValid() {
-      return !this.isAdmin || this.newSchool;
+      return !this.isAdmin || !!this.newSchool;
     },
 
     /** @returns {boolean} */
@@ -146,7 +146,7 @@ export default {
 
     /** @returns {Promise} */
     loadSchools() {
-      return School.list( ( err, schools ) => {
+      return School.list( /** @param {Error | string} err; @param {School[]} schools*/ ( err, schools ) => {
         if ( err ) {
           return this.setError( err, 'Failed to load schools' );
         }
@@ -157,18 +157,18 @@ export default {
 
     /** @returns {Promise} */
     loadTeachers() {
-      const onDone = ( err, teachers ) => {
+      const onDone = /** @param {Error | string} err; @param {Teacher[]} teachers */ ( err, teachers ) => {
         if ( err ) {
           this.teachers = [];
           return this.setError( err, 'Failed to load teachers' );
         }
 
-        this.teachers = teachers.sort( ( a, b ) => {
+        this.teachers = teachers.sort( /** @param {Teacher} a; @param {Teacher} b @returns {number} */ ( a, b ) => {
           if ( a.school !== b.school ) {
-            return a.school > b.school;
+            return a.school > b.school ? 1 : -1;
           }
           else {
-            return a.name.toLowerCase() > b.name.toLowerCase();
+            return a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1;
           }
         } );
       };
@@ -186,6 +186,7 @@ export default {
       }
     },
 
+    /** @param {Event} e */
     tryToCreate( e ) {
       if ( !this.canCreate ) {
         return;
@@ -206,7 +207,7 @@ export default {
     createTeacher() {
       this.isCreating = true;
 
-      const onFinished = ( err, _ ) => {
+      const onFinished = /** @param {Error | string} err */ err => {
         this.isCreating = false;
 
         if ( err ) {
@@ -225,7 +226,7 @@ export default {
         this.school.createTeacher( this.newName.trim(), this.newEmail.trim(), onFinished );
       }
       else {  // admin
-        School.get( this.newSchool, ( err, school ) => {
+        School.get( this.newSchool, /** @param {Error | string} err; @param {School} school */ ( err, school ) => {
           if ( err ) {
             return onFinished( err );
           }
@@ -237,9 +238,11 @@ export default {
 
     /** 
      * @param {Teacher} teacher
+     * @param {Event} e
      */
     moveTeacher( teacher, e ) {
-      Admin.moveTeacher( teacher, e.target.value, this.schools, err => {
+      const el = /** @type {HTMLInputElement} */ (e.target);
+      Admin.moveTeacher( teacher, el.value, this.schools, /** @param {Error | string} err */ err => {
         if ( err ) {
           this.setError( err, 'Failed to move the teacher to another school' );
         }

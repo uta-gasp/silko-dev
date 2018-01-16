@@ -34,6 +34,7 @@ import Options from '@/components/vis/Options.vue';
 
 // ts-check-only
 import DataPage from '@/model/data/dataPage.js';
+import Data from '@/vis/data/data.js';
 
 const COMMON_UI = {
   wordColor: '#666',
@@ -61,7 +62,7 @@ export default {
     return {
       isOptionsDisplayed: false,
       options: {
-        _common: this.createCommonOptions( COMMON_UI ),
+        _common: this.createCommonOptions(),
         _sgwm: sgwmController.createOptions(),
       },
 
@@ -82,13 +83,13 @@ export default {
 
   props: {
     data: {   // vis/Data
-      type: Object,
+      type: Data,
       required: true,
     },
   },
 
   computed: {
-    /** @returns {number} */
+    /** @returns {number} pages count */
     textLength() {
       return this.defaultPages.length;
     },
@@ -105,6 +106,10 @@ export default {
   },
 
   methods: {
+    // to be implemented
+    changePage() { },
+    redraw() { },
+
     /** @returns {OptionGroup} */
     createCommonOptions() {
       return new OptionGroup({
@@ -120,33 +125,40 @@ export default {
       });
     },
 
+    /** @param {{index: number}} e */
     setPage( e ) {
       this.pageIndex = e.index;
       this.currentPages = this.data.records.map( record => record.data.pages[ e.index ] );
       this.changePage();
     },
 
+    /** @param {Event} e */
     showOptions( e ) {
       this.isOptionsDisplayed = true;
     },
 
+    /** @param {Event} e */
     close( e ) {
       this.$emit( 'close' );
     },
 
+    /** @param {Event} e */
     applyOptions( e ) {
       sgwmController.save();
       this.redraw();
     },
 
+    /** @param {Event} e */
     closeOptions( e ) {
       this.isOptionsDisplayed = false;
     },
 
+    /** @param {Event} e */
     restartPlayer( e ) {
 
     },
 
+    /** @param {Event} e */
     togglePlayer( e ) {
 
     },

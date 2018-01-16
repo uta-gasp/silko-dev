@@ -70,15 +70,15 @@ import DataPage from '@/model/data/dataPage.js';
 
 /**
  * @typedef Assignment
- * @param {Class} cls
- * @param {Task} task
+ * @property {Class} cls
+ * @property {Task} task
  */
 
 /**
  * @typedef Session
- * @param {Class} cls
- * @param {Task} task
- * @param {string} session
+ * @property {Class} cls
+ * @property {Task} task
+ * @property {string} session
  */
 
 export default {
@@ -154,6 +154,7 @@ export default {
 
     /** 
      * @param {Assignment} assignment
+     * @param {Evebt} e
      */
     start( assignment, e ) {
       if ( Student.MULTICLASS ) {

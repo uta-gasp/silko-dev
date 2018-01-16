@@ -1,6 +1,6 @@
 <template lang="pug">
   #questionnaire-results
-    .list
+    .list(v-if="questionnaire")
       table.table
         thead
           tr
@@ -33,16 +33,20 @@ import ControlPanel from '@/components/vis/controlPanel.vue';
 // ts=check-onlt
 import { AnswerCandidate } from '@/model/session/question.js';
 import VisDataRecord from '@/vis/data/record.js';
+import VisData from '@/vis/data/data.js';
 
 /**
- * @typedef {Record<string, AnswerCandidate>} Answers
+ * @typedef {Object.<string, AnswerCandidate>} Answers
  */
 
 /**
  * @typedef {Object} Questionnaire
- * @property {Record<string, Answers>} sessions
+ * @property {Object.<string, string>} sessions
  * @property {string[]} questions
  */
+
+/** @type {Questionnaire} */
+const __needed_only_to_make_vscode_happy_about_Questionnaire__ = null;
 
 /**
  * @fires close
@@ -57,23 +61,18 @@ export default {
   data() {
     return {
       /** @type {Questionnaire} */
-      questionnaire: {},
+      questionnaire: null,
     };
   },
 
   props: {
     data: {   // vis/Data/Data
-      type: Object,
+      type: VisData,
       required: true,
     },
   },
 
   computed: {
-    /** @returns {number} */
-    textLength() {
-      return this.defaultText.length;
-    },
-
     /** @returns {string} */
     title() {
       const r = this.data.records[0];
@@ -83,16 +82,16 @@ export default {
 
   filters: {
     /**
-     * @param {id} string 
-     * @returns {number} 
+     * @param {string} id
+     * @returns {string} 
      */
     name( id ) {
       return id.split( ',' )[0];
     },
 
     /**
-     * @param {id} string 
-     * @returns {number} 
+     * @param {string} id
+     * @returns {string} 
      */
     date( id ) {
       return id.split( ',' )[1];
@@ -100,12 +99,13 @@ export default {
   },
 
   methods: {
+    /** @param {Event} e */
     close( e ) {
       this.$emit( 'close' );
     },
 
     /**
-     * @param {Answers} answers 
+     * @param {Object.<string, AnswerCandidate>} answers 
      * @param {string} question 
      * @returns {{isCorrect?: boolean, isIncorrect?: boolean}}
      */
@@ -123,7 +123,7 @@ export default {
     },
 
     /**
-     * @param {Answers} answers 
+     * @param {Object.<string, AnswerCandidate>} answers 
      * @param {string} question 
      * @returns {string}
      */
@@ -137,7 +137,7 @@ export default {
     },
 
     /**
-     * @param {Answers} answers 
+     * @param {Object.<string, AnswerCandidate>} answers 
      * @returns {string}
      */
     getTotal( answers ) {
@@ -165,7 +165,9 @@ export default {
 
     /** @returns {Questionnaire} */
     createQuestionnaire() {
+      /** @type {Object.<string>} */
       const sessions = {};
+      /** @type {Set<string>} */
       const _questions = new Set();
 
       this.data.records.forEach( record => {
@@ -174,6 +176,7 @@ export default {
         }
 
         const id = this.getRecordName( record );
+        /** @type {Object.<string, string>} */
         const answers = {};
 
         record.data.questionnaire.forEach( question => {
@@ -184,6 +187,7 @@ export default {
         sessions[ id ] = answers;
       } );
 
+      /** @type {string[]} */
       const questions = [];
       for ( let q of _questions ) {
         questions.push( q );

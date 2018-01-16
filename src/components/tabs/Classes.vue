@@ -127,7 +127,7 @@ export default {
     },
 
     loadIntros() {
-      this.teacher.getIntros( /** @param {Error} err, @param {Intro[]} intro */ ( err, intros ) => {
+      this.teacher.getIntros( /** @param {Error} err, @param {Intro[]} intros */ ( err, intros ) => {
         if ( err ) {
           return this.setError( err, 'Failed to load introductions' );
         }

@@ -65,6 +65,7 @@ import RemoveWarning from '@/components/widgets/RemoveWarning.vue';
 
 // ts-check-only
 import Intro from '@/model/intro.js';
+import { IntroCreateParams } from '@/model/commons/createParams.js';
 
 export default {
   name: 'instructions',
@@ -130,6 +131,7 @@ export default {
       }
     },
 
+    /** @param {{name: string}} e */
     tryToCreate( e ) {
       const exists = this.intros.some( intro => {
         return intro.name.toLowerCase() === e.name.toLowerCase();
@@ -149,7 +151,7 @@ export default {
     createIntro( newIntro ) {
       this.isCreating = true;
 
-      this.teacher.createIntro( newIntro.name, newIntro.texts, err => {
+      this.teacher.createIntro( newIntro.name, newIntro.texts, /** @param {Error | string} err */ err => {
         this.isCreating = false;
 
         if ( err ) {
@@ -165,6 +167,7 @@ export default {
 
     /**
      * @param {Intro} item
+     * @param {Event} e
      */
     remove( item, e ) {
       this.toDelete = item;
@@ -172,11 +175,13 @@ export default {
 
     /**
      * @param {Intro} item
+     * @param {Event} e
      */
     edit( item, e ) {
       this.toEdit = item;
     },
 
+    /** @param {{name: string, texts: IntroCreateParams}} e */
     saveEdited( e ) {
       this.toEdit.update( e.name, e.texts, /** @param {Error} err */ err => {
         if ( err ) {
@@ -189,16 +194,18 @@ export default {
         this.loadIntros();
       } );
 
-      this.closeEditor();
+      this.closeEditor( null );
     },
 
+    /** @param {Event} e */
     closeEditor( e ) {
       this.toEdit = null;
     },
 
+    /** @param {{confirm: boolean}} e */
     removeWarningClosed( e ) {
       if ( e.confirm ) {
-        this.teacher.deleteIntro( this.toDelete, err => {
+        this.teacher.deleteIntro( this.toDelete, /** @param {Error} err */ err => {
           if ( err ) {
             this.setError( err, 'Failed to delete the introduction' );
           }

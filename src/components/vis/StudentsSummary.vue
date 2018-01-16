@@ -34,6 +34,23 @@ import Options from '@/components/vis/Options.vue';
 
 // ts-check-only
 import Student from '@/model/student.js';
+import Data from '@/model/data.js';
+import DataPage from '@/model/data/dataPage.js';
+import { Feedbacks } from '@/model/session/feedbacks.js';
+import VisData from '@/vis/data/data.js';
+
+/**
+ * @typedef Session
+ * @property {Data} data
+ * @property {Feedbacks} feedbacks
+ */
+
+/**
+ * @typedef StudentStat
+ * @property {Student} ref
+ * @property {Session[]} sessions
+ * @property {(string | number)[]} statistics
+ */
 
 sgwmController.initializeSettings();
 
@@ -52,7 +69,7 @@ export default {
     return {
       isOptionsDisplayed: false,
 
-      /** @type {Student[]} */
+      /** @type {StudentStat[]} */
       students: [],
 
       // options representation for editor
@@ -78,7 +95,7 @@ export default {
 
   props: {
     data: {   // vis/Data
-      type: Object,
+      type: VisData,
       required: true,
     },
   },
@@ -101,19 +118,23 @@ export default {
   },
 
   methods: {
+    /** @param {Event} e */
     showOptions( e ) {
       this.isOptionsDisplayed = true;
     },
 
+    /** @param {Event} e */
     close( e ) {
       this.$emit( 'close' );
     },
 
+    /** @param {Event} e */
     applyOptions( e ) {
       sgwmController.save();
       this.makeStudents();
     },
 
+    /** @param {Event} e */
     closeOptions( e ) {
       this.isOptionsDisplayed = false;
     },
@@ -132,6 +153,7 @@ export default {
     },
 
     makeStudents() {
+      /** @type {Map<string,StudentStat>} */
       const students = new Map();
 
       // Records.session.feedbacks
@@ -149,12 +171,14 @@ export default {
           const student = {
             ref: record.student,
             sessions: [ session ],
+            /** @type {(string | number)[]} */
             statistics: null,
           };
           students.set( record.student.id, student );
         }
       } );
 
+      /** @type {StudentStat[]} */
       const studentList = [];
       students.forEach( student => {
         student.statistics = this.calculateStatistics( student );
@@ -166,7 +190,7 @@ export default {
     },
 
     /**
-     * @param {Student} student
+     * @param {StudentStat} student
      * @returns {(string | number)[]}
      */
     calculateStatistics( student ) {
@@ -192,6 +216,7 @@ export default {
         const pages = session.data.pages;
         const syllabifier = session.feedbacks.syllabification.enabled ? new Syllabifier( session.feedbacks.syllabification ) : null;
 
+        /** @type {DataPage} */
         let firstPage;
         let lastPage;
         pages.forEach( ( page, pageIndex ) => {
@@ -307,14 +332,14 @@ export default {
     sortData( statIndex, sortDirection ) {
       const students = this.students.map( student => student );
 
-      students.sort( ( a, b ) => {
+      students.sort( /** @param {StudentStat} a; @param {StudentStat} b; @returns {number} */ ( a, b ) => {
         if ( statIndex < 0 ) {
-          return sortDirection > 0 ? a.ref.name < b.ref.name : a.ref.name > b.ref.name;
+          return sortDirection > 0 ? (a.ref.name < b.ref.name ? 1 : 0) : (a.ref.name > b.ref.name ? 1 : 0);
         }
         else {
-          return sortDirection > 0
-            ? b.statistics[ statIndex ] - a.statistics[ statIndex ]
-            : a.statistics[ statIndex ] - b.statistics[ statIndex ];
+          const valA = /** @type {number} */ (a.statistics[ statIndex ]);
+          const valB = /** @type {number} */ (b.statistics[ statIndex ]);
+          return sortDirection > 0 ? valB - valA : valA - valB;
         }
       } );
 

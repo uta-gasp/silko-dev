@@ -141,7 +141,7 @@ export default {
       /** @type {UserBase} */
       user: null,
 
-      /** @type {School[]} */
+      /** @type {School[] | boolean} */
       schools: null,
       /** @type {School} */
       schoolToRegester: null,
@@ -184,6 +184,7 @@ export default {
   },
 
   methods: {
+    /** @param {Event} e */
     register( e ) {
       this.schools = true;
 
@@ -206,33 +207,38 @@ export default {
       // });
     },
 
+    /** @param {{selected: School}} e */
     sendResistrationRequest( e ) {
-      this.closeSelectionBox();
+      this.closeSelectionBox( null );
 
       this.schoolToRegester = e.selected;
 
       this.isGettingEmail = true;
     },
 
+    /** @param {Event} e */
     remindPassword( e ) {
       this.isGettingEmail = true;
     },
 
+    /** @param {Event} e */
     closeSelectionBox( e ) {
       this.schools = null;
     },
 
+    /** @param {Event} e */
     closeEmailBox( e ) {
       this.isGettingEmail = false;
     },
 
+    /** @param {Event} e */
     sendPasswordResetRequest( e ) {
       if ( this.schoolToRegester ) {
         this.setSuccess( `The registration request for "${this.email}" has been sent.` );
         this.schoolToRegester = null;
       }
       else {
-        login.resetPassword( this.email, err => {
+        login.resetPassword( this.email, /** @param {Error | string} err */ err => {
           if ( err ) {
             this.setError( err, `Cannot send the password reset request to "${this.email}".` );
           }
@@ -243,11 +249,12 @@ export default {
         } );
       }
 
-      this.closeEmailBox();
+      this.closeEmailBox( null );
     },
 
+    /** @param {Event} e */
     passwordResetAppeared( e ) {
-      this.$refs.email.focus();
+      /** @type {HTMLInputElement} */ (this.$refs.email).focus();
     },
   },
 
@@ -269,7 +276,7 @@ export default {
       this.isConnecting = false;
     }
     else {
-      login.events.addListener( 'connected', e => {
+      login.events.addListener( 'connected', /** @param {{user: UserBase}} e */ e => {
         this.isConnecting = false;
         if (e.user) {
           this.user = e.user;

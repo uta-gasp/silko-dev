@@ -9,6 +9,7 @@
       :title="title"
       :feedback="defaultFeedback"
       :text-length="textLength"
+      :initial-page-index="initialPageIndex"
       :options="options"
       @page-changed="setPage"
       @show-options="showOptions"
@@ -30,6 +31,7 @@ import ControlPanel from '@/components/vis/controlPanel.vue';
 import Options from '@/components/vis/Options.vue';
 
 // ts-check-pnly
+import Data from '@/vis/data/data.js';
 import DataPageFocusedWord from '@/model/data/dataPageFocusedWord.js';
 
 const UNITS = {
@@ -54,7 +56,7 @@ export default {
 
   data() {
     return {
-      pageIndex: 0,
+      pageIndex: -1,
       isOptionsDisplayed: false,
 
       defaultFeedback: this.data.records[0].session.feedbacks,
@@ -78,7 +80,7 @@ export default {
 
   props: {
     data: {   // vis/Data
-      type: Object,
+      type: Data,
       required: true,
     },
   },
@@ -87,6 +89,11 @@ export default {
     /** @returns {number} */
     textLength() {
       return this.data.records[0].data.pages.length;
+    },
+
+    /** @returns {number} */
+    initialPageIndex() {
+      return this.data.records[0].data.pages[0].isIntro ? 1 : 0;
     },
 
     /** @returns {string} */
@@ -98,28 +105,34 @@ export default {
   },
 
   methods: {
+    /** @param {{index: number}} e */
     setPage( e ) {
       this.pageIndex = e.index;
       this.makeList();
     },
 
+    /** @param {*} e */
     showOptions( e ) {
       this.isOptionsDisplayed = true;
     },
 
+    /** @param {*} e */
     close( e ) {
       this.$emit( 'close' );
     },
 
+    /** @param {*} e */
     applyOptions( e ) {
       this.makeList();
     },
 
+    /** @param {*} e */
     closeOptions( e ) {
       this.isOptionsDisplayed = false;
     },
 
     makeList() {
+      /** @type {Map<string, DataPageFocusedWord>} */
       const words = new Map();
 
       let totalDuration = 0;
@@ -129,7 +142,7 @@ export default {
         } );
       } );
 
-      const descending = ( a, b ) => b[1].focusing.duration - a[1].focusing.duration;
+      const descending = /** @param {*} a; @param {*} b */ ( a, b ) => b[1].focusing.duration - a[1].focusing.duration;
       this.words = this.compute( new Map( [...words.entries()].sort( descending ) ), totalDuration );
     },
 
@@ -157,7 +170,7 @@ export default {
     },
 
     /**
-     * @param {DataPageFocusedWord[]} words
+     * @param {Map<string, DataPageFocusedWord>} words
      * @param {number} totalDuration
      * @returns {{text: string, value: string}[]}
      */
@@ -165,7 +178,7 @@ export default {
       /** @type {{text: string, value: string}[]} */
       const result = [];
 
-      words.forEach( /** @param {DataPageFocusedWord} word */ word => {
+      words.forEach( word => {
         let value = '';
         const duration = word.focusing.duration;
         if ( UI.units === UNITS.SECONDS ) {
@@ -184,7 +197,7 @@ export default {
 
   mounted() {
     console.log( 'Durations created' );
-    this.setPage( { index: 0 } );
+    this.setPage( { index: this.initialPageIndex } );
   },
 };
 </script>

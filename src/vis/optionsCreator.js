@@ -1,16 +1,21 @@
 export class OptionItem {
   /**
    * @param {Object} p
-   * @param {Function | string} p.type
+   * @param {NumberConstructor | BooleanConstructor | StringConstructor | string} p.type
    * @param {string} p.label 
    * @param {string[]} [p.items] 
    * @param {number} [p.step] 
    */
-  constructor( { type = {}, label = '', items = [''], step = 0 } ) {
+  constructor( { type = '', label = '', items = [''], step = 0 } ) {
+    /** @type {NumberConstructor | BooleanConstructor | StringConstructor | string} */
     this.type = type;
     this.label = label;
     this.items = items;
     this.step = step;
+    /** @type {number} */
+    this.min = undefined;
+    /** @type {number} */
+    this.max = undefined;
     /** @type {object} */
     this.ref = undefined;
   }
@@ -30,6 +35,7 @@ export class OptionGroup {
    */
   constructor( { id = '', title = '', options = {}, defaults = [{}] } ) {
     this.title = title;
+    /** @type {OptionItems | OptionGroup[]} */
     this.options = options;
     this.defaults = defaults;
     this.id = id;
@@ -97,16 +103,24 @@ export class OptionsCreator {
   }
 
   /**
-   * @param {Record<string, OptionGroup>} chapters 
+   * @param {Record<string, OptionGroup> | OptionGroup[]} chapters 
    */
   static restoreDefaults( chapters ) {
-    for ( let id in chapters ) {
-      const chapter = chapters[ id ];
+    const restore = /** @param {OptionGroup} chapter*/ chapter => {
       if ( chapter.defaults ) {
         clone( chapter.defaults, chapter.options );
       }
       else if ( Array.isArray( chapter.options ) ) {
         OptionsCreator.restoreDefaults( chapter.options );
+      }
+    };
+
+    if ( Array.isArray( chapters ) ) {
+      chapters.forEach( restore );
+    }
+    else {
+      for ( let id in chapters ) {
+        restore( chapters[ id ] );
       }
     }
   }

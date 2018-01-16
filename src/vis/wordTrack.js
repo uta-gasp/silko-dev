@@ -36,13 +36,13 @@ export class ReplayWord {
 export class WordTrack {
 
   /**
-   * @param {HTMLElement} root
+   * @param {Element} root
    * @param {string} userName 
    * @param {DataPage[]} session 
    * @param {number} id 
    */
   constructor( root, userName, session, id ) {
-    /** @type {HTMLElement} */
+    /** @type {Element} */
     this._root = root;
     /** @type {string} */
     this._name = userName;

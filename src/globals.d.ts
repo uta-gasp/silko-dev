@@ -184,14 +184,3 @@ declare var GazeTargets: GazeTargets;
 declare var SGWM: SGWM;
 declare var responsiveVoice: ResponsiveVoice;
 declare var firebase: Firebase;
-
-
-// Extensions of build-in types
-
-interface Array<T> {
-  includes( elem: T );
-}
-
-interface Node {
-  classList: any;
-}

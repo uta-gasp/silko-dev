@@ -12,8 +12,8 @@ export default {
      * @param {string} pre 
      */
     setError( err, pre ) {
-      if ( err.message ) {
-        err = err.message;
+      if ( /** @type {Error} */ (err).message ) {
+        err = /** @type {Error} */ (err).message;
       }
 
       if ( pre ) {

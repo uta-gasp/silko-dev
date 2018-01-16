@@ -145,12 +145,12 @@ export default {
 
     /** @returns {boolean} */
     isNewGradeValid() {
-      return this.newGrade.trim().length;
+      return !!this.newGrade.trim().length;
     },
 
     /** @returns {boolean} */
     isSchoolValid() {
-      return !Admin.isLogged || this.newSchool;
+      return !Admin.isLogged || !!this.newSchool;
     },
 
     /** @returns {boolean} */
@@ -207,7 +207,7 @@ export default {
 
     /** @returns {Promise} */
     loadSchools() {
-      return School.list( ( err, schools ) => {
+      return School.list( /** @param {Error | string} err; @param {School[]} schools */ ( err, schools ) => {
         if ( err ) {
           return this.setError( err, 'Failed to load schools' );
         }
@@ -217,21 +217,21 @@ export default {
     },
 
     loadStudents() {
-      const onDone = ( err, students ) => {
+      const onDone = /** @param {Error | string} err; @param {Student[]} students */( err, students ) => {
         if ( err ) {
           this.students = [];
           return this.setError( err, 'Failed to load students' );
         }
 
-        this.students = students.sort( ( a, b ) => {
+        this.students = students.sort( /** @param {Student} a;@param {Student} b; @returns {number} */ ( a, b ) => {
           if ( a.school !== b.school ) {
-            return a.school > b.school;
+            return a.school > b.school ? 1 : -1;
           }
           else if ( a.grade !== b.grade ) {
-            return a.grade > b.grade;
+            return a.grade > b.grade ? 1 : -1;
           }
           else {
-            return a.name.toLowerCase() > b.name.toLowerCase();
+            return a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1;
           }
         } );
       };
@@ -240,7 +240,7 @@ export default {
         this.school.getStudents( onDone );
       }
       else if ( this.teacher ) {
-        this.teacher.getSchool( ( err, school ) => {
+        this.teacher.getSchool( /** @param {Error | string} err; @param {School} school */ ( err, school ) => {
           if ( err ) {
             return this.setError( err, 'Failed to load teacher\'s school' );
           }
@@ -258,6 +258,7 @@ export default {
       }
     },
 
+    /** @param {Event} e */
     tryToCreateStudent( e ) {
       if ( !this.canCreateStudent ) {
         return;
@@ -286,7 +287,7 @@ export default {
     createStudent( email ) {
       this.isCreating = true;
 
-      const onFinished = ( err, _ ) => {
+      const onFinished = /** @param {Error | string} err */ err => {
         this.isCreating = false;
 
         if ( err ) {
@@ -318,7 +319,7 @@ export default {
         this.teacher.createStudent( studentObject, onFinished );
       }
       else {  // admin
-        School.get( this.newSchool, ( err, school ) => {
+        School.get( this.newSchool, /** @param {Error | string} err; @param {School} school */ ( err, school ) => {
           if ( err ) {
             return onFinished( err );
           }
@@ -330,9 +331,11 @@ export default {
 
     /** 
      * @param {Student} student
+     * @param {Event} e
      */
     moveStudent( student, e ) {
-      Admin.moveStudent( student, e.target.value, this.schools, err => {
+      const el = /** @type {HTMLInputElement} */ (e.target);
+      Admin.moveStudent( student, el.value, this.schools, /** @param {Error | string} err */ err => {
         if ( err ) {
           this.setError( err, 'Failed to move the student to another school' );
         }
@@ -361,16 +364,17 @@ export default {
       this.toDelete = student;
     },
 
+    /** @param {{confirm: boolean}} e */
     removeWarningClosed( e ) {
       if ( e.confirm ) {
         const student = this.toDelete;
 
-        School.get( student.school, ( err, school ) => {
+        School.get( student.school, /** @param {Error | string} err; @param {School} school */ ( err, school ) => {
           if ( err ) {
             return this.setError( err, 'Failed to access the student school' );
           }
 
-          school.deleteStudent( student, err => {
+          school.deleteStudent( student, /** @param {Error | string} err */ err => {
             if ( err ) {
               this.setError( err, 'Failed to remove the student from the database' );
             }

@@ -34,10 +34,10 @@ export default class DataUtils {
   /**
    * @param {ObjectWithName} a 
    * @param {ObjectWithName} b 
-   * @returns {boolean}
+   * @returns {number}
    */
   static byName( a, b ) {
-    return a.name.toLowerCase() > b.name.toLowerCase();
+    return a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1;
   }
 
   /**

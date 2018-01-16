@@ -94,7 +94,7 @@ export default {
   methods: {
 
     loadSchools() {
-      School.list( ( err, schools ) => {
+      School.list( /** @param {Error | string} err; @param {School[]} schools */ ( err, schools ) => {
         if ( err ) {
           this.schools = [];
           return this.setError( err, 'Failed to load schools' );
@@ -110,6 +110,7 @@ export default {
       }
     },
 
+    /** @param {Event} e */
     tryToCreate( e ) {
       if ( !this.canCreate ) {
         return;
@@ -131,7 +132,7 @@ export default {
 
     createSchool() {
       this.isCreating = true;
-      Admin.createSchool( this.newName.trim(), this.newEmail.trim(), ( err, _ ) => {
+      Admin.createSchool( this.newName.trim(), this.newEmail.trim(), /** @param {Error | string} err */ err => {
         this.isCreating = false;
 
         if ( err ) {
@@ -149,6 +150,10 @@ export default {
   },
 
   filters: {
+    /** 
+     * @param {Object} obj 
+     * @returns {number}
+     * */
     count( obj ) {
       return Object.keys( obj ).length;
     },

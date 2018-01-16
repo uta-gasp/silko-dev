@@ -73,6 +73,7 @@ import TemporalNotification from '@/components/widgets/TemporalNotification.vue'
 import Class from '@/model/class.js';
 import Student from '@/model/student.js';
 import Task from '@/model/task.js';
+import School from '@/model/school.js';
 
 /**
  * @typedef GradeSubItem
@@ -87,6 +88,9 @@ import Task from '@/model/task.js';
  * @property {string} text
  * @property {GradeSubItem[]} subitems
  */
+
+/** @type {Grade} */
+const __needed_only_to_make_vscode_happy_about_Grade__ = null;
 
 export default {
   name: 'student-list',
@@ -148,7 +152,7 @@ export default {
 
   methods: {
     loadTasks() {
-      this.currentClass.getTasks( ( err, tasks ) => {
+      this.currentClass.getTasks( /** @param {Error | string} err; @param {Task[]} tasks */ ( err, tasks ) => {
         if ( err ) {
           return this.setError( err, 'Failed to load tasks' );
         }
@@ -160,7 +164,7 @@ export default {
     },
 
     loadStudents() {
-      this.currentClass.getStudents( ( err, students ) => {
+      this.currentClass.getStudents( /** @param {Error | string} err; @param {Student[]} students */ ( err, students ) => {
         if ( err ) {
           this.students = [];
           return this.setError( err, 'Failed to load students' );
@@ -170,14 +174,15 @@ export default {
       } );
     },
 
+    /** @param {Callback} cb */
     loadAvailableStudents( cb ) {
-      this.teacher.getSchool( ( err, school ) => {
+      this.teacher.getSchool( /** @param {Error | string} err; @param {School} school */ ( err, school ) => {
         if ( err ) {
           this.setError( err, 'Failed to load teacher\'s school' );
           return cb( err );
         }
 
-        school.getStudents( ( err, students ) => {
+        school.getStudents( /** @param {Error | string} err; @param {Student[]} students */ ( err, students ) => {
           if ( err ) {
             return this.setError( err, 'Failed to load school students' );
           }
@@ -190,8 +195,12 @@ export default {
       } );
     },
 
-    /** @returns {Grade[]} */
+    /**
+     * @param {Student[]} students
+     * @returns {Grade[]} 
+     * */
     makeGrades( students ) {
+      /** @type {Grade[]}  */
       const grades = [];
       students.forEach( student => {
         let grade = grades.find( item => {
@@ -217,22 +226,22 @@ export default {
       } );
 
       grades.forEach( grade => {
-        grade.subitems.sort( ( a, b ) => a.text.toLowerCase() > b.text.toLowerCase() );
+        grade.subitems.sort( /** @param {{text: string}} a;@param {{text: string}} b; @returns {number} */ ( a, b ) => a.text.toLowerCase() > b.text.toLowerCase() ? 1 : -1 );
       } );
 
-      return grades.sort( ( a, b ) => {
+      return grades.sort( /** @param {Grade} a;@param {Grade} b; @returns {number} */ ( a, b ) => {
         const gradeA = Number.parseInt( a.text, 10 );
         const gradeB = Number.parseInt( b.text, 10 );
         if ( !Number.isNaN( gradeA ) && !Number.isNaN( gradeB ) ) {
           if ( gradeA === gradeB ) {
-            return a.text > b.text;
+            return a.text > b.text ? 1 : -1;
           }
           else {
-            return gradeA > gradeB;
+            return gradeA > gradeB ? 1 : -1;
           }
         }
         else {
-          return a.text > b.text;
+          return a.text > b.text ? 1 : -1;
         }
       } );
     },
@@ -246,17 +255,19 @@ export default {
       return dataUtils.displayCount( arr, name );
     },
 
+    /** @param {Event} e */
     openEditor( e ) {
-      this.loadAvailableStudents( err => {
+      this.loadAvailableStudents( /** @param {Error | string} err */ err => {
         if ( !err ) {
           this.isEditing = true;
         }
       } );
     },
 
+    /** @param {{subitems: Student[]}} e */
     addNewStudents( e ) {
       if ( e.subitems ) {
-        this.currentClass.addStudents( e.subitems, err => {
+        this.currentClass.addStudents( e.subitems, /** @param {Error | string} err */ err => {
           if ( err ) {
             this.setError( err, 'Failed to add new student' );
           }
@@ -268,9 +279,10 @@ export default {
         } );
       }
 
-      this.closeEditor();
+      this.closeEditor( null );
     },
 
+    /** @param {Event} e */
     closeEditor( e ) {
       this.isEditing = false;
     },
@@ -278,9 +290,10 @@ export default {
     /**
      * @param {Student} student
      * @param {string} taskID
+     * @param {Event} e
      */
     addAssignment( student, taskID, e ) {
-      student.addAssignment( taskID, this.currentClass.id, err => {
+      student.addAssignment( taskID, this.currentClass.id, /** @param {Error | string} err */ err => {
         if ( err ) {
           this.setError( err, 'Failed to add the assignment' );
         }
@@ -293,9 +306,10 @@ export default {
     /**
      * @param {Student} student
      * @param {string} taskID
+     * @param {Event} e
      */
     removeAssignment( student, taskID, e ) {
-      student.removeAssignment( taskID, err => {
+      student.removeAssignment( taskID, /** @param {Error | string} err */ err => {
         if ( err ) {
           this.setError( err, 'Failed to remove the assignment' );
         }
@@ -324,9 +338,10 @@ export default {
 
     /**
      * @param {Student} student
+     * @param {Event} e
      */
     remove( student, e ) {
-      this.currentClass.removeStudent( student, err => {
+      this.currentClass.removeStudent( student, /** @param {Error | string} err */ err => {
         if ( err ) {
           this.setError( err, 'Failed to remove the student from the list' );
         }
@@ -363,7 +378,7 @@ export default {
     showTaskList( id ) {
       this.hideTaskList();
 
-      this.activeMenu = this.$refs[ id ][0];
+      this.activeMenu = /** @type {Element[]} */ (this.$refs[ id ])[0];
       this.activeMenu.classList.add( 'is-active' );
     },
 

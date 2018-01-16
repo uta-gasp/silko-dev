@@ -22,6 +22,7 @@
       :title="title"
       :feedback="null"
       :text-length="textLength"
+      :initial-page-index="initialPageIndex"
       :options="options"
       :show-player="true"
       :is-player-paused="isPlayerPaused"
@@ -40,10 +41,13 @@ import Vue from 'vue';
 
 import { OptionsCreator, OptionGroup, OptionItem } from '@/vis/optionsCreator.js';
 import sgwmController from '@/vis/sgwmController.js';
-import { WordTrack } from '@/vis/wordTrack.js';
+import { WordTrack, ReplayWord } from '@/vis/wordTrack.js';
 
 import ControlPanel from '@/components/vis/controlPanel.vue';
 import Options from '@/components/vis/Options.vue';
+
+// ts-check-pnly
+import Data from '@/vis/data/data.js';
 
 sgwmController.initializeSettings();
 
@@ -64,7 +68,7 @@ export default {
 
   data() {
     return {
-      pageIndex: 0,
+      pageIndex: -1,
       isOptionsDisplayed: false,
       isPlayerPaused: false,
 
@@ -93,7 +97,7 @@ export default {
 
   props: {
     data: {   // vis/Data
-      type: Object,
+      type: Data,
       required: true,
     },
   },
@@ -102,6 +106,11 @@ export default {
     /** @returns {number} */
     textLength() {
       return this.defaultText.length;
+    },
+
+    /** @returns {number} */
+    initialPageIndex() {
+      return this.data.records[0].data.pages[0].isIntro ? 1 : 0;
     },
 
     /** @returns {string} */
@@ -113,6 +122,7 @@ export default {
   },
 
   methods: {
+    /** @param {{index: number}} e */
     setPage( e ) {
       if ( this.tracks ) {
         this.stopAll();
@@ -126,18 +136,21 @@ export default {
       } );
     },
 
+    /** @param {Event} e */
     showOptions( e ) {
       this.isOptionsDisplayed = true;
     },
 
+    /** @param {Event} e */
     close( e ) {
       this.$emit( 'close' );
     },
 
+    /** @param {Event} e */
     applyOptions( e ) {
       sgwmController.save();
 
-      const rows = this.$refs.table.querySelectorAll( 'tr' );
+      const rows = (/** @type {Element} */ (this.$refs.table)).querySelectorAll( 'tr' );
       this.tracks.forEach( track => {
         track.words.forEach( word => {
           this.colorizeCell( rows[ word.id + 1 ].cells[ track.id + 1 ], word.totalDuration );
@@ -145,10 +158,12 @@ export default {
       } );
     },
 
+    /** @param {Event} e */
     closeOptions( e ) {
       this.isOptionsDisplayed = false;
     },
 
+    /** @param {Event} e */
     restartPlayer( e ) {
       this.stopAll();
       this.makeList();
@@ -158,6 +173,7 @@ export default {
       } );
     },
 
+    /** @param {Event} e */
     togglePlayer( e ) {
       this.isPlayerPaused = !this.isPlayerPaused;
       this.tracks.forEach( track => track.togglePause() );
@@ -183,14 +199,14 @@ export default {
 
     createTracks() {
       this.tracks = this.data.records.map( ( record, index ) => {
-        return new WordTrack( this.$refs.root, record.student.name, record.data.pages, index );
+        return new WordTrack( /** @type {Element} */ (this.$refs.root), record.student.name, record.data.pages, index );
       } );
     },
 
     start() {
       this.isPlayerPaused = false;
 
-      const rows = this.$refs.table.querySelectorAll( 'tr' );
+      const rows = (/** @type {Element} */ (this.$refs.table)).querySelectorAll( 'tr' );
 
       this.tracks.forEach( track => {
         const words = track.session[ this.pageIndex ].text;
@@ -200,11 +216,11 @@ export default {
           mappingResult ? mappingResult.fixations : null,
           words,
           this.onWordFixated( track, rows ),
-          this.onTrackCompleted( track, rows[ words.length + 1 ] ),
+          this.onTrackCompleted( /*track, rows[ words.length + 1 ]*/ ),
         );
       } );
 
-      this.$refs.root.scrollTop = 0;
+      (/** @type {Element} */ (this.$refs.root)).scrollTop = 0;
     },
 
     stopAll() {
@@ -212,7 +228,7 @@ export default {
     },
 
     /**
-     * @param {Element} cell
+     * @param {HTMLElement} cell
      * @param {number} duration
      */
     colorizeCell( cell, duration ) {
@@ -232,17 +248,18 @@ export default {
 
     /**
      * @param {WordTrack} track
-     * @param {Element[]} rows
+     * @param {NodeListOf<HTMLTableRowElement>} rows
+     * @returns {Function}
      */
     onWordFixated( track, rows ) {
-      return ( word, duration ) => {
+      return /** @param {ReplayWord} word; @param {number} duration */ ( word, duration ) => {
         const rawWord = track.words[ word.id ];
         rawWord.totalDuration = rawWord.totalDuration + duration;
 
         const cell = rows[ word.id + 1 ].cells[ track.id + 1 ];
         this.colorizeCell( cell, rawWord.totalDuration );
 
-        track.pointer.style = `left: ${cell.offsetLeft + ( cell.offsetWidth - track.pointerSize ) / 2}px; top: ${cell.offsetTop + ( cell.offsetHeight - track.pointerSize ) / 2}px`;
+        track.pointer.setAttribute('style', `left: ${cell.offsetLeft + ( cell.offsetWidth - track.pointerSize ) / 2}px; top: ${cell.offsetTop + ( cell.offsetHeight - track.pointerSize ) / 2}px` );
       };
     },
 
@@ -257,7 +274,7 @@ export default {
   mounted() {
     console.log( 'Word replay created' );
 
-    this.setPage( { index: 0 } );
+    this.setPage( { index: this.initialPageIndex } );
   },
 
   beforeDestroy() {

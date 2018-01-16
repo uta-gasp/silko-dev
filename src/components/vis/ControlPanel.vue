@@ -121,30 +121,36 @@ export default {
   },
 
   methods: {
+    /** @param {Event} e */
     prevPage( e ) {
       if ( this.pageIndex > 0 ) {
         this.setPage( this.pageIndex - 1 );
       }
     },
 
+    /** @param {Event} e */
     nextPage( e ) {
       if ( this.pageIndex < this.textLength - 1 ) {
         this.setPage( this.pageIndex + 1 );
       }
     },
 
+    /** @param {Event} e */
     showOptions( e ) {
       this.$emit( 'show-options' );
     },
 
+    /** @param {Event} e */
     restartPlayer( e ) {
       this.$emit( 'restart-player' );
     },
 
+    /** @param {Event} e */
     togglePlayer( e ) {
       this.$emit( 'toggle-player' );
     },
 
+    /** @param {Event} e */
     close( e ) {
       this.$emit( 'close' );
     },
