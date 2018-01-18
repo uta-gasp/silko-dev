@@ -27,6 +27,8 @@
 </template>
 
 <script>
+import { SyllabOptions } from '@/model/session/feedbacks.js';
+
 /**
  * @fires input
  */
@@ -45,7 +47,7 @@ export default {
 
   props: {
     value: {
-      type: Object,
+      type: Object, // SyllabOptions
       required: true,
     },
     header: {

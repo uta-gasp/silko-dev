@@ -1,7 +1,7 @@
 <template lang="pug">
   #questionnaire-page
     section.section
-      .container
+      .container(v-if="question")
         .content.is-large
           p {{ question.question }}
 
@@ -13,12 +13,7 @@
 </template>
 
 <script>
-import { Question } from '@/model/session/question.js';
-
-/**
- * @typedef {Question} AnsweredQuestion
- * @property {string} answer
- */
+import { Question, AnswerCandidate } from '@/model/session/question.js';
 
 /**
  * @fires finished
@@ -29,10 +24,10 @@ export default {
   data() {
     return {
       questionIndex: 0,
-      /** @type {AnsweredQuestion[]} */
-      questions: this.questionnaire
+      /** @type {Question[]} */
+      questions: /** @type {Question[]} */ (this.questionnaire)
         .map( question => Object.assign( { answer: null }, question ) )
-        .filter( question => question.type === Question.types.text.name || this.longGazedWords.includes( question.word ) ),
+        .filter( question => question.type === Question.types.text.name || /** @type {string[]} */ (this.longGazedWords).includes( question.word ) ),
     };
   },
 
@@ -40,25 +35,25 @@ export default {
     questionnaire: {
       type: Array,
       required: true,
-      default: () => [],
+      default: /** @returns {Array} */ () => [],
     },
     longGazedWords: {
       type: Array,
-      default: () => [],
+      default: /** @returns {Array} */ () => [],
     },
   },
 
   computed: {
-    /** @returns {AnsweredQuestion} */
+    /** @returns {Question} */
     question() {
-      return this.questionIndex >= 0 && this.questionIndex < this.questions.length
-        ? this.questions[ this.questionIndex ] : {};
+      return this.questionIndex >= 0 && this.questionIndex < this.questions.length ?
+          this.questions[ this.questionIndex ] : null;
     },
   },
 
   methods: {
     /** 
-     * @param {string} answer
+     * @param {AnswerCandidate} answer
      * @returns {object} 
      */
     asnwerRevealedClass( answer ) {
@@ -69,7 +64,7 @@ export default {
     },
 
     /** 
-     * @param {string} answer
+     * @param {AnswerCandidate} answer
      */
     reply( answer ) {
       if ( this.question.answer ) {

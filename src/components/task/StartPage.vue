@@ -29,6 +29,10 @@
 <script>
 import gazeTracking from '@/utils/gazeTracking.js';
 
+import Intro from '@/model/intro.js';
+import Task from '@/model/task.js';
+import Student from '@/model/student.js';
+
 import TaskPage from '@/components/task/TaskPage.vue';
 
 import fullscreen from '@/components/mixins/fullscreen.js';
@@ -57,15 +61,24 @@ export default {
   },
 
   props: {
-    texts: Object,
-    task: Object,
-    student: Object,
+    texts: {
+      type: Intro,
+      required: true,
+    },
+    task: {
+      type: Task,
+      required: true,
+    },
+    student: {
+      type: Student,
+      required: true,
+    },
   },
 
   computed: {
-    /** @returns {string} */
+    /** @returns {string[]} */
     startInstruction() {
-      return this.texts.startInstruction ? this.texts.startInstruction.split( '\n' ) : '';
+      return this.texts.startInstruction ? this.texts.startInstruction.split( '\n' ) : [];
     },
 
     /** @returns {string} */
@@ -80,17 +93,19 @@ export default {
   },
 
   methods: {
-
+    /** @param {Event} e */
     start( e ) {
       this.isReading = true;
       this.makeFullscreen( this.$refs.fullscreen );
       gazeTracking.start();
     },
 
+    /** @param {Event} e */
     cancel( e ) {
       this.$emit( 'close', { cancelled: true } );
     },
 
+    /** @param {Event} e */
     finishedReading( e ) {
       this.isReading = false;
       this.$emit( 'close', { finished: true, ...e } );
@@ -98,6 +113,7 @@ export default {
       gazeTracking.stop();
     },
 
+    /** @param {Event} e */
     gazeDataSaved( e ) {
       this.$emit( 'saved', e );
     },
@@ -122,7 +138,7 @@ export default {
       this.isRunning = state.isConnected && state.isTracking && !state.isBusy;
     } );
 
-    this.onFullscreenChanges( isFullscreen => {
+    this.onFullscreenChanges( /** @param {boolean} isFullscreen */ isFullscreen => {
       this.isFullscreen = isFullscreen;
     } );
   },

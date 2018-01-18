@@ -123,11 +123,11 @@ export default {
   props: {
     task: {
       type: Task,
-      default: () => { return {}; },
+      default: null,
     },
     intros: {
       type: Array,
-      default: () => [],
+      default: /** @returns {Intro[]} */ () => [],
     },
   },
 
@@ -138,7 +138,7 @@ export default {
       return !( this.task && this.task.name );
     },
 
-    /** @returns {{name: string, alignment: string, fontname: string, intro: Intro, text: string}} */
+    /** @returns {{name: string, alignment: string, fontname: string, intro: string, text: string}} */
     currentModel() {
       return {
         name: this.name,

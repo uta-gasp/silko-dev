@@ -37,9 +37,9 @@
 <script>
 import login from '@/utils/login.js';
 
-import ActionError from '@/components/mixins/actionError';
+import ActionError from '@/components/mixins/actionError.js';
 
-import TemporalNotification from '@/components/widgets/TemporalNotification';
+import TemporalNotification from '@/components/widgets/TemporalNotification.vue';
 
 const checkValues = {
   INVALID: -1,
@@ -68,7 +68,7 @@ export default {
   },
 
   computed: {
-    /** @returns {boolean} */
+    /** @returns {number} */
     isEmailValid() {
       if ( !this.email ) {
         return checkValues.UNKNOWN;
@@ -81,7 +81,7 @@ export default {
       }
     },
 
-    /** @returns {boolean} */
+    /** @returns {number} */
     isPasswordValid() {
       if ( !this.password ) {
         return checkValues.UNKNOWN;
@@ -100,10 +100,11 @@ export default {
   },
 
   methods: {
+    /** @param {Event} e */
     login( e ) {
       this.inProgress = true;
 
-      login.logIn( this.email, this.password, ( err, _ /* user */ ) => {
+      login.logIn( this.email, this.password, /** @param {Error | string} err */ err => {
         this.inProgress = false;
 
         if ( err ) {

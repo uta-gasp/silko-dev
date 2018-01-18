@@ -9,7 +9,7 @@ import Speaker from './speaker.js';
 import WordFocus from './wordFocus.js';
 
 // ts-check-only
-import SyllabificationFeedback from '@/model/session/syllabificationFeedback';
+import { SyllabOptions, SpeechOptions } from '@/model/session/feedbacks';
 import SpeechFeedback from '@/model/session/speechFeedback';
 
 const FOCUS_THRESHOLD = 150;
@@ -25,8 +25,8 @@ const HIGHLIGHT_CLASS = 'currentWord';
 export default class FeedbackProvider {
 
   /**
-   * @param {SyllabificationFeedback} syllab 
-   * @param {SpeechFeedback} speech 
+   * @param {SyllabOptions} syllab 
+   * @param {SpeechOptions} speech 
    */
   constructor( syllab, speech ) {
     /** @type {Syllabifier} */

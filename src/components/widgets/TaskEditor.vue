@@ -47,6 +47,8 @@ import TaskEditorQuestionnaire from '@/components/widgets/taskEditorQuestionnair
 // ts-check-only
 import { TextPageImage } from '@/model/task/textPageImage.js';
 import { Question } from '@/model/session/question.js';
+import Intro from '@/model/intro.js';
+import { SyllabOptions, SpeechOptions } from '@/model/session/feedbacks.js';
 
 /**
  * @typedef Tab
@@ -81,6 +83,7 @@ export default {
       alignment: '',
       fontname: '',
       text: '',
+      /** @type {Intro | string} */
       intro: '',
 
       syllab: Task.defaultSyllab,
@@ -121,17 +124,18 @@ export default {
       default: 'Create',
     },
     task: {
+      type: Task,
       required: true,
       default: null,
     },
     source: {
-      type: Object,
+      type: Task,
       default: null,
     },
     intros: {
       type: Array,
       required: true,
-      default: () => [],
+      default: /** @returns {Array} */ () => [],
     },
   },
 
@@ -238,16 +242,19 @@ export default {
       this.currentTab = tab;
     },
 
+    /** @param {Event} e */
     preview( e ) {
       this.inPreview = true;
       this.makeFullscreen( this.$refs.fullscreen );
     },
 
+    /** @param {Event} e */
     closePreview( e ) {
       this.inPreview = false;
       this.closeFullscreen();
     },
 
+    /** @param {{name: string, alignment: string, fontname: string, intro: Intro, text: string}} e */
     setTextInput( e ) {
       this.name = e.name;
       this.alignment = e.alignment;
@@ -258,6 +265,7 @@ export default {
       this.$emit( 'modified' );
     },
 
+    /** @param {{syllab: SyllabOptions, speech: SpeechOptions, syllabExceptions: string}} e */
     setFeedbackInput( e ) {
       this.syllab = e.syllab;
       this.speech = e.speech;
@@ -266,12 +274,14 @@ export default {
       this.$emit( 'modified' );
     },
 
+    /** @param {{images: TextPageImage[]}} e */
     setImagesInput( e ) {
       this.images = e.images;
 
       this.$emit( 'modified' );
     },
 
+    /** @param {Event} e */
     setDefaultFeedback( e ) {
       const defaults = JSON.stringify( {
         syllab: this.syllab,
@@ -280,12 +290,14 @@ export default {
       window.localStorage.setItem( TASK_DEFAULTS, defaults );
     },
 
+    /** @param {{questionnaire: Question[]}} e */
     setQuestionnaireInput( e ) {
       this.questionnaire = e.questionnaire;
 
       this.$emit( 'modified' );
     },
 
+    /** @param {Event} e */
     save( e ) {
       this.syllab.exceptions = this.syllabExceptions;
 

@@ -32,6 +32,8 @@
 import TaskText from '@/components/widgets/TaskText.vue';
 import TaskImages from '@/components/widgets/TaskImages.vue';
 
+import Task from '@/model/task.js';
+
 import TextPresenter from '@/task/textPresenter.js';
 import FeedbackProvider from '@/task/feedbackProvider.js';
 
@@ -66,7 +68,7 @@ export default {
       default: null,
     },
     task: {
-      type: Object,
+      type: Task,
     },
   },
 

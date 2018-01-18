@@ -9,7 +9,8 @@
 import ImageController from '@/task/imageController.js';
 
 // ts-check-onlu
-import TextPageImage from '@/model/task/textPageImage.js';
+import { TextPageImage } from '@/model/task/textPageImage.js';
+import DataImage from '@/model/data/image.js';
 
 /**
  * @fires show
@@ -43,11 +44,11 @@ export default {
     images: {
       type: Array,
       required: true,
-      default: () => []
+      default: /** @returns {Array} */ () => []
     },
 
     fixation: {
-      type: Object, // { word: String, duration: Number }
+      type: Object, // { word: String, duration: number }
     },
   },
 
@@ -62,7 +63,7 @@ export default {
         return false;
       }
 
-      return images.some( image => image.location === location );
+      return images.some( /** @param {DataImage} image */ image => image.location === location );
     },
   },
 

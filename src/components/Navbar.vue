@@ -72,13 +72,15 @@ export default {
   },
 
   methods: {
+    /** @param {Event} e */
     logOut( e ) {
       login.logOut();
     },
 
+    /** @param {Event} e */
     updateLanguage( e ) {
-      this.user.prefs.lang = e.target.value;
-      this.user.update( err => {
+      this.user.prefs.lang = /** @type {HTMLInputElement} */ (e.target).value;
+      this.user.update( /** @param {Error | string} err */ err => {
         eventBus.$emit( 'lang' );
       });
     },

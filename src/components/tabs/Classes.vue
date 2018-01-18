@@ -118,7 +118,7 @@ export default {
     loadClasses() {
       this.teacher.getClasses( /** @param {Error} err, @param {Class[]} classes */ ( err, classes ) => {
         if ( err ) {
-          this.classed = [];
+          this.classes = [];
           return this.setError( err, 'Failed to load classes' );
         }
 
@@ -142,6 +142,7 @@ export default {
       }
     },
 
+    /** @param {Event} e */
     tryToCreate( e ) {
       if ( !this.canCreate ) {
         return;
@@ -183,11 +184,13 @@ export default {
 
     /**
      * @param {Class} item
+     * @param {Event} e
      */
     removeClass( item, e ) {
       this.toDelete = item;
     },
 
+    /** @param {{confirm: boolean}} e */
     removeWarningClosed( e ) {
       if ( e.confirm ) {
         this.teacher.deleteClass( this.toDelete, /** @param {Error} err */ err => {
@@ -205,6 +208,7 @@ export default {
       this.toDelete = null;
     },
 
+    /** @param {{err: string}} e */
     taskSaved( e ) {
       if ( e.err ) {
         this.setError( e.err, 'Failed to save updates' );
@@ -214,6 +218,7 @@ export default {
       }
     },
 
+    /** @param {{err: string}} e */
     taskCreated( e ) {
       if ( e.err ) {
         this.setError( e.err, 'Failed to create new task' );
@@ -224,6 +229,7 @@ export default {
       }
     },
 
+    /** @param {Event} e */
     taskDeleted( e ) {
       this.refreshStudents = Math.random();
     },

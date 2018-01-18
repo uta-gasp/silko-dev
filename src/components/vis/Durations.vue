@@ -7,7 +7,7 @@
 
     control-panel(
       :title="title"
-      :feedback="defaultFeedback"
+      :feedback="feedback"
       :text-length="textLength"
       :initial-page-index="initialPageIndex"
       :options="options"
@@ -26,6 +26,7 @@
 
 <script>
 import { OptionsCreator, OptionGroup, OptionItem } from '@/vis/optionsCreator.js';
+import { Feedbacks } from '@/model/session/feedbacks';
 
 import ControlPanel from '@/components/vis/controlPanel.vue';
 import Options from '@/components/vis/Options.vue';
@@ -33,6 +34,7 @@ import Options from '@/components/vis/Options.vue';
 // ts-check-pnly
 import Data from '@/vis/data/data.js';
 import DataPageFocusedWord from '@/model/data/dataPageFocusedWord.js';
+import { Feedback } from '@/model/session/feedback';
 
 const UNITS = {
   SECONDS: 'seconds',
@@ -101,6 +103,10 @@ export default {
       const r = this.data.records[0];
       const student = this.data.params.student ? ` for ${this.data.params.student}` : '';
       return `Word reading durations in "${r.task.name}"${student}`;
+    },
+
+    feedback() {
+      return new Feedbacks( this.defaultFeedback.speech, this.defaultFeedback.syllabification );
     },
   },
 

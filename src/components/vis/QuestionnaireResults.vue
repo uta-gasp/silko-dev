@@ -41,7 +41,7 @@ import VisData from '@/vis/data/data.js';
 
 /**
  * @typedef {Object} Questionnaire
- * @property {Object.<string, string>} sessions
+ * @property {Object.<string, Object.<string, AnswerCandidate>>} sessions
  * @property {string[]} questions
  */
 
@@ -165,7 +165,7 @@ export default {
 
     /** @returns {Questionnaire} */
     createQuestionnaire() {
-      /** @type {Object.<string>} */
+      /** @type {Object.<string, Object.<string, AnswerCandidate>>}>} */
       const sessions = {};
       /** @type {Set<string>} */
       const _questions = new Set();
@@ -176,7 +176,8 @@ export default {
         }
 
         const id = this.getRecordName( record );
-        /** @type {Object.<string, string>} */
+
+        /** @type {Object.<string, AnswerCandidate>} */
         const answers = {};
 
         record.data.questionnaire.forEach( question => {

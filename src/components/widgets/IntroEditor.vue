@@ -47,6 +47,8 @@
 </template>
 
 <script>
+import Intro from '@/model/intro.js';
+
 /**
  * @fires save
  */
@@ -83,7 +85,7 @@ export default {
       default: true,
     },
     intro: {
-      type: Object,
+      type: Intro,
       default: null,
     },
     reload: Number,
@@ -137,7 +139,7 @@ export default {
   },
 
   methods: {
-
+    /** @param {Event} e */
     save( e ) {
       this.$emit( 'save', {
         name: this.name.trim(),

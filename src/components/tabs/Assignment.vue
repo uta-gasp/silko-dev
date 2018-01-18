@@ -76,7 +76,7 @@ export default {
       state: STATES.calibrate,
       isDataSaved: false,
 
-      /** @type {string?} */
+      /** @type {string} */
       errorText: null,
 
       /** @type {{data: string, session: string}} */
@@ -117,16 +117,16 @@ export default {
           }
         }
 
-        this.student.loadTask( taskID, /** @param {Error} err, @param {Task} task */ ( err, task ) => {
+        this.student.loadTask( taskID, /** @param {Error | string} err, @param {Task} task */ ( err, task ) => {
           if ( err ) {
-            this.errorText = err;
+            this.errorText = /** @type {string} */ (err);
             return;
           }
           this.task = task;
         } ).then( _ => {
-          this.task.getIntro( /** @param {Error} err, @param {Intro} intro */ ( err, intro ) => {
+          this.task.getIntro( /** @param {Error | string} err, @param {Intro} intro */ ( err, intro ) => {
             if ( err ) {
-              this.errorText = err.message ? err.message : err;
+              this.errorText = /** @type {Error} */ (err).message ? /** @type {Error} */ (err).message : /** @type {string} */ (err);
             }
             else if ( intro ) {
               this.intro = intro;
@@ -207,7 +207,7 @@ export default {
       if ( this.questionnaire ) {
         this.student.addQuestionnaire( this.keys.data, this.questionnaire, /** @param {Error | string} err */ err => {
           if ( err ) {
-            this.errorText = err;
+            this.errorText = /** @type {string} */ (err);
           }
         } );
       }
@@ -215,7 +215,7 @@ export default {
       const id = Student.MULTICLASS ? this.task.id : this.task.cls;
       this.student.taskDone( id, this.keys.session, /** @param {Error | string} err */ err => {
         if ( err ) {
-          this.errorText = err;
+          this.errorText = /** @type {string} */ (err);
         }
       } );
     },

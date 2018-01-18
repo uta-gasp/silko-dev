@@ -80,7 +80,7 @@ export default {
       parent: this.cls,
       /** @type {Task[]} */
       tasks: null,
-      /** @type {Task[]} */
+      /** @type {string[]} IDs */
       locked: null,
 
       /** @type {Task} */
@@ -102,7 +102,7 @@ export default {
     },
     intros: {
       type: Array,
-      default: () => [],
+      default: () => /** @type {Array}*/ ([]),
     },
   },
 
@@ -110,7 +110,7 @@ export default {
 
     /** @returns {boolean} */
     isEditing() {
-      return this.toEdit || this.isCreating;
+      return !!this.toEdit || this.isCreating;
     },
 
     /** @returns {string} */
@@ -144,7 +144,7 @@ export default {
   methods: {
 
     loadTasks() {
-      this.parent.getTasks( ( err, tasks ) => {
+      this.parent.getTasks( /** @param {Error | string} err; @param {Task[]} tasks */ ( err, tasks ) => {
         if ( err ) {
           this.tasks = [];
           return this.setError( err, 'Failed to load tasks' );
@@ -152,7 +152,7 @@ export default {
 
         this.tasks = tasks.sort( dataUtils.byName );
 
-        DBUtils.areTasksLocked( this.tasks.map( task => task.id ), ( err, response ) => {
+        DBUtils.areTasksLocked( this.tasks.map( task => task.id ), /** @param {Error | string} err; @param {string[]} response */ ( err, response ) => {
           if ( err ) {
             return console.error( 'DBUtils.isTaskLocked:', err );
           }
@@ -181,6 +181,7 @@ export default {
 
     /** 
      * @param {Task} task
+     * @param {Event} e
      */
     edit( task, e ) {
       this.toEdit = task;
@@ -189,6 +190,7 @@ export default {
 
     /** 
      * @param {Task} task
+     * @param {Event} e
      */
     copy( task, e ) {
       this.toCopy = task;
@@ -196,10 +198,11 @@ export default {
       this.isTaskModified = false;
     },
 
+    /** @param {Task} e */
     save( e ) {
       const task = e;
       if ( this.toEdit ) {
-        this.toEdit.update( task, err => {
+        this.toEdit.update( task, /** @param {Error | string} err */ err => {
           this.$emit( 'saved', { err } );
           this.loadTasks();
         } );
@@ -208,7 +211,7 @@ export default {
         this.$emit( 'created', { err: 'A task with the same name exists already' } );
       }
       else {
-        this.parent.createTask( task, 'text', ( err, _ /* newTask */ ) => {
+        this.parent.createTask( task, 'text', /** @param {Error | string} err */ err => {
           this.$emit( 'created', { err } );
 
           if ( err ) {
@@ -220,13 +223,15 @@ export default {
       }
 
       this.isTaskModified = false;
-      this.closeEditor();
+      this.closeEditor( null );
     },
 
+    /** @param {Event} e */
     onTaskModified( e ) {
       this.isTaskModified = true;
     },
 
+    /** @param {{cancelled: boolean}} e */
     closeEditor( e ) {
       let canClose = true;
       if (e && this.isTaskModified) {
@@ -245,6 +250,7 @@ export default {
 
     /** 
      * @param {Task} task
+     * @param {Event} e
      */
     remove( task, e ) {
       this.toDelete = task;
@@ -252,27 +258,29 @@ export default {
 
     /** 
      * @param {string} id
+     * @param {Event} e
      * @returns {boolean}
      */
     isLocked( id, e ) {
       return this.locked === null || this.locked.indexOf( id ) >= 0;
     },
 
+    /** @param {{confirm: boolean}} e */
     removeWarningClosed( e ) {
       if ( e.confirm ) {
         const id = this.toDelete.id;
 
-        this.parent.deleteTask( this.toDelete, err => {
+        this.parent.deleteTask( this.toDelete, /** @param {Error | string} err */ err => {
           if ( err ) {
             return this.setError( err, 'Failed to delete the task' );
           }
           else {
-            DBUtils.deleteTaskSessions( id, ( err, _ /* response */ ) => {
+            DBUtils.deleteTaskSessions( id, /** @param {Error | string} err */ err => {
               if ( err ) {
                 return console.error( 'DBUtils.deleteTaskSessions:', err );
               }
             } );
-            DBUtils.deleteStudentTaskSessions( id, ( err, _ /* response */ ) => {
+            DBUtils.deleteStudentTaskSessions( id, /** @param {Error | string} err */ err => {
               if ( err ) {
                 return console.error( 'DBUtils.deleteStudentTaskSessions:', err );
               }
@@ -289,6 +297,7 @@ export default {
       this.toDelete = null;
     },
 
+    /** @param {Event} e */
     openNewTextBox( e ) {
       this.isCreating = true;
       this.isTaskModified = false;

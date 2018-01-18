@@ -259,12 +259,12 @@ export default {
   },
 
   created() {
-    eventBus.$on( 'login', _ => {
+    eventBus.$on( 'login', () => {
       this.tokens = i10n( 'home' );
       this.user = login.user;
       this.isConnecting = false;
     } );
-    eventBus.$on( 'logout', _ => {
+    eventBus.$on( 'logout', () => {
       this.user = null;
     } );
     eventBus.$on( 'lang', () => {

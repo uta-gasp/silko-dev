@@ -31,6 +31,9 @@
 </template>
 
 <script>
+import { Feedbacks } from '@/model/session/feedbacks';
+import { Question } from '@/model/session/question';
+
 import Player from '@/components/vis/Player.vue';
 import VisTitle from '@/components/vis/VisTitle.vue';
 
@@ -62,7 +65,7 @@ export default {
     },
 
     feedback: {   // model/session/Feedbacks
-      type: Object,
+      type: Feedbacks,
       default: null,
     },
 
@@ -113,7 +116,7 @@ export default {
         return '-';
       }
 
-      const correct = this.questionnaire.filter( question => {
+      const correct = /** @type {Question[]} */ (this.questionnaire).filter( question => {
         return question.answer.isCorrect;
       } ).length / this.questionnaire.length * 100;
       return correct.toFixed( 0 ) + '%';

@@ -44,7 +44,7 @@ export default class TextPresenter {
     /** @type {Syllabifier} */
     this._syllabifier = syllabifier;
 
-    /** @type {TextPage[]} */
+    /** @type {(TextPage | string[])[]} */
     this._pages = task.pages;
     /** @type {boolean} */
     this._hasInstructionPage = !!( firstPage && firstPage.length );
@@ -135,7 +135,15 @@ export default class TextPresenter {
     el.innerHTML = '';
 
     const page = this._pages[ this._pageIndex ];
-    const lines = page.lines || page;   // backward compatibility with format where Task.pages=[[String]]
+
+    /** @type {string[]} */
+    let lines;
+    if ('lines' in page) {
+      lines = /** @type {TextPage}*/ (page).lines;
+    }
+    else { // backward compatibility with format where Task.pages=[[String]]
+      lines = /** @type {string[]}*/ (page);
+    }
 
     lines.forEach( line => {
       el.appendChild( this._lineToElement( line ) );

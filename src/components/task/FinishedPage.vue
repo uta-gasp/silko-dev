@@ -6,12 +6,14 @@
 </template>
 
 <script>
+import Intro from '@/model/intro.js';
+
 export default {
   name: 'finished-page',
 
   props: {
     saving: Boolean,
-    texts: Object,
+    texts: Intro,
   },
 
   computed: {
@@ -22,7 +24,7 @@ export default {
   },
 
   methods: {
-
+    /** @param {Event} e */
     back( e ) {
       this.$router.replace( '../assignments' );
     },

@@ -30,7 +30,7 @@ export default {
   },
 
   methods: {
-
+    /** @param {Event} e */
     close( e ) {
       this.$emit( 'close', { cancelled: true } );
     },

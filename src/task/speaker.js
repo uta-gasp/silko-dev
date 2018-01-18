@@ -7,6 +7,7 @@ import SpeechFeedback from '@/model/session/speechFeedback.js';
 
 // ts-check-only
 import WordFocus from './wordFocus.js';
+import { SpeechOptions } from '@/model/session/feedbacks.js';
 
 const LONG_WORD_MIN_LENGTH = 7;
 const EXTRA_THRESHOLD_FOR_CHAR = 0.05;
@@ -14,10 +15,10 @@ const EXTRA_THRESHOLD_FOR_CHAR = 0.05;
 export default class Speaker {
 
   /**
-   * @param {SpeechFeedback} options 
+   * @param {SpeechOptions} options 
    */
   constructor( options ) {
-    /** @type {SpeechFeedback} */
+    /** @type {SpeechOptions} */
     this._options = { ...options };
     this._options.threshold.factor = 4;
 

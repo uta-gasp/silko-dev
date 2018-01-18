@@ -67,13 +67,13 @@ export default {
 
   props: {
     task: {
-      type: Object,
-      default: () => { return {}; },
+      type: Task,
+      default: null,
     },
   },
 
   computed: {
-    /** @returns {{syllab: SyllabOptions, speech: SpeechOptions, syllabExceptions: string[]}} */
+    /** @returns {{syllab: SyllabOptions, speech: SpeechOptions, syllabExceptions: string}} */
     model() {
       const result = {
         syllab: this.syllab,

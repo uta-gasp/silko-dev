@@ -133,7 +133,7 @@ import WordReplay from '@/components/vis/WordReplay.vue';
 import StudentsSummary from '@/components/vis/StudentsSummary.vue';
 import QuestionnaireResults from '@/components/vis/QuestionnaireResults.vue';
 
-// ts-check-onlu
+// ts-check-only
 import ModelData from '@/model/data.js';
 import ModelClass from '@/model/class.js';
 import Session from '@/vis/data/session.js';

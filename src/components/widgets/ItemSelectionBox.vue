@@ -61,6 +61,9 @@ import Subitem from '@/utils/selectionBoxItem.js';
  * @typedef {Record<string, Group>} Groups
  */
 
+ /** @type {Item} */
+const __needed_only_to_make_vscode_happy_happy_about_Item__ = null;
+
 /**
  * @fires accept
  */
@@ -105,7 +108,8 @@ export default {
   computed: {
     /** @returns {boolean} */
     hasItemsSelected() {
-      return this.items.some( item => item.subitems.some( subitem => subitem.selected ) );
+      const items = /** @type {Array<Item>} */ (this.items);
+      return items.some( item => item.subitems.some( subitem => subitem.selected ) );
     },
   },
 
@@ -116,7 +120,7 @@ export default {
         return null;
       }
 
-      const groups = { '_': { items: [], hidden: false } };
+      const groups = { '_': { items: /** @type {Subitem[]} */ ([]), hidden: false } };
 
       this.currentItem.subitems.forEach( subitem => {
         if ( !subitem.group ) {
@@ -135,6 +139,7 @@ export default {
 
     /** 
      * @param {Item} item 
+     * @param {Event} e
      */
     selectItem( item, e ) {
       this.currentItem = item;
@@ -172,6 +177,7 @@ export default {
 
     /** 
      * @param {Group} group 
+     * @param {Event} e
      */
     toggleItemsVisibility( group, e ) {
       group.hidden = !group.hidden;
@@ -179,6 +185,7 @@ export default {
 
     /** 
      * @param {Subitem} subitem 
+     * @param {MouseEvent} e
      */
     selectMultipleSubitems( subitem, e ) {
       if ( e.shiftKey ) {
@@ -200,10 +207,11 @@ export default {
     /** 
      * @param {Subitem} subitem 
      * @param {number} index 
+     * @param {MouseEvent} e
      */
     selectSubitem( subitem, index, e ) {
       if ( !this.multiple ) {
-        this.items.forEach( item => {
+        /** @type {Array<Item>} */ (this.items).forEach( item => {
           item.subitems.forEach( subitem => {
             subitem.selected = false;
           } );
@@ -233,23 +241,26 @@ export default {
       this.lastSelectionGroup = subitem.group;
     },
 
+    /** @param {Event} e */
     selectAllSubitems( e ) {
       this.currentItem.subitems.forEach( subitem => {
         subitem.selected = true;
       } );
     },
 
+    /** @param {Event} e */
     removeAllSubitems( e ) {
       this.currentItem.subitems.forEach( subitem => {
         subitem.selected = false;
       } );
     },
 
+    /** @param {Event} e */
     accept( e ) {
       const selected = {};
       let selectedOnly = null;
 
-      this.items.forEach( item => {
+      /** @type {Array<Item>} */ (this.items).forEach( item => {
         item.subitems.forEach( subitem => {
           if ( subitem.selected ) {
             selected[ subitem.id ] = subitem.text;
@@ -269,7 +280,7 @@ export default {
 
   created() {
     if ( this.items.length === 1 ) {
-      this.selectItem( this.items[0] );
+      this.selectItem( this.items[0], null );
     }
   },
 };

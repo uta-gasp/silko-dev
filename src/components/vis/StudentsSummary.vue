@@ -24,6 +24,8 @@
 </template>
 
 <script>
+import { Feedbacks, SyllabOptions } from '@/model/session/feedbacks.js';
+
 import Regressions from '@/vis/regressions.js';
 import sgwmController from '@/vis/sgwmController.js';
 
@@ -36,7 +38,6 @@ import Options from '@/components/vis/Options.vue';
 import Student from '@/model/student.js';
 import Data from '@/model/data.js';
 import DataPage from '@/model/data/dataPage.js';
-import { Feedbacks } from '@/model/session/feedbacks.js';
 import VisData from '@/vis/data/data.js';
 
 /**
@@ -162,7 +163,7 @@ export default {
           data: record.data,
           feedbacks: record.session.feedbacks,
         };
-
+        
         if ( students.has( record.student.id ) ) {
           const student = students.get( record.student.id );
           student.sessions.push( session );
@@ -214,7 +215,7 @@ export default {
 
       student.sessions.forEach( session => {
         const pages = session.data.pages;
-        const syllabifier = session.feedbacks.syllabification.enabled ? new Syllabifier( session.feedbacks.syllabification ) : null;
+        const syllabifier = session.feedbacks.syllabification.enabled ? new Syllabifier( SyllabOptions.from( session.feedbacks.syllabification ) ) : null;
 
         /** @type {DataPage} */
         let firstPage;

@@ -23,6 +23,17 @@ interface ETUDCustomValueType {
   device: string;
 }
 
+interface ETUDState {
+  device: string;
+  isServiceRunning: boolean;
+  isBusy: boolean;
+  isConnected: boolean;
+  isCalibrated: boolean;
+  isTracking: boolean;
+  isStopped: boolean;
+  isDisconnected: boolean;
+}
+
 interface ETUDCustomValueCallbackArg {
   code: number;
   value: any;

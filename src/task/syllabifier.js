@@ -4,6 +4,7 @@ import loggerFactory from '@/utils/logger.js';
 
 // ts-check-only
 import WordFocus from './wordFocus.js';
+import { SyllabOptions } from '@/model/session/feedbacks.js';
 
 const logger = loggerFactory( 'syllabifier' );
 
@@ -14,10 +15,10 @@ const EXTRA_THRESHOLD_FOR_CHAR = 0.05;
 export default class Syllabifier {
 
   /**
-   * @param {SyllabificationFeedback} options 
+   * @param {SyllabOptions} options 
    */
   constructor( options ) {
-    /** @type {SyllabificationFeedback} */
+    /** @type {SyllabOptions} */
     this._options = { ...options };
     this._options.threshold.factor = 4;
 

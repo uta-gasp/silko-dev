@@ -30,6 +30,19 @@ export class SyllabOptions {
     this.threshold = null;
   }
 
+  /**
+   * @param {SyllabificationFeedback} feedback 
+   * @returns {SyllabOptions}
+   */
+  static from( feedback ) {
+    const result = new SyllabOptions();
+    result.language = feedback.language;
+    result.mode = feedback.mode;
+    result.threshold = feedback.threshold;
+    result.temporary = feedback.temporary;
+    result.exceptions = feedback.exceptions;
+    return result;
+  }
 }
 
 export class SpeechOptions {

@@ -52,15 +52,15 @@ export default {
   },
 
   methods: {
-
+    /** @param {Event} e */
     reject( e ) {
       this.$emit( 'close', { confirm: false, data: this.data } );
     },
 
+    /** @param {Event} e */
     confirm( e ) {
       this.$emit( 'close', { confirm: true, data: this.data } );
     },
-
   },
 };
 </script>

@@ -5,7 +5,7 @@
 
 /**
  * @typedef {Function} GTCallback
- * @param {any} arg
+ * @property {any} arg
  */
 
 const RECONNECT_INTERVAL = 3000;
@@ -80,7 +80,7 @@ class GazeTracking {
       },
     }, {
       /** 
-       * @param {any} state 
+       * @param {ETUDState} state 
        * */ 
       state: state => {
         lastState = state;

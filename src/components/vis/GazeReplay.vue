@@ -2,7 +2,7 @@
 import dataUtils from '@/utils/data-utils.js';
 
 import { OptionsCreator, OptionGroup, OptionItem } from '@/vis/optionsCreator.js';
-import Painter from '@/vis/painter.js';
+import { Painter } from '@/vis/painter.js';
 import Metric from '@/vis/metric.js';
 import ReplayTrack from '@/vis/replayTrack.js';
 
@@ -85,7 +85,7 @@ export default {
       this.isWarningMessageVisible = false;
 
       if ( !this.painter ) {
-        this.painter = new Painter( this.$refs.canvas, {
+        this.painter = new Painter( /** @type {HTMLCanvasElement}*/ (this.$refs.canvas), {
           syllab: this.defaultFeedback.syllabification,
         } );
         this.painter.setScreenSize( this.data.records[0].session.screen );
@@ -121,7 +121,7 @@ export default {
         }
 
         this.tracks.push( new ReplayTrack(
-          this.$refs.root,
+          /** @type {HTMLElement} */ (this.$refs.root),
           name,
           record.data.pages,
           this.painter.offset,
@@ -143,11 +143,12 @@ export default {
           this.pageIndex, {  // callbacks
             fixation: () => {
             },
-            completed: reason => {
+            completed: /** @param {string} reason */ reason => {
               this.isWarningMessageVisible = !!reason;
               const name = {
                 color: track.color,
                 index: ti,
+                text: ''
               };
               this.painter.checkName( name, {
                 fontSize: UI.nameFontSize,

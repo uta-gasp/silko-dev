@@ -24,7 +24,8 @@ import TemporalNotification from '@/components/widgets/TemporalNotification.vue'
 import RemoveWarning from '@/components/widgets/RemoveWarning.vue';
 
 // ts-check-only
-import Session from '@/model/session.js';
+import Session from '@/vis/data/session.js';
+import Student from '@/vis/data/student.js';
 
 export default {
   name: 'session-edit-box',
@@ -44,8 +45,8 @@ export default {
   },
 
   props: {
-    student: {     // [_Student]
-      type: Object,
+    student: {
+      type: Student,
       required: true,
     },
   },
@@ -79,7 +80,7 @@ export default {
 
     deleteSession() {
       const sessionID = this.sessionToDelete.ref.id;
-      this.student.ref.deleteSession( sessionID, err => {
+      this.student.ref.deleteSession( sessionID, /** @param {Error | string} err */ err => {
         if ( err ) {
           return this.setError( err, 'Failed to delete the session' );
         }
@@ -95,6 +96,7 @@ export default {
       this.sessionToDelete = null;
     },
 
+    /** @param {{confirm: boolean}} e */
     removeWarningClosed( e ) {
       if ( e.confirm ) {
         this.deleteSession();

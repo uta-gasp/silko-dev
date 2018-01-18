@@ -7,7 +7,7 @@
 
     control-panel(
       :title="title"
-      :feedback="defaultFeedback"
+      :feedback="feedback"
       :questionnaire="data.records.length === 1 ? defaultQuestionnaire : null"
       :text-length="textLength"
       :initial-page-index="initialPageIndex"
@@ -28,6 +28,7 @@
 <script>
 import { OptionsCreator, OptionGroup, OptionItem } from '@/vis/optionsCreator.js';
 import sgwmController from '@/vis/sgwmController.js';
+import { Feedbacks } from '@/model/session/feedbacks';
 
 import ControlPanel from '@/components/vis/controlPanel.vue';
 import Options from '@/components/vis/Options.vue';
@@ -102,6 +103,10 @@ export default {
     /** @returns {string} */
     title() {
       return '';
+    },
+
+    feedback() {
+      return new Feedbacks( this.defaultFeedback.speech, this.defaultFeedback.syllabification );
     },
   },
 

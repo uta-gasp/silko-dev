@@ -1,12 +1,17 @@
-/**
- * @typedef {Object} QuestionType
- * @property {string} name
- * @property {string} text
- */
+export class QuestionType {
+  /**
+   * @param {string} name 
+   * @param {string} text 
+   */
+  constructor( name, text) {
+    this.name = name;
+    this.text = text;
+  }
+}
 
 const TYPES = {
-  text: { name: 'text', text: 'whole text' },
-  word: { name: 'word', text: 'long-gazed word' },
+  text: new QuestionType( 'text', 'whole text' ),
+  word: new QuestionType( 'word', 'long-gazed word' ),
 };
 
 export class AnswerCandidate {
@@ -35,7 +40,7 @@ export class Question {
     this.word = word;
     this.question = question;
     this.answers = answers;
-    /** @type {string} */
+    /** @type {AnswerCandidate} */
     this.answer = null;
   }
 

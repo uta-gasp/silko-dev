@@ -4,7 +4,7 @@ import Metric from '@/vis/metric.js';
 import Colors from '@/vis/colors.js';
 
 // ts-check-only
-import SyllabificationFeedback from '@/model/session/syllabificationFeedback.js';
+import { SyllabOptions } from '@/model/session/feedbacks.js';
 import Font from '@/model/session/font.js';
 
 /**
@@ -109,11 +109,11 @@ const MERGED_FIXATION_BORDER_COLOR = '#808';
 const CHECK_MARK = String.fromCharCode( 0x2713 );
 const NO_DATA_MARK = String.fromCharCode( 0x26A0 );
 
-export default class Painter {
+export class Painter {
 
   /**
    * @param {HTMLCanvasElement} el 
-   * @param {{syllab: SyllabificationFeedback}} settings 
+   * @param {{syllab: SyllabOptions}} settings 
    */
   constructor( el, settings ) {
     this._width = document.body.offsetWidth;

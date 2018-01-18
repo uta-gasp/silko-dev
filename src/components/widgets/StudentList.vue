@@ -61,6 +61,9 @@
 <script>
 import dataUtils from '@/utils/data-utils.js';
 
+import Class from '@/model/class.js';
+import Teacher from '@/model/teacher.js';
+
 import ActionError from '@/components/mixins/actionError';
 import ActionSuccess from '@/components/mixins/actionSuccess';
 
@@ -70,7 +73,6 @@ import ItemSelectionBox from '@/components/widgets/ItemSelectionBox.vue';
 import TemporalNotification from '@/components/widgets/TemporalNotification.vue';
 
 // ts-check-only
-import Class from '@/model/class.js';
 import Student from '@/model/student.js';
 import Task from '@/model/task.js';
 import School from '@/model/school.js';
@@ -131,11 +133,11 @@ export default {
 
   props: {
     cls: {
-      type: Object,
+      type: Class,
       default: null,
     },
     teacher: {
-      type: Object,
+      type: Teacher,
       default: null,
     },
     refresh: {

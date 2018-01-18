@@ -50,7 +50,7 @@ export class TextPageImageEvent {
   setMeta( meta, type ) {
     Object.getOwnPropertyNames( this ).forEach( prop => {
       const id = prop === 'name' ? type : `${type}-${prop}`;
-      meta[ id ] = this[ prop ];
+      meta[ id ] = /** @type {any} */ (this)[ prop ];
     } );
   }
 
@@ -123,7 +123,7 @@ export class TextPageImage {
   /** 
    * @param {ImageCreateParams} param0
    */
-  constructor( /** @type {{src: string, page: number, location: string, on: TextPageImageEvent & TextPageImageFixationEvent, off: TextPageImageEvent & TextPageImageDelayEvent}} */ 
+  constructor( /** @type {{src: string, page: number, location: string, on: TextPageImageEvent | TextPageImageFixationEvent, off: TextPageImageEvent | TextPageImageDelayEvent}} */ 
     { src, page, location, on, off } ) {
     /** @type {string} */
     this.src = src;
@@ -131,9 +131,9 @@ export class TextPageImage {
     this.page = page;
     /** @type {string} */
     this.location = location;
-    /** @type {TextPageImageEvent & TextPageImageFixationEvent} */
+    /** @type {TextPageImageEvent | TextPageImageFixationEvent} */
     this.on = on;
-    /** @type {TextPageImageEvent & TextPageImageDelayEvent} */
+    /** @type {TextPageImageEvent | TextPageImageDelayEvent} */
     this.off = off;
 
     this.file = null;

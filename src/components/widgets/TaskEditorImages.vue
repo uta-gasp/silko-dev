@@ -182,7 +182,7 @@ export default {
 
   data() {
     return {
-      /** @type {TextPageImage} */
+      /** @type {TextPageImage[]} */
       images: [],
 
       /** @type {File} */
@@ -215,8 +215,8 @@ export default {
 
   props: {
     task: {
-      type: Object,
-      default: () => { return {}; },
+      type: Task,
+      default: null,
     },
 
     currentText: {
@@ -252,6 +252,7 @@ export default {
 
   methods: {
     listImages() {
+      /** @type {TextPageImage[]} */
       const images = [];
       if ( !this.task ) {
         return;
@@ -277,7 +278,7 @@ export default {
      */
     remove( index ) {
       const deletedImage = this.images.splice( index, 1 )[0];
-      Task.deleteImage( deletedImage, err => {
+      Task.deleteImage( deletedImage, /** @param {Error | string} err */ err => {
         if ( err ) {
           this.setError( err, 'Cannot delete the image' );
         }
@@ -326,7 +327,7 @@ export default {
     },
 
     /** 
-     * @param {TextPageImage & {file: HTMLImageElement}} image 
+     * @param {TextPageImage} image 
      * @returns {string | number}
      */
     getImagePage( image ) {
@@ -342,7 +343,7 @@ export default {
     },
 
     /** 
-     * @param {TextPageImageEvent} imageShowEvent
+     * @param {TextPageImageEvent} event
      * @returns {string}
      */
     formatEventName( event ) {
@@ -358,12 +359,12 @@ export default {
     },
 
     /** 
-     * @param {TextPageImageEvent} imageShowEvent
+     * @param {TextPageImageFixationEvent | TextPageImageDelayEvent} event
      * @returns {string}
      */
     formatEventParams( event ) {
       if ( event.name === TextPageImage.EVENT.fixation ) {
-        return `"${event.word}"\nlonger than ${event.duration} ms`;
+        return `"${/** @type {TextPageImageFixationEvent}*/ (event).word}"\nlonger than ${event.duration} ms`;
       }
       else if ( event.name === TextPageImage.EVENT.delay ) {
         return `${event.duration} seconds`;
@@ -373,6 +374,7 @@ export default {
       }
     },
 
+    /** @param {DragEvent} e */
     dropFile( e ) {
       this.isDraggingFileOverDropzone = false;
       const dt = e.dataTransfer;
@@ -380,8 +382,12 @@ export default {
       this.selectFile( { target: { files } } );
     },
 
+    /** 
+     * @param {DragEvent | {target: {files: FileList}}} e 
+     * @returns {*}
+     */
     selectFile( e ) {
-      const file = e.target.files[0];
+      const file = /** @type {HTMLInputElement} */ (e.target).files[0];
       if ( !file ) {
 
       }
@@ -396,22 +402,25 @@ export default {
       }
     },
 
+    /** @param {Event} e */
     uploadImage( e ) {
       this.uploadProgress = 0;
 
+      const onEvent = this.constructImageEvent( this.on );
+      const offEvent = this.constructImageEvent( this.off );
       const image = new TextPageImage( {
         src: null,
-        page: this.page,
+        page: +this.page,
         location: this.location,
-        on: this.constructImageEvent( this.on ),
-        off: this.constructImageEvent( this.off ),
+        on: onEvent,
+        off: offEvent,
       } );
 
       Task.uploadImage( this.selectedFile, image.meta,
         percentage => {
           this.uploadProgress = percentage;
         },
-        ( err, url ) => {
+        /** @param {Error | string} err; @param {string} url */ ( err, url ) => {
           this.uploadProgress = -1;
 
           if ( err ) {
@@ -430,13 +439,14 @@ export default {
       );
     },
 
+    /** @param {Event} e */
     cancel( e ) {
       this.selectedFile = null;
     },
 
     /** 
      * @param {string} name
-     * @returns {TextPageImageEvent}
+     * @returns {TextPageImageEvent | TextPageImageFixationEvent | TextPageImageDelayEvent}
      */
     constructImageEvent( name ) {
       if ( name === TextPageImage.EVENT.fixation ) {

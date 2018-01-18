@@ -4,7 +4,7 @@ import dataUtils from '@/utils/data-utils.js';
 import VisPlot from '@/components/vis/VisPlot.vue';
 
 import { OptionsCreator, OptionGroup, OptionItem } from '@/vis/optionsCreator.js';
-import Painter from '@/vis/painter.js';
+import { Painter } from '@/vis/painter.js';
 import Metric from '@/vis/metric.js';
 import Regressions from '@/vis/regressions.js';
 
@@ -83,7 +83,7 @@ export default {
   methods: {
     changePage() {
       if ( !this.painter ) {
-        this.painter = new Painter( this.$refs.canvas, {
+        this.painter = new Painter( /** @type {HTMLCanvasElement} */ (this.$refs.canvas), {
           syllab: this.defaultFeedback.syllabification,
         } );
         this.painter.setFont( this.record.session.font );

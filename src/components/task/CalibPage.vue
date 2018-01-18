@@ -29,6 +29,8 @@
 <script>
 import gazeTracking from '@/utils/gazeTracking.js';
 
+import Intro from '@/model/intro.js';
+
 /**
  * @fires close
  */
@@ -44,13 +46,14 @@ export default {
   },
 
   props: {
-    texts: Object,
+    texts: Intro,
+    required: true,
   },
 
   computed: {
-    /** @returns {string} */
+    /** @returns {string[]} */
     calibInstruction() {
-      return this.texts.calibInstruction ? this.texts.calibInstruction.split( '\n' ) : '';
+      return this.texts.calibInstruction ? this.texts.calibInstruction.split( '\n' ) : [];
     },
 
     /** @returns {string} */
@@ -70,23 +73,28 @@ export default {
   },
 
   methods: {
+    /** @param {Event} e */
     showETUDOptions( e ) {
       gazeTracking.showOptions();
     },
 
+    /** @param {Event} e */
     reload( e ) {
       this.$router.replace( '/assignments' );
       // window.location.assign( window.location.origin );
     },
 
+    /** @param {Event} e */
     calibrate( e ) {
       this.$emit( 'close', { skip: false } );
     },
 
+    /** @param {Event} e */
     skip( e ) {
       this.$emit( 'close', { skip: true } );
     },
 
+    /** @param {Event} e */
     cancel( e ) {
       this.$router.replace( '/assignments' );
     },

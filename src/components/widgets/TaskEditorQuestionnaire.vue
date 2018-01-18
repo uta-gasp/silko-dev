@@ -49,7 +49,10 @@
 </template>
 
 <script>
-import { Question, AnswerCandidate } from '@/model/session/question.js';
+import { Question, AnswerCandidate, QuestionType } from '@/model/session/question.js';
+
+// ts-check-only
+import Task from '@/model/task.js';
 
 /**
  * @fires input
@@ -59,7 +62,8 @@ export default {
 
   data() {
     return {
-      type: '',
+      /** @type {QuestionType} */
+      type: null,
       word: '',
       question: '',
       /** @type {AnswerCandidate[]} */
@@ -74,17 +78,17 @@ export default {
 
   props: {
     task: {
-      type: Object,
-      default: () => { return {}; },
+      type: Task,
+      default: null,
     },
   },
 
   computed: {
     /** @returns {boolean} */
     canAdd() {
-      return this.type === this.types.word ? this.word.length > 0 : true &&
+      return this.type === this.types[ 'word' ] ? this.word.length > 0 : true &&
           this.question.length > 5 &&
-          this.answers.every( answer => answer.text.length );
+          this.answers.every( answer => !!answer.text.length );
     },
 
     /** @returns {{questionnaire: Question[]}} */
@@ -115,10 +119,11 @@ export default {
       return ['', '', '', ''].map( ( _, index ) => ( { text: '', isCorrect: index === 0 } ) );
     },
 
+    /** @param {Event} e */
     add( e ) {
       this.questions.push( new Question(
         this.type.name,
-        this.type === this.types.word ? this.word : '',
+        this.type === this.types[ 'word' ] ? this.word : '',
         this.question,
         this.answers,
       ) );
@@ -145,7 +150,7 @@ export default {
   },
 
   created() {
-    this.type = this.types.text;
+    this.type = this.types[ 'text' ];
     this.answers = this.getEmptyAnswers();
   },
 };

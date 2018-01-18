@@ -22,6 +22,10 @@
 import TaskText from '@/components/widgets/TaskText.vue';
 import TaskImages from '@/components/widgets/TaskImages.vue';
 
+import Intro from '@/model/intro.js';
+import Task from '@/model/task.js';
+import Student from '@/model/student.js';
+
 import TextPresenter from '@/task/textPresenter.js';
 import FeedbackProvider from '@/task/feedbackProvider.js';
 import DataCollector from '@/task/dataCollector.js';
@@ -70,9 +74,18 @@ export default {
   },
 
   props: {
-    texts: Object,
-    task: Object,
-    student: Object,
+    texts: {
+      type: Intro,
+      required: true,
+    },
+    task: {
+      type: Task,
+      required: true,
+    },
+    student: {
+      type: Student,
+      required: true,
+    },
   },
 
   computed: {
@@ -91,7 +104,7 @@ export default {
       return this.texts.finish || 'Finish';
     },
 
-    /** @returns {DataImage[]} */
+    /** @returns {TextPageImage[]} */
     images() {
       if ( !this.textPresenter ) {
         return [];

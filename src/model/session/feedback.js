@@ -24,11 +24,11 @@ export class Feedback {
   constructor( options ) {
     this.enabled = options.enabled;
     this.language = options.language;
-    this.threshold = {
+    this.threshold = Object.assign( {}, options.threshold );  /*{
       value: options.threshold.value,
       smart: options.threshold.smart,
       adjustForWordLength: options.threshold.adjustForWordLength,
-    };
+    };*/
   }
 
 }
