@@ -259,6 +259,12 @@ export default {
   },
 
   created() {
+    eventBus.$on( 'connected', /** @param {{user: UserBase}} e */ e => {
+      this.isConnecting = false;
+      if (e.user) {
+        this.user = e.user;
+      }
+    } );
     eventBus.$on( 'login', () => {
       this.tokens = i10n( 'home' );
       this.user = login.user;
@@ -272,17 +278,7 @@ export default {
     } );
 
     this.user = login.user;
-    if (this.user) {
-      this.isConnecting = false;
-    }
-    else {
-      login.events.addListener( 'connected', /** @param {{user: UserBase}} e */ e => {
-        this.isConnecting = false;
-        if (e.user) {
-          this.user = e.user;
-        }
-      });
-    }
+    this.isConnecting = !login.isConnected;
   },
 };
 </script>

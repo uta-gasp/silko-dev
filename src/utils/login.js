@@ -5,14 +5,6 @@ import UserBase from '@/db/userBase';
 
 class Login {
 
-  constructor() {
-    this._events = new EventEmitter();
-    
-    db.events.addListener( 'connected', e => {
-      this._events.emitEvent( 'connected', e );
-    });
-  }
-
   /**
    * @param {string} email 
    * @param {string} password 
@@ -40,11 +32,11 @@ class Login {
     return db.user;
   }
 
-  /** @returns {EventEmitter} */
-  get events() {
-    return db.events;
+  /** @returns {boolean} */
+  get isConnected() {
+    return db.isConnected;
   }
-  
+
   /** @returns {string} */
   get DEFAULT_EMAIL_DOMAIN() {
     return db.FAKE_EMAIL_DOMAIN;

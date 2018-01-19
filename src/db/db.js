@@ -32,10 +32,17 @@ function ctor( obj ) {
   return Object.getPrototypeOf( obj ).constructor;
 }
 
+/**
+ * @fires connected
+ * @fires login - global
+ * @fires logout - global
+ */
 class DB {
 
   // Constructor
   constructor() {
+    this._connected = false;
+
     if ( !window['firebase'] ) {
       window.alert( 'Cannot access Firebase' );
       return;
@@ -72,13 +79,6 @@ class DB {
     this.currentPassword = '';
 
     this.auth.onAuthStateChanged( this._onUserChanged.bind( this ) );
-
-    this._events = new EventEmitter();
-  }
-
-  /** @returns {EventEmitter} */
-  get events() {
-    return this._events;
   }
 
   /** @returns {UserBase} - current user */
@@ -468,7 +468,8 @@ class DB {
    * @param {FBUser} user 
    */
   _onUserChanged( user ) {
-    this._events.emitEvent( 'connected', [ { user } ] );
+    eventBus.$emit( 'connected', { user } );
+    this._connected = true;
 
     if ( user ) {
       // switch user back if needed
