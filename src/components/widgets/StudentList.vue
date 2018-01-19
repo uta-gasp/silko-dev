@@ -124,10 +124,6 @@ export default {
 
       /** @type {Element} */
       activeMenu: null,
-
-      onBodyClick: () => {
-        this.hideTaskList();
-      },
     };
   },
 
@@ -295,6 +291,8 @@ export default {
      * @param {Event} e
      */
     addAssignment( student, taskID, e ) {
+      this.hideTaskList();
+
       student.addAssignment( taskID, this.currentClass.id, /** @param {Error | string} err */ err => {
         if ( err ) {
           this.setError( err, 'Failed to add the assignment' );
@@ -407,11 +405,11 @@ export default {
   },
 
   created() {
-    window.document.body.addEventListener( 'click', this.onBodyClick );
+    window.document.body.addEventListener( 'click', this.hideTaskList );
   },
 
   destroyed() {
-    window.document.body.removeEventListener( 'click', this.onBodyClick );
+    window.document.body.removeEventListener( 'click', this.hideTaskList );
   },
 
   mounted() {
