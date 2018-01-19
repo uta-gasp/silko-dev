@@ -125,7 +125,6 @@ export default {
     },
     task: {
       type: Task,
-      required: true,
       default: null,
     },
     source: {

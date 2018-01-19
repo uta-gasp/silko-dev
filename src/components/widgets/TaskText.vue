@@ -11,7 +11,7 @@ export default {
     return {
       textStyle: {
         'color': '#775',
-        'font-family': this.fontname + ', Arial, sans-serif',
+        'font-family': `${this.fontname ? this.fontname : 'Calibri'}, Arial, sans-serif`,
         'font-size': '20pt',
         'font-style': 'normal',
         'font-weight': 'bold',

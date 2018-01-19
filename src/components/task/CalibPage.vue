@@ -46,8 +46,10 @@ export default {
   },
 
   props: {
-    texts: Intro,
-    required: true,
+    texts: {
+      type: Object, // Intro,
+      required: true,
+    }
   },
 
   computed: {
