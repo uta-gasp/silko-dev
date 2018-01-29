@@ -1,19 +1,19 @@
 import Vue from 'vue';
-import Router from 'vue-router';
+import VueRouter from 'vue-router';
 
-import Home from '@/components/tabs/Home';
-import Schools from '@/components/tabs/Schools';
-import Teachers from '@/components/tabs/Teachers';
-import Students from '@/components/tabs/Students';
-import Instructions from '@/components/tabs/Instructions';
-import Classes from '@/components/tabs/Classes';
-import Results from '@/components/tabs/Results';
-import Assignments from '@/components/tabs/Assignments';
-import Assignment from '@/components/tabs/Assignment';
+import Home from '@/components/tabs/Home.vue';
+import Schools from '@/components/tabs/Schools.vue';
+import Teachers from '@/components/tabs/Teachers.vue';
+import Students from '@/components/tabs/Students.vue';
+import Instructions from '@/components/tabs/Instructions.vue';
+import Classes from '@/components/tabs/Classes.vue';
+import Results from '@/components/tabs/Results.vue';
+import Assignments from '@/components/tabs/Assignments.vue';
+import Assignment from '@/components/tabs/Assignment.vue';
 
-Vue.use( Router );
+Vue.use( VueRouter );
 
-export default new Router( {
+export default new VueRouter( {
   routes: [
     { path: '/', component: Home },
     { path: '/schools', component: Schools },
