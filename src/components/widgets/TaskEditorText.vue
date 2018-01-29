@@ -2,7 +2,7 @@
   #task-editor-text.field
     p.control
       .columns.is-inlined
-        .column(v-if="isNewTask")
+        .column(v-if="isNameEditable")
           label.label Name
           input.input(type="text" placeholder="Name" v-model="name")
         .column.is-narrow
@@ -125,6 +125,9 @@ export default {
       type: Task,
       default: null,
     },
+    isNameEditable: {
+      type: Boolean,
+    },
     intros: {
       type: Array,
       default: /** @returns {Intro[]} */ () => [],
@@ -132,11 +135,6 @@ export default {
   },
 
   computed: {
-
-    /** @returns {boolean} */
-    isNewTask() {
-      return !( this.task && this.task.name );
-    },
 
     /** @returns {{name: string, alignment: string, fontname: string, intro: string, text: string}} */
     currentModel() {

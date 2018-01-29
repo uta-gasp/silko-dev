@@ -9,6 +9,7 @@
       task-editor-text(v-show="currentTab === tabs.text"
         :task="ref"
         :intros="intros"
+        :is-name-editable="isTaskNameEditable"
         @input="setTextInput")
 
       task-editor-feedback(v-show="currentTab === tabs.feedback"
@@ -140,6 +141,11 @@ export default {
 
   computed: {
 
+    /** @returns {boolean} */
+    isTaskNameEditable() {
+      return !this.ref || !this.ref.name || !!this.source;
+    },
+    
     /** @returns {boolean} */
     isNameValid() {
       return this.name.length > 1;
