@@ -37,8 +37,9 @@ import Task from '@/model/task.js';
 import TextPresenter from '@/task/textPresenter.js';
 import FeedbackProvider from '@/task/feedbackProvider.js';
 
+import { TextPageImage, Word } from '@/model/task/textPageImage.js';
+
 // ts-check-only
-import { TextPageImage } from '@/model/task/textPageImage.js';
 import Vue from 'vue';
 
 /**
@@ -58,7 +59,7 @@ export default {
       textPresenter: null,
       /** @type {FeedbackProvider} */
       feedbackProvider: null,
-      fixatedWord: '',
+      fixatedWord: null,
     };
   },
 
@@ -100,7 +101,7 @@ export default {
 
     /** @returns {{word: string, duration: number}} */
     fixation() {
-      return { word: this.fixatedWord, duration: 999999 };
+      return { word: this.fixatedWord, duration: 900000 + Math.floor( Math.random() * 100000 ) };
     },
   },
 
@@ -114,12 +115,14 @@ export default {
 
     /** @param {Event} e */
     next( e ) {
+      this.fixatedWord = null;
       this.textPresenter.nextPage();
       this.feedbackProvider.reset();
     },
 
     /** @param {Event} e */
     prev( e ) {
+      this.fixatedWord = null;
       this.textPresenter.prevPage();
       this.feedbackProvider.reset();
     },
@@ -154,7 +157,7 @@ export default {
       if ( /** @type {Element} */ (e.target).classList.contains( 'word' ) ) {
         const text = this.feedbackProvider.syllabifier.unprepare( /** @type {Element} */ (e.target).textContent );
         if ( text ) {
-          this.fixatedWord = text;
+          this.fixatedWord = new Word( text );
         }
       }
     },

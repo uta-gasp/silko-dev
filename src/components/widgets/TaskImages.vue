@@ -8,8 +8,8 @@
 <script>
 import ImageController from '@/task/imageController.js';
 
-// ts-check-onlu
-import { TextPageImage } from '@/model/task/textPageImage.js';
+// ts-check-only
+import { TextPageImage, Word } from '@/model/task/textPageImage.js';
 import DataImage from '@/model/data/image.js';
 
 /**
@@ -48,7 +48,8 @@ export default {
     },
 
     fixation: {
-      type: Object, // { word: String, duration: number }
+      type: Object, // { word: Word, duration: number }
+      default: null
     },
   },
 
@@ -76,7 +77,7 @@ export default {
     },
 
     /**
-     * @param {{word: string, duration: number}} fixation
+     * @param {{word: Word, duration: number}} fixation
      */
     fixation( fixation ) {
       this.imageController.fixate( fixation.word, fixation.duration );

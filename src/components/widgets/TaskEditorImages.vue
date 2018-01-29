@@ -93,9 +93,9 @@
               .field.is-horizontal(v-show="on === 'fixation'")
                 .field-label.is-normal.is-inner-label.no-wrap at
                 .field-body.select-container
-                  .select
-                    select(v-model="fixationWord")
-                      option(v-for="word in currentWords" :value="word" :key="word") {{ word }}
+                  .select.is-multiple
+                    select(v-model="fixationWords" multiple)
+                      option(v-for="word in currentWords" :value="word" :key="word.text + Math.random()") {{ word.text }}
                 .field-label.is-normal.is-inner-label.no-wrap longer than
                 .field-body.number-container
                   input.input.is-number(
@@ -125,7 +125,8 @@ import Task from '@/model/task.js';
 import { TextPageImage,
   TextPageImageEvent,
   TextPageImageFixationEvent,
-  TextPageImageDelayEvent } from '@/model/task/textPageImage.js';
+  TextPageImageDelayEvent,
+  Word } from '@/model/task/textPageImage.js';
 
 import ActionError from '@/components/mixins/actionError';
 
@@ -139,25 +140,32 @@ function getPages( text ) {
   return text.split( '\n\n' ).filter( page => !!page.trim() );
 }
 
+/**
+ * @param {string} text
+ * @returns {string}
+ */
+function removeFormatting( text ) {
+  return text.split( '|' )[0];
+}
+
 /** 
  * @param {string} text
- * @returns {string[]}
+ * @returns {Word[]}
  */
 function getUniqueWords( text ) {
   return Array.from(
     new Set( text.trim()
       .split( /\s/ig )
-      .map( word => word.trim() )
-      .filter( word => word.length )
-      .sort()
+      .map( word => removeFormatting( word.trim() ) )
+      .filter( word => word.length && word.charAt(0) !== '|' )
     )
-  );
+  ).map( word => new Word( word ) );
 }
 
 /** 
  * @param {string} text
  * @param {number} pageIndex
- * @returns {string[]}
+ * @returns {Word[]}
  */
 function getPageUniqueWords( text, pageIndex ) {
   const page = getPages( text )[ pageIndex ];
@@ -192,7 +200,7 @@ export default {
       page: '-1',
       location: 'bottom',
       on: TextPageImage.EVENT.none,
-      fixationWord: '',
+      fixationWords: /** @type {Word[]} */ ([]),
       fixationDuration: 1000,
       off: TextPageImage.EVENT.none,
       delayDuration: 1,
@@ -364,7 +372,9 @@ export default {
      */
     formatEventParams( event ) {
       if ( event.name === TextPageImage.EVENT.fixation ) {
-        return `"${/** @type {TextPageImageFixationEvent}*/ (event).word}"\nlonger than ${event.duration} ms`;
+        const fixEvent = /** @type {TextPageImageFixationEvent}*/ (event);
+        const words = fixEvent.words.map( word => word.text ).join( ' ' );
+        return `"${words}"\nlonger than ${event.duration} ms`;
       }
       else if ( event.name === TextPageImage.EVENT.delay ) {
         return `${event.duration} seconds`;
@@ -450,7 +460,7 @@ export default {
      */
     constructImageEvent( name ) {
       if ( name === TextPageImage.EVENT.fixation ) {
-        return new TextPageImageFixationEvent( this.fixationWord, this.fixationDuration );
+        return new TextPageImageFixationEvent( this.fixationWords, this.fixationDuration );
       }
       else if ( name === TextPageImage.EVENT.delay ) {
         return new TextPageImageDelayEvent( this.delayDuration );

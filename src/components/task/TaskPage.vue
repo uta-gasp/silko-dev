@@ -33,10 +33,10 @@ import DataCollector from '@/task/dataCollector.js';
 import gazeTracking from '@/utils/gazeTracking.js';
 
 import Font from '@/model/session/font.js';
+import { TextPageImage, Word } from '@/model/task/textPageImage.js';
 
 // ts-check-only
 import DataImage from '@/model/data/image.js';
-import { TextPageImage } from '@/model/task/textPageImage.js';
 import Vue from 'vue';
 
 const FIX_UPDATE_INTERVAL = 25;
@@ -178,7 +178,7 @@ export default {
         wordText = this.feedbackProvider.setFocusedWord( word );
       }
       this.collector.setFocusedWord( word );
-      this.fixation = { word: wordText, duration: 0 };
+      this.fixation = { word: wordText ? new Word( wordText ) : null, duration: 0 };
     } );
 
     gazeTracking.setCallback( 'wordLeft', 'task-page', _ => {

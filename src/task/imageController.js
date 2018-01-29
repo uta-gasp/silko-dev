@@ -1,4 +1,4 @@
-import { TextPageImage } from '@/model/task/textPageImage.js';
+import { TextPageImage, TextPageImageFixationEvent, TextPageImageDelayEvent, Word } from '@/model/task/textPageImage.js';
 
 export default class ImageController {
 
@@ -6,6 +6,7 @@ export default class ImageController {
    * @typedef {Function} ImageEventHandler
    * @param {TextPageImage} image
    */
+
   /**
    * @param {{onShow: ImageEventHandler, onHide: ImageEventHandler}} eventHandlers 
    * @param {TextPageImage[]} [images=[]] 
@@ -13,7 +14,7 @@ export default class ImageController {
   constructor( {
     onShow = /** @param {TextPageImage} _ */_ => {}, 
     onHide = /** @param {TextPageImage} _ */ _ => {} }, 
-  images = []
+    images = []
   ) {
     /** @type {ImageEventHandler} */
     this._onShow = onShow;
@@ -67,16 +68,26 @@ export default class ImageController {
   }
 
   /**
-   * @param {string} word 
+   * @param {Word} word 
    * @param {number} duration 
    */
   fixate( word, duration ) {
+    if (!word) {
+      return;
+    }
+
     this._images.forEach( image => {
-      if ( image.on.name === TextPageImage.EVENT.fixation &&
-          image.on.word === word &&
-          image.on.duration < duration &&
-          this._locations[ image.location ] !== image ) {
-        this._show( image );
+      if (this._locations[ image.location ] === image) {
+        return;
+      }
+
+      if (image.on.name === TextPageImage.EVENT.fixation) {
+        const fixEvent = /** @type {TextPageImageFixationEvent} */(image.on);
+        const words = fixEvent.words;
+        const hasWord = words.find( w => word.isEqual( w ) );
+        if (hasWord && fixEvent.duration < duration) {
+          this._show( image );
+        }
       }
     } );
   }
@@ -115,7 +126,7 @@ export default class ImageController {
       const timer = window.setTimeout( () => {
         this._hide( image );
         this._timers.delete( image );
-      }, image.off.duration * 1000 );
+      }, /** @type {TextPageImageDelayEvent} */ (image.off).duration * 1000 );
 
       this._timers.set( image, timer );
     }

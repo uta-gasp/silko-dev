@@ -18,6 +18,22 @@ function uuidv4() {
 
 const FILE_ID_SPLITTER = '_';
 
+export class Word {
+  /**
+   * @param {string} text 
+   */
+  constructor( text ) {
+    this.text = text;
+  }
+
+  /**
+   * @param {Word} ref 
+   */
+  isEqual( ref ) {
+    return this.text === ref.text;
+  }
+}
+
 export class TextPageImageEvent {
 
   /**
@@ -48,10 +64,12 @@ export class TextPageImageEvent {
    * @param {string} type
    */
   setMeta( meta, type ) {
+    /*
     Object.getOwnPropertyNames( this ).forEach( prop => {
       const id = prop === 'name' ? type : `${type}-${prop}`;
-      meta[ id ] = /** @type {any} */ (this)[ prop ];
+      meta[ id ] = (this)[ prop ];
     } );
+    */
   }
 
   /**
@@ -77,13 +95,13 @@ export class TextPageImageEvent {
 export class TextPageImageFixationEvent extends TextPageImageEvent {
 
   /**
-   * @param {string} word
+   * @param {Word[]} words
    * @param {number} duration
    */
-  constructor( word, duration ) {
+  constructor( words, duration ) {
     super( TextPageImage.EVENT.fixation );
 
-    this.word = word;
+    this.words = words;
     this.duration = duration;
   }
 
@@ -92,7 +110,7 @@ export class TextPageImageFixationEvent extends TextPageImageEvent {
    * @returns {boolean} 
    */
   get isValid() {
-    return this.word && this._isGreaterThanInt( this.duration, 100 );
+    return this.words && this.words.length > 0 && this._isGreaterThanInt( this.duration, 100 );
   }
 
 }
