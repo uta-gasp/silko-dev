@@ -152,14 +152,14 @@ function removeFormatting( text ) {
  * @param {string} text
  * @returns {Word[]}
  */
-function getUniqueWords( text ) {
+function getUniqueWords( text, useIDs = false ) {
   return Array.from(
     new Set( text.trim()
-      .split( /\s/ig )
+      .split( /\s+/gi )
       .map( word => removeFormatting( word.trim() ) )
       .filter( word => word.length && word.charAt(0) !== '|' )
     )
-  ).map( word => new Word( word ) );
+  ).map( ( word, index ) => new Word( word, useIDs ? index + '' : '' ) ); 
 }
 
 /** 
@@ -173,7 +173,33 @@ function getPageUniqueWords( text, pageIndex ) {
     return [];
   }
 
-  return getUniqueWords( page );
+  return getUniqueWords( page, true );
+}
+
+/** 
+ * @param {string} text
+ * @returns {Word[]}
+ */
+function getWords( text, useIDs = false ) {
+  return text.trim()
+    .split( /\s+/gi )
+    .map( word => removeFormatting( word.trim() ) )
+    .filter( word => word.length && word.charAt(0) !== '|' )
+    .map( ( word, index ) => new Word( word, useIDs ? index + '' : '' ) ); 
+}
+
+/** 
+ * @param {string} text
+ * @param {number} pageIndex
+ * @returns {Word[]}
+ */
+function getPageWords( text, pageIndex ) {
+  const page = getPages( text )[ pageIndex ];
+  if ( !page ) {
+    return [];
+  }
+
+  return getWords( page, true );
 }
 
 /** 
@@ -239,11 +265,11 @@ export default {
       return getPages( this.currentText ).length;
     },
 
-    /** @returns {string[]} */
+    /** @returns {Word[]} */
     currentWords() {
       return +this.page < 0
         ? getUniqueWords( this.currentText )
-        : getPageUniqueWords( this.currentText, +this.page );
+        : getPageWords( this.currentText, +this.page );
     },
 
     /** @returns {boolean} */

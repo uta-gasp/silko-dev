@@ -76,7 +76,8 @@
                 span(style="font-style: italic") italic
                 span words
 
-    textarea.textarea.text(placeholder="Text" v-model="text")
+    .notification.is-warning The task contains images and therefore its text cannot be modified.
+    textarea.textarea.text(placeholder="Text" v-model="text" :disabled="hasTaskImages")
 </template>
 
 <script>
@@ -84,6 +85,7 @@ import Task from '@/model/task.js';
 
 // ts-check-only
 import Intro from '@/model/intro.js';
+import TextPage from '@/model/task/textPage.js';
 
 /**
  * @fires input
@@ -145,6 +147,11 @@ export default {
         intro: this.intro,
         text: this.text,
       };
+    },
+
+    /** @returns {boolean} */
+    hasTaskImages() {
+      return this.task.pages.some( /** @param {TextPage} page */ page => !!page.images.length );
     },
   },
 

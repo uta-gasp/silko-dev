@@ -248,6 +248,7 @@ export default class TextPresenter {
 
     // Show the content of every non-empty text node that is a child of root
     let node;
+    let wordID = 0;
     const docFrags = [];
 
     while ( ( node = nodeIterator.nextNode() ) ) {
@@ -265,6 +266,7 @@ export default class TextPresenter {
 
         const span = document.createElement( 'span' );
         span.classList.add( WORD_CLASS );
+        span.dataset.wordId = wordID++ + '';
         span.innerHTML = wordText;
         docFrag.appendChild( span );
 

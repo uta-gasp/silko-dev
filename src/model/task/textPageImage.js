@@ -21,16 +21,19 @@ const FILE_ID_SPLITTER = '_';
 export class Word {
   /**
    * @param {string} text 
+   * @param {string} id
    */
-  constructor( text ) {
+  constructor( text, id ) {
     this.text = text;
+    this.id = id;
   }
 
   /**
    * @param {Word} ref 
    */
   isEqual( ref ) {
-    return this.text === ref.text;
+    return this.text === ref.text &&
+           (ref.id ? this.id === ref.id : true);
   }
 }
 

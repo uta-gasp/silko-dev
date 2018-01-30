@@ -172,13 +172,15 @@ export default {
     //       }
     //     } );
 
-    gazeTracking.setCallback( 'wordFocused', 'task-page', word => {
+    gazeTracking.setCallback( 'wordFocused', 'task-page', /** @param {HTMLElement} word */ word => {
       let wordText = null;
       if ( !this.textPresenter.isInstructionPage ) {
         wordText = this.feedbackProvider.setFocusedWord( word );
       }
       this.collector.setFocusedWord( word );
-      this.fixation = { word: wordText ? new Word( wordText ) : null, duration: 0 };
+
+      const wordID = word ? word.dataset.wordId : '';
+      this.fixation = { word: wordText ? new Word( wordText, wordID ) : null, duration: 0 };
     } );
 
     gazeTracking.setCallback( 'wordLeft', 'task-page', _ => {
