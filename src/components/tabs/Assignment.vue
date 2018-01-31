@@ -40,6 +40,7 @@ import FinishedPage from '@/components/task/FinishedPage.vue';
 // ts-check-only
 import Task from '@/model/task.js';
 import Question from '@/model/session/question.js';
+import VueRouter from 'vue-router';
 
 /**
  * @typedef {Question} AnsweredQuestion
