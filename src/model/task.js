@@ -294,6 +294,9 @@ export default class Task extends Recordable {
     const promises = [];
 
     this.pages.forEach( page => {
+      if (!page.images) {
+        return;
+      }
       page.images.forEach( image => {
         promises.push( db.deleteFile( image.src, _ => {} ) );
       } );

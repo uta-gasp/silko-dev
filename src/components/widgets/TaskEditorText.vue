@@ -76,7 +76,7 @@
                 span(style="font-style: italic") italic
                 span words
 
-    .notification.is-warning The task contains images and therefore its text cannot be modified.
+    .notification.is-warning(v-if="hasTaskImages") The task contains images and therefore its text cannot be modified.
     textarea.textarea.text(placeholder="Text" v-model="text" :disabled="hasTaskImages")
 </template>
 
@@ -151,7 +151,7 @@ export default {
 
     /** @returns {boolean} */
     hasTaskImages() {
-      return this.task.pages.some( /** @param {TextPage} page */ page => !!page.images.length );
+      return this.task.pages.some( /** @param {TextPage} page */ page => !!page.images && !!page.images.length );
     },
   },
 
