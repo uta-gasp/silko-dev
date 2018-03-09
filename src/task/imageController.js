@@ -83,7 +83,7 @@ export default class ImageController {
 
       if (image.on.name === TextPageImage.EVENT.fixation) {
         const fixEvent = /** @type {TextPageImageFixationEvent} */(image.on);
-        const words = fixEvent.words;
+        const words = fixEvent.word ? [ fixEvent.word ] : fixEvent.words;
         const hasWord = words.find( w => word.isEqual( w ) );
         if (hasWord && fixEvent.duration < duration) {
           this._show( image );

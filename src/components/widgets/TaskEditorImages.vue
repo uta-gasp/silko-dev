@@ -399,7 +399,7 @@ export default {
     formatEventParams( event ) {
       if ( event.name === TextPageImage.EVENT.fixation ) {
         const fixEvent = /** @type {TextPageImageFixationEvent}*/ (event);
-        const words = fixEvent.words.map( word => word.text ).join( ' ' );
+        const words = (fixEvent.word ? [ { text: fixEvent.word } ] : fixEvent.words).map( word => word.text ).join( ' ' );
         return `"${words}"\nlonger than ${event.duration} ms`;
       }
       else if ( event.name === TextPageImage.EVENT.delay ) {
