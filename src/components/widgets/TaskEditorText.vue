@@ -151,9 +151,11 @@ export default {
 
     /** @returns {boolean} */
     hasTaskImagesBoundToWords() {
-      return this.task.pages.some( /** @param {TextPage} page */ page => !!page.images && page.images.some( image => {
-        return !!image.on.words || !!image.on.word;
-      }) );
+      return this.task && this.task.pages && this.task.pages.some( /** @param {TextPage} page */ page => 
+        !!page.images && page.images.some( image => {
+          return !!image.on.words || !!image.on.word;
+        }) 
+      );
     },
   },
 
