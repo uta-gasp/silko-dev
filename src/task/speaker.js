@@ -58,7 +58,7 @@ export default class Speaker {
 
     const mustPronounce =
             !wordFocus.pronounced &&
-            wordFocus.entries === 1 &&
+            //wordFocus.entries === 1 &&
             wordFocus.accumulatedTime > threshold;
 
     if ( !mustPronounce ) {
