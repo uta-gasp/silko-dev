@@ -4,7 +4,7 @@
     task-text(ref="container")
 
     task-images(
-      v-if="images"
+      v-show="images"
       :images="images"
       :fixation="fixation"
       @show="onImageShow"
