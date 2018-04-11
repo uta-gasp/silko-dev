@@ -36,7 +36,7 @@
                   button.button.is-light(@click="edit( item )")
                     i.fa.fa-edit
                   button.button.is-danger(@click="remove( item )")
-                    i.fa.fa-remove
+                    i.far.fa-trash-alt
 
     modal-container(v-if="toEdit" title="Instruction editor" @close="closeEditor")
       intro-editor(

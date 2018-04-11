@@ -20,7 +20,7 @@
         i.fa.fa-database
         span {{ tokens[ 'link_classes' ] }}
       router-link.nav-item.is-tab(to="/results" v-if="isTeacher")
-        i.fa.fa-pie-chart
+        i.fa.fa-chart-pie
         span {{ tokens[ 'link_results' ] }}
       router-link.nav-item.is-tab(to="/assignments" v-if="isStudent")
         i.fa.fa-tasks

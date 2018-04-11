@@ -25,18 +25,16 @@
               th Name
               th Tasks
               th Students
-              th.is-narrow Actions
           tbody
             tr(v-for="item in classes" :key="item.id")
-              td.title.is-4.no-wrapping {{ item.name }}
+              td 
+                .title.is-4.no-wrapping {{ item.name }}
+                button.button.is-danger(title="Delete the class" @click="removeClass( item )")
+                  i.far.fa-trash-alt
               td
                 task-list(:cls="item" :intros="intros" @saved="taskSaved" @created="taskCreated" @deleted="taskDeleted")
               td
                 student-list(:cls="item" :teacher="teacher" :refresh="refreshStudents")
-              td.is-narrow
-                .is-pulled-right
-                  button.button.is-danger(title="Delete the class" @click="removeClass( item )")
-                    i.fa.fa-remove
 
     remove-warning(v-if="toDelete" object="class" :name="toDeleteName" @close="removeWarningClosed")
 </template>

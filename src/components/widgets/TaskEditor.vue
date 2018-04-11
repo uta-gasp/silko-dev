@@ -5,7 +5,7 @@
         li(:class="{ 'is-active': isCurrentTab( tab ) }" v-for="(tab, id) in tabs" :key="id")
           a(@click="selectTab( tab )") {{ tab.name }}
 
-    .field
+    .field.expand
       task-editor-text(v-show="currentTab === tabs.text"
         :task="ref"
         :intros="intros"
@@ -335,6 +335,12 @@ export default {
   #task-editor {
     width: 700px;
     min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .expand {
+    flex-grow: 1;    
   }
 
   .tabs a {
@@ -348,10 +354,5 @@ export default {
   .bottom-panel {
     display: flex;
     justify-content: space-between;
-
-    position: absolute;
-    bottom: 1.25em;
-    left: 1.5em;
-    right: 1.5em;
   }
 </style>

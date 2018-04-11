@@ -29,59 +29,15 @@
           label.label Text
         .column.is-narrow.tip-header Formatting
 
-        nav.panel.notification.is-tip.is-paddingless
-          p.panel-block
-            code Empty line
-            span.explanation page separator
-          p.panel-block
-            code |
-            span.explanation applies comma-separated styles listed afterward for
-              span.explanation.is-inline-block a word:
-                .example
-                  i Iso koulupiha|bold
-                  span &#61; Iso
-                  b koulupiha
-              span.explanation.is-inline-block a line:
-                .example
-                  i Iso koulupiha |bold
-                  span &#61;
-                  b Iso koulupiha
-          p.panel-block
-            code
-              a(href="https://www.w3schools.com/cssref/css_colors.asp" target="_blank") red
-              span
-              a(href="https://www.w3schools.com/colors/colors_rgb.asp") #22aaff
-              span
-              abbr(title="25% lighter than the normal text") light
-              span
-              abbr(title="25% darker than the normal text") dark
-            span.explanation font color
-          p.panel-block
-            code 22pt
-            span.explanation font size
-          p.panel-block
-            code italic regular
-            span.explanation font style
-          p.panel-block
-            code normal bold
-            span.explanation font weight
-          p.panel-block
-            h4.heading.is-4.is-inline.has-text-centered Example
-            span.has-text-centered
-              i.is-block A big grey line with blue|#22aaff &amp; italic|italic words |grey,18pt
-              .is-block(style="color: grey; font-size: 18pt")
-                span A big grey line with
-                span(style="color: #22aaff") blue
-                span &amp;
-                span(style="font-style: italic") italic
-                span words
-
+        task-text-formatting-instructions.is-tip
     .notification.is-warning(v-if="hasTaskImagesBoundToWords") The task contains images bound to words and therefore its text cannot be modified.
     textarea.textarea.text(placeholder="Text" v-model="text" :disabled="hasTaskImagesBoundToWords")
 </template>
 
 <script>
 import Task from '@/model/task.js';
+
+import TaskTextFormattingInstructions from '@/components/widgets/TaskTextFormattingInstructions.vue';
 
 // ts-check-only
 import Intro from '@/model/intro.js';
@@ -92,6 +48,10 @@ import TextPage from '@/model/task/textPage.js';
  */
 export default {
   name: 'task-editor-text',
+
+  components: {
+    'task-text-formatting-instructions': TaskTextFormattingInstructions
+  },
 
   data() {
     return {
@@ -185,14 +145,20 @@ export default {
 
 <style lang="less" scoped>
 
+  #task-editor-text {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
   .label:not(:last-child) {
     margin-bottom: 0;
   }
 
   .text {
-    min-height: 334px;
     font-size: 15px;
     line-height: 1.25em;
+    flex-grow: 1;    
   }
 
   .tip-parent {
@@ -225,10 +191,6 @@ export default {
     background-color: white;
     padding: 0 0.5em;
     margin: 2px 0.5em;
-  }
-
-  .explanation {
-    padding-left: 1em;
   }
 
   .panel-block {

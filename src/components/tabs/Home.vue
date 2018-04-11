@@ -68,7 +68,7 @@
           span.icon.is-small.is-left
             i.fa.fa-envelope
           span.icon.is-small.is-right(v-if="!isEmailValid")
-            i.fa.fa-warning
+            i.fa.fa-exclamation-triangle
 
       p.control
         .has-text-centered

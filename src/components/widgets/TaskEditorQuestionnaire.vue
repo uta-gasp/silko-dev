@@ -44,7 +44,7 @@
                   span.answer(:class="{ 'is-correct': answer.isCorrect }" v-for="answer in question.answers") {{ answer.text }}
               td.is-narrow
                 button.button.is-danger(@click="remove( question )")
-                  i.fa.fa-remove
+                  i.far.fa-trash-alt
 
 </template>
 

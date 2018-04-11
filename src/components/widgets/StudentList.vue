@@ -40,8 +40,8 @@
                       @click.stop="addAssignment( student, task.id, $event )" ) {{ task.name }}
 
             td.is-narrow
-              button.button.is-danger(title="Remove the student from this class" @click="remove( student )")
-                i.fa.fa-remove
+              button.button(title="Remove the student from this class" @click="remove( student )")
+                i.fa.fa-times
 
     modal-container(v-if="isEditing" title="Available students" @close="closeEditor")
       item-selection-box(

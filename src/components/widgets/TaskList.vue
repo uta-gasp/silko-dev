@@ -21,15 +21,15 @@
                 :title="isLocked( task.id ) ? 'This task has recorded sessions' : 'Edit the task'"
                 :disabled="isLocked( task.id )"
                 @click="edit( task )")
-                i.fa.fa-edit
+                i.far.fa-edit
               button.button.is-light(
                 title="Create a new task from the existing"
                 @click="copy( task )")
-                i.fa.fa-copy
+                i.far.fa-copy
               button.button.is-danger(
                 title="Delete the task"
                 @click="remove( task )")
-                i.fa.fa-remove
+                i.far.fa-trash-alt
 
     modal-container(v-if="isEditing" :title="taskEditorTitle" @close="closeEditor")
       task-editor(:action="action" :task="toEdit" :source="toCopy" :intros="intros" @save="save" @modified="onTaskModified")

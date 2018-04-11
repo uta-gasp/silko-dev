@@ -7,7 +7,7 @@
             .name.is-inline-block {{ sessionToString( session ) }}
           td
             button.button.is-danger(@click="showDeleteWarning( session )")
-              i.fa.fa-remove
+              i.fa.fa-times
 
     remove-warning(v-if="sessionToDelete" object="session" :name="toDeleteName" @close="removeWarningClosed")
 

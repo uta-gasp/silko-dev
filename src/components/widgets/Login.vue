@@ -12,7 +12,7 @@
         span.icon.is-small.is-left
           i.fa.fa-envelope
         span.icon.is-small.is-right(v-if="isEmailValid === checkValues.INVALID")
-          i.fa.fa-warning
+          i.fa.fa-exclamation-triangle
 
       p.control.has-icons-left.has-icons-right
         input.input(
@@ -24,7 +24,7 @@
         span.icon.is-small.is-left
           i.fa.fa-user-secret
         span.icon.is-small.is-right(v-if="isPasswordValid === checkValues.INVALID")
-          i.fa.fa-warning
+          i.fa.fa-exclamation-triangle
 
       p.control
         .has-text-centered

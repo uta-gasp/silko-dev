@@ -3,15 +3,19 @@ import { TextPageImage, TextPageImageFixationEvent, TextPageImageDelayEvent, Wor
 export default class ImageController {
 
   /**
-   * @typedef {Function} ImageEventHandler
-   * @param {TextPageImage} image
+   * @typedef {function(TextPageImage)} ImageEventHandler
    */
 
   /**
-   * @param {{onShow: ImageEventHandler, onHide: ImageEventHandler}} eventHandlers 
+   * @typedef {object} ImageEventHandlers
+   * @property {ImageEventHandler} onShow
+   * @property {ImageEventHandler} onHide
+   */
+
+  /**
    * @param {TextPageImage[]} [images=[]] 
    */
-  constructor( {
+  constructor( /** @type {ImageEventHandlers} */  {
     onShow = /** @param {TextPageImage} _ */_ => {}, 
     onHide = /** @param {TextPageImage} _ */ _ => {} }, 
     images = []
@@ -30,9 +34,9 @@ export default class ImageController {
       bottom: null,
     };
 
-    /** @type {Map} */
+    /** @type {Map<TextPageImage, HTMLImageElement>} */
     this._prefetched = new Map();
-    /** @type {Map} */
+    /** @type {Map<TextPageImage, number>} */
     this._timers = new Map();
 
     this._prefetch();

@@ -53,7 +53,7 @@
                 span.ellipsis {{ getListOfStudentClasses( student ) }}
               td(v-if="isAdmin").is-narrow
                 button.button.is-danger(@click="remove( student )")
-                  i.fa.fa-remove
+                  i.far.fa-trash-alt
 
     remove-warning(v-if="toDelete" object="student" :name="toDeleteName" @close="removeWarningClosed")
 </template>

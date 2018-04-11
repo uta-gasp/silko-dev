@@ -1,6 +1,6 @@
 <template lang="pug">
   #task-editor-images
-    section.top-only
+    section.top-only(v-if="!isEditing")
       table.table(v-if="images.length")
         thead
           tr
@@ -25,15 +25,20 @@
               .event-name {{ formatEventName( image.off ) }}
               .event-param(v-show="hasParameters( image.off )") {{ formatEventParams( image.off ) }}
             td
-              button.button.is-danger(
+              button.button(
+                title="Edit the image appearance parameters"
+                @click="edit( index )")
+                i.far.fa-edit
+            td
+              button.button(
                 title="Remove the image"
                 @click="remove( index )")
-                i.fa.fa-remove
+                i.fa.fa-times
       section(v-else)
         i No images
 
     section.absolute-parent
-      .has-text-centered
+      .has-text-centered(v-if="!isEditing")
         section.is-fullwidth.is-dropzone(
             :class="{ 'is-dragover': isDraggingFileOverDropzone }"
             @drag.stop.prevent=""
@@ -52,8 +57,8 @@
                 span.file-label Choose an image…
                 span.help or drag it here
 
-      .sticked(:class="{ 'at-top': !images.length, 'at-bottom': images.length }" v-if="selectedFile")
-        article.media
+      div(:class="{ 'sticked': !isEditing, 'at-top': !images.length, 'at-bottom': images.length }" v-if="selectedFile || isEditing")
+        article.media(v-if="selectedFile")
           figure.media-left
             p.image.is-64x64
               img(:src="getImageURL( selectedFile )")
@@ -69,6 +74,10 @@
               button.button.is-primary(@click="uploadImage" :disabled="isUploading || !hasValidParams") Upload
               button.button(@click="cancel" :disabled="isUploading") Cancel
         article
+          .field.is-horizontal(v-if="isEditing")
+            .field-label.is-normal  
+            .field-body
+              h4.heading.is-4 {{ getImageName( images[ editingImageIndex ] ) }}
           .field.is-horizontal
             .field-label.is-normal Page
             .field-body
@@ -114,6 +123,12 @@
                     type="text"
                     v-model="delayDuration")
                 .field-label.is-normal.is-inner-label.no-wrap sec
+          .field.is-horizontal(v-if="isEditing")
+            .field-label.is-normal
+            .field-body
+              .is-grouped.is-right  
+                button.button.is-primary(@click="saveEdited()") Save
+                button.button(@click="cancelEditing()") Cancel
 
     temporal-notification(type="danger" :show="showError")
       span {{ errorMessage }}
@@ -221,6 +236,7 @@ export default {
 
       /** @type {File} */
       selectedFile: null,
+      editingImageIndex: -1,
       uploadProgress: -1,
 
       page: '-1',
@@ -278,6 +294,11 @@ export default {
     },
 
     /** @returns {boolean} */
+    isEditing() {
+      return this.editingImageIndex >= 0;
+    },
+
+    /** @returns {boolean} */
     hasValidParams() {
       return this.constructImageEvent( this.on ).isValid &&
              this.constructImageEvent( this.off ).isValid;
@@ -305,6 +326,40 @@ export default {
       } );
 
       this.images = images;
+    },
+
+    /** 
+     * @param {number} index 
+     */
+    edit( index ) {
+      const img = this.images[ index ];
+
+      this.page = '' + img.page;
+      this.location = img.location;
+      this.on = this.deconstructImageEvent( img.on );
+      this.off = this.deconstructImageEvent( img.off );
+
+      this.editingImageIndex = index;
+    },
+
+    saveEdited() {
+      const onEvent = this.constructImageEvent( this.on );
+      const offEvent = this.constructImageEvent( this.off );
+      this.images[ this.editingImageIndex ] = new TextPageImage( {
+        src: this.images[ this.editingImageIndex ].src,
+        page: +this.page,
+        location: this.location,
+        on: onEvent,
+        off: offEvent,
+      } );
+      
+      this.editingImageIndex = -1;
+      
+      this.$emit( 'input', { images: this.images } );
+    },
+
+    cancelEditing() {
+      this.editingImageIndex = -1;
     },
 
     /** 
@@ -349,7 +404,10 @@ export default {
      * @returns {string}
      */
     getImageName( image ) {
-      if ( image.file ) {
+      if (!image) {
+        return '';
+      }
+      else if ( image.file ) {
         return image.file.name;
       }
       else if ( image.src ) {
@@ -494,6 +552,22 @@ export default {
       else {
         return new TextPageImageEvent( name );
       }
+    },
+
+    /** 
+     * @param {TextPageImageEvent | TextPageImageFixationEvent | TextPageImageDelayEvent} event
+     * @returns {string} Event name
+     */
+    deconstructImageEvent( event ) {
+      if ( event.name === TextPageImage.EVENT.fixation ) {
+        this.fixationWords = /** @type {TextPageImageFixationEvent} */ (event).words || [event.word] || [];
+        this.fixationDuration = /** @type {TextPageImageFixationEvent} */ (event).duration;
+      }
+      else if ( name === TextPageImage.EVENT.delay ) {
+        this.delayDuration = /** @type {TextPageImageDelayEvent} */ (event).duration;
+      }
+
+      return event.name;
     },
   },
 
