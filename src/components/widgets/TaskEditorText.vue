@@ -4,7 +4,7 @@
       .columns.is-inlined
         .column(v-if="isNameEditable")
           label.label Name
-          input.input(type="text" placeholder="Name" v-model="name")
+          input.input(type="text" :placeholder="placeholder" v-model="name")
         .column.is-narrow
           label.label Alignment
           .select
@@ -42,6 +42,7 @@ import TaskTextFormattingInstructions from '@/components/widgets/TaskTextFormatt
 // ts-check-only
 import Intro from '@/model/intro.js';
 import TextPage from '@/model/task/textPage.js';
+import { TextPageImageFixationEvent } from '@/model/task/textPageImage.js';
 
 /**
  * @fires input
@@ -55,7 +56,8 @@ export default {
 
   data() {
     return {
-      name: this.task && this.task.name ? this.task.name : '',
+      name: this.task && this.task.name && !this.isCloning ? this.task.name : '',
+      originalName: this.task && this.task.name && this.isCloning ? this.task.name : '',
       alignment: this.task && this.task.alignment ? this.task.alignment : 'center',
       fontname: this.task && this.task.fontname ? this.task.fontname : 'Calibri',
       intro: this.task && this.task.intro ? this.task.intro : '',
@@ -90,6 +92,10 @@ export default {
     isNameEditable: {
       type: Boolean,
     },
+    isCloning: {
+      type: Boolean,
+      default: false,
+    },
     intros: {
       type: Array,
       default: /** @returns {Intro[]} */ () => [],
@@ -113,10 +119,15 @@ export default {
     hasTaskImagesBoundToWords() {
       return this.task && this.task.pages && this.task.pages.some( /** @param {TextPage} page */ page => 
         !!page.images && page.images.some( image => {
-          return !!image.on.words || !!image.on.word;
+          return !!/** @type {TextPageImageFixationEvent} */(image.on).words || !!image.on.word;
         }) 
       );
     },
+
+    /** @returns {string} */
+    placeholder() {
+      return this.isCloning ? this.originalName : 'Name';
+    }
   },
 
   watch: {

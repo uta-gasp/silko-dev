@@ -10,6 +10,7 @@
         :task="ref"
         :intros="intros"
         :is-name-editable="isTaskNameEditable"
+        :is-cloning="isCloningTask"
         @input="setTextInput")
 
       task-editor-feedback(v-show="currentTab === tabs.feedback"
@@ -145,6 +146,11 @@ export default {
     isTaskNameEditable() {
       return !this.ref || !this.ref.name || !!this.source;
     },
+
+    /** @returns {boolean} */
+    isCloningTask() {
+      return !!this.source;
+    },
     
     /** @returns {boolean} */
     isNameValid() {
@@ -190,7 +196,7 @@ export default {
       }
 
       if ( this.ref.name ) {
-        this.name = this.ref.name;
+        this.name = !!this.source ? '' : this.ref.name;
       }
       if ( this.ref.pages ) {
         this.text = Task.pagesToText( this.ref.pages );
