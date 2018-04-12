@@ -1,8 +1,11 @@
 <template lang="pug">
   #task-images
-    img.image.left(v-show="hasImageAt( 'left' )" :src="image.left")
-    img.image.right(v-show="hasImageAt( 'right' )" :src="image.right")
-    img.image.bottom(v-show="hasImageAt( 'bottom' )" :src="image.bottom")
+    img.image(v-for="props in imageProps" 
+      v-show="hasImageAt( props )" 
+      :src="getSource( props )" 
+      :class="getClass( props )"
+      :style="getStyle( props )"
+    )
 </template>
 
 <script>
@@ -11,6 +14,18 @@ import ImageController from '@/task/imageController.js';
 // ts-check-only
 import { TextPageImage, Word } from '@/model/task/textPageImage.js';
 import DataImage from '@/model/data/image.js';
+
+class ImageProps {
+  /**
+   * @param {TextPageImage} image
+   */
+  constructor(image) {
+    this.location = image.location;
+    this.src = image.src;
+    this.keepOriginalSize = !!image.keepOriginalSize;
+    this.offset = image.offset || 0;
+  }
+}
 
 /**
  * @fires show
@@ -21,19 +36,20 @@ export default {
 
   data() {
     return {
-      image: {
-        left: '',
-        right: '',
-        bottom: '',
+      imageProps: {
+        left: null,
+        right: null,
+        bottom: null,
       },
 
       imageController: new ImageController( {
         onShow: image => {
-          this.image[ image.location ] = image.src;
+          this.imageProps[ image.location ] = new ImageProps( image );
+          //this._setOffset( this.image[ image.location ] )
           this.$emit( 'show', { image } );
         },
         onHide: image => {
-          this.image[ image.location ] = '';
+          this.imageProps[ image.location ] = null;
           this.$emit( 'hide', { image } );
         },
       } ),
@@ -55,16 +71,51 @@ export default {
 
   methods: {
     /**
-     * @param {string} location
+     * @param {ImageProps} props
      * @returns {boolean}
      */
-    hasImageAt( location ) {
+    hasImageAt( props ) {
       const images = this.images;
-      if ( !images ) {
+      if ( !images || !props) {
         return false;
       }
 
-      return images.some( /** @param {DataImage} image */ image => image.location === location );
+      return images.some( /** @param {DataImage} image */ image => image.location === props.location );
+    },
+
+    /**
+     * @param {ImageProps} props
+     * @returns {string}
+     */
+    getSource( props ) {
+      return props ? props.src : '';
+    },
+
+    /**
+     * @param {ImageProps} props
+     * @returns {any}
+     */
+    getClass( props ) {
+      if (!props)
+        return null;
+
+      return {
+        [props.location]: true,
+        'has-original-size': props.keepOriginalSize,
+      }
+    },
+
+    /**
+     * @param {ImageProps} props
+     * @returns {string}
+     */
+    getStyle( props ) {
+      if (!props)
+        return '';
+
+      return [
+        `margin-${props.location}: ${props.offset}%`,
+      ].join(' ');
     },
   },
 
@@ -96,10 +147,20 @@ export default {
   @size: 15%;
   @margin: 0.25em;
 
+  .fit-to-margin {
+
+  }
+
   .horizontal {
     width: calc(@size - 2 * @margin);
     top: 50%;
     transform: translateY(-50%);
+  }
+
+  .vertical {
+    height: calc(@size - 2 * @margin);
+    left: 50%;
+    transform: translateX(-50%);
   }
 
   #task-images {
@@ -128,10 +189,13 @@ export default {
 
     &.bottom {
       bottom: 0;
-      height: calc(@size - 2 * @margin);
-      left: 50%;
-      transform: translateX(-50%);
+      .vertical();
     }
+  }
+
+  .has-original-size {
+    width: auto !important;
+    height: auto !important;
   }
 
 </style>

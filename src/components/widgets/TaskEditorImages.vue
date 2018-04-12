@@ -8,6 +8,7 @@
             th Name
             th Page
             th Location
+            th Size
             th On
             th Off
             th
@@ -17,7 +18,8 @@
               p.image.is-64x64.preview(v-if="canShow( image )" :style="getCSSBackgroundImage( image )")
             td {{ getImageName( image ) }}
             td {{ getImagePage( image ) }}
-            td {{ image.location }}
+            td {{ getImageLocation( image ) }}
+            td {{ image.keepOriginalSize ? 'original' : 'shrinked' }}
             td
               .event-name {{ formatEventName( image.on ) }}
               .event-param(v-show="hasParameters( image.on )") {{ formatEventParams( image.on ) }}
@@ -88,11 +90,20 @@
           .field.is-horizontal
             .field-label.is-normal Location
             .field-body
+              input.input.is-inline(type="number" step="1" v-model.number="offset" min="0" max="50")
+              .info-label % from
               .select
                 select(v-model="location")
                   option(value="left") left
                   option(value="bottom") bottom
                   option(value="right") right
+          .field.is-horizontal
+            .field-label.is-normal Size
+            .field-body
+              .select
+                select(v-model="keepOriginalSize")
+                  option(value="true") original
+                  option(value="false") 15% of width / height
           .field.is-horizontal
             .field-label.is-normal Show
             .field-body
@@ -241,6 +252,8 @@ export default {
 
       page: '-1',
       location: 'bottom',
+      offset: 0,
+      keepOriginalSize: 'false',
       on: TextPageImage.EVENT.none,
       fixationWords: /** @type {Word[]} */ ([]),
       fixationDuration: 1000,
@@ -336,10 +349,14 @@ export default {
 
       this.page = '' + img.page;
       this.location = img.location;
+      this.offset = img.offset || 0;
+      this.keepOriginalSize = '' + !!img.keepOriginalSize;
       this.on = this.deconstructImageEvent( img.on );
       this.off = this.deconstructImageEvent( img.off );
 
       this.editingImageIndex = index;
+
+      this.$emit( 'editing', true );
     },
 
     saveEdited() {
@@ -349,6 +366,8 @@ export default {
         src: this.images[ this.editingImageIndex ].src,
         page: +this.page,
         location: this.location,
+        offset: this.offset,
+        keepOriginalSize: this.keepOriginalSize === 'true',
         on: onEvent,
         off: offEvent,
       } );
@@ -356,10 +375,12 @@ export default {
       this.editingImageIndex = -1;
       
       this.$emit( 'input', { images: this.images } );
+      this.$emit( 'editing', false );
     },
 
     cancelEditing() {
       this.editingImageIndex = -1;
+      this.$emit( 'editing', false );
     },
 
     /** 
@@ -426,6 +447,14 @@ export default {
       return image.page < 0 ? 'any' : ( image.page + 1 );
     },
 
+    /** 
+     * @param {TextPageImage} image 
+     * @returns {string}
+     */
+    getImageLocation( image ) {
+      return image.location + (image.offset ? ` + ${image.offset}%` : '');
+    },
+ 
     /** 
      * @param {TextPageImageEvent} imageShowEvent
      * @returns {boolean}
@@ -506,6 +535,8 @@ export default {
         src: null,
         page: +this.page,
         location: this.location,
+        offset: this.offset,
+        keepOriginalSize: this.keepOriginalSize === 'true',
         on: onEvent,
         off: offEvent,
       } );
@@ -678,5 +709,11 @@ export default {
     margin-left: 0.75rem;
     margin-right: 0.75rem;
     flex-grow: 0;
+  }
+
+  .info-label {
+    display: inline-block;
+    line-height: 2.25;
+    padding: 0 0.5em;    
   }
 </style>

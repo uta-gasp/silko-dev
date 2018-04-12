@@ -222,11 +222,9 @@ export default class Task extends Recordable {
   }
 
   /**
-   * @typedef TaskSource
-   * @implements {Task}
-   * @property {string} text
-   * @property {TextPageImage[]} images
+   * @typedef {Task & {text: string, images: TextPageImage[]}} TaskSource
    */
+
   /**
    * @param {TaskSource} task 
    * @param {Callback} cb 

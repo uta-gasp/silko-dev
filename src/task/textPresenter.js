@@ -114,7 +114,7 @@ export default class TextPresenter {
     this._createLines( this._container );
   }
 
-  /** @returns {Map} */
+  /** @returns {Map<HTMLElement,string>} */
   get words() {
     const result = new Map();
 

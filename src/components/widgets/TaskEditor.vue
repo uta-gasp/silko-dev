@@ -11,28 +11,33 @@
         :intros="intros"
         :is-name-editable="isTaskNameEditable"
         :is-cloning="isCloningTask"
-        @input="setTextInput")
+        @input="setTextInput"
+      )
 
       task-editor-feedback(v-show="currentTab === tabs.feedback"
         :task="ref"
-        @input="setFeedbackInput")
+        @input="setFeedbackInput"
+      )
 
       task-editor-images(v-show="currentTab === tabs.images"
         :task="ref"
         :current-text="text"
-        @input="setImagesInput")
+        @input="setImagesInput"
+        @editing="onImageEditing($event)"
+      )
 
       task-editor-questionnaire(v-show="currentTab === tabs.questionnaire"
         :task="ref"
-        @input="setQuestionnaireInput")
+        @input="setQuestionnaireInput"
+      )
 
     p.control.bottom-panel
       button.button.is-primary(:disabled="!canSave" @click="save") {{ action }}
       button.button.is-primary(v-show="currentTab === tabs.feedback" @click="setDefaultFeedback") Set as default
-      button.button.is-primary(@click="preview") Preview
+      button.button.is-primary(:disabled="!canPreview" @click="preview") Preview
 
     .fullscreen(ref="fullscreen")
-      task-preview(v-if="inPreview" :task="currentTask" @close="closePreview")
+      task-preview(v-if="inPreview" :task="getCurrentTask()" @close="closePreview")
 </template>
 
 <script>
@@ -98,6 +103,7 @@ export default {
       /** @type {Question[]} */
       questionnaire: [],
 
+      canPreview: true,
       inPreview: false,
 
       tabs: {
@@ -166,25 +172,6 @@ export default {
     canSave() {
       return this.isNameValid &&
           this.isTextValid;
-    },
-
-    /** @returns {Task} */
-    currentTask() {
-      let result = new Task();
-      result = Object.assign( result, {
-        name: this.name.trim(),
-        type: 'text',
-        alignment: this.alignment,
-        fontname: this.fontname,
-        pages: Task.textToPages( this.text ),
-        syllab: { ...this.syllab },
-        speech: { ...this.speech },
-      } );
-
-      Task.embedImagesIntoPages( result.pages, this.images );
-
-      result.syllab.exceptions = Task.textToSyllabs( this.syllabExceptions );
-      return result;
     },
   },
 
@@ -292,6 +279,11 @@ export default {
       this.$emit( 'modified' );
     },
 
+    /** @param {boolean} e */
+    onImageEditing( e ) {
+      this.canPreview = !e;
+    },
+
     /** @param {Event} e */
     setDefaultFeedback( e ) {
       const defaults = JSON.stringify( {
@@ -306,6 +298,25 @@ export default {
       this.questionnaire = e.questionnaire;
 
       this.$emit( 'modified' );
+    },
+
+    /** @returns {Task} */
+    getCurrentTask() {
+      let result = new Task();
+      result = Object.assign( result, {
+        name: this.name.trim(),
+        type: 'text',
+        alignment: this.alignment,
+        fontname: this.fontname,
+        pages: Task.textToPages( this.text ),
+        syllab: { ...this.syllab },
+        speech: { ...this.speech },
+      } );
+
+      Task.embedImagesIntoPages( result.pages, this.images );
+
+      result.syllab.exceptions = Task.textToSyllabs( this.syllabExceptions );
+      return result;
     },
 
     /** @param {Event} e */

@@ -2,7 +2,9 @@
  * @typedef {Object} ImageCreateParams
  * @property {string} src - URL string
  * @property {number} page - -1 for all pages, <n> for a certain page
- * @property {string} location:-'left', 'right', 'bottom'
+ * @property {string} location:- 'left', 'right', 'bottom'
+ * @property {number} offset:- offset from the location in pixels
+ * @property {boolean} keepOriginalSize:- the image appears with its  original size  if 'true', and srinked to 15% of vh/vw otherwise
  * @property {TextPageImageEvent} on
  * @property {TextPageImageEvent} off
  */
@@ -142,16 +144,20 @@ export class TextPageImageDelayEvent extends TextPageImageEvent {
 export class TextPageImage {
 
   /** 
-   * @param {ImageCreateParams} param0
+   * @type {(args: ImageCreateParams) => void}
    */
-  constructor( /** @type {{src: string, page: number, location: string, on: TextPageImageEvent | TextPageImageFixationEvent, off: TextPageImageEvent | TextPageImageDelayEvent}} */ 
-    { src, page, location, on, off } ) {
+  constructor( /** @type {{src: string, page: number, location: string, offset: number, keepOriginalSize: boolean, on: TextPageImageEvent | TextPageImageFixationEvent, off: TextPageImageEvent | TextPageImageDelayEvent}} */ 
+    { src, page, location, offset, keepOriginalSize, on, off } ) {
     /** @type {string} */
     this.src = src;
     /** @type {number} */
     this.page = page;
     /** @type {string} */
     this.location = location;
+    /** @type {number} */
+    this.offset = offset || 0;
+    /** @type {boolean} */
+    this.keepOriginalSize = !!keepOriginalSize;
     /** @type {TextPageImageEvent | TextPageImageFixationEvent} */
     this.on = on;
     /** @type {TextPageImageEvent | TextPageImageDelayEvent} */
@@ -175,6 +181,8 @@ export class TextPageImage {
     const result = {
       page: this.page,
       location: this.location,
+      offset: this.offset,
+      keepOriginalSize: this.keepOriginalSize,
     };
 
     this.on.setMeta( result, 'on' );

@@ -12,6 +12,10 @@ export default class Image {
     this.src = image.src;
     /** @type {string} */
     this.location = image.location;
+    /** @type {number} */
+    this.offset = image.offset || 0;
+    /** @type {boolean} */
+    this.keepOriginalSize = !!image.keepOriginalSize;
     /** @type {string} */
     this.on = image.on.name;
     /** @type {string} */
