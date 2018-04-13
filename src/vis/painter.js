@@ -124,6 +124,8 @@ export class Painter {
     this._offsetX = 0;
     this._offsetY = 0;
 
+    this._font = null;
+
     this._syllabifier = new Syllabifier( settings.syllab );
 
     this._ctx = el.getContext( '2d' );
@@ -147,6 +149,7 @@ export class Painter {
    * @param {Font} font 
    */
   setFont( font ) {
+    this._font = font;
     this._ctx.font = `${font.style} ${font.weight} ${font.size} ${font.family}`;
   }
 
@@ -313,10 +316,25 @@ export class Painter {
   }
 
   /**
+   * @param {number} realWidth
+   * @param {string} text
+   */
+  _autoAdjustFontSize( realWidth, text ) {
+    this._ctx.font = `${this._font.style} ${this._font.weight} ${this._font.size} ${this._font.family}`;
+    const wordSizeOfDefaultSize = this._ctx.measureText( text );
+    const ratioToRealSize = realWidth / wordSizeOfDefaultSize.width;
+
+    const p = /(\d+)(\w+)/.exec( this._font.size );
+    const newSize = (parseFloat(p[1]) * ratioToRealSize).toFixed( 2 ) + p[2];
+    this._ctx.font = `${this._font.style} ${this._font.weight} ${newSize} ${this._font.family}`;
+  }
+  
+  /**
    * @typedef {Object} TransparentWordsSettings
    * @implements {WordsSettings}
    * @property {number} alpha
    */
+  
   /**
    * @param {Word} word
    * @param {TransparentWordsSettings} settings 
@@ -324,6 +342,8 @@ export class Painter {
   _drawWord( word, settings ) {
     const ctx = this._ctx;
     const rc = word.rect;
+
+    this._autoAdjustFontSize( rc.width, word.text );
 
     var { x, y } = this._offset( rc, { dy: 0.8 * rc.height } );
 
@@ -349,11 +369,20 @@ export class Painter {
       ctx.fillText( suffix, x, y );
     }
 
-    if ( settings.showConnections || settings.drawWordFrame ) {
+    if ( settings.drawWordFrame ) {
       const { x, y } = this._offset( rc );
       ctx.strokeStyle = settings.wordRectColor;
       ctx.lineWidth = 1;
       ctx.strokeRect( x, y, rc.width, rc.height );
+    }
+    else if ( settings.showConnections) {
+      const { x, y } = this._offset( rc );
+      ctx.strokeStyle = settings.wordRectColor;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo( x, y );
+      ctx.lineTo( x + rc.width, y );
+      ctx.stroke();
     }
   }
 

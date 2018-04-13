@@ -1,7 +1,10 @@
 <template lang="pug">
   #task-page
 
-    task-text(ref="container")
+    task-text(
+      ref="container"
+      :fontname="task.fontname"
+    )
 
     task-images(
       v-show="images"
@@ -62,7 +65,7 @@ export default {
       /** @type {DataCollector} */
       collector: null,
 
-      font: Font.from( TaskText.data().textStyle ),
+      font: null,
 
       fixation: {
         word: null,
@@ -156,10 +159,14 @@ export default {
   },
 
   mounted() {
+    const container = /** @type {Vue} */ (this.$refs.container);
+
+    this.font = Font.from( container.$data.textStyle );
+
     this.feedbackProvider = new FeedbackProvider( this.task.syllab, this.task.speech );
     this.feedbackProvider.init();
 
-    const textEl = /** @type {Vue} */ (this.$refs.container).$refs.text;
+    const textEl = container.$refs.text;
     this.textPresenter = new TextPresenter( this.task, this.texts.firstPage, /** @type {HTMLElement}*/ (textEl), this.feedbackProvider.syllabifier );
 
     this.collector = new DataCollector( this.task, this.student, this.font, this.feedbackProvider.setup );
