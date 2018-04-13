@@ -10,6 +10,7 @@
 
 <script>
 import ImageController from '@/task/imageController.js';
+import ScreenSize from '@/model/session/screenSize.js';
 
 // ts-check-only
 import { TextPageImage, Word } from '@/model/task/textPageImage.js';
@@ -58,7 +59,7 @@ export default {
 
   props: {
     images: {
-      type: Array,
+      type: Array,  // TextPageImage[]
       required: true,
       default: /** @returns {Array} */ () => []
     },
@@ -67,6 +68,11 @@ export default {
       type: Object, // { word: Word, duration: number }
       default: null
     },
+
+    viewport: {
+      type: Object, // ScreenSize
+      default: null
+    }
   },
 
   methods: {
@@ -113,9 +119,55 @@ export default {
       if (!props)
         return '';
 
-      return [
-        `margin-${props.location}: ${props.offset}%`,
-      ].join(' ');
+      if (this.viewport) {
+        let offsetX = -1;
+        let offsetY = -1;
+        let translateX = 0;
+        let translateY = 0;
+        let width = 'auto';
+        let height = 'auto';
+
+        const SIZE = 0.15; // 15%
+
+        if (props.location === 'bottom') {
+          offsetY = this.viewport.height - (props.offset || 0);
+          translateY = -100;
+          translateX = -50;
+          if (!props.keepOriginalSize) {
+            height = (this.viewport.height * SIZE).toFixed(0) + 'px';
+          }
+        }
+        else if (props.location === 'right') {
+          offsetX = this.viewport.width - (props.offset || 0);
+          translateX = -100;
+          translateY = -50;
+          if (!props.keepOriginalSize) {
+            width = (this.viewport.width * SIZE).toFixed(0) + 'px';
+          }
+        }
+        else if (props.location === 'left') {
+          offsetX = props.offset || 0;
+          translateY = -50;
+          if (!props.keepOriginalSize) {
+            width = (this.viewport.width * SIZE).toFixed(0) + 'px';
+          }
+        }
+
+        return [
+          `right: auto`,
+          `bottom: auto`,
+          `left: ${offsetX < 0 ? '50%' : offsetX + 'px'}`,
+          `top: ${offsetY < 0 ?'50%' : offsetY + 'px'}`,
+          `transform: translateX(${translateX}%) translateY(${translateY}%)`,
+          `width: ${width}`,
+          `height: ${height}`,
+        ].join(';');
+      }
+      else {
+        return [
+          `margin-${props.location}: ${props.offset}px`,
+        ].join(';');
+      }
     },
   },
 
@@ -146,10 +198,6 @@ export default {
 
   @size: 15%;
   @margin: 0.25em;
-
-  .fit-to-margin {
-
-  }
 
   .horizontal {
     width: calc(@size - 2 * @margin);

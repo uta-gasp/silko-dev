@@ -90,8 +90,8 @@
           .field.is-horizontal
             .field-label.is-normal Location
             .field-body
-              input.input.is-inline(type="number" step="1" v-model.number="offset" min="0" max="50")
-              .info-label % from
+              input.input.is-inline(type="number" step="5" v-model.number="offset" min="0" max="800")
+              .info-label pixels from
               .select
                 select(v-model="location")
                   option(value="left") left
@@ -452,7 +452,7 @@ export default {
      * @returns {string}
      */
     getImageLocation( image ) {
-      return image.location + (image.offset ? ` + ${image.offset}%` : '');
+      return image.location + (image.offset ? ` + ${image.offset}px` : '');
     },
  
     /** 
