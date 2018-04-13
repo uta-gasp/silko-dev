@@ -2,7 +2,7 @@
   #vis-plot(ref="root")
     canvas(ref="canvas")
     task-images(
-      :images="currentImages"
+      :images="visibleImages"
       :fixation="fixation"
       :viewport="defaultSession.screen"
     )
@@ -35,7 +35,6 @@
 import { OptionsCreator, OptionGroup, OptionItem } from '@/vis/optionsCreator.js';
 import sgwmController from '@/vis/sgwmController.js';
 import { Feedbacks } from '@/model/session/feedbacks';
-import { TextPageImage, TextPageImageEvent } from '@/model/task/textPageImage.js';
 
 import ControlPanel from '@/components/vis/controlPanel.vue';
 import Options from '@/components/vis/Options.vue';
@@ -43,7 +42,9 @@ import TaskImages from '@/components/widgets/TaskImages.vue';
 
 // ts-check-only
 import DataPage from '@/model/data/dataPage.js';
+import DataImage from '@/model/data/image.js';
 import Data from '@/vis/data/data.js';
+import { TextPageImage } from '@/model/task/textPageImage.js';
 
 const COMMON_UI = {
   wordColor: '#666',
@@ -89,8 +90,10 @@ export default {
       isPlayerPaused: false,
       isWarningMessageVisible: false,
 
-      /** @type {TextPageImage[]} */
+      /** @type {DataImage[]} */
       currentImages: [],
+      /** @type {TextPageImage[]} */
+      visibleImages: [],
       fixation: null,
     };
   },
@@ -147,15 +150,7 @@ export default {
     setPage( e ) {
       this.pageIndex = e.index;
       this.currentPages = this.data.records.map( record => record.data.pages[ e.index ] );
-      this.currentImages = (this.currentPages[0].images || []).map( image => new TextPageImage({
-        src: image.src, 
-        page: -1, 
-        location: image.location, 
-        offset: image.offset, 
-        keepOriginalSize: image.keepOriginalSize,
-        on: new TextPageImageEvent( TextPageImage.EVENT.none ), 
-        off: new TextPageImageEvent( TextPageImage.EVENT.none )
-      }));
+      this.currentImages = this.currentPages[0].images || [];
       this.changePage();
     },
 

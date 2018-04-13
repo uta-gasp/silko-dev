@@ -8,6 +8,8 @@ import { Painter } from '@/vis/painter.js';
 import Metric from '@/vis/metric.js';
 import Regressions from '@/vis/regressions.js';
 
+import { TextPageImage } from '@/model/task/textPageImage.js';
+
 // ts-check-only
 import DataPageTextWord from '@/model/data/dataPageTextWord.js';
 
@@ -91,6 +93,8 @@ export default {
       }
 
       this.mapAndShow();
+
+      this.visibleImages = this.currentImages.map( image => TextPageImage.from( image, { ignoreDisplayCondition: true } ) );
     },
 
     redraw() {

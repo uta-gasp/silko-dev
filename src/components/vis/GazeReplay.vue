@@ -6,7 +6,12 @@ import { Painter } from '@/vis/painter.js';
 import Metric from '@/vis/metric.js';
 import ReplayTrack from '@/vis/replayTrack.js';
 
+import { TextPageImage } from '@/model/task/textPageImage.js';
+
 import VisPlot from '@/components/vis/VisPlot.vue';
+
+// ts-check-only
+import Fixation from '@/model/data/fixation';
 
 const LEGEND_LOCATION = {
   x: 2,
@@ -83,6 +88,9 @@ export default {
 
     changePage() {
       this.isWarningMessageVisible = false;
+      this.visibleImages = this.currentImages
+        .filter( image => image.on === TextPageImage.EVENT.none)
+        .map( image => TextPageImage.from( image ) );
 
       if ( !this.painter ) {
         this.painter = new Painter( /** @type {HTMLCanvasElement}*/ (this.$refs.canvas), {
@@ -141,7 +149,21 @@ export default {
       this.tracks.forEach( ( track, ti ) => {
         track.start(
           this.pageIndex, {  // callbacks
-            fixation: () => {
+            fixation: ( /** @type {Fixation} */ fixation, /** @type {HTMLElement} */ pointer ) => {
+              const missingImages = this.currentImages.filter( image => {
+                return !this.visibleImages.find( img => img.src === image.src ) && 
+                        image.shown < fixation.tsSync; 
+              });
+              const imagesToHide = this.currentImages.filter( image => {
+                return !!this.visibleImages.find( img => img.src === image.src ) && 
+                        image.hidden > 0 && image.hidden < fixation.tsSync;
+              });
+
+              if (missingImages.length > 0 || imagesToHide.legnth > 0) {
+                this.visibleImages = this.currentImages
+                  .filter( image => image.shown <= fixation.tsSync && (image.hidden > 0 ? fixation.tsSync < image.hidden : true) )
+                  .map( image => TextPageImage.from( image, { ignoreDisplayCondition: true } ) );
+              }
             },
             completed: /** @param {string} reason */ reason => {
               this.isWarningMessageVisible = !!reason;

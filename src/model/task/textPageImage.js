@@ -1,3 +1,5 @@
+import DataImage from '@/model/data/image.js';
+
 /**
  * @typedef {Object} ImageCreateParams
  * @property {string} src - URL string
@@ -205,6 +207,25 @@ export class TextPageImage {
   static generatePrefix() {
     const uuid = uuidv4();
     return `${uuid}${FILE_ID_SPLITTER}`;
+  }
+
+  /**
+   * @param {DataImage} image
+   * @param {{ignoreDisplayCondition: boolean}} options?
+   * @returns {TextPageImage}
+   */
+  static from( image, options ) {
+    options = options || { ignoreDisplayCondition: false };
+
+    return new TextPageImage({
+      src: image.src, 
+      page: -1, 
+      location: image.location, 
+      offset: image.offset, 
+      keepOriginalSize: image.keepOriginalSize,
+      on: new TextPageImageEvent( options.ignoreDisplayCondition ? TextPageImage.EVENT.none : image.on ), 
+      off: new TextPageImageEvent( image.off )
+    });
   }
 
 };
