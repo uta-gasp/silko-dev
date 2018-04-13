@@ -197,20 +197,6 @@ export default {
     display: block;
   }
 
-  .example {
-    display: inline-block;
-    background-color: white;
-    padding: 0 0.5em;
-    margin: 2px 0.5em;
-  }
-
-  .panel-block {
-    span:before,
-    span:after {
-      content: " ";
-    }
-  }
-
   .is-inlined,
   .is-inlined .column {
     margin-bottom: 0;

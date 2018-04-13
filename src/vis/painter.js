@@ -3,6 +3,8 @@ import Syllabifier from '@/task/syllabifier.js';
 import Metric from '@/vis/metric.js';
 import Colors from '@/vis/colors.js';
 
+import WordFont from '@/model/data/wordFont.js';
+
 // ts-check-only
 import { SyllabOptions } from '@/model/session/feedbacks.js';
 import Font from '@/model/session/font.js';
@@ -23,8 +25,10 @@ import Font from '@/model/session/font.js';
  * @property {number} left
  * @property {number} right
  * @property {number} top
+ * @property {number} bottom
  * @property {{charSpeed: number, syllableSpeed: number}} reading
  * @property {{duration: number, count: number}} [focusing]
+ * @property {WordFont} [font]
  */
 
 /**
@@ -34,6 +38,14 @@ import Font from '@/model/session/font.js';
  * @property {number} y
  * @property {number} width
  * @property {number} height
+ */
+
+/**
+ * Underline
+ * @typedef {Object} Underline
+ * @property {number} left
+ * @property {number} right
+ * @property {number} y
  */
 
 /**
@@ -160,6 +172,7 @@ export class Painter {
    * @property {string} showConnections
    * @property {string} hyphen
    */
+
   /**
    * @param {Word[]} words 
    * @param {WordsSettings} settings 
@@ -235,7 +248,16 @@ export class Painter {
       }
 
       if ( settings.showConnections && fix.word ) {
-        this._drawConnection( fix, {x: ( fix.word.left + fix.word.right ) / 2, y: fix.word.top}, settings );
+        this._drawConnection( fix, {
+              x: ( fix.word.left + fix.word.right ) / 2, 
+              y: fix.word.bottom
+            }, {
+              left: fix.word.left,
+              right: fix.word.right,
+              y: fix.word.bottom
+            },
+          settings 
+        );
       }
 
       this._drawFixation( fix, settings );
@@ -317,16 +339,25 @@ export class Painter {
 
   /**
    * @param {number} realWidth
-   * @param {string} text
+   * @param {Word} word
    */
-  _autoAdjustFontSize( realWidth, text ) {
-    this._ctx.font = `${this._font.style} ${this._font.weight} ${this._font.size} ${this._font.family}`;
-    const wordSizeOfDefaultSize = this._ctx.measureText( text );
-    const ratioToRealSize = realWidth / wordSizeOfDefaultSize.width;
+  _autoAdjustFontSize( realWidth, word ) {
+    if (word.font) {
+      const font = word.font;
+      this._ctx.font = `${font.style} ${font.weight} ${font.size} ${this._font.family}`;
+    }
+    else {
+      const font = this._font;
+      this._ctx.font = `${font.style} ${font.weight} ${font.size} ${font.family}`;
 
-    const p = /(\d+)(\w+)/.exec( this._font.size );
-    const newSize = (parseFloat(p[1]) * ratioToRealSize).toFixed( 2 ) + p[2];
-    this._ctx.font = `${this._font.style} ${this._font.weight} ${newSize} ${this._font.family}`;
+      const wordSizeOfDefaultSize = this._ctx.measureText( word.text );
+      const ratioToRealSize = realWidth / wordSizeOfDefaultSize.width;
+
+      const p = /(\d+)(\w+)/.exec( font.size );
+      const newSize = (parseFloat(p[1]) * ratioToRealSize).toFixed( 2 ) + p[2];
+
+      this._ctx.font = `${font.style} ${font.weight} ${newSize} ${this._font.family}`;
+    }
   }
   
   /**
@@ -343,13 +374,13 @@ export class Painter {
     const ctx = this._ctx;
     const rc = word.rect;
 
-    this._autoAdjustFontSize( rc.width, word.text );
+    this._autoAdjustFontSize( rc.width, word );
 
     var { x, y } = this._offset( rc, { dy: 0.8 * rc.height } );
 
     ctx.textAlign = 'start';
     ctx.textBaseline = 'alphabetic';
-    ctx.fillStyle = settings.wordColor;
+    ctx.fillStyle = word.font ? word.font.color : settings.wordColor;
     ctx.fillText( word.text, x, y );
 
     if ( settings.alpha > 0 ) {
@@ -374,15 +405,6 @@ export class Painter {
       ctx.strokeStyle = settings.wordRectColor;
       ctx.lineWidth = 1;
       ctx.strokeRect( x, y, rc.width, rc.height );
-    }
-    else if ( settings.showConnections) {
-      const { x, y } = this._offset( rc );
-      ctx.strokeStyle = settings.wordRectColor;
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo( x, y );
-      ctx.lineTo( x + rc.width, y );
-      ctx.stroke();
     }
   }
 
@@ -411,9 +433,10 @@ export class Painter {
   /**
    * @param {Point} from 
    * @param {Point} to 
+   * @param {Underline} underline
    * @param {GazePathSettings} settings 
    */
-  _drawConnection( from, to, settings ) {
+  _drawConnection( from, to, underline, settings ) {
     const ctx = this._ctx;
 
     ctx.strokeStyle = settings.connectionColor;
@@ -426,6 +449,15 @@ export class Painter {
     var { x, y } = this._offset( to );
     ctx.lineTo( x, y );
 
+    ctx.stroke();
+
+    ctx.strokeStyle = settings.connectionColor;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    var { x, y } = this._offset( { x: underline.left, y: underline.y } );
+    ctx.moveTo( x, y );
+    var { x, y } = this._offset( { x: underline.right, y: underline.y } );
+    ctx.lineTo( x, y );
     ctx.stroke();
   };
 

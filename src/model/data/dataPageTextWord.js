@@ -1,4 +1,5 @@
 import Rect from './rect.js';
+import WordFont from './wordFont.js';
 
 export default class DataPageTextWord {
 
@@ -6,11 +7,13 @@ export default class DataPageTextWord {
    * @param {number} id 
    * @param {string} text 
    * @param {Rect} rect 
+   * @param {WordFont} [font]
    */
-  constructor( id, text, rect ) {
+  constructor( id, text, rect, font ) {
     this.id = id;
     this.text = text;
     this.rect = rect;
+    this.font = font;
   }
 
   /**
@@ -19,7 +22,7 @@ export default class DataPageTextWord {
    * @returns {DataPageTextWord}
    */
   static from( el, id ) {
-    return el ? new DataPageTextWord( id, el.textContent, Rect.from( el ) ) : null;
+    return el ? new DataPageTextWord( id, el.textContent, Rect.from( el ), WordFont.fromEl( el ) ) : null;
   }
 
   /**
