@@ -1,5 +1,5 @@
 /** @type {boolean} */
-const enabled = !!window[ 'webpackHotUpdate' ];
+const enabled = !! /** @type {Object.<string,any>} */ (window)[ 'webpackHotUpdate' ];
 
 function random( max = 100, step = 1, min = 0 ) {
   min = Math.ceil( min );

@@ -10,12 +10,6 @@ import db from '@/db/db.js';
 // ts-check-only
 import { Question } from '@/model/session/question';
 
-/**
- * @typedef {Object} QuestionWithAnswer
- * @implements {Question}
- * @property {string} answer
- */
-
 export default class Student extends Recordable {
 
   /**
@@ -304,7 +298,7 @@ export default class Student extends Recordable {
 
   /**
    * @param {string} dataID 
-   * @param {QuestionWithAnswer} questionnaire 
+   * @param {Question[]} questionnaire 
    * @param {Callback} cb 
    * @returns {Promise}
    */

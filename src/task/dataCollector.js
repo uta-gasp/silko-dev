@@ -51,7 +51,7 @@ class Page {
    * @param {boolean} isIntroPage 
    */
   constructor( isIntroPage ) {
-    /** @type {Map} */
+    /** @type {Map<HTMLElement,DataPageFocusedWord>} */
     this.words = new Map();
     /** @type {DataPage} */
     this.data = new DataPage();

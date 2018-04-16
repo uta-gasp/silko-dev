@@ -166,8 +166,8 @@ export default {
     this.feedbackProvider = new FeedbackProvider( this.task.syllab, this.task.speech );
     this.feedbackProvider.init();
 
-    const textEl = container.$refs.text;
-    this.textPresenter = new TextPresenter( this.task, this.texts.firstPage, /** @type {HTMLElement}*/ (textEl), this.feedbackProvider.syllabifier );
+    const textEl = /** @type {HTMLElement}*/ (container.$refs.text);
+    this.textPresenter = new TextPresenter( this.task, this.texts.firstPage, textEl, this.feedbackProvider.syllabifier );
 
     this.collector = new DataCollector( this.task, this.student, this.font, this.feedbackProvider.setup );
     this.feedbackProvider.events.addListener( 'syllabified', /** @param {HTMLElement} el */ el => this.collector.syllabified( el ) );

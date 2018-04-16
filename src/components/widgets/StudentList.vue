@@ -172,7 +172,7 @@ export default {
       } );
     },
 
-    /** @param {Callback} cb */
+    /** @param {(err?: string | Error) => void} cb */
     loadAvailableStudents( cb ) {
       this.teacher.getSchool( /** @param {Error | string} err; @param {School} school */ ( err, school ) => {
         if ( err ) {

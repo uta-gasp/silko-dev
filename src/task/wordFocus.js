@@ -32,7 +32,7 @@ export default class WordFocus {
         return true;
       }
       if ( node.nodeType === Node.ELEMENT_NODE ) {
-        return !node.classList.contains( 'hyphens' );
+        return ! /** @type {Element} */ (node).classList.contains( 'hyphens' );
       }
       return false;
     } );

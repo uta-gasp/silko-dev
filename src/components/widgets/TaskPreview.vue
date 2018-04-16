@@ -59,6 +59,7 @@ export default {
       textPresenter: null,
       /** @type {FeedbackProvider} */
       feedbackProvider: null,
+      /** @type {Word} */
       fixatedWord: null,
     };
   },
@@ -99,7 +100,7 @@ export default {
       return this.task.pages[ pageIndex ].images;
     },
 
-    /** @returns {{word: string, duration: number}} */
+    /** @returns {{word: Word, duration: number}} */
     fixation() {
       return { word: this.fixatedWord, duration: 900000 + Math.floor( Math.random() * 100000 ) };
     },
@@ -154,10 +155,11 @@ export default {
 
     /** @param {Event} e */
     fixate( e ) {
-      if ( /** @type {Element} */ (e.target).classList.contains( 'word' ) ) {
-        const text = this.feedbackProvider.syllabifier.unprepare( /** @type {Element} */ (e.target).textContent );
+      const el = /** @type {HTMLElement} */ (e.target);
+      if ( el.classList.contains( 'word' ) ) {
+        const text = this.feedbackProvider.syllabifier.unprepare( el.textContent );
         if ( text ) {
-          this.fixatedWord = new Word( text );
+          this.fixatedWord = new Word( text, el.dataset.wordId );
         }
       }
     },

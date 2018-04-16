@@ -366,10 +366,10 @@ export default {
         number.step = option.step + '';
       }
       if ( option.min !== undefined ) {
-        number.min = option.min;
+        number.min = option.min.toString();
       }
       if ( option.max !== undefined ) {
-        number.max = option.max;
+        number.max = option.max.toString();
       }
       number.classList.add( 'value' );
       number.classList.add( id );

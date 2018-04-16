@@ -72,10 +72,7 @@ export default {
   data() {
     return {
       isOptionsDisplayed: false,
-      options: {
-        _common: this.createCommonOptions(),
-        _sgwm: sgwmController.createOptions(),
-      },
+      options: null,
 
       commonUI: COMMON_UI,
 
@@ -187,11 +184,18 @@ export default {
 
     /** 
      * @param {DataPage} page 
-     * @returns {{fixations: SGWMFixation[], words: SGWMWord[]}}
+     * @returns {{fixations: any[], words: any[]}} {{fixations: SGWMFixation[], words: SGWMWord[]}}
      * */
     map( page ) {
       return sgwmController.map( page );
     },
+  },
+
+  created() {
+    this.options = {
+      _common: this.createCommonOptions(),
+      _sgwm: sgwmController.createOptions(),
+    };    
   },
 
   mounted() {

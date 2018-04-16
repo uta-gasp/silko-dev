@@ -78,8 +78,8 @@ export default class Admin {
       const prevSchool = schools.find( school => school.id === prevSchoolID );
       const newSchool = schools.find( school => school.id === newSchoolID );
 
-      delete prevSchool[ list ][ user.id ];
-      newSchool[ list ][ user.id ] = user.name;
+      delete /** @type {any} */ (prevSchool)[ list ][ user.id ];
+      /** @type {any} */ (newSchool)[ list ][ user.id ] = user.name;
 
       db.updateField( newSchool, `${list}/${user.id}`, user.name, err => {
         if ( err ) {

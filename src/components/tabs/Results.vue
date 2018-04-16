@@ -229,7 +229,7 @@ export default {
       }
     },
 
-    /** @param {Callback} cb */
+    /** @param {(err?: string | Error) => void} cb */
     loadClasses( cb ) {
       this.teacher.getClasses( /** @param {Error | string} err; @param {ModelClass[]} classes */ ( err, classes ) => {
         if ( err ) {

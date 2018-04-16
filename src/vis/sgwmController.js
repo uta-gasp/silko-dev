@@ -149,7 +149,7 @@ export default class sgwmController {
   static save() {
     for ( let name in _SGWM ) {
       /** @type {SGWMSettings} */
-      const settings = _SGWM[ name ];
+      const settings = /** @type {Object.<string, SGWMSettings>} */ (_SGWM)[ name ];
       settings.save();
     }
   }

@@ -43,17 +43,8 @@ export default {
         bottom: null,
       },
 
-      imageController: new ImageController( {
-        onShow: image => {
-          this.imageProps[ image.location ] = new ImageProps( image );
-          //this._setOffset( this.image[ image.location ] )
-          this.$emit( 'show', { image } );
-        },
-        onHide: image => {
-          this.imageProps[ image.location ] = null;
-          this.$emit( 'hide', { image } );
-        },
-      } ),
+      /** @type {ImageController} */
+      imageController: null,
     };
   },
 
@@ -185,6 +176,20 @@ export default {
     fixation( fixation ) {
       this.imageController.fixate( fixation.word, fixation.duration );
     },
+  },
+
+  mounted() {
+    this.imageController = new ImageController( {
+        onShow: image => {
+          this.imageProps[ image.location ] = new ImageProps( image );
+          //this._setOffset( this.image[ image.location ] )
+          this.$emit( 'show', { image } );
+        },
+        onHide: image => {
+          this.imageProps[ image.location ] = null;
+          this.$emit( 'hide', { image } );
+        },
+      } );
   },
 
   destroyed() {

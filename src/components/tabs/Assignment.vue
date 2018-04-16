@@ -39,13 +39,8 @@ import FinishedPage from '@/components/task/FinishedPage.vue';
 
 // ts-check-only
 import Task from '@/model/task.js';
-import Question from '@/model/session/question.js';
+import { Question } from '@/model/session/question.js';
 import VueRouter from 'vue-router';
-
-/**
- * @typedef {Question} AnsweredQuestion
- * @property {string} answer
- */
 
 const STATES = {
   calibrate: { },
@@ -82,7 +77,7 @@ export default {
 
       /** @type {{data: string, session: string}} */
       keys: null,
-      /** @type {AnsweredQuestion[]} */
+      /** @type {Question[]} */
       questionnaire: null,
       /** @type {string[]} */
       longGazedWords: [],
@@ -192,7 +187,7 @@ export default {
       this.isDataSaved = true;
     },
 
-    /** @param {{questionnaire: AnsweredQuestion[]}} e */
+    /** @param {{questionnaire: Question[]}} e */
     questionnaireDone( e ) {
       this.questionnaire = e.questionnaire;
       this.state = STATES.finished;

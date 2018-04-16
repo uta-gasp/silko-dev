@@ -1,11 +1,4 @@
 export class OptionItem {
-  /**
-   * @param {Object} p
-   * @param {NumberConstructor | BooleanConstructor | StringConstructor | ArrayConstructor | string} p.type
-   * @param {string} p.label 
-   * @param {string[]} [p.items] 
-   * @param {number} [p.step] 
-   */
   constructor( /** @type {{type: (NumberConstructor | BooleanConstructor | StringConstructor | ArrayConstructor | string), label: string, items?: string[], step?: number}} */ 
     { type, label, items = [''], step = 0 } ) {
     this.type = type;
@@ -26,14 +19,8 @@ export class OptionItem {
  */
 
 export class OptionGroup {
-  /**
-   * @param {Object} p
-   * @param {string} [p.id]
-   * @param {string} p.title 
-   * @param {OptionItems | OptionGroup[]} p.options 
-   * @param {any[]} [p.defaults] 
-   */
-  constructor( { id = '', title = '', options = {}, defaults = [{}] } ) {
+  constructor( /** @type {{id?: string, title: string, options: OptionItems | OptionGroup[], defaults?: any[]}} */ 
+    { id = '', title = '', options = {}, defaults = [{}] } ) {
     this.title = title;
     /** @type {OptionItems | OptionGroup[]} */
     this.options = options;

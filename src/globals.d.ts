@@ -169,9 +169,9 @@ interface FBUser {
 
 interface FBAuth {
   onAuthStateChanged( cb: function );
-  signInWithEmailAndPassword( email: string, password: string ): Promise;
-  sendPasswordResetEmail( email: string ): Promise;
-  createUserWithEmailAndPassword( email: string, password: string ): Promise;
+  signInWithEmailAndPassword( email: string, password: string ): Promise<FBUser>;
+  sendPasswordResetEmail( email: string ): Promise<any>;
+  createUserWithEmailAndPassword( email: string, password: string ): Promise<FBUser>;
   signOut();
 }
 
@@ -180,6 +180,17 @@ interface FirebaseDataSnapshot {
   readonly bytesTransferred: number;
   readonly totalBytes: number;
   readonly ref: Firebase;
+  exists(): boolean;
+  val(): any;
+  forEach( cb: (data: FirebaseDataSnapshot) => void ): void;
+  update( data: any, cb?: (data: any) => void );
+  push( data: any );
+  child( field: string ): FirebaseDataSnapshot;
+  set( data: any, cb?: (data: aby) => void ): Promise;
+  once( event: string, cb: (data: FirebaseDataSnapshot) => void, failed?: (err: string) => void ): Promise;
+  remove(): Promise;
+  orderByChild( field: string ): FirebaseDataSnapshot;
+  equalTo( value: string ): FirebaseDataSnapshot;
 }
 
 interface Firebase {
@@ -187,7 +198,13 @@ interface Firebase {
   initializeApp( object );
   database( object );
   readonly storage: FBStorage;
-	auth( authToken?: string ): FBAuth;
+  auth( authToken?: string ): FBAuth;
+  remove();
+}
+
+interface FirebaseRef {
+  child( name: string ): FirebaseDataSnapshot;
+  update( data: any, cb?: () => Promise );
 }
 
 declare var EventEmitter: EventEmitter;

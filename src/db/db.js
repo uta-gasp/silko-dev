@@ -47,7 +47,17 @@ class DB {
   constructor() {
     this._connected = false;
 
-    if ( !window['firebase'] ) {
+    /** @type {FirebaseRef} */
+    this.fb = null;
+    this.storage = null;
+    this.auth = null;
+
+    /** @type {UserBase} */
+    this._user = null;
+    this.ignoreUserSwitch = false;
+    this.currentPassword = '';
+
+    if ( !/** @type {any} */(window)['firebase'] ) {
       window.alert( 'Cannot access Firebase' );
       return;
     }
@@ -76,11 +86,6 @@ class DB {
     this.fb = firebase.database( app ).ref();
     this.storage = firebase.storage().ref();
     this.auth = firebase.auth();
-
-    /** @type {UserBase} */
-    this._user = null;
-    this.ignoreUserSwitch = false;
-    this.currentPassword = '';
 
     this.auth.onAuthStateChanged( this._onUserChanged.bind( this ) );
   }
@@ -111,7 +116,7 @@ class DB {
       email += this.FAKE_EMAIL_DOMAIN;
     }
 
-    return this.auth.signInWithEmailAndPassword( email, password ).then( /** @param {FBUser} user */ user => {
+    return this.auth.signInWithEmailAndPassword( email, password ).then( user => {
       this.currentPassword = password;
       cb( null, user );
     } ).catch( /** @param {string} err */ err => {
@@ -134,7 +139,7 @@ class DB {
    * @returns {Promise}
    */
   resetPassword( email, cb ) {
-    return this.auth.sendPasswordResetEmail( email ).then( /** @param {any} _ */ _ => {
+    return this.auth.sendPasswordResetEmail( email ).then( _ => {
       cb( null );
     } ).catch( /** @param {string} err */ err => {
       cb( err );
@@ -163,7 +168,7 @@ class DB {
       const password = obj.password || DEFAULT_PASSWORD;
       delete obj.password;
 
-      this.auth.createUserWithEmailAndPassword( obj.email, password ).then( /** @param {FBUser} user */ user => {
+      this.auth.createUserWithEmailAndPassword( obj.email, password ).then( user => {
         // user.sendEmailVerification();
 
         if ( obj.email.indexOf( '@' ) > 0 && obj.email.indexOf( this.FAKE_EMAIL_DOMAIN ) < 0 ) {
@@ -267,13 +272,13 @@ class DB {
    */
   get( cls, id, cb ) {
     const ref = this.fb.child( `${cls.db}/${id}` );
-    return ref.once( 'value', /** @param {FirebaseDataSnapshot} snapshot */ snapshot => {
+    return ref.once( 'value', snapshot => {
       if ( !snapshot.exists() ) {
         return cb( new Error( `${cls.db}/${id} do not exist` ) );
       }
 
       cb( null, cls.from( snapshot ) );
-    }, /** @param {string} err */ err => {
+    }, err => {
       cb( err );
     } );
   }
@@ -295,19 +300,19 @@ class DB {
 
     this._toArray( ids ).forEach( id => {
       const ref = this.fb.child( `${cls.db}/${id}` );
-      promises.push( ref.once( 'value', /** @param {FirebaseDataSnapshot} snapshot */ snapshot => {
+      promises.push( ref.once( 'value', snapshot => {
         if ( !snapshot.exists() ) {
           errors.push( `${cls.db}/${id}` );
           return;
         }
 
         results.push( cls.from( snapshot ) );
-      }, /** @param {string} err */ err => {
+      }, err => {
         errors.push( err );
       } ) );
     } );
 
-    return Promise.all( promises ).then( /** @param {any} _ */ _ => {
+    return Promise.all( promises ).then( _ => {
       cb( errors.join( ', ' ), results );
     } );
   }
@@ -321,16 +326,16 @@ class DB {
    */
   getFieldAll( path, cls, cb ) {
     const ref = this.fb.child( path ); // `${cls.db}/${id}/${field}`
-    return ref.once( 'value', /** @param {FirebaseDataSnapshot} snapshot */ snapshot => {
+    return ref.once( 'value', snapshot => {
       /** @type {Recordable[]} */
       const objs = [];
 
-      snapshot.forEach( /** @param {FirebaseDataSnapshot} childSnapshot */ childSnapshot => {
+      snapshot.forEach( childSnapshot => {
         objs.push( cls.from( childSnapshot ) );
       } );
 
       cb( null, objs );
-    }, /** @param {string} err */ err => {
+    }, err => {
       cb( err );
     } );
   }
@@ -343,7 +348,7 @@ class DB {
    */
   getAll( cls, cb ) {
     const ref = this.fb.child( cls.db );
-    return ref.once( 'value', /** @param {FirebaseDataSnapshot} snapshot */ snapshot => {
+    return ref.once( 'value', snapshot => {
       if ( !snapshot.exists() ) {
         return cb( null, [] );
         // return cb( new Error( `${cls.db} do not exist` ) );
@@ -352,12 +357,12 @@ class DB {
       /** @type {Recordable[]} */
       const objs = [];
 
-      snapshot.forEach( /** @param {FirebaseDataSnapshot} childSnapshot */ childSnapshot => {
+      snapshot.forEach( childSnapshot => {
         objs.push( cls.from( childSnapshot ) );
       } );
 
       cb( null, objs );
-    }, /** @param {string} err */ err => {
+    }, err => {
       cb( err );
     } );
   }
@@ -410,13 +415,13 @@ class DB {
    */
   deleteUser( id ) {
     const query = this.fb.child( 'users' ).orderByChild( 'id' ).equalTo( id );
-    return query.once( 'value', /** @param {FirebaseDataSnapshot} snapshot */ snapshot => {
+    return query.once( 'value', snapshot => {
       if ( snapshot.exists() ) {
-        snapshot.forEach( /** @param {FirebaseDataSnapshot} user */ user => {
+        snapshot.forEach( user => {
           user.ref.remove();
         } );
       }
-    }, /** @param {string} err */ err => {
+    }, err => {
       console.log( '@/db/db.js/.deleteUser firebase.Query.once', err );  // TODO is just logging error enough?
     } );
   }
@@ -491,7 +496,7 @@ class DB {
       }
 
       // otherwise get the user record, if it exists
-      this.fb.child( `users/${user.uid}` ).once( 'value', /** @param {FirebaseDataSnapshot} snapshot */ snapshot => {             // TODO - replace by this.get
+      this.fb.child( `users/${user.uid}` ).once( 'value', snapshot => {             // TODO - replace by this.get
         const userRef = new User( snapshot.val(), user.uid, user.uid === ADMIN_UID );
         UserCreator.create( user, userRef, /** @param {Error} err; @param {UserBase} result*/ ( err, result ) => {
           if ( err ) {

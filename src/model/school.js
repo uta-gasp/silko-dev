@@ -103,11 +103,10 @@ export default class School extends Recordable {
   }
 
   /**
-   * @param {StudentCreateParams} param0 
    * @param {Callback} cb 
    * @returns {Promise}
    */
-  createStudent( {name = '', email = '', password = '', grade = ''}, cb ) {
+  createStudent( /** @type {StudentCreateParams} */ {name = '', email = '', password = '', grade = ''}, cb ) {
     return db.add( Student, {
       name: name,
       email: email,

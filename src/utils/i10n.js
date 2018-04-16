@@ -122,8 +122,8 @@ const repo = {
     },
 
     info_title: {
-      'en': p1 => `As ${p1}, you can`,
-      'fi': p1 => `${p1} saa`,
+      'en': /** @param {string} p1 */ p1 => `As ${p1}, you can`,
+      'fi': /** @param {string} p1 */ p1 => `${p1} saa`,
     },
     info_adm_1: {
       'en': 'Add and list teachers',
@@ -235,9 +235,10 @@ export let langs = [ 'en', 'fi' ];
 
 /**
  * @param {string} compName 
- * @returns {Object.<string>}
+ * @returns {Object.<string,string>}
  */
 export function i10n( compName ) {
+  /** @type {Object.<string,any>} */
   const compRepo = repo[ compName ];
   if (!compRepo) {
     return null;
@@ -250,7 +251,7 @@ export function i10n( compName ) {
     lang = langs[0];
   }
 
-  /** @type {Object.<string>} */
+  /** @type {Object.<string,string>} */
   const result = {};
   for (let token in compRepo) {
     result[ token ] = compRepo[ token ][ lang ];

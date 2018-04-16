@@ -73,7 +73,7 @@ export default class DataPage {
   }
 
   /**
-   * @param {Map} words - { el: DataPageFocusedWord }
+   * @param {Map<HTMLElement,DataPageFocusedWord>} words
    */
   setWords( words ) {
     const focusedWords = [];

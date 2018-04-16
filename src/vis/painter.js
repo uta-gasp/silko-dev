@@ -329,11 +329,11 @@ export class Painter {
   }
 
   /**
-   * @param {Point | Rect | Fixation} point 
-   * @param {{dx: number, dy: number}} [offset={dx: 0, dy: 0}] 
    * @returns {Point}
    */
-  _offset( { x = 0, y = 0 }, { dx = 0, dy = 0 } = { dx: 0, dy: 0 } ) {
+  _offset( 
+      /** @type {Point | Rect | Fixation} */ { x = 0, y = 0 }, 
+      /** @type {{dx?: number, dy?: number}} */ { dx = 0, dy = 0 } = { dx: 0, dy: 0 } ) {
     return { x: x + this._offsetX + dx, y: y + this._offsetY + dy };
   }
 
