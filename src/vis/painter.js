@@ -224,6 +224,8 @@ export class Painter {
     ctx.fillStyle = settings.background;
     ctx.fillRect( x, y, rc.width, rc.height );
 
+    this._autoAdjustFontSize( rc.width, event.text );
+
     /* eslint no-redeclare: "off" */
     var { x, y } = this._offset( rc, { dy: 0.8 * rc.height } );
     ctx.fillStyle = settings.wordColor;
@@ -339,18 +341,21 @@ export class Painter {
 
   /**
    * @param {number} realWidth
-   * @param {Word} word
+   * @param {Word | string} word
    */
   _autoAdjustFontSize( realWidth, word ) {
-    if (word.font) {
-      const font = word.font;
+    const wordObj = /** @type {Word} */ (word);
+    if (wordObj.font) {
+      const font = wordObj.font;
       this._ctx.font = `${font.style} ${font.weight} ${font.size} ${this._font.family}`;
     }
     else {
+      /** @type {string} */
+      const text = wordObj.text ? wordObj.text : /** @type {string} */ (word);
       const font = this._font;
       this._ctx.font = `${font.style} ${font.weight} ${font.size} ${font.family}`;
 
-      const wordSizeOfDefaultSize = this._ctx.measureText( word.text );
+      const wordSizeOfDefaultSize = this._ctx.measureText( text );
       const ratioToRealSize = realWidth / wordSizeOfDefaultSize.width;
 
       const p = /(\d+)(\w+)/.exec( font.size );
