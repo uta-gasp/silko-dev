@@ -181,13 +181,17 @@ export default {
   mounted() {
     this.imageController = new ImageController( {
         onShow: image => {
+          console.log('IMC_CB', 'shown', image.src.split('_').find((v, i, a) => i === (a.length - 1)).split('?')[0]);
           this.imageProps[ image.location ] = new ImageProps( image );
           //this._setOffset( this.image[ image.location ] )
           this.$emit( 'show', { image } );
+          console.log('IMC_CB', '---');
         },
         onHide: image => {
+          console.log('IMC_CB', 'hidden', image.src.split('_').find((v, i, a) => i === (a.length - 1)).split('?')[0]);
           this.imageProps[ image.location ] = null;
           this.$emit( 'hide', { image } );
+          console.log('IMC_CB', '---');
         },
       } );
   },

@@ -283,16 +283,18 @@ export default class Student extends Recordable {
         return cb( err );
       }
 
-      // TODO
-      // These lines are for production mode
+      // DEBUG-LINES
+      // PROD: enable these lines
+      /*
       if ( Student.MULTICLASS ) {
         this.removeAssignment( task, cb );
       }
       else {
         this.setAssignment( task, null, cb );
-      }
-      // This line is for dev mode
-      // cb();
+      }*/
+
+      // PROD: remove next line
+      cb();
     } );
   }
 

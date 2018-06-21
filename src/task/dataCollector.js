@@ -196,7 +196,13 @@ export default class DataCollector {
     this._pages.items.forEach( page => {
       page.words.forEach( word => {
         if ( word.focusing.duration >= threshold ) {
-          result.push( re.exec( word.text )[0] );
+          const arr = re.exec( word.text );
+          if (arr && arr.length > 0) {
+            result.push( arr[0] );
+          }
+          else {
+            console.log('DataCollector.longGazedWords ??', word.text);
+          }
         }
       } );
     } );
@@ -332,20 +338,25 @@ export default class DataCollector {
    * @param {TextPageImage} image 
    */
   imageShow( image ) {
+    console.log('DC', 'shown');
     const page = this._pages.current;
     page.data.images.push( new Image( image, this._timer.value ) );
+    console.log('DC', '---');
   }
 
   /**
    * @param {TextPageImage} image 
    */
   imageHide( image ) {
+    console.log('DC', 'hidden');
     const page = this._pages.current || this._pages.last;
     const currentImage = page.data.images.find( img => img.src === image.src && img.isCurrent );
 
     if ( currentImage ) {
       currentImage.hide( this._timer.value );
     }
+
+    console.log('DC', '---');
   }
 
   _closeImages() {
@@ -365,6 +376,10 @@ export default class DataCollector {
    * @param {Callback} cb 
    */
   _save( cb ) {
+    // DEBUG-LINES
+    // PROD: remove next line
+    return cb();
+
     const data = {
       task: this._session.task,
       student: this._session.student,

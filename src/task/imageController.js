@@ -45,6 +45,7 @@ export default class ImageController {
   }
 
   shutdown() {
+    console.log('IMC', 'shutdown');
     this._timers.forEach( ( timer, image ) => {
       window.clearTimeout( timer );
       this._hide( image );
@@ -58,17 +59,20 @@ export default class ImageController {
     }
 
     this._timers.clear();
+    console.log('IMC', '---');
   }
 
   /**
    * @param {TextPageImage[]} images 
    */
   setImages( images ) {
+    console.log('IMC', 'setImages');
     this.shutdown();
 
     this._images = images;
 
     this._start();
+    console.log('IMC', '---');
   }
 
   /**
@@ -87,9 +91,10 @@ export default class ImageController {
 
       if (image.on.name === TextPageImage.EVENT.fixation) {
         const fixEvent = /** @type {TextPageImageFixationEvent} */(image.on);
-        const words = fixEvent.word ? [ fixEvent.word ] : fixEvent.words;
+        const words = /** @type {[Word]} */ (fixEvent.word ? [ fixEvent.word ] : fixEvent.words);
         const hasWord = words.find( w => word.isEqual( w ) );
         if (hasWord && fixEvent.duration < duration) {
+          console.log('IMC', 'fixated "', words.map(v => '-' + v.text + '-').join(' '), '" ---');
           this._show( image );
         }
       }
@@ -100,23 +105,32 @@ export default class ImageController {
     this._images.forEach( image => {
       const el = new Image();
       el.src = image.src;
+      el.width = 1;
+      el.height = 1;
+      el.style.position = 'absolute';
+      el.style.left = '0'; 
+      el.style.top = '0';
+      window.document.body.appendChild(el);
 
       this._prefetched.set( image, el );
     } );
   }
 
   _start() {
+    console.log('IMC', '_start');
     this._images.forEach( image => {
       if ( image.on.name === TextPageImage.EVENT.none ) {
         this._show( image );
       }
     } );
+    console.log('IMC', '---');
   }
 
   /**
    * @param {TextPageImage} image 
    */
   _show( image ) {
+    console.log('IMC', '_show');
     // handle off = 'image' cases
     for ( let location in this._locations ) {
       const tempImage = this._locations[ location ];
@@ -137,14 +151,17 @@ export default class ImageController {
 
     this._locations[ image.location ] = image;
     this._onShow( image );
+    console.log('IMC', '---');
   }
 
   /**
    * @param {TextPageImage} image 
    */
   _hide( image ) {
+    console.log('IMC', '_hide');
     this._locations[ image.location ] = null;
     this._onHide( image );
+    console.log('IMC', '---');
   }
 
 }
