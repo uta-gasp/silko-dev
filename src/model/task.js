@@ -280,7 +280,8 @@ export default class Task extends Recordable {
    * @returns {Promise}
    */
   static deleteImage( image, cb ) {
-    return db.deleteFile( image.src, cb );
+    const url = TextPageImage.urlFromName( image.src );
+    return db.deleteFile( url, cb );
   }
 
   /**
@@ -296,7 +297,8 @@ export default class Task extends Recordable {
         return;
       }
       page.images.forEach( image => {
-        promises.push( db.deleteFile( image.src, _ => {} ) );
+        const url = TextPageImage.urlFromName( image.src );
+        promises.push( db.deleteFile( url, _ => {} ) );
       } );
     } );
 

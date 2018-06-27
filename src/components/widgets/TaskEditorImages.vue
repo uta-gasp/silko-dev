@@ -417,7 +417,7 @@ export default {
      * @returns {string}
      */
     getCSSBackgroundImage( image ) {
-      return `background-image: url('${image.file ? this.getImageURL( image.file ) : image.src}')`;
+      return `background-image: url('${image.file ? this.getImageURL( image.file ) : TextPageImage.urlFromName( image.src )}')`;
     },
 
     /** 
@@ -552,7 +552,7 @@ export default {
             this.setError( err, 'Cannot upload the file' );
           }
           else {
-            image.src = url;
+            image.src = TextPageImage.nameFromURL( url );
             image.file = this.selectedFile;
             this.images.push( image );
 

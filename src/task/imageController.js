@@ -104,7 +104,7 @@ export default class ImageController {
   _prefetch() {
     this._images.forEach( image => {
       const el = new Image();
-      el.src = image.src;
+      el.src = TextPageImage.urlFromName( image.src );
       el.width = 1;
       el.height = 1;
       el.style.position = 'absolute';

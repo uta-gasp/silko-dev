@@ -228,4 +228,24 @@ export class TextPageImage {
     });
   }
 
+  /**
+   * @param {string} url 
+   * @returns {string}
+   */
+  static nameFromURL( url ) {
+    return decodeURIComponent( url ).split( '/' ).pop();
+  }
+
+  /**
+   * @param {string} name
+   * @returns {string}
+   */
+  static urlFromName( name ) {
+    if (name.startsWith('https://')) {
+      return name;
+    }
+    else {
+      return 'https://firebasestorage.googleapis.com/v0/b/eye-school-test.appspot.com/o/image%2F' + name;
+    }
+  }
 };

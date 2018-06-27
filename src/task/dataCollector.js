@@ -378,7 +378,7 @@ export default class DataCollector {
   _save( cb ) {
     // DEBUG-LINES
     // PROD: remove next line
-    return cb();
+    // return cb();
 
     const data = {
       task: this._session.task,
