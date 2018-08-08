@@ -14,7 +14,12 @@
             td {{ student.ref.name }}
             td(v-for="(stat, index) in student.statistics" :key="index")
               span(v-if="index === 1") {{ `${Math.floor(stat / 60).toFixed(0)}:${secondsToString( stat % 60 )}` }}
-              span(v-else) {{ stat }}
+              span(v-else) 
+                span(v-if="statistics[ index ].hasProgress" @click="showProgress( student, index )" :class="{ 'progressLink': true }") {{ stat }}
+                span(v-else) {{ stat }}
+
+    modal-container(v-if="isShowingProgress" title="" @close="closeChart")
+      progress-chart.chart(:data="progressChartData")
 
     control-panel(
       :title="title"
@@ -34,6 +39,8 @@ import sgwmController from '@/vis/sgwmController.js';
 
 import Syllabifier from '@/task/syllabifier.js';
 
+import ProgressChart from '@/components/widgets/ProgressChart.vue';
+import ModalContainer from '@/components/widgets/ModalContainer.vue';
 import ControlPanel from '@/components/vis/controlPanel.vue';
 import Options from '@/components/vis/Options.vue';
 
@@ -65,8 +72,10 @@ export default {
   name: 'student-summary',
 
   components: {
+    'modal-container': ModalContainer,
     'control-panel': ControlPanel,
     'options': Options,
+    'progress-chart': ProgressChart,
   },
 
   data() {
@@ -84,16 +93,18 @@ export default {
       sortedStatIndex: -1,
       nameSortDir: 1,
 
+      progressChartData: null,
+
       statistics: [
-        { name: 'Sessions', sortDir: 0 },
-        { name: 'Reading time', sortDir: 0 },
-        { name: 'WPM', title: 'Words per minute', sortDir: 0 },
-        { name: 'SPM', title: 'Syllables per minute (sessions)', sortDir: 0 },
-        { name: 'SPW', title: 'Seconds per word', sortDir: 0 },
-        { name: 'Fixation', title: 'Average fixation duration in milliseconds', sortDir: 0 },
-        { name: 'FSD', title: 'Fixation standard deviation in milliseconds', sortDir: 0 },
-        { name: 'Syllabifications', sortDir: 0 },
-        { name: 'Regressions', sortDir: 0 },
+        { name: 'Sessions', sortDir: 0, hasProgress: false },
+        { name: 'Reading time', sortDir: 0, hasProgress: false },
+        { name: 'WPM', title: 'Words per minute', sortDir: 0, hasProgress: true },
+        { name: 'SPM', title: 'Syllables per minute (sessions)', sortDir: 0, hasProgress: true },
+        { name: 'SPW', title: 'Seconds per word', sortDir: 0, hasProgress: true },
+        { name: 'Fixation', title: 'Average fixation duration in milliseconds', sortDir: 0, hasProgress: true },
+        { name: 'FSD', title: 'Fixation standard deviation in milliseconds', sortDir: 0, hasProgress: false },
+        { name: 'Syllabifications', sortDir: 0, hasProgress: true },
+        { name: 'Regressions', sortDir: 0, hasProgress: true },
       ],
     };
   },
@@ -120,6 +131,10 @@ export default {
       const grade = this.data.params.grade;
       return `${grade.studentCount} ${grade.name}`;
     },
+
+    isShowingProgress() {
+      return !!this.progressChartData;
+    }
   },
 
   methods: {
@@ -364,6 +379,224 @@ export default {
 
       this.students = students;
     },
+
+    // Stats computation in
+
+    /**
+     * @param {DataPage[]} pages
+     * @param {function} onPage
+     * @return {{duration: number, wordCount: number}}
+     */
+    computeDurationAndWords( pages, onPage ) {
+      let duration = 0;
+      let wordCount = 0;
+
+      /** @type {DataPage} */
+      let firstPage;
+      let lastPage;
+      pages.forEach( ( page, pageIndex ) => {
+        if ( !firstPage && page.fixations ) {
+          firstPage = page;
+        }
+        if ( page.fixations ) {
+          lastPage = page;
+
+          const fixRange = {
+            first: page.fixations[0],
+            last: page.fixations[ page.fixations.length - 1 ],
+          };
+
+          duration += ( fixRange.last.ts + fixRange.last.duration ) - fixRange.first.ts;
+          wordCount += page.text.length;
+
+          if (onPage) {
+            onPage( page );
+          }
+        }
+      } );
+
+      if ( firstPage && lastPage ) {
+        return { duration, wordCount };
+      }
+      else {
+        return null;
+      }
+    },
+
+    /**
+     * @param {StudentStat} student
+     */
+    computeWPM( student ) {
+      /** @type {number[]} */
+      const values = [];
+
+      student.sessions.forEach( session => {
+        const basicStat = this.computeDurationAndWords( session.data.pages, null );
+        if ( basicStat ) {
+          values.push( basicStat.wordCount ? ( basicStat.wordCount / ( basicStat.duration / 60000 ) ) : 0 );
+        }
+      } );
+
+      return {
+        title: 'Words per minute',
+        values: values
+      };
+    },
+
+    /**
+     * @param {StudentStat} student
+     */
+    computeSPM( student ) {
+      /** @type {number[]} */
+      const values = [];
+
+      student.sessions.forEach( session => {
+        if (!session.feedbacks.syllabification.enabled) {
+          return;
+        }
+
+        const syllabifier = new Syllabifier( SyllabOptions.from( session.feedbacks.syllabification ) );
+
+        let syllabCount = 0;
+
+        const basicStat = this.computeDurationAndWords( session.data.pages, /** @param {DataPage} page */page => {
+            const text =  page.text.map( word => word.text ).join( ' ' );
+            syllabCount += syllabifier.getSyllabCount( text );
+        });
+
+        if ( basicStat ) {
+          values.push( basicStat.duration ? syllabCount / ( basicStat.duration / 60000 ) : 0 );
+        }
+      } );
+
+      return {
+        title: 'Syllables per minute (sessions)',
+        values: values
+      };
+    },
+
+    /**
+     * @param {StudentStat} student
+     */
+    computeSPW( student ) {
+      /** @type {number[]} */
+      const values = [];
+
+      student.sessions.forEach( session => {
+        const basicStat = this.computeDurationAndWords( session.data.pages, null );
+
+        if ( basicStat ) {
+          values.push( basicStat.duration ? basicStat.duration / basicStat.wordCount / 1000 : 0 );
+        }
+      } );
+
+      return {
+        title: 'Seconds per word',
+        values: values
+      };
+    },
+
+    /**
+     * @param {StudentStat} student
+     */
+    computeFixation( student ) {
+      /** @type {number[]} */
+      const values = [];
+
+      student.sessions.forEach( session => {
+        const fixations = {
+          count: 0,
+          duration: 0
+        };
+        const basicStat = this.computeDurationAndWords( session.data.pages, /** @param {DataPage} page */page => {
+          fixations.count += page.fixations.length;
+          fixations.duration += page.fixations.reduce( ( sum, fix ) => ( sum + fix.duration ), 0 );
+        });
+
+        if ( basicStat ) {
+          values.push( fixations.count ? fixations.duration / fixations.count : 0 );
+        }
+      } );
+
+      return {
+        title: 'Average fixation duration in milliseconds',
+        values: values
+      };
+    },
+
+    /**
+     * @param {StudentStat} student
+     */
+    computeSyllabifications( student ) {
+      /** @type {number[]} */
+      const values = [];
+
+      student.sessions.forEach( session => {
+        let syllabifications = 0;
+        const basicStat = this.computeDurationAndWords( session.data.pages, /** @param {DataPage} page */page => {
+          syllabifications += page.syllabifications ? page.syllabifications.length : 0;
+        });
+
+        if ( basicStat ) {
+          values.push( syllabifications );
+        }
+      } );
+
+      return {
+        title: 'Syllabifications',
+        values: values
+      };
+    },
+    
+    /**
+     * @param {StudentStat} student
+     */
+    computeRegressions( student ) {
+      /** @type {number[]} */
+      const values = [];
+
+      student.sessions.forEach( session => {
+        let regressionCount = 0;
+
+        const basicStat = this.computeDurationAndWords( session.data.pages, /** @param {DataPage} page */ page => {
+          const mappedPage = sgwmController.map( page );
+          regressionCount += Regressions.compute( mappedPage.fixations );
+        });
+
+        if ( basicStat ) {
+          values.push( regressionCount );
+        }
+      } );
+
+      return {
+        title: 'Regressions',
+        values: values
+      };
+    },
+
+    /**
+     * @param {StudentStat} student
+     * @param {number} statIndex
+     */
+    showProgress( student, statIndex ) {
+      const name = this.statistics[ statIndex ].name;
+      const progressData = this[ 'compute' + name ]( student );
+
+      this.progressChartData = {
+        labels: progressData.values.map( (v, i) => i ),
+        datasets: [
+          {
+            label: progressData.title,
+            backgroundColor: '#f87979',
+            data: progressData.values,
+          }
+        ]
+      };
+    },
+
+    closeChart() {
+      this.progressChartData = null;
+    },
   },
 
   mounted() {
@@ -457,5 +690,18 @@ export default {
         }
       }
     }
-  }
+
+    .progressLink {
+      cursor: pointer;
+      color: #246;
+      font-weight: bold;
+    }
+
+    .chart {
+      min-width: 60vw;
+      max-width: 90vw;
+      height: 80vh;
+      margin: 0 auto
+    }
+}
 </style>
