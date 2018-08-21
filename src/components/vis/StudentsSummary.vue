@@ -18,7 +18,7 @@
                 span(v-if="statistics[ index ].hasProgress" @click="showProgress( student, index )" :class="{ 'progressLink': true }") {{ stat }}
                 span(v-else) {{ stat }}
 
-    modal-container(v-if="isShowingProgress" title="" @close="closeChart")
+    modal-container(v-if="isShowingProgress" :title="progressChartData.title" @close="closeChart")
       progress-chart.chart(:data="progressChartData")
 
     control-panel(
@@ -54,6 +54,8 @@ import VisData from '@/vis/data/data.js';
  * @typedef Session
  * @property {Data} data
  * @property {Feedbacks} feedbacks
+ * @property {string} name
+ * @property {string} date
  */
 
 /**
@@ -181,6 +183,8 @@ export default {
         const session = {
           data: record.data,
           feedbacks: record.session.feedbacks,
+          name: record.task.name,
+          date: record.session.date,
         };
         
         if ( students.has( record.student.id ) ) {
@@ -429,17 +433,21 @@ export default {
     computeWPM( student ) {
       /** @type {number[]} */
       const values = [];
+      /** @type {string[]} */
+      const labels = [];
 
       student.sessions.forEach( session => {
         const basicStat = this.computeDurationAndWords( session.data.pages, null );
         if ( basicStat ) {
-          values.push( basicStat.wordCount ? ( basicStat.wordCount / ( basicStat.duration / 60000 ) ) : 0 );
+          values.push( basicStat.wordCount ? basicStat.wordCount / ( basicStat.duration / 60000 ) : 0 );
+          labels.push( session.name + '|' + session.date );
         }
       } );
 
       return {
         title: 'Words per minute',
-        values: values
+        values: values,
+        labels: labels,
       };
     },
 
@@ -449,6 +457,8 @@ export default {
     computeSPM( student ) {
       /** @type {number[]} */
       const values = [];
+      /** @type {string[]} */
+      const labels = [];
 
       student.sessions.forEach( session => {
         if (!session.feedbacks.syllabification.enabled) {
@@ -466,12 +476,14 @@ export default {
 
         if ( basicStat ) {
           values.push( basicStat.duration ? syllabCount / ( basicStat.duration / 60000 ) : 0 );
+          labels.push( session.name + '|' + session.date );
         }
       } );
 
       return {
         title: 'Syllables per minute (sessions)',
-        values: values
+        values: values,
+        labels: labels,
       };
     },
 
@@ -481,18 +493,22 @@ export default {
     computeSPW( student ) {
       /** @type {number[]} */
       const values = [];
+      /** @type {string[]} */
+      const labels = [];
 
       student.sessions.forEach( session => {
         const basicStat = this.computeDurationAndWords( session.data.pages, null );
 
         if ( basicStat ) {
           values.push( basicStat.duration ? basicStat.duration / basicStat.wordCount / 1000 : 0 );
+          labels.push( session.name + '|' + session.date );
         }
       } );
 
       return {
         title: 'Seconds per word',
-        values: values
+        values: values,
+        labels: labels,
       };
     },
 
@@ -502,6 +518,8 @@ export default {
     computeFixation( student ) {
       /** @type {number[]} */
       const values = [];
+      /** @type {string[]} */
+      const labels = [];
 
       student.sessions.forEach( session => {
         const fixations = {
@@ -515,12 +533,14 @@ export default {
 
         if ( basicStat ) {
           values.push( fixations.count ? fixations.duration / fixations.count : 0 );
+          labels.push( session.name + '|' + session.date );
         }
       } );
 
       return {
         title: 'Average fixation duration in milliseconds',
-        values: values
+        values: values,
+        labels: labels,
       };
     },
 
@@ -530,6 +550,8 @@ export default {
     computeSyllabifications( student ) {
       /** @type {number[]} */
       const values = [];
+      /** @type {string[]} */
+      const labels = [];
 
       student.sessions.forEach( session => {
         let syllabifications = 0;
@@ -539,12 +561,14 @@ export default {
 
         if ( basicStat ) {
           values.push( syllabifications );
+          labels.push( session.name + '|' + session.date );
         }
       } );
 
       return {
         title: 'Syllabifications',
-        values: values
+        values: values,
+        labels: labels,
       };
     },
     
@@ -554,6 +578,8 @@ export default {
     computeRegressions( student ) {
       /** @type {number[]} */
       const values = [];
+      /** @type {string[]} */
+      const labels = [];
 
       student.sessions.forEach( session => {
         let regressionCount = 0;
@@ -565,12 +591,14 @@ export default {
 
         if ( basicStat ) {
           values.push( regressionCount );
+          labels.push( session.name + '|' + session.date );
         }
       } );
 
       return {
         title: 'Regressions',
-        values: values
+        values: values,
+        labels: labels,
       };
     },
 
@@ -583,12 +611,23 @@ export default {
       const progressData = this[ 'compute' + name ]( student );
 
       this.progressChartData = {
-        labels: progressData.values.map( (v, i) => i ),
+        title: progressData.title,
+        labels: progressData.labels,
         datasets: [
           {
-            label: progressData.title,
+            label: '',
+            data: progressData.values.map( v => parseFloat( v.toFixed(1) ) ),
+
             backgroundColor: '#f87979',
-            data: progressData.values,
+            borderColor: '#7979f8',
+            
+            fill: false,
+            lineTension: 0.2,
+
+            pointRadius: 6,
+            pointBorderWidth: 3,
+            pointHoverRadius: 10,
+            pointHoverBorderWidth: 3,
           }
         ]
       };
