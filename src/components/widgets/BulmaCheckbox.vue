@@ -45,6 +45,12 @@ export default {
     },
 
   },
+
+  watch: {
+    value( val ) {
+      this.checked = val;
+    }
+  }
 };
 </script>
 

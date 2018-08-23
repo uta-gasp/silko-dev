@@ -41,6 +41,10 @@ export default class Task extends Recordable {
     this.speech = Task.defaultSpeech;
     /** @type {Question[]} */
     this.questionnaire = [];
+    /** @type {boolean} */
+    this.useTimeout = false;
+    /** @type {number} */
+    this.timeout = 5;
   }
 
   /** @return {string} */
@@ -239,6 +243,8 @@ export default class Task extends Recordable {
       syllab: task.syllab,
       speech: task.speech,
       questionnaire: task.questionnaire,
+      useTimeout: task.useTimeout,
+      timeout: task.timeout,
     };
 
     Task.embedImagesIntoPages( _task.pages, task.images );

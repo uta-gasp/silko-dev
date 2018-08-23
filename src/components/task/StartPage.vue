@@ -14,6 +14,7 @@
         :texts="texts"
         :task="task"
         :student="student"
+        :finilize="finilizeTask"
         @finished="finishedReading"
         @saved="gazeDataSaved")
 
@@ -57,6 +58,8 @@ export default {
       isRunning: ( gazeTracking.state.isConnected && gazeTracking.state.isTracking && !gazeTracking.state.isBusy ) || false,
       isReading: false,
       isFullscreen: false,
+      timeoutTimer: null,
+      finilizeTask: false,  // trigger
     };
   },
 
@@ -98,6 +101,13 @@ export default {
       this.isReading = true;
       this.makeFullscreen( this.$refs.fullscreen );
       gazeTracking.start();
+
+      if (this.task.useTimeout) {
+        this.timeoutTimer = setTimeout( () => {
+          this.timeoutTimer = null;
+          this.finilizeTask = true;
+        }, this.task.timeout * 60000 );
+      }
     },
 
     /** @param {Event} e */
@@ -107,6 +117,7 @@ export default {
 
     /** @param {Event} e */
     finishedReading( e ) {
+      this.clearTaskTimeout();
       this.isReading = false;
       this.$emit( 'close', { finished: true, ...e } );
       this.closeFullscreen();
@@ -117,12 +128,21 @@ export default {
     gazeDataSaved( e ) {
       this.$emit( 'saved', e );
     },
+
+    clearTaskTimeout() {
+      if (this.timeoutTimer) {
+        clearTimeout( this.timeoutTimer );
+        this.timeoutTimer = null;
+      }
+    },
   },
 
   watch: {
     /** @param {boolean} value */
     isRunning( value ) {
       if ( !value && this.isFullscreen && this.isReading ) {
+        this.clearTaskTimeout();
+
         setTimeout( () => {
           this.closeFullscreen();
           this.$router.replace( '/assignments' );

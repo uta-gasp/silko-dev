@@ -25,6 +25,10 @@ export class TaskCreateParams {
     this.syllabExceptions = null;
     /** @type {TextPageImage[]} */
     this.images = null;
+    /** @type {boolean} */
+    this.useTimeout = false;
+    /** @type {number} */
+    this.timeout = 5;
   }
 
 }

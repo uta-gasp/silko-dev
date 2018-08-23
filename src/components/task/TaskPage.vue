@@ -89,6 +89,10 @@ export default {
       type: Student,
       required: true,
     },
+    finilize: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   computed: {
@@ -155,6 +159,14 @@ export default {
     /** @param {{image: TextPageImage}} e */
     onImageHide( e ) {
       this.collector.imageHide( e.image );
+    },
+  },
+
+  watch: {
+    finilize( value ) {
+      if (value) {
+        this.finish( null );
+      }
     },
   },
 

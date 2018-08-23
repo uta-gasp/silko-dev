@@ -32,8 +32,14 @@
       )
 
     p.control.bottom-panel
-      button.button.is-primary(:disabled="!canSave" @click="save") {{ action }}
-      button.button.is-primary(v-show="currentTab === tabs.feedback" @click="setDefaultFeedback") Set as default
+      span.is-inline-block
+        button.button.is-primary(:disabled="!canSave" @click="save") {{ action }}
+        button.button.stacked(v-show="currentTab === tabs.feedback" @click="setDefaultFeedback") Set as default
+        span.is-inline-block.stacked
+          bulma-checkbox.is-inline-block(v-model="useTimeout" label="Use timeout:" :disabled="false")
+          input.input.is-inline-block.timeout(type="number" step="1" v-model.number="timeout" :disabled="!useTimeout" min="1" max="1000")
+          span min.
+
       button.button.is-primary(:disabled="!canPreview" @click="preview") Preview
 
     .fullscreen(ref="fullscreen")
@@ -50,6 +56,8 @@ import TaskEditorText from '@/components/widgets/taskEditorText.vue';
 import TaskEditorFeedback from '@/components/widgets/taskEditorFeedback.vue';
 import TaskEditorImages from '@/components/widgets/taskEditorImages.vue';
 import TaskEditorQuestionnaire from '@/components/widgets/taskEditorQuestionnaire.vue';
+
+import BulmaCheckbox from '@/components/widgets/bulmaCheckbox.vue';
 
 // ts-check-only
 import { TextPageImage } from '@/model/task/textPageImage.js';
@@ -79,6 +87,7 @@ export default {
     'task-editor-feedback': TaskEditorFeedback,
     'task-editor-images': TaskEditorImages,
     'task-editor-questionnaire': TaskEditorQuestionnaire,
+    'bulma-checkbox': BulmaCheckbox,
   },
 
   data() {
@@ -102,6 +111,9 @@ export default {
 
       /** @type {Question[]} */
       questionnaire: [],
+
+      useTimeout: false,
+      timeout: 5,
 
       canPreview: true,
       inPreview: false,
@@ -223,6 +235,13 @@ export default {
       if ( this.ref.questionnaire ) {
         this.questionnaire = this.ref.questionnaire;
       }
+
+      if ( this.ref.useTimeout ) {
+        this.useTimeout = this.ref.useTimeout;
+      }
+      if ( this.ref.timeout ) {
+        this.timeout = this.ref.timeout;
+      }
     },
 
     /**
@@ -311,6 +330,8 @@ export default {
         pages: Task.textToPages( this.text ),
         syllab: { ...this.syllab },
         speech: { ...this.speech },
+        useTimeout: this.useTimeout,
+        timeout: this.timeout,
       } );
 
       Task.embedImagesIntoPages( result.pages, this.images );
@@ -333,6 +354,8 @@ export default {
         speech: this.speech,
         images: this.images,
         questionnaire: this.questionnaire,
+        useTimeout: this.useTimeout,
+        timeout: this.timeout,
       } );
     },
   },
@@ -371,5 +394,13 @@ export default {
   .bottom-panel {
     display: flex;
     justify-content: space-between;
+  }
+
+  .stacked {
+    margin-left: 0.5em;
+  }
+
+  .timeout {
+    width: 5em;
   }
 </style>

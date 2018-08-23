@@ -68,6 +68,8 @@ export default class Class extends Recordable {
       syllab: task.syllab,
       speech: task.speech,
       questionnaire: task.questionnaire,
+      useTimeout: task.useTimeout,
+      timeout: task.timeout,
     };
 
     Task.embedImagesIntoPages( taskObj.pages, task.images );
