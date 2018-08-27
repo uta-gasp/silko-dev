@@ -29,6 +29,8 @@ export class TaskCreateParams {
     this.useTimeout = false;
     /** @type {number} */
     this.timeout = 5;
+    /** @type {number} */
+    this.recordAudio = false;
   }
 
 }

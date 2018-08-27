@@ -39,6 +39,8 @@
           bulma-checkbox.is-inline-block(v-model="useTimeout" label="Use timeout:" :disabled="false")
           input.input.is-inline-block.timeout(type="number" step="1" v-model.number="timeout" :disabled="!useTimeout" min="1" max="1000")
           span min.
+        span.is-inline-block.stacked
+          bulma-checkbox.is-inline-block(v-model="recordAudio" label="Record audio")
 
       button.button.is-primary(:disabled="!canPreview" @click="preview") Preview
 
@@ -114,6 +116,7 @@ export default {
 
       useTimeout: false,
       timeout: 5,
+      recordAudio: false,
 
       canPreview: true,
       inPreview: false,
@@ -242,6 +245,9 @@ export default {
       if ( this.ref.timeout ) {
         this.timeout = this.ref.timeout;
       }
+      if ( this.ref.recordAudio ) {
+        this.recordAudio = this.ref.recordAudio;
+      }
     },
 
     /**
@@ -332,6 +338,7 @@ export default {
         speech: { ...this.speech },
         useTimeout: this.useTimeout,
         timeout: this.timeout,
+        recordAudio: this.recordAudio,
       } );
 
       Task.embedImagesIntoPages( result.pages, this.images );
@@ -356,6 +363,7 @@ export default {
         questionnaire: this.questionnaire,
         useTimeout: this.useTimeout,
         timeout: this.timeout,
+        recordAudio: this.recordAudio,
       } );
     },
   },

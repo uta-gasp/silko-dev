@@ -70,6 +70,7 @@ export default class Class extends Recordable {
       questionnaire: task.questionnaire,
       useTimeout: task.useTimeout,
       timeout: task.timeout,
+      recordAudio: task.recordAudio,
     };
 
     Task.embedImagesIntoPages( taskObj.pages, task.images );

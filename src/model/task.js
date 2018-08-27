@@ -45,6 +45,8 @@ export default class Task extends Recordable {
     this.useTimeout = false;
     /** @type {number} */
     this.timeout = 5;
+    /** @type {boolean} */
+    this.recordAudio = false;
   }
 
   /** @return {string} */
@@ -245,6 +247,7 @@ export default class Task extends Recordable {
       questionnaire: task.questionnaire,
       useTimeout: task.useTimeout,
       timeout: task.timeout,
+      recordAudio: task.recordAudio,
     };
 
     Task.embedImagesIntoPages( _task.pages, task.images );

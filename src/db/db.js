@@ -435,14 +435,21 @@ class DB {
    * @return {Promise}
    */
   uploadFile( file, prefix, meta, progressHandler, cb ) {
-    const folder = /image\//.test( file.type ) ? 'image' : 'file';
-    const metadata = {
+    let folder = 'file';
+    if (/image\//.test( file.type )) {
+      folder = 'image';
+    }
+    else if (/audio\//.test( file.type )) {
+      folder = 'sound';
+    }
+
+    const metadata = meta ? {
       customMetadata: meta,
-    };
+    } : undefined;
 
     const uploadTask = this.storage.child( `${folder}/${prefix}${file.name}` ).put( file, metadata );
     uploadTask.on( 'state_changed', /** @param {FirebaseDataSnapshot} snapshot */ snapshot => {
-      if ( snapshot.state === firebase.storage.TaskState.PROGRESS ) {
+      if ( snapshot.state === firebase.storage.TaskState.PROGRESS && progressHandler ) {
         progressHandler( 100 * ( snapshot.bytesTransferred / snapshot.totalBytes ) );
       }
     }, /** @param {string} err */ err => {
@@ -453,6 +460,30 @@ class DB {
 
     return uploadTask.then().catch( /** @param {string} err */ err => {
       cb( err ); 
+    } );
+  }
+
+/**
+   * @param {Blob} audio 
+   * @param {string} name 
+   * @param {function(number): void} progressHandler 
+   * @param {Callback} cb 
+   * @return {Promise}
+   */
+  uploadAudio( audio, name, progressHandler, cb ) {
+    const uploadTask = this.storage.child( `sound/${name}` ).put( audio );
+    uploadTask.on( 'state_changed', /** @param {FirebaseDataSnapshot} snapshot */ snapshot => {
+      if ( snapshot.state === firebase.storage.TaskState.PROGRESS && progressHandler ) {
+        progressHandler( 100 * ( snapshot.bytesTransferred / snapshot.totalBytes ) );
+      }
+    }, /** @param {string} err */ err => {
+      cb( err );
+    }, /** @param {any} _ */ _ => {
+      cb( null, uploadTask.snapshot.downloadURL );
+    } );
+
+    return uploadTask.then().catch( /** @param {string} err */ err => {
+      cb( err );
     } );
   }
 

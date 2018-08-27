@@ -162,6 +162,8 @@ export default class DataCollector {
     this._focusedElem = null;
     /** @type {DataPageFocusedWord} */
     this._currentWord = null;
+    /** @type {string[]} */
+    this._audioFiles = null;
   }
 
   start() {
@@ -359,6 +361,13 @@ export default class DataCollector {
     console.log('DC', '---');
   }
 
+  /**
+   * @param {string[]} urls
+   */
+  setAudioFiles( urls ) {
+    this._audioFiles = urls;
+  }
+
   _closeImages() {
     const page = this._pages.current || this._pages.last;
     if ( !page ) {
@@ -383,9 +392,12 @@ export default class DataCollector {
     const data = {
       task: this._session.task,
       student: this._session.student,
-      pages: this._pages.items.map( page => {
+      pages: this._pages.items.map( (page, index) => {
         page.data.filterFixations( MIN_FIXATION_DURATION );
         page.data.setWords( page.words );
+        if (this._audioFiles) {
+          page.data.audio = this._audioFiles[ index ] || null;
+        }
         return page.data;
       } ),
       /** @type {Question[]} */

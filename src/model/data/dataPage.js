@@ -25,6 +25,8 @@ export default class DataPage {
     this.images = [];
     /** @type {boolean} */
     this.isIntro = false;
+    /** @type {string} */
+    this.audio = null;
   }
 
   /**

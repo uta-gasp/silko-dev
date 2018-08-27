@@ -32,11 +32,14 @@ import Student from '@/model/student.js';
 import TextPresenter from '@/task/textPresenter.js';
 import FeedbackProvider from '@/task/feedbackProvider.js';
 import DataCollector from '@/task/dataCollector.js';
+import AudioRecorder from '@/task/audioRecorder.js';
 
 import gazeTracking from '@/utils/gazeTracking.js';
 
 import Font from '@/model/session/font.js';
 import { TextPageImage, Word } from '@/model/task/textPageImage.js';
+
+import db from '@/db/db.js';
 
 // ts-check-only
 import DataImage from '@/model/data/image.js';
@@ -73,6 +76,9 @@ export default {
       },
 
       fixationUpdateTimer: 0,
+
+      audioRecorder: null,
+      audioFiles: [],
     };
   },
 
@@ -126,8 +132,113 @@ export default {
   },
 
   methods: {
+
+    init() {
+      const container = /** @type {Vue} */ (this.$refs.container);
+
+      this.font = Font.from( container.$data.textStyle );
+
+      this.feedbackProvider = new FeedbackProvider( this.task.syllab, this.task.speech );
+      this.feedbackProvider.init();
+
+      const textEl = /** @type {HTMLElement}*/ (container.$refs.text);
+      this.textPresenter = new TextPresenter( this.task, this.texts.firstPage, textEl, this.feedbackProvider.syllabifier );
+
+      this.collector = new DataCollector( this.task, this.student, this.font, this.feedbackProvider.setup );
+      this.feedbackProvider.events.addListener( 'syllabified', /** @param {HTMLElement} el */ el => this.collector.syllabified( el ) );
+      this.feedbackProvider.events.addListener( 'pronounced', /** @param {HTMLElement} el */ el => this.collector.pronounced( el ) );
+
+      //     gazeTracking.setCallback( 'stateUpdated', 'task-page', state => {
+      //       if ( state.isConnected && state.isTracking && !state.isBusy ) {
+      //         this.collector.start();
+      //       }
+      //     } );
+
+      gazeTracking.setCallback( 'wordFocused', 'task-page', /** @param {HTMLElement} word */ word => {
+        let wordText = null;
+        if ( !this.textPresenter.isInstructionPage ) {
+          wordText = this.feedbackProvider.setFocusedWord( word );
+        }
+        this.collector.setFocusedWord( word );
+
+        const wordID = word ? word.dataset.wordId : '';
+        this.fixation = { word: wordText ? new Word( wordText, wordID ) : null, duration: 0 };
+      } );
+
+      gazeTracking.setCallback( 'wordLeft', 'task-page', _ => {
+        if ( !this.textPresenter.isInstructionPage ) {
+          this.feedbackProvider.setFocusedWord( null );
+        }
+        this.collector.setFocusedWord( null );
+        this.fixation = { word: null, duration: 0 };
+      } );
+
+      gazeTracking.setCallback( 'gazePoint', 'task-page', gazePoint => {
+        this.collector.addGazePoint( gazePoint );
+      } );
+
+      this.collector.start();
+      this.fixationUpdateTimer = window.setInterval( () => {
+        const word = this.collector.focusedWord;
+        if ( !word ) {
+          if ( this.fixation.word ) {
+            this.fixation = { word: null, duration: 0 };
+          }
+        }
+        else {
+          this.fixation = { word: this.fixation.word, duration: word.duration };
+        }
+      }, FIX_UPDATE_INTERVAL );
+    },
+
     /** @param {Event} e */
     next( e ) {
+      if (this.task.recordAudio) {
+        if (e)  { // not started yet
+          this.audioRecorder.stop().then( /** @param {Blob} blob */ blob => {
+            this.saveAudio( blob, url => {
+              this.audioFiles.push( url );
+            } );
+            this.audioRecorder.start();
+            this.startPage();
+          });
+        }
+        else {
+          this.audioRecorder.start();
+          this.startPage();
+        }
+      }
+      else {
+        this.startPage();
+      }
+    },
+
+    /** @param {Event} e */
+    finish( e ) {
+      if (this.task.recordAudio) {
+        this.audioRecorder.stop().then( /** @param {Blob} blob */ blob => {
+          this.saveAudio( blob, /** @param {string} url */ url => {
+            this.audioFiles.push( url );
+            this.stop();
+          } );
+        });
+      }
+      else {
+        this.stop();
+      }
+    },
+
+    /** @param {{image: TextPageImage}} e */
+    onImageShow( e ) {
+      this.collector.imageShow( e.image );
+    },
+
+    /** @param {{image: TextPageImage}} e */
+    onImageHide( e ) {
+      this.collector.imageHide( e.image );
+    },
+
+    startPage() {
       let wordReadingDuration;
       if ( this.textPresenter.page === 0 && this.texts.firstPage && this.texts.firstPage.length ) {
         wordReadingDuration = this.collector.wordReadingDuration;
@@ -140,9 +251,15 @@ export default {
       gazeTracking.updateTargets();
     },
 
-    /** @param {Event} e */
-    finish( e ) {
-      this.$emit( 'finished', { longGazedWords: this.collector.longGazedWords( this.task.syllab.threshold.value ) } );
+    stop() {
+      this.$emit( 'finished', { 
+        longGazedWords: this.collector.longGazedWords( this.task.syllab.threshold.value )
+      } );
+
+      if (this.task.recordAudio) {
+        this.collector.setAudioFiles( this.audioFiles );
+      }
+
       this.collector.stop( /** @param {Error} err; @param {{data: string, session: string}} keys */( err, keys ) => {
         this.$emit( 'saved', { err, keys } );
       } );
@@ -151,14 +268,18 @@ export default {
       this.fixationUpdateTimer = 0;
     },
 
-    /** @param {{image: TextPageImage}} e */
-    onImageShow( e ) {
-      this.collector.imageShow( e.image );
-    },
-
-    /** @param {{image: TextPageImage}} e */
-    onImageHide( e ) {
-      this.collector.imageHide( e.image );
+    /** @param {Blob} blob */
+    saveAudio( blob, cb ) {
+      const name = `${TextPageImage.generatePrefix()}-${this.textPresenter.page}`;
+      db.uploadAudio( blob, name, null, (err, url) => {
+        if (err) {
+          console.error( 'AUDIO', err );
+          cb( '' );
+        }
+        else if (url) {
+          cb( url );
+        }
+      });
     },
   },
 
@@ -171,63 +292,11 @@ export default {
   },
 
   mounted() {
-    const container = /** @type {Vue} */ (this.$refs.container);
-
-    this.font = Font.from( container.$data.textStyle );
-
-    this.feedbackProvider = new FeedbackProvider( this.task.syllab, this.task.speech );
-    this.feedbackProvider.init();
-
-    const textEl = /** @type {HTMLElement}*/ (container.$refs.text);
-    this.textPresenter = new TextPresenter( this.task, this.texts.firstPage, textEl, this.feedbackProvider.syllabifier );
-
-    this.collector = new DataCollector( this.task, this.student, this.font, this.feedbackProvider.setup );
-    this.feedbackProvider.events.addListener( 'syllabified', /** @param {HTMLElement} el */ el => this.collector.syllabified( el ) );
-    this.feedbackProvider.events.addListener( 'pronounced', /** @param {HTMLElement} el */ el => this.collector.pronounced( el ) );
-
-    //     gazeTracking.setCallback( 'stateUpdated', 'task-page', state => {
-    //       if ( state.isConnected && state.isTracking && !state.isBusy ) {
-    //         this.collector.start();
-    //       }
-    //     } );
-
-    gazeTracking.setCallback( 'wordFocused', 'task-page', /** @param {HTMLElement} word */ word => {
-      let wordText = null;
-      if ( !this.textPresenter.isInstructionPage ) {
-        wordText = this.feedbackProvider.setFocusedWord( word );
-      }
-      this.collector.setFocusedWord( word );
-
-      const wordID = word ? word.dataset.wordId : '';
-      this.fixation = { word: wordText ? new Word( wordText, wordID ) : null, duration: 0 };
-    } );
-
-    gazeTracking.setCallback( 'wordLeft', 'task-page', _ => {
-      if ( !this.textPresenter.isInstructionPage ) {
-        this.feedbackProvider.setFocusedWord( null );
-      }
-      this.collector.setFocusedWord( null );
-      this.fixation = { word: null, duration: 0 };
-    } );
-
-    gazeTracking.setCallback( 'gazePoint', 'task-page', gazePoint => {
-      this.collector.addGazePoint( gazePoint );
-    } );
-
-    this.collector.start();
-    this.fixationUpdateTimer = window.setInterval( () => {
-      const word = this.collector.focusedWord;
-      if ( !word ) {
-        if ( this.fixation.word ) {
-          this.fixation = { word: null, duration: 0 };
-        }
-      }
-      else {
-        this.fixation = { word: this.fixation.word, duration: word.duration };
-      }
-    }, FIX_UPDATE_INTERVAL );
-
-    this.next( null );
+    AudioRecorder().then( recorder => {
+      this.audioRecorder = recorder;
+      this.init();
+      this.next( null );
+    });
   },
 
   beforeDestroy() {
