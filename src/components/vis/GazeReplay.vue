@@ -218,7 +218,7 @@ export default {
   },
 
   mounted() {
-    console.log( 'GazePlot created' );
+    console.log( 'GazeReplay created' );
     this.createTracks();
     this.start();
   },

@@ -53,6 +53,8 @@
                   td.is-narrow
                     button.button.is-primary(:disabled="!isLoaded" @click="selectSession( student, VISUALIZATIONS.gazePlot )") Gaze plot
                   td.is-narrow
+                    button.button.is-primary(:disabled="!isLoaded || !hasItems(student, filterHasAudio)" @click="selectSession( student, VISUALIZATIONS.audioReplay, filterHasAudio )") Audio replay
+                  td.is-narrow
                     button.button.is-primary(:disabled="!isLoaded" @click="selectSession( student, VISUALIZATIONS.durations )") Durations
                   td.is-narrow
                     button.button.is-primary(:disabled="!isLoaded" @click="selectSession( student, VISUALIZATIONS.gazeReplay )") Gaze replay
@@ -74,8 +76,8 @@
       :title="studentWithSessions[0].text"
       @close="closeSessionSelectionBox")
       item-selection-box(
-        :multiple="!isGazePlot"
-        :single-group="!isGazePlot && !studentWithSessions[0].multiGroup"
+        :multiple="!isMultipleSessions"
+        :single-group="!isMultipleSessions && !studentWithSessions[0].multiGroup"
         :items="studentWithSessions"
         item-name="student"
         subitem-name="session"
@@ -88,6 +90,8 @@
       session-editing-box(:student="editingStudent" @deleted="sessionDeleted")
 
     gaze-plot(v-if="isShowing( VISUALIZATIONS.gazePlot )" :data="visualization" @close="closeVisualization")
+
+    audio-replay(v-if="isShowing( VISUALIZATIONS.audioReplay )" :data="visualization" @close="closeVisualization")
 
     durations(v-if="isShowing( VISUALIZATIONS.durations )" :data="visualization" @close="closeVisualization")
 
@@ -127,6 +131,7 @@ import SessionEditBox from '@/components/widgets/SessionEditBox.vue';
 import ItemSelectionBox from '@/components/widgets/ItemSelectionBox.vue';
 
 import GazePlot from '@/components/vis/GazePlot.vue';
+import AudioReplay from '@/components/vis/AudioReplay.vue';
 import Durations from '@/components/vis/Durations.vue';
 import GazeReplay from '@/components/vis/GazeReplay.vue';
 import WordReplay from '@/components/vis/WordReplay.vue';
@@ -162,6 +167,7 @@ export default {
     'session-editing-box': SessionEditBox,
     'item-selection-box': ItemSelectionBox,
     'gaze-plot': GazePlot,
+    'audio-replay': AudioReplay,
     'durations': Durations,
     'gaze-replay': GazeReplay,
     'word-replay': WordReplay,
@@ -197,6 +203,7 @@ export default {
 
       VISUALIZATIONS: {
         gazePlot: 'GazePlot',
+        audioReplay: 'AudioReplay',
         durations: 'Durations',
         gazeReplay: 'GazeReplay',
         wordReplay: 'WordReplay',
@@ -208,8 +215,11 @@ export default {
 
   computed: {
     /** @returns {boolean} */
-    isGazePlot() {
-      return this.deferredVisualization ? this.deferredVisualization.name === this.VISUALIZATIONS.gazePlot : false;
+    isMultipleSessions() {
+      return this.deferredVisualization ? (
+        this.deferredVisualization.name === this.VISUALIZATIONS.gazePlot ||
+        this.deferredVisualization.name === this.VISUALIZATIONS.audioReplay
+      ) : false;
     },
   },
 
@@ -361,8 +371,9 @@ export default {
     /**
      * @param {Student} student 
      * @param {string} visualizationName 
+     * @param {function?} filter
      */
-    selectSession( student, visualizationName ) {
+    selectSession( student, visualizationName, filter ) {
       if ( student.sessions.length === 1 ) {
         this.visualizeSessions( student.sessions, visualizationName, new Params( {
           student: student.ref.name,
@@ -379,6 +390,9 @@ export default {
       };
 
       student.sessions.forEach( session => {
+        if (filter && !filter( session )) {
+          return;
+        }
         studentWithSessions.subitems.push( new SelectionBoxItem( {
           id: session.ref.id,
           text: `${dataUtils.sessionDate( session.ref.date )}`,
@@ -388,6 +402,15 @@ export default {
       } );
 
       this.studentWithSessions = [ studentWithSessions ];
+    },
+
+    /**
+     * @param {Student} student 
+     * @param {function} filter
+     * @returns {boolean}
+     */
+    hasItems( student, filter ) {
+      return student.sessions.filter( filter ).length > 0;
     },
 
     /** @param {{subitems: Object.<string>}} e */
@@ -460,6 +483,11 @@ export default {
     /** @param {Event} e */
     closeVisualization( e ) {
       this.visualization = null;
+    },
+
+    /** @param {Session} session */
+    filterHasAudio( session ) {
+      return session.task.hasAudio;
     },
   },
 

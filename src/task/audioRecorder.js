@@ -27,11 +27,6 @@ export default function() {
 
             mediaRecorder.addEventListener( 'stop', () => {
               const audioBlob = new Blob( audioChunks );
-              // const audioUrl = URL.createObjectURL( audioBlob );
-              // const audio = new Audio( audioUrl );
-              // const play = () => {
-              //   audio.play();
-              // };
 
               resolve( audioBlob );
 

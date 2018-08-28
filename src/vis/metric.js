@@ -121,7 +121,8 @@ export default class Metric {
    * @returns {number} 0..1
    */
   static getAlpha( word, metricType, metricRange ) {
-    return alphaComputers.get( metricType )( word, metricRange );
+    const ac = alphaComputers.get( metricType ) || alphaComputers.get( Type.NONE );
+    return ac( word, metricRange );
   }
 
   /** @returns {object} list of metric types */
