@@ -26,6 +26,7 @@
         i.fa.fa-tasks
         span {{ tokens[ 'link_assignments' ] }}
     .nav-right(v-if="user")
+      a.button(href="https://uta-gasp.gitbooks.io/silko/" target="_blank") Manual
       #usermenu.dropdown.is-right(:class="{ 'is-active': isUsermenuDropped }")
         .dropdown-trigger
           button.button(
