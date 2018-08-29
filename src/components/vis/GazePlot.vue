@@ -50,6 +50,8 @@ export default {
 
       /** @type {Painter} */
       painter: null,
+      /** @type {HTMLAudioElement} */
+      audio: null,
     };
   },
 
@@ -73,6 +75,27 @@ export default {
       this.mapAndShow();
 
       this.visibleImages = this.currentImages.map( image => TextPageImage.from( image, { ignoreDisplayCondition: true } ) );
+
+      this.audioPlayerProps.visible = false;
+      if (this.data.records.length === 1 && this.data.records[0].data.pages[ this.pageIndex ].audio ) {
+        this.audio = new Audio( this.data.records[0].data.pages[ this.pageIndex ].audio );
+        this.audio.addEventListener( 'loadeddata', e => {
+          this.audioPlayerProps.duration = (e.target || e.path[0]).duration;
+          this.audioPlayerProps.visible = true;
+        });
+        this.audio.addEventListener( 'timeupdate', e => {
+          this.audioPlayerProps.time = (e.target || e.path[0]).currentTime;
+        });
+        this.audio.addEventListener( 'play', e => {
+          this.audioPlayerProps.playing = !(e.target || e.path[0]).paused;
+        });
+        this.audio.addEventListener( 'pause', e => {
+          this.audioPlayerProps.playing = !(e.target || e.path[0]).paused;
+        });
+        this.audio.addEventListener( 'ended', e => {
+          (e.target || e.path[0]).currentTime = 0;
+        });
+      }
     },
 
     redraw() {
@@ -171,6 +194,17 @@ export default {
       }, UI ),
       defaults: OptionsCreator.createDefaults( UI ),
     });
+
+    this.audioPlayerProps.toggled = e => { 
+      if (this.audio) {
+        e.isPlaying ? this.audio.play() : this.audio.pause();
+      }
+    };
+    this.audioPlayerProps.slided = e => { 
+      if (this.audio) {
+        this.audio.currentTime = e.time;
+      }
+    };
   },
 
   mounted() {
