@@ -24,18 +24,6 @@ export default {
 
   data() {
     return {
-      // options representation for editor
-      options: {
-        audioReplay: new OptionGroup({
-          id: 'audioReplay',
-          title: 'Audio Replay',
-          options: OptionsCreator.createOptions( {
-            // nothing is here
-          }, UI ),
-          defaults: OptionsCreator.createDefaults( UI ),
-        }),
-      },
-
       /** @type {Painter} */
       painter: null,
       /** @type {ReplayTrack} */
@@ -195,6 +183,21 @@ export default {
         drawWordFrame: false,
       } ) );
     },
+  },
+
+  created() {
+    // options representation for editor
+    /*
+    options: {
+      audioReplay: new OptionGroup({
+        id: 'audioReplay',
+        title: 'Audio Replay',
+        options: OptionsCreator.createOptions( {
+          // nothing is here
+        }, UI ),
+        defaults: OptionsCreator.createDefaults( UI ),
+      }),
+    },*/
   },
 
   mounted() {

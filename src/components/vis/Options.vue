@@ -1,23 +1,23 @@
 <template lang="pug">
   #options(@click="close")
-      .inner
-        .options-title Settings
-        .options(ref="container")
-          //---- example of the content
-          //- .group
-          //-     .name [NAME]
-          //-     .row
-          //-         .label [LABEL]
-          //-         select.value.ID
-          //-             each ITEM in LIST
-          //-                 option(value="#{ITEM}") #{ITEM}
-          //-     .row
-          //-         .label [LABEL]
-          //-         input.value.id(type="checkbox")
-        .buttons
-          button.button.is-primary(@click="save") Save and close
-          button.button.is-primary(@click="apply") Apply
-          button.button.is-danger(@click="reset") Reset
+    .inner
+      .options-title Settings
+      .options(ref="container")
+        //---- example of the content
+        //- .group
+        //-     .name [NAME]
+        //-     .row
+        //-         .label [LABEL]
+        //-         select.value.ID
+        //-             each ITEM in LIST
+        //-                 option(value="#{ITEM}") #{ITEM}
+        //-     .row
+        //-         .label [LABEL]
+        //-         input.value.id(type="checkbox")
+      .buttons
+        button.button.is-primary(@click="save") Save and close
+        button.button.is-primary(@click="apply") Apply
+        button.button.is-danger(@click="reset") Reset
 </template>
 
 <script>
@@ -157,9 +157,28 @@ export default {
 
     bind() {
       const container = /** @type {Element} */ (this.$refs.container);
-
+      let groups = [];
       for ( let visID in this.values ) {
-        const vis = /** @type {OptionGroup} */ (this.values[ visID ]);
+        groups.push( this.values[ visID ] );
+      }
+
+      groups = groups.sort( (a, b) => {
+        if (a.id[0] === '_') {
+          if (b.id[0] === '_')
+            return (a.id < b.id) ? -1 : 1;
+          else
+            return 1;
+        }
+        else if (b.id[0] === '_') {
+          return -1;
+        }
+        else {
+          return (a.id < b.id) ? -1 : 1;
+        }
+      });
+
+      groups.forEach( item => {
+        const vis = /** @type {OptionGroup} */ (item);
 
         const group = document.createElement( 'div' );
         group.classList.add( 'group' );
@@ -185,7 +204,7 @@ export default {
         }
 
         container.appendChild( group );
-      }
+      });
     },
 
     /** 

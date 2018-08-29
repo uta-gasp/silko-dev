@@ -406,14 +406,14 @@ export default {
 
     /**
      * @param {Student} student 
-     * @param {function} filter
+     * @param {(s: Session) => boolean} filter
      * @returns {boolean}
      */
     hasItems( student, filter ) {
       return student.sessions.filter( filter ).length > 0;
     },
 
-    /** @param {{subitems: Object.<string>}} e */
+    /** @param {{subitems: Array}} e */
     continueDeferredWithStudents( e ) {
       const sessions = this.deferredVisualization.sessions.filter( session =>
         e.subitems[ session.student.id ]
@@ -432,7 +432,7 @@ export default {
       this.closeStudentSelectionBox( null );
     },
 
-    /** @param {{subitems: Object.<string>}} e */
+    /** @param {{subitems: Array}} e */
     continueDeferredWithSessions( e ) {
       const sessions = this.deferredVisualization.sessions.filter( session =>
         e.subitems[ session.ref.id ]

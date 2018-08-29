@@ -72,7 +72,7 @@ export default {
   data() {
     return {
       isOptionsDisplayed: false,
-      options: null,
+      options: {},
 
       commonUI: COMMON_UI,
 
@@ -192,10 +192,8 @@ export default {
   },
 
   created() {
-    this.options = {
-      _common: this.createCommonOptions(),
-      _sgwm: sgwmController.createOptions(),
-    };    
+    this.options["_common"] = this.createCommonOptions();
+    this.options["_sgwm"] = sgwmController.createOptions();
   },
 
   mounted() {

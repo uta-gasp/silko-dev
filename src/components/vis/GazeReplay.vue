@@ -38,25 +38,6 @@ export default {
 
   data() {
     return {
-      // options representation for editor
-      options: {
-        gazeReplay: new OptionGroup({
-          id: 'gazeReplay',
-          title: 'Gaze Replay',
-          options: OptionsCreator.createOptions( {
-            colorMetric: new OptionItem({ type: Array, items: ['none', 'duration', 'char speed', 'syllable speed'], label: 'Word color metric' }),
-
-            nameFontFamily: new OptionItem({ type: String, label: 'Name font' }),
-            nameFontSize: new OptionItem({ type: Number, step: 1, label: 'Name font size' }),
-            nameSpacing: new OptionItem({ type: Number, step: 0.1, label: 'Name spacing' }),
-
-            'syllab.background': new OptionItem({ type: '#', label: 'Syllabification background' }),
-            'syllab.wordColor': new OptionItem({ type: '#', label: 'Syllabification word color' }),
-          }, UI ),
-          defaults: OptionsCreator.createDefaults( UI ),
-        }),
-      },
-
       /** @type {Painter} */
       painter: null,
       /** @type {ReplayTrack[]} */
@@ -215,6 +196,25 @@ export default {
         drawWordFrame: false,
       } ) );
     },
+  },
+
+  created() {
+    // options representation for editor
+    this.options["gazeReplay"] = new OptionGroup({
+      id: 'gazeReplay',
+      title: 'Gaze Replay',
+      options: OptionsCreator.createOptions( {
+        colorMetric: new OptionItem({ type: Array, items: ['none', 'duration', 'char speed', 'syllable speed'], label: 'Word color metric' }),
+
+        nameFontFamily: new OptionItem({ type: String, label: 'Name font' }),
+        nameFontSize: new OptionItem({ type: Number, step: 1, label: 'Name font size' }),
+        nameSpacing: new OptionItem({ type: Number, step: 0.1, label: 'Name spacing' }),
+
+        'syllab.background': new OptionItem({ type: '#', label: 'Syllabification background' }),
+        'syllab.wordColor': new OptionItem({ type: '#', label: 'Syllabification word color' }),
+      }, UI ),
+      defaults: OptionsCreator.createDefaults( UI ),
+    });
   },
 
   mounted() {

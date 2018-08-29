@@ -48,28 +48,6 @@ export default {
     return {
       record: this.data.records[0],
 
-      // options representation for editor
-      options: {
-        gazePlot: new OptionGroup({
-          id: 'gazePlot',
-          title: 'Gaze Plot',
-          options: OptionsCreator.createOptions( {
-            colorMetric: new OptionItem({ type: Array, items: Metric.Types, label: 'Word color metric' }),
-
-            saccadeColor: new OptionItem({ type: '#', label: 'Saccade color' }),
-            regressionColor: new OptionItem({ type: '#', label: 'Regressive saccade color' }),
-
-            showConnections: new OptionItem({ type: Boolean, label: 'Show word-fixation connections' }),
-            showSaccades: new OptionItem({ type: Boolean, label: 'Show saccades' }),
-            showFixations: new OptionItem({ type: Boolean, label: 'Show fixations' }),
-
-            'syllab.background': new OptionItem({ type: '#', label: 'Syllabification background' }),
-            'syllab.wordColor': new OptionItem({ type: '#', label: 'Syllabification word color' }),
-          }, UI ),
-          defaults: OptionsCreator.createDefaults( UI ),
-        }),
-      },
-
       /** @type {Painter} */
       painter: null,
     };
@@ -171,6 +149,28 @@ export default {
 
       return result;
     },
+  },
+
+  created() {
+    // options representation for editor
+    this.options["gazePlot"] = new OptionGroup({
+      id: 'gazePlot',
+      title: 'Gaze Plot',
+      options: OptionsCreator.createOptions( {
+        colorMetric: new OptionItem({ type: Array, items: Metric.Types, label: 'Word color metric' }),
+
+        saccadeColor: new OptionItem({ type: '#', label: 'Saccade color' }),
+        regressionColor: new OptionItem({ type: '#', label: 'Regressive saccade color' }),
+
+        showConnections: new OptionItem({ type: Boolean, label: 'Show word-fixation connections' }),
+        showSaccades: new OptionItem({ type: Boolean, label: 'Show saccades' }),
+        showFixations: new OptionItem({ type: Boolean, label: 'Show fixations' }),
+
+        'syllab.background': new OptionItem({ type: '#', label: 'Syllabification background' }),
+        'syllab.wordColor': new OptionItem({ type: '#', label: 'Syllabification word color' }),
+      }, UI ),
+      defaults: OptionsCreator.createDefaults( UI ),
+    });
   },
 
   mounted() {
