@@ -184,7 +184,7 @@ export default class DataCollector {
 
   nextPage() {
     this._closeImages();
-    this._pages.add();
+    this._pages.add().data.ts = this._timer.value;
   }
 
   /**

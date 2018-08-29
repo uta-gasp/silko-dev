@@ -27,6 +27,8 @@ export default class DataPage {
     this.isIntro = false;
     /** @type {string} */
     this.audio = null;
+    /** @type {number} */
+    this.ts = 0;
   }
 
   /**

@@ -91,7 +91,7 @@
 
     gaze-plot(v-if="isShowing( VISUALIZATIONS.gazePlot )" :data="visualization" @close="closeVisualization")
 
-    audio-replay(v-if="isShowing( VISUALIZATIONS.audioReplay )" :data="visualization" @close="closeVisualization")
+    gaze-with-audio(v-if="isShowing( VISUALIZATIONS.audioReplay )" :data="visualization" @close="closeVisualization")
 
     durations(v-if="isShowing( VISUALIZATIONS.durations )" :data="visualization" @close="closeVisualization")
 
@@ -131,7 +131,8 @@ import SessionEditBox from '@/components/widgets/SessionEditBox.vue';
 import ItemSelectionBox from '@/components/widgets/ItemSelectionBox.vue';
 
 import GazePlot from '@/components/vis/GazePlot.vue';
-import AudioReplay from '@/components/vis/AudioReplay.vue';
+//import AudioReplay from '@/components/vis/AudioReplay.vue';
+import GazeWithAudio from '@/components/vis/GazeWithAudio.vue';
 import Durations from '@/components/vis/Durations.vue';
 import GazeReplay from '@/components/vis/GazeReplay.vue';
 import WordReplay from '@/components/vis/WordReplay.vue';
@@ -167,7 +168,8 @@ export default {
     'session-editing-box': SessionEditBox,
     'item-selection-box': ItemSelectionBox,
     'gaze-plot': GazePlot,
-    'audio-replay': AudioReplay,
+    //'audio-replay': AudioReplay,
+    'gaze-with-audio': GazeWithAudio,
     'durations': Durations,
     'gaze-replay': GazeReplay,
     'word-replay': WordReplay,
@@ -203,7 +205,7 @@ export default {
 
       VISUALIZATIONS: {
         gazePlot: 'GazePlot',
-        audioReplay: 'AudioReplay',
+        audioReplay: 'GazeWithAudio',
         durations: 'Durations',
         gazeReplay: 'GazeReplay',
         wordReplay: 'WordReplay',
