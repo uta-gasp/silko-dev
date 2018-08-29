@@ -28,6 +28,14 @@
     )
     options(v-show="isOptionsDisplayed" :values="options" @close="closeOptions" @apply="applyOptions")
 
+    audio-player.audio-player(
+      v-if="audioPlayerProps.visible" 
+      :duration="audioPlayerProps.duration"
+      :playing="audioPlayerProps.playing"
+      :time="audioPlayerProps.time"
+      @toggled="audioPlayerProps.toggled($event)",
+      @slided="audioPlayerProps.slided($event)")
+
     slot
 </template>
 
@@ -39,6 +47,7 @@ import { Feedbacks } from '@/model/session/feedbacks';
 import ControlPanel from '@/components/vis/controlPanel.vue';
 import Options from '@/components/vis/Options.vue';
 import TaskImages from '@/components/widgets/TaskImages.vue';
+import AudioPlayer from '@/components/widgets/AudioPlayer.vue';
 
 // ts-check-only
 import DataPage from '@/model/data/dataPage.js';
@@ -67,6 +76,7 @@ export default {
     'control-panel': ControlPanel,
     'options': Options,
     'task-images': TaskImages,
+    'audio-player': AudioPlayer,
   },
 
   data() {
@@ -86,6 +96,15 @@ export default {
 
       isPlayerPaused: false,
       isWarningMessageVisible: false,
+
+      audioPlayerProps: {
+        visible: false,
+        duration: 0,
+        playing: false,
+        time: 0,
+        toggled( e ) { },
+        slided( e ) { },
+      },
 
       /** @type {DataImage[]} */
       currentImages: [],
@@ -224,6 +243,13 @@ export default {
       position: fixed;
       top: 3.5em;
       right: 4px;
+    }
+
+    .audio-player {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
     }
   }
 </style>

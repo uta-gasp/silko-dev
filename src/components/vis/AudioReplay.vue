@@ -71,8 +71,6 @@ export default {
     },
 
     changePage() {
-      console.log( 'AR', 'new page', this.pageIndex );
-
       this.isWarningMessageVisible = false;
       this.visibleImages = this.currentImages
         .filter( image => image.on === TextPageImage.EVENT.none)
@@ -88,12 +86,9 @@ export default {
       if ( this.track ) {
         this.stop();
         this.loadAudio( err => {
-          console.log( err );
+          console.error( 'AudioReplay', err );
           this.start();
         });
-      }
-      else {
-        console.log( 'AR', 'no track yet' );
       }
     },
 
@@ -115,19 +110,27 @@ export default {
 
     loadAudio( cb ) {
       const audioFile = this.record.data.pages[ this.pageIndex ].audio;
-      console.log( 'AR', 'loading audio...' );
+      console.log( 'AudioReplay', 'loading audio...' );
       if (audioFile) {
         // const audioUrl = URL.createObjectURL( audioBlob );
         this.audio = new Audio( audioFile );
         this.audio.autoplay = true;
-        this.audio.addEventListener( 'loadeddata', () => {
+        this.audio.addEventListener( 'loadeddata', e => {
+          this.audioPlayerProps.duration = (e.target || e.path[0]).duration;
           cb();
         });
-
-        //console.dir(audio);
-        // const play = () => {
-        //   audio.play();
-        // };
+        this.audio.addEventListener( 'timeupdate', e => {
+          this.audioPlayerProps.time = (e.target || e.path[0]).currentTime;
+        });
+        this.audio.addEventListener( 'play', e => {
+          this.audioPlayerProps.playing = !(e.target || e.path[0]).paused;
+        });
+        this.audio.addEventListener( 'pause', e => {
+          this.audioPlayerProps.playing = !(e.target || e.path[0]).paused;
+        });
+        this.audio.addEventListener( 'ended', e => {
+          (e.target || e.path[0]).currentTime = 0;
+        });
       }
       else {
         cb( 'no audio' );
@@ -198,6 +201,14 @@ export default {
         defaults: OptionsCreator.createDefaults( UI ),
       }),
     },*/
+    this.audioPlayerProps.visible = true;
+    this.audioPlayerProps.toggled = e => { this.togglePlayer(); }
+    this.audioPlayerProps.slided = e => { 
+      if (this.audio) {
+        this.audio.currentTime = e.time;
+        // TODO: slide gaze track
+      }
+    }
   },
 
   mounted() {
@@ -205,7 +216,9 @@ export default {
 
     this.createTrack();
     this.loadAudio( err => {
-      console.log( err );
+      if (err) {
+        console.error( 'AudioReplay', err );
+      }
       this.start();
     });
   },
