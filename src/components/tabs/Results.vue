@@ -19,7 +19,7 @@
                   th
                   th
               tbody
-                tr(v-for="task in cls.tasks" :key="task.id")
+                tr(v-for="task in tasksWithSessions( cls.tasks )" :key="task.id")
                   td {{ task.name }}
                   td.is-narrow
                     button.button.is-primary(:disabled="!isLoaded" @click="selectTaskStudents( task, VISUALIZATIONS.durations )") Durations
@@ -28,8 +28,7 @@
                   td.is-narrow
                     button.button.is-primary(:disabled="!isLoaded" @click="selectTaskStudents( task, VISUALIZATIONS.wordReplay )") Word replay
                   td.is-narrow
-                    span(v-if="task.hasQuestionnaire")
-                      button.button.is-primary(:disabled="!isLoaded" @click="selectTaskStudents( task, VISUALIZATIONS.questionnaireResults )") Questionnaire
+                    button.button.is-primary(:disabled="!isLoaded || !task.hasQuestionnaire" @click="selectTaskStudents( task, VISUALIZATIONS.questionnaireResults )") Questionnaire
 
             .container(v-if="cls.students === null")
               loading
@@ -39,6 +38,7 @@
               thead
                 tr
                   th Students
+                  th
                   th
                   th
                   th
@@ -277,6 +277,17 @@ export default {
       if ( !Teacher.isLogged ) {
         this.$router.replace( '/' );
       }
+    },
+
+    /** @param {Task[]} tasks */
+    tasksWithSessions( tasks ) {
+      return tasks.filter( task => {
+        let sessionCount = 0;
+        task.students.forEach( student => {
+          sessionCount += student.sessions.length;
+        });
+        return sessionCount > 0;
+      });
     },
 
     /** @param {Event} e */

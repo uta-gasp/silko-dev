@@ -29,6 +29,8 @@ export default class Session extends Recordable {
     this.screen = null;
     /** @type {string} ID */
     this.data = '';
+    /** @type {string[]} IDs */
+    this.files = [];
   }
 
   /** @returns {string} */

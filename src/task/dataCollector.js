@@ -137,6 +137,8 @@ class DataCollectorSession {
     this.screen = ScreenSize.full;
     /** @type {string} */
     this.data = null;
+    /** @type {string[]} IDs */
+    this.files = [];
   }
 
 }
@@ -366,6 +368,9 @@ export default class DataCollector {
    */
   setAudioFiles( urls ) {
     this._audioFiles = urls;
+    urls.forEach( url => {
+      this._session.files.push( url );
+    })
   }
 
   _closeImages() {

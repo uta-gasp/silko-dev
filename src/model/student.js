@@ -285,16 +285,15 @@ export default class Student extends Recordable {
 
       // DEBUG-LINES
       // PROD: enable these lines
-      /*
       if ( Student.MULTICLASS ) {
         this.removeAssignment( task, cb );
       }
       else {
         this.setAssignment( task, null, cb );
-      }*/
+      }
 
       // PROD: remove next line
-      cb();
+      // cb();
     } );
   }
 
@@ -340,7 +339,7 @@ export default class Student extends Recordable {
         return cb( err );
       }
 
-      db.get( Session, id, ( err, session ) => {
+      db.get( Session, id, /** @param {string | Error} err @param {Session} session */ ( err, session ) => {
         if ( err ) {
           return cb( err );
         }
@@ -348,6 +347,12 @@ export default class Student extends Recordable {
         const promises = [];
         promises.push( db.deleteItems( Data, [ session.data ] ) );
         promises.push( db.deleteItems( Session, [ id ] ) );
+
+        session.files.forEach( file => db.deleteFile( file, err => {
+          if (err) {
+            console.error( 'Student.deleteSession:', err );
+          }
+        }));
 
         Promise.all( promises ).then( () => {
           cb( null );
