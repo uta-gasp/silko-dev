@@ -14,9 +14,9 @@
       @hide="onImageHide")
 
     .is-bottom-right
-      a.button.is-primary.is-large(v-show="hasNextPage" @click="next")
+      a.button.is-primary.is-large(v-show="hasNextPage" :disabled="isWaitingToFinilizePage" @click="next")
         span {{ titleNext }}
-      a.button.is-primary.is-large(v-show="!hasNextPage" @click="finish")
+      a.button.is-primary.is-large(v-show="isLastPage" :disabled="isWaitingToFinilizePage" @click="finish")
         span {{ titleFinish }}
 
 </template>
@@ -77,6 +77,7 @@ export default {
 
       fixationUpdateTimer: 0,
 
+      isWaitingToFinilizePage: false,
       audioRecorder: null,
       audioFiles: [],
     };
@@ -105,6 +106,11 @@ export default {
     /** @returns {boolean} */
     hasNextPage() {
       return this.textPresenter ? this.textPresenter.hasNextPage : false;
+    },
+
+    /** @returns {boolean} */
+    isLastPage() {
+      return this.textPresenter ? !this.textPresenter.hasNextPage : false;
     },
 
     /** @returns {string} */
@@ -193,20 +199,15 @@ export default {
 
     /** @param {Event} e */
     next( e ) {
-      if (this.task.recordAudio) {
-        if (e)  { // not started yet
-          this.audioRecorder.stop().then( /** @param {Blob} blob */ blob => {
-            this.saveAudio( blob, url => {
-              this.audioFiles.push( url );
-            } );
-            this.audioRecorder.start();
-            this.startPage();
-          });
-        }
-        else {
-          this.audioRecorder.start();
+      if (e && this.task.recordAudio)  { // when showing the first page
+        this.isWaitingToFinilizePage = true;
+        this.audioRecorder.stop().then( /** @param {Blob} blob */ blob => {
+          this.saveAudio( blob, url => {
+            this.audioFiles.push( url );
+          } );
           this.startPage();
-        }
+          this.isWaitingToFinilizePage = false;
+        });
       }
       else {
         this.startPage();
@@ -216,10 +217,12 @@ export default {
     /** @param {Event} e */
     finish( e ) {
       if (this.task.recordAudio) {
+        this.isWaitingToFinilizePage = true;
         this.audioRecorder.stop().then( /** @param {Blob} blob */ blob => {
           this.saveAudio( blob, /** @param {string} url */ url => {
             this.audioFiles.push( url );
             this.stop();
+            this.isWaitingToFinilizePage = false;
           } );
         });
       }
@@ -246,6 +249,10 @@ export default {
 
       this.textPresenter.nextPage();
       this.collector.nextPage();
+      if (this.task.recordAudio) {
+        this.audioRecorder.start();
+      }
+
       this.feedbackProvider.reset( wordReadingDuration );
 
       gazeTracking.updateTargets();

@@ -63,8 +63,6 @@ export default class ReplayTrack {
       return;
     }
 
-    console.log(time);
-
     let fixation = null;
     let fixationIndex = -1;
     /*
