@@ -100,10 +100,10 @@ export default {
         });
         this.audio.addEventListener( 'timeupdate', e => {
           this.audioPlayerProps.time = (e.target || e.path[0]).currentTime;
+          this.track.setTime( (page.ts || 0) + this.audio.currentTime * 1000 );
           if (this.track.fixation) {
             this.updateImages( this.track.fixation.tsSync );
           }
-          this.track.setTime( (page.ts || 0) + this.audio.currentTime * 1000 );
         });
         this.audio.addEventListener( 'play', e => {
           this.audioPlayerProps.playing = !(e.target || e.path[0]).paused;

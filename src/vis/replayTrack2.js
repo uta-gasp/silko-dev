@@ -60,6 +60,7 @@ export default class ReplayTrack {
    */
   setTime( time ) {
     if (!this._fixations) {
+      console.log('fix', '!fixs');
       return;
     }
 
@@ -73,7 +74,7 @@ export default class ReplayTrack {
     */
    for (let i = 0; i < this._fixations.length; i += 1) {
     const fix = this._fixations[i];
-      if (fix.ts <= time && time <= (fix.ts + fix.duration)) {
+      if (fix.tsSync <= time && time <= (fix.tsSync + fix.duration)) {
         fixation = fix;
         fixationIndex = i;
         this._lastTimestamp = time;
