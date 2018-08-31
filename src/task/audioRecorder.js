@@ -74,7 +74,7 @@ export default function() {
         let mediaRecorder = null;
         let audioChunks = [];
 
-        const start = () => {
+        const start = cb => {
           if (mediaRecorder) {
             return console.error( 'AudioRecorder', 'cannot start new recorder' );
           }
@@ -82,6 +82,9 @@ export default function() {
           mediaRecorder = new MediaRecorder( stream );
           mediaRecorder.addEventListener( 'dataavailable', event => {
             audioChunks.push( event.data );
+          });
+          mediaRecorder.addEventListener( 'start', () => {
+            cb();
           });
           mediaRecorder.start();
         };

@@ -250,7 +250,9 @@ export default {
       this.textPresenter.nextPage();
       this.collector.nextPage();
       if (this.task.recordAudio) {
-        this.audioRecorder.start();
+        this.audioRecorder.start( () => {
+          this.collector.updatePageTimestamp();
+        });
       }
 
       this.feedbackProvider.reset( wordReadingDuration );

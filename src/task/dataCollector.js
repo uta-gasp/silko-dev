@@ -189,6 +189,12 @@ export default class DataCollector {
     this._pages.add().data.ts = this._timer.value;
   }
 
+  updatePageTimestamp() {
+    if (this._pages.current) {
+      this._pages.current.data.ts = this._timer.value;
+    }
+  }
+
   /**
    * @param {number} threshold 
    * @returns {string[]}
