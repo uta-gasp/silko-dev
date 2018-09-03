@@ -66,8 +66,9 @@ export default {
       this.$emit( 'toggled', { isPlaying: this.isPlaying } );
     },
 
+    /** @param {UIEvent} e */
     updateTime( e ) {
-      this.$emit( 'slided', { time: e.target.value / 1000 } );
+      this.$emit( 'slided', { time: /** @type {HTMLInputElement} */ (e.target).value / 1000 } );
     },
   },
 

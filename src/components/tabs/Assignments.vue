@@ -21,6 +21,8 @@
                       i.fa.fa-ellipsis-h
                     span.icon(v-if="assignment.task.speech.language" title="Voice")
                       i.fa.fa-headphones
+                    span.icon(v-if="assignment.task.recordAudio" title="Recording")
+                      i.fa.fa-microphone
                 .card-content
                   .content {{ assignment.task.name }}
                 .card-footer
