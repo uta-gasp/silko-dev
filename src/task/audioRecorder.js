@@ -2,6 +2,49 @@
 
 export default function() {
   /*
+  return new Promise( resolve => {
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then( stream => {
+        let audioChunks = [];
+
+        let audioCtx = new AudioContext();
+
+        let source = audioCtx.createMediaStreamSource( stream );
+        source.connect( audioCtx.destination );
+        source.addEventListener( 'audioprocess', e => {
+          console.dir( e.inputBuffer );
+          audioChunks.push( e.inputBuffer );
+        });
+        source.addEventListener( 'ended', e => {
+          console.dir( 'ended', e );
+        });
+        source.addEventListener( 'complete', e => {
+          console.dir( 'complete', e );
+        });
+        source.addEventListener( 'message', e => {
+          console.dir( 'message', e );
+        });
+
+        const start = cb => {
+          audioChunks = [];
+          console.log( 'start', 'time', audioCtx.currentTime);
+          cb();
+        };
+
+        const stop = () => {
+          console.log( 'stop', 'time', audioCtx.currentTime);
+          return new Promise( resolve => {
+            const audioBlob = new Blob( audioChunks );
+            resolve( audioBlob );
+          });
+        };
+
+        resolve({ start, stop });
+      });
+  });
+  */
+
+  /*
   if (window.WebAudioRecorder) {
     console.log('WebAudioRecorder enabled');
 

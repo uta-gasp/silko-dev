@@ -38,7 +38,7 @@ export default {
   computed: {
     /** @returns {string} */
     title() {
-      return `Audio replay in "${this.record.task.name}" for ${this.data.params.student}`;
+      return `${this.record.student.name} reading "${this.record.task.name}" at ${dataUtils.sessionDate( this.record.session.date )}`;
     },
   },
 
@@ -70,7 +70,7 @@ export default {
       this.track.setPage( this.pageIndex );
       this.loadAudio( err => {
         if (err) {
-          console.error( 'AudioReplay', err );
+          console.error( 'GazeWithAudio', err );
         }
         else {
           this.audio.play();
@@ -100,7 +100,7 @@ export default {
         });
         this.audio.addEventListener( 'timeupdate', e => {
           this.audioPlayerProps.time = (e.target || e.path[0]).currentTime;
-          this.track.setTime( (page.ts || 0) + this.audio.currentTime * 1000 );
+          this.track.setTime( (-page.ts || 0) + this.audio.currentTime * 1000 );
           if (this.track.fixation) {
             this.updateImages( this.track.fixation.tsSync );
           }
@@ -173,7 +173,7 @@ export default {
   },
 
   mounted() {
-    console.log( 'AudioReplay created' );
+    console.log( 'GazeWithAudio created' );
   },
 
   beforeDestroy() {

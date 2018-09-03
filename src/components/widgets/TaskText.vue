@@ -10,7 +10,7 @@ export default {
   data() {
     return {
       textStyle: {
-        'color': '#775',
+        'color': '#333',
         'font-family': `${this.fontname ? this.fontname : 'Calibri'}, Arial, sans-serif`,
         'font-size': '20pt',
         'font-style': 'normal',
@@ -81,11 +81,11 @@ export default {
     // custom styles to be supported by TextPresenter
 
     .light {
-      color: lighten(#775, 25%) !important;
+      color: lighten(#333, 50%) !important;
     }
 
     .dark {
-      color: darken(#775, 25%) !important;
+      color: darken(#333, 25%) !important;
     }
   }
 

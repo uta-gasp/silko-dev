@@ -9,6 +9,7 @@
       :max="durationMs" 
       :disabled="isPlaying"
       @input="updateTime")
+    .time {{ currentTimeMin }}
 </template>
 
 <script>
@@ -48,6 +49,14 @@ export default {
 
     currentTimeMs() {
       return Math.round( this.currentTime * 1000 );
+    },
+
+    currentTimeMin() {
+      const seconds = this.currentTime;
+      const min = Math.floor( seconds / 60 );
+      const sec = Math.floor( seconds );
+      const frac = Math.floor((seconds - sec) * 10);
+      return `${min}:${sec < 10 ? '0'+sec : sec}.${frac}`;
     },
   },
 
@@ -104,5 +113,11 @@ export default {
       width: -moz-available;
     }
 
+    .time {
+      color: #fff;
+      padding: 0 0.5em;
+      width: 6em;
+      text-align: start;
+    }
   }
 </style>
