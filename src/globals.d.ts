@@ -6,6 +6,16 @@ interface Callback {
 
 // External libraries
 
+interface MediaRecorder extends EventTarget {
+  new ( stream: MediaStream );
+  start();
+  stop();
+}
+
+interface MediaRecorderDataEvent extends Event {
+  data: Blob;
+}
+
 interface EventEmitter {
   new ();
   addListener( event: string, handler: Function );
