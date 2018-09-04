@@ -1,5 +1,29 @@
 // exports a propmise resolving to { start(), stop() } object
 
+/**
+ * @name EmptyFunction
+ * @function
+ */
+
+/**
+ * @typedef {Object} MediaRecorder
+ * @property {EmptyFunction} start
+ * @property {EmptyFunction} stop
+ * @augments {EventTarget}
+ */
+
+/**
+ * @typedef {Object} MediaRecorderDataEvent
+ * @property {Blob} data
+ */
+
+/**
+ * @typedef {Function} Callback
+ */
+
+/**
+ * @returns {Promise}
+ */
 export default function() {
   /*
   return new Promise( resolve => {
@@ -115,15 +139,16 @@ export default function() {
       .then( stream => {
         /** @type {MediaRecorder} */
         let mediaRecorder = null;
+        /** @type {Blob[]} */
         let audioChunks = [];
 
-        const start = cb => {
+        const start = /** @param {Callback} cb */ cb => {
           if (mediaRecorder) {
             return console.error( 'AudioRecorder', 'cannot start new recorder' );
           }
 
           mediaRecorder = new MediaRecorder( stream );
-          mediaRecorder.addEventListener( 'dataavailable', event => {
+          mediaRecorder.addEventListener( 'dataavailable', /** @param {MediaRecorderDataEvent} event */ event => {
             audioChunks.push( event.data );
           });
           mediaRecorder.addEventListener( 'start', () => {

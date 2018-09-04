@@ -6,14 +6,6 @@
       span {{ successMessage }}
 
     nav.panel
-      p.panel-heading Add instruction
-      .panel-block.is-paddingless
-        intro-editor.control(
-          :name-editable="true"
-          :reload="resetNew"
-          @save="tryToCreate")
-
-    nav.panel
       p.panel-heading Instructions
       .panel-block.is-paddingless
         .container(v-if="intros === null")
@@ -37,6 +29,14 @@
                     i.fa.fa-edit
                   button.button.is-danger(@click="remove( item )")
                     i.far.fa-trash-alt
+
+    nav.panel
+      p.panel-heading New instruction
+      .panel-block.is-paddingless
+        intro-editor.control(
+          :name-editable="true"
+          :reload="resetNew"
+          @save="tryToCreate")
 
     modal-container(v-if="toEdit" title="Instruction editor" @close="closeEditor")
       intro-editor(

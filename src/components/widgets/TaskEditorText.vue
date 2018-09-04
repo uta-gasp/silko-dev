@@ -17,7 +17,7 @@
             select(v-model="fontname")
               option(v-for="name in FONTS" :key="name") {{ name }}
         .column.is-narrow
-          label.label Introduction
+          label.label Instructions
           span.select
             select(v-model="intro")
               option(value="") none

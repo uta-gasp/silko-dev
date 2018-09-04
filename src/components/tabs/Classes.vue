@@ -6,15 +6,6 @@
       span {{ successMessage }}
 
     nav.panel
-      p.panel-heading Add class
-      .panel-block
-        .field.control
-          p.control
-            input.input(type="text" placeholder="Name" v-model="newName")
-          p.control
-            button.button.is-primary(:disabled="!canCreate" @click="tryToCreate") Create
-
-    nav.panel
       p.panel-heading Classes
       .panel-block.is-paddingless
         .container(v-if="classes === null")
@@ -35,6 +26,15 @@
                 task-list(:cls="item" :intros="intros" @saved="taskSaved" @created="taskCreated" @deleted="taskDeleted")
               td
                 student-list(:cls="item" :teacher="teacher" :refresh="refreshStudents")
+
+    nav.panel
+      p.panel-heading New class
+      .panel-block
+        .field.control
+          p.control
+            input.input(type="text" placeholder="Name" v-model="newName")
+          p.control
+            button.button.is-primary(:disabled="!canCreate" @click="tryToCreate") Create
 
     remove-warning(v-if="toDelete" object="class" :name="toDeleteName" @close="removeWarningClosed")
 </template>

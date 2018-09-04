@@ -6,7 +6,7 @@
       span {{ successMessage }}
 
     nav.panel
-      p.panel-heading Add school
+      p.panel-heading New school
       .panel-block
         .field.control
           p.control
