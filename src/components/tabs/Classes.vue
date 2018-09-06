@@ -32,7 +32,9 @@
       .panel-block
         .field.control
           p.control
-            input.input(type="text" placeholder="Name" v-model="newName")
+            input.input(type="text" placeholder="Name" v-model="newName" :class="{'is-danger': newName.length && !canCreate}")
+          p.help.is-danger(v-show="newName.length && !canCreate") name is too short
+
           p.control
             button.button.is-primary(:disabled="!canCreate" @click="tryToCreate") Create
 

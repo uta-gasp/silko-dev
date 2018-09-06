@@ -10,14 +10,19 @@
       .panel-block
         .field.control
           p.control
-            input.input(type="text" placeholder="Name" v-model="newName")
+            input.input(type="text" placeholder="Name" v-model="newName" :class="{'is-danger': newName.length && !isNewNameValid}")
+          p.help.is-danger(v-show="newName.length && !isNewNameValid") name is too short
+
           p.control
-            input.input(type="email" placeholder="Email" v-model="newEmail")
+            input.input(type="email" placeholder="Email" v-model="newEmail" :class="{'is-danger': newEmail.length && !isNewEmailValid}")
+          p.help.is-danger(v-show="newEmail.length && !isNewEmailValid") email is not valid
+
           p.control(v-if="isAdmin")
             span.select
               select(v-model="newSchool" required)
                 option(value="" disabled selected hidden ) School
                 option(v-for="item in schoolItems" v-bind:value="item.value") {{ item.text }}
+                
           p.control
             button.button.is-primary(:disabled="!canCreate" @click="tryToCreate") Create
     nav.panel

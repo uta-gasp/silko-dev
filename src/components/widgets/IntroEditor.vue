@@ -5,7 +5,8 @@
         .column
           label.label(v-show="showLabels") Name
           p.control
-            input.input(type="text" placeholder="Name" :disabled="!nameEditable" v-model="name")
+            input.input(type="text" placeholder="Name" :disabled="!nameEditable" v-model="name" :class="{'is-danger': name.length && !isNameValid}")
+          p.help.is-danger(v-show="name.length && !isNameValid") name is too short
       .columns(v-show="showLabels")
         .column.is-three-quarters
           p.control
@@ -16,7 +17,8 @@
       .columns
         .column.is-three-quarters
           p.control
-            textarea.textarea.low(placeholder="Calibration instruction" v-model="calib")
+            textarea.textarea.low(placeholder="Calibration instruction" v-model="calib" :class="{'is-danger': calib.length && !isCalibInstructionValid}")
+          p.help.is-danger(v-show="calib.length && !isCalibInstructionValid") instruction is too short
         .column
           p.control
             input.input(type="text" placeholder="Calibrate" v-model="calibStart")
@@ -25,7 +27,8 @@
       .columns
         .column.is-three-quarters
           p.control
-            textarea.textarea.low(placeholder="Start instruction" v-model="start")
+            textarea.textarea.low(placeholder="Start instruction" v-model="start" :class="{'is-danger': start.length && !isStartInstructionValid}")
+          p.help.is-danger(v-show="start.length && !isStartInstructionValid") instruction is too short
         .column
           p.control
             input.input(type="text" placeholder="Start" v-model="startRun")
@@ -34,7 +37,8 @@
       .columns
         .column.is-three-quarters
           p.control
-            textarea.textarea(placeholder="First page" v-model="firstPage")
+            textarea.textarea(placeholder="First page" v-model="firstPage" :class="{'is-danger': firstPage.length && !isFirstPageValid}")
+          p.help.is-danger(v-show="firstPage.length && !isFirstPageValid") instruction is too short
         .column
           p.control
             input.input(type="text" placeholder="Next" v-model="next")
