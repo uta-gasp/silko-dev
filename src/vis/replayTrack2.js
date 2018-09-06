@@ -42,6 +42,8 @@ export default class ReplayTrack {
    */
   setPage( pageIndex ) {
     this._fixationIndex = -1;
+    this._updatePointer( null );
+
     this._fixations = this._session[ pageIndex ].fixations;
     if ( !this._fixations ) {
       return;
