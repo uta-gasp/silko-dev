@@ -26,7 +26,7 @@
         i.fa.fa-tasks
         span {{ tokens[ 'link_assignments' ] }}
     .nav-right(v-if="user")
-      a.button(href="https://uta-gasp.gitbooks.io/silko/" target="_blank") Manual
+      a.button(:href="manualLink" target="_blank") Manual
       #usermenu.dropdown.is-right(:class="{ 'is-active': isUsermenuDropped }")
         .dropdown-trigger
           button.button(
@@ -58,6 +58,28 @@ import { i10n, langs } from '@/utils/i10n.js';
 // ts-check-only
 import UserBase from '@/db/userBase';
 
+const MANUAL_PAGES = {
+  'admin': {
+    '/': '',
+  },
+  'school': {
+    '/': '',
+    '/teachers': 'maintain-teachers.html',
+    '/students': 'maintain-students.html',
+  },
+  'teacher': {
+    '/': '',
+    '/students': 'listing-students.html',
+    '/instructions': 'introductions.html',
+    '/classes': 'classes.html',
+    '/results': 'results.html',
+  },
+  'student': {
+    '/': '',
+    '/assignments': 'assignments.html',
+  }
+}
+
 export default {
   name: 'navbar',
 
@@ -69,22 +91,8 @@ export default {
       tokens: i10n( 'navbar' ),
       isUsermenuDropped: false,
       isUsermenuHover: false,
+      manualTopic: '',
     };
-  },
-
-  methods: {
-    /** @param {Event} e */
-    logOut( e ) {
-      login.logOut();
-    },
-
-    /** @param {Event} e */
-    updateLanguage( e ) {
-      this.user.prefs.lang = /** @type {HTMLInputElement} */ (e.target).value;
-      this.user.update( /** @param {Error | string} err */ err => {
-        eventBus.$emit( 'lang' );
-      });
-    },
   },
 
   computed: {
@@ -113,6 +121,39 @@ export default {
     isAssignment() {
       return this.$route.path.indexOf( '/assignment/' ) >= 0;
     },
+
+    /** @returns {string} */
+    manualLink() {
+      let userType = 'teacher';
+      if (this.user) {
+        if (this.user.isSchool) {
+          userType = 'school';
+        }
+        else if (this.user.isStudent) {
+          userType = 'student';
+        }
+      }
+
+      const lang = this.user ? this.user.prefs.lang : 'en';
+      const manualPage = MANUAL_PAGES[ userType ][ this.manualTopic ] || '';
+
+      return `https://uta-gasp.gitbooks.io/silko/${lang}/${userType}/${manualPage}`;
+    },
+  },
+
+  methods: {
+    /** @param {Event} e */
+    logOut( e ) {
+      login.logOut();
+    },
+
+    /** @param {Event} e */
+    updateLanguage( e ) {
+      this.user.prefs.lang = /** @type {HTMLInputElement} */ (e.target).value;
+      this.user.update( /** @param {Error | string} err */ err => {
+        eventBus.$emit( 'lang' );
+      });
+    },
   },
 
   created() {
@@ -131,6 +172,15 @@ export default {
 
     document.addEventListener( 'click', e => {
       this.isUsermenuDropped = false;
+    });
+
+    this.$router.onReady( () => {
+      this.manualTopic = this.$router.currentRoute.path;
+    });
+    
+    this.$router.beforeResolve( (to, from, next) => {
+      this.manualTopic = to.path;
+      next();
     });
   },
 };

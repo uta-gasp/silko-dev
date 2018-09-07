@@ -7,10 +7,15 @@ interface Callback {
 // External libraries
 
 interface MediaRecorder extends EventTarget {
-  new ( stream: MediaStream );
   start();
   stop();
 }
+
+declare var MediaRecorder: {
+  prototype: MediaRecorder;
+  new( stream: MediaStream ): MediaRecorder;
+};
+
 
 interface MediaRecorderDataEvent extends Event {
   data: Blob;
