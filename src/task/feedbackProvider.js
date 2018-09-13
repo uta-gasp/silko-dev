@@ -10,7 +10,6 @@ import WordFocus from './wordFocus.js';
 
 // ts-check-only
 import { SyllabOptions, SpeechOptions } from '@/model/session/feedbacks';
-import SpeechFeedback from '@/model/session/speechFeedback';
 
 const FOCUS_THRESHOLD = 150;
 const REENTRY_THRESHOLD = 1000;

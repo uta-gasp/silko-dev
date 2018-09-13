@@ -3,10 +3,11 @@
  * @see {@link https://uta-gasp.github.com/sgwm/}
  */
 
+import { i10n } from '@/utils/i10n.js';
+
 import { OptionsCreator, OptionGroup, OptionItem } from '@/vis/optionsCreator.js';
 
 // ts-check-only
-import Rect from '@/model/data/rect';
 import DataPage from '@/model/data/dataPage';
 
 /**
@@ -19,6 +20,8 @@ import DataPage from '@/model/data/dataPage';
 
 /** @type {_SGWMSettings} */
 const _SGWM = {};
+
+const tokens = i10n( 'sgwm' );
 
 export default class sgwmController {
 
@@ -83,43 +86,43 @@ export default class sgwmController {
   static createOptions() {
     return new OptionGroup({
       id: '_sgwm',
-      title: 'Data mapping',
+      title: tokens[ 'hdr_data_map' ],
       options: OptionsCreator.createOptions( [
         new OptionGroup({
-          title: 'Fixation processing',
+          title: tokens[ 'hdr_fix_proc' ],
           options: OptionsCreator.createOptions( {
-            'FixationProcessorSettings.location.enabled': new OptionItem({ type: Boolean, label: 'By location' }),
-            'FixationProcessorSettings.location.marginX': new OptionItem({ type: Number, step: 10, label: '\tmargin X, px' }),
-            'FixationProcessorSettings.location.marginY': new OptionItem({ type: Number, label: '\tmargin Y, px' }),
-            'FixationProcessorSettings.duration.enabled': new OptionItem({ type: Boolean, label: 'By duration' }),
-            'FixationProcessorSettings.duration.mergingDurationThreshold': new OptionItem({ type: Number, label: '\tmerging threshold, ms' }),
-            'FixationProcessorSettings.duration.mergingDistanceThreshold': new OptionItem({ type: Number, label: '\tmerging distance, px' }),
-            'FixationProcessorSettings.duration.removingDurationThreshold': new OptionItem({ type: Number, label: '\tmin duration, ms' }),
+            'FixationProcessorSettings.location.enabled': new OptionItem({ type: Boolean, label: tokens[ 'lbl_loc' ] }),
+            'FixationProcessorSettings.location.marginX': new OptionItem({ type: Number, step: 10, label: '\t' + tokens[ 'lbl_margin' ]( 'X' ) }),
+            'FixationProcessorSettings.location.marginY': new OptionItem({ type: Number, label: '\t' + tokens[ 'lbl_margin' ]( 'X' ) }),
+            'FixationProcessorSettings.duration.enabled': new OptionItem({ type: Boolean, label: tokens[ 'lbl_dur' ] }),
+            'FixationProcessorSettings.duration.mergingDurationThreshold': new OptionItem({ type: Number, label: '\t' + tokens[ 'lbl_merge_th' ] }),
+            'FixationProcessorSettings.duration.mergingDistanceThreshold': new OptionItem({ type: Number, label: '\t' + tokens[ 'lbl_merge_dist' ] }),
+            'FixationProcessorSettings.duration.removingDurationThreshold': new OptionItem({ type: Number, label: '\t' + tokens[ 'lbl_min_dur' ] }),
           } ),
           defaults: OptionsCreator.createDefaults( _SGWM.FixationProcessorSettings, [ 'location', 'duration' ], 'FixationProcessorSettings' ),
         }),
         new OptionGroup({
-          title: 'Splitter',
+          title: tokens[ 'hdr_splitter' ],
           options: OptionsCreator.createOptions( {
-            'SplitToProgressionsSettings.bounds.left': new OptionItem({ type: Number, step: 0.1, label: 'Left margin, chars' }),
-            'SplitToProgressionsSettings.bounds.right': new OptionItem({ type: Number, step: 0.1, label: 'Right margin, chars' }),
-            'SplitToProgressionsSettings.bounds.verticalChar': new OptionItem({ type: Number, step: 0.1, label: 'Vertical margin, chars' }),
-            'SplitToProgressionsSettings.bounds.verticalLine': new OptionItem({ type: Number, step: 0.1, label: 'Vertical margin, lines' }),
-            'SplitToProgressionsSettings.angle': new OptionItem({ type: Number, step: 0.1, label: 'Max incline, rad' }),
+            'SplitToProgressionsSettings.bounds.left': new OptionItem({ type: Number, step: 0.1, label: tokens[ 'lbl_left_margin' ] }),
+            'SplitToProgressionsSettings.bounds.right': new OptionItem({ type: Number, step: 0.1, label: tokens[ 'lbl_right_margin' ] }),
+            'SplitToProgressionsSettings.bounds.verticalChar': new OptionItem({ type: Number, step: 0.1, label: tokens[ 'lbl_v_margin_char' ] }),
+            'SplitToProgressionsSettings.bounds.verticalLine': new OptionItem({ type: Number, step: 0.1, label: tokens[ 'lbl_v_margin_lines' ] }),
+            'SplitToProgressionsSettings.angle': new OptionItem({ type: Number, step: 0.1, label: tokens[ 'lbl_incline' ] }),
           } ),
           defaults: OptionsCreator.createDefaults( _SGWM.SplitToProgressionsSettings, [ 'bounds', 'angle' ], 'SplitToProgressionsSettings' ),
         }),
         new OptionGroup({
-          title: 'Merger',
+          title: tokens[ 'hdr_merger' ],
           options: OptionsCreator.createOptions( {
-            'ProgressionMergerSettings.minLongSetLength': new OptionItem({ type: Number, label: 'Shortest progression, fixations' }),
-            'ProgressionMergerSettings.fitThreshold': new OptionItem({ type: Number, step: 0.01, label: 'Line separation threshold, lines' }),
-            'ProgressionMergerSettings.maxLinearGradient': new OptionItem({ type: Number, step: 0.01, label: 'Max line incline, rad' }),
-            'ProgressionMergerSettings.removeSingleFixationLines': new OptionItem({ type: Boolean, label: 'Remove unmerged single fixations' }),
-            'ProgressionMergerSettings.correctForEmptyLines': new OptionItem({ type: Boolean, label: 'Account for empty lines' }),
-            'ProgressionMergerSettings.currentLineSupportInCorrection': new OptionItem({ type: Number, step: 0.05, label: '\tsupport current line by' }),
-            'ProgressionMergerSettings.emptyLineDetectorFactor': new OptionItem({ type: Number, step: 0.05, label: '\tempty line factor, lines' }),
-            'ProgressionMergerSettings.intelligentFirstLineMapping': new OptionItem({ type: Boolean, label: 'Intelligent first reading line search' }),
+            'ProgressionMergerSettings.minLongSetLength': new OptionItem({ type: Number, label: tokens[ 'lbl_short_prog' ] }),
+            'ProgressionMergerSettings.fitThreshold': new OptionItem({ type: Number, step: 0.01, label: tokens[ 'lbl_line_sep' ] }),
+            'ProgressionMergerSettings.maxLinearGradient': new OptionItem({ type: Number, step: 0.01, label: tokens[ 'lbl_line_incline' ] }),
+            'ProgressionMergerSettings.removeSingleFixationLines': new OptionItem({ type: Boolean, label: tokens[ 'lbl_remove_fix' ] }),
+            'ProgressionMergerSettings.correctForEmptyLines': new OptionItem({ type: Boolean, label: tokens[ 'lbl_empty_lines' ] }),
+            'ProgressionMergerSettings.currentLineSupportInCorrection': new OptionItem({ type: Number, step: 0.05, label: '\t' + tokens[ 'lbl_support_line' ] }),
+            'ProgressionMergerSettings.emptyLineDetectorFactor': new OptionItem({ type: Number, step: 0.05, label: '\t' + tokens[ 'lbl_empty_line' ] }),
+            'ProgressionMergerSettings.intelligentFirstLineMapping': new OptionItem({ type: Boolean, label: tokens[ 'lbl_first_line' ] }),
           } ),
           defaults: OptionsCreator.createDefaults( _SGWM.ProgressionMergerSettings, [
             'minLongSetLength', 'fitThreshold', 'maxLinearGradient', 'removeSingleFixationLines',
@@ -127,15 +130,15 @@ export default class sgwmController {
             'intelligentFirstLineMapping' ], 'ProgressionMergerSettings' ),
         }),
         new OptionGroup({
-          title: 'Word mapper',
+          title: tokens[ 'hdr_word_map' ],
           options: OptionsCreator.createOptions( {
-            'WordMapperSettings.wordCharSkipStart': new OptionItem({ type: Number, label: 'Skip from start, chars' }),
-            'WordMapperSettings.wordCharSkipEnd': new OptionItem({ type: Number, label: 'Skip from end, chars' }),
-            'WordMapperSettings.scalingDiffLimit': new OptionItem({ type: Number, step: 0.1, label: 'Scaling diff limit' }),
-            'WordMapperSettings.rescaleFixationX': new OptionItem({ type: Boolean, label: 'Rescale fixations horizontally' }),
-            'WordMapperSettings.partialLengthMaxWordLength': new OptionItem({ type: Number, label: '\tshort word, chars' }),
-            'WordMapperSettings.effectiveLengthFactor': new OptionItem({ type: Number, step: 0.1, label: '\tlimit to' }),
-            'WordMapperSettings.ignoreTransitions': new OptionItem({ type: Boolean, label: 'Ignore transitions' }),
+            'WordMapperSettings.wordCharSkipStart': new OptionItem({ type: Number, label: tokens[ 'lbl_skip_start' ] }),
+            'WordMapperSettings.wordCharSkipEnd': new OptionItem({ type: Number, label: tokens[ 'lbl_skip_end' ] }),
+            'WordMapperSettings.scalingDiffLimit': new OptionItem({ type: Number, step: 0.1, label: tokens[ 'lbl_scale' ] }),
+            'WordMapperSettings.rescaleFixationX': new OptionItem({ type: Boolean, label: tokens[ 'lbl_rescale' ] }),
+            'WordMapperSettings.partialLengthMaxWordLength': new OptionItem({ type: Number, label: '\t' + tokens[ 'lbl_short_word' ] }),
+            'WordMapperSettings.effectiveLengthFactor': new OptionItem({ type: Number, step: 0.1, label: '\t' + tokens[ 'lbl_limit' ] }),
+            'WordMapperSettings.ignoreTransitions': new OptionItem({ type: Boolean, label: tokens[ 'lbl_ignore_trans' ] }),
           } ),
           defaults: OptionsCreator.createDefaults( _SGWM.WordMapperSettings, [
             'wordCharSkipStart', 'wordCharSkipEnd', 'scalingDiffLimit',

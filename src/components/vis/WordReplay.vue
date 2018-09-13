@@ -39,6 +39,8 @@
 <script>
 import Vue from 'vue';
 
+import { i10n } from '@/utils/i10n.js';
+
 import { OptionsCreator, OptionGroup, OptionItem } from '@/vis/optionsCreator.js';
 import sgwmController from '@/vis/sgwmController.js';
 import { WordTrack, ReplayWord } from '@/vis/wordTrack.js';
@@ -50,6 +52,8 @@ import Options from '@/components/vis/Options.vue';
 import Data from '@/vis/data/data.js';
 
 sgwmController.initializeSettings();
+
+const tokens = i10n( 'vis_word_replay' );
 
 const UI = {
   levelDuration: 500,
@@ -84,9 +88,13 @@ export default {
       options: {
         wordReplay: new OptionGroup({
           id: 'wordReplay',
-          title: 'Word replay',
+          title: tokens[ 'hdr_options' ],
           options: OptionsCreator.createOptions( {
-            levelDuration: new OptionItem({ type: Number, step: 50, label: 'Level duration, ms' }),
+            levelDuration: new OptionItem({ 
+              type: Number, 
+              step: 50, 
+              label: tokens[ 'lbl_level_dur' ] + ', ms' 
+            }),
           }, UI ),
           defaults: OptionsCreator.createDefaults( UI ),
         }),
@@ -116,8 +124,7 @@ export default {
     /** @returns {string} */
     title() {
       const r = this.data.records[0];
-      const student = this.data.params.student ? ` for ${this.data.params.student}` : '';
-      return `Word replay in "${r.task.name}"${student}`;
+      return tokens[ 'hdr_word_replay' ]( this.data.params.student, r.task.name );
     },
   },
 

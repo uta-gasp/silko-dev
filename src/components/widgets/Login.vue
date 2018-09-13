@@ -5,7 +5,7 @@
         input.input(
           :class="{'is-danger': isEmailValid === checkValues.INVALID}"
           type="email"
-          placeholder="Email or ID"
+          :placeholder="tokens[ 'email_id' ]"
           autofocus="autofocus"
           v-model="email"
           @keyup.enter="login")
@@ -18,7 +18,7 @@
         input.input(
           :class="{'is-danger': isPasswordValid === checkValues.INVALID}"
           type="password"
-          placeholder="Password"
+          :placeholder="tokens[ 'password' ]"
           v-model="password"
           @keyup.enter="login")
         span.icon.is-small.is-left
@@ -36,6 +36,7 @@
 
 <script>
 import login from '@/utils/login.js';
+import { i10n } from '@/utils/i10n.js';
 
 import ActionError from '@/components/mixins/actionError.js';
 
@@ -64,6 +65,8 @@ export default {
       inProgress: false,
 
       checkValues,
+
+      tokens: i10n( '_form' ),
     };
   },
 

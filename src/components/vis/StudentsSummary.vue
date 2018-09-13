@@ -4,9 +4,10 @@
       table
         thead
           tr
-            th(:class="headerNameClass" @click="sort( -1 )") Name
-            th(:class="statNameClass( stat, index )" 
-              v-for="(stat, index) in statistics" :title="stat.title || ''" 
+            th(:class="headerNameClass" @click="sort( -1 )") {{ tokens[ 'name' ] }}
+            th(v-for="(stat, index) in statistics" 
+              :class="statNameClass( stat, index )" 
+              :title="stat.title || ''" 
               :key="index"
               @click="sort( index )") {{ stat.name }}
         tbody
@@ -15,7 +16,9 @@
             td(v-for="(stat, index) in student.statistics" :key="index")
               span(v-if="index === 1") {{ `${Math.floor(stat / 60).toFixed(0)}:${secondsToString( stat % 60 )}` }}
               span(v-else) 
-                span(v-if="statistics[ index ].hasProgress" @click="showProgress( student, index )" :class="{ 'progressLink': true }") {{ stat }}
+                span(v-if="statistics[ index ].hasProgress" 
+                  :class="{ 'progressLink': true }"
+                  @click="showProgress( student, index )") {{ stat }}
                 span(v-else) {{ stat }}
 
     modal-container(v-if="isShowingProgress" :title="progressChartData.title" @close="closeChart")
@@ -32,6 +35,8 @@
 </template>
 
 <script>
+import { i10n } from '@/utils/i10n.js';
+
 import { Feedbacks, SyllabOptions } from '@/model/session/feedbacks.js';
 
 import Regressions from '@/vis/regressions.js';
@@ -97,17 +102,9 @@ export default {
 
       progressChartData: null,
 
-      statistics: [
-        { name: 'Sessions', sortDir: 0, hasProgress: false },
-        { name: 'Reading time', sortDir: 0, hasProgress: false },
-        { name: 'WPM', title: 'Words per minute', sortDir: 0, hasProgress: true },
-        { name: 'SPM', title: 'Syllables per minute (sessions)', sortDir: 0, hasProgress: true },
-        { name: 'SPW', title: 'Seconds per word', sortDir: 0, hasProgress: true },
-        { name: 'Fixation', title: 'Average fixation duration in milliseconds', sortDir: 0, hasProgress: true },
-        { name: 'FSD', title: 'Fixation standard deviation in milliseconds', sortDir: 0, hasProgress: false },
-        { name: 'Syllabifications', sortDir: 0, hasProgress: true },
-        { name: 'Regressions', sortDir: 0, hasProgress: true },
-      ],
+      tokens: i10n( 'vis_summary', '_form', '_labels' ),
+
+      statistics: [],
     };
   },
 
@@ -445,7 +442,7 @@ export default {
       } );
 
       return {
-        title: 'Words per minute',
+        title: this.tokens[ 'tit_wpm' ],
         values: values,
         labels: labels,
       };
@@ -481,7 +478,7 @@ export default {
       } );
 
       return {
-        title: 'Syllables per minute (sessions)',
+        title: this.tokens[ 'tit_sylpm' ],
         values: values,
         labels: labels,
       };
@@ -506,7 +503,7 @@ export default {
       } );
 
       return {
-        title: 'Seconds per word',
+        title: this.tokens[ 'tit_spw' ],
         values: values,
         labels: labels,
       };
@@ -538,7 +535,7 @@ export default {
       } );
 
       return {
-        title: 'Average fixation duration in milliseconds',
+        title: this.tokens[ 'tit_fd' ],
         values: values,
         labels: labels,
       };
@@ -566,7 +563,7 @@ export default {
       } );
 
       return {
-        title: 'Syllabifications',
+        title: this.tokens[ 'tit_syllabs' ],
         values: values,
         labels: labels,
       };
@@ -596,7 +593,7 @@ export default {
       } );
 
       return {
-        title: 'Regressions',
+        title: this.tokens[ 'tit_regrs' ],
         values: values,
         labels: labels,
       };
@@ -636,6 +633,20 @@ export default {
     closeChart() {
       this.progressChartData = null;
     },
+  },
+
+  created() {
+    this.statistics = [
+      { name: this.tokens[ 'sessions' ], sortDir: 0, hasProgress: false },
+      { name: this.tokens[ 'lbl_time' ], sortDir: 0, hasProgress: false },
+      { name: this.tokens[ 'lbl_wpm' ], title: this.tokens[ 'tit_wpm' ], sortDir: 0, hasProgress: true },
+      { name: this.tokens[ 'lbl_spm' ], title: this.tokens[ 'tit_sylpm' ], sortDir: 0, hasProgress: true },
+      { name: this.tokens[ 'lbl_spw' ], title: this.tokens[ 'tit_spw' ], sortDir: 0, hasProgress: true },
+      { name: this.tokens[ 'lbl_fix' ], title: this.tokens[ 'tit_fd' ], sortDir: 0, hasProgress: true },
+      { name: this.tokens[ 'lbl_fsd' ], title: this.tokens[ 'tit_fsd' ], sortDir: 0, hasProgress: false },
+      { name: this.tokens[ 'tit_syllabs' ], sortDir: 0, hasProgress: true },
+      { name: this.tokens[ 'tit_regrs' ], sortDir: 0, hasProgress: true },
+    ];
   },
 
   mounted() {

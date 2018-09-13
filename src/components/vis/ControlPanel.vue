@@ -5,32 +5,34 @@
       player.player(v-if="showPlayer" :is-paused="isPlayerPaused" @restart="restartPlayer" @toggle="togglePlayer")
 
       .props(v-if="feedback")
-        abbr.prop.speech(:class="{ off: !feedback.speech.enabled }" title="Speech output")
-        abbr.prop.syllab(:class="{ off: !feedback.syllabification.enabled }" title="Syllabification")
+        abbr.prop.speech(:class="{ off: !feedback.speech.enabled }" :title="tokens[ 'tit_speech' ]")
+        abbr.prop.syllab(:class="{ off: !feedback.syllabification.enabled }" :title="tokens[ 'tit_syllab' ]")
           span(v-if="feedback.syllabification.enabled") {{ feedback.syllabification.threshold.value }}
 
       .props(v-if="questionnaire && questionnaire.length")
-        abbr.prop.questionnaire(title="Questionnaire corectness") {{ correctAnswers }}
+        abbr.prop.questionnaire(:title="tokens[ 'tit_quest' ]") {{ correctAnswers }}
 
       .menu
         template(v-if="textLength")
           .navigation
-            abbr(title="Previous page")
+            abbr(:title="tokens[ 'tit_prev' ]")
               button.icon-btn.prev(:class="{ disabled: !pageIndex }" @click="prevPage")
             .page {{ dispPage }}
-            abbr(title="Next page")
+            abbr(:title="tokens[ 'tit_next' ]")
               button.icon-btn.next(:class="{ disabled: pageIndex === textLength - 1 }" @click="nextPage")
           .separator
         template(v-if="showOptionsButton")
-          abbr(title="Settings")
+          abbr(:title="tokens[ 'tit_settings' ]")
             button.icon-btn.settings(@click="showOptions")
           .separator
-        abbr(title="Close this visualization")
+        abbr(:title="tokens[ 'tit_close' ]")
           button.icon-btn.close(@click="close")
 
 </template>
 
 <script>
+import { i10n } from '@/utils/i10n.js';
+
 import { Feedbacks } from '@/model/session/feedbacks';
 import { Question } from '@/model/session/question';
 
@@ -55,6 +57,8 @@ export default {
   data() {
     return {
       pageIndex: this.initialPageIndex || 0,
+
+      tokens: i10n( 'control_panel' ),
     };
   },
 
@@ -107,7 +111,7 @@ export default {
       const introPageIndex = hasIntroPage ? 0 : -1;
       const textPageCount = hasIntroPage ? this.textLength - 1 : this.textLength;
       const delta = hasIntroPage ? 0 : 1;
-      return this.pageIndex === introPageIndex ? 'int' : `${this.pageIndex + delta}/${textPageCount}`;
+      return this.pageIndex === introPageIndex ? this.tokens[ 'lbl_intro' ] : `${this.pageIndex + delta}/${textPageCount}`;
     },
 
     /** @returns {string} */

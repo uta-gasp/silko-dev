@@ -15,9 +15,9 @@
 
     .is-bottom-right
       a.button.is-primary.is-large(v-show="hasNextPage" :disabled="isWaitingToFinilizePage" @click="next")
-        span {{ titleNext }}
+        span {{ tokens[ 'btn_next' ] }}
       a.button.is-primary.is-large(v-show="isLastPage" :disabled="isWaitingToFinilizePage" @click="finish")
-        span {{ titleFinish }}
+        span {{ tokens[ 'btn_finish' ] }}
 
 </template>
 
@@ -34,6 +34,7 @@ import FeedbackProvider from '@/task/feedbackProvider.js';
 import DataCollector from '@/task/dataCollector.js';
 import AudioRecorder from '@/task/audioRecorder.js';
 
+import { i10n } from '@/utils/i10n.js';
 import gazeTracking from '@/utils/gazeTracking.js';
 
 import Font from '@/model/session/font.js';
@@ -80,6 +81,8 @@ export default {
       isWaitingToFinilizePage: false,
       audioRecorder: null,
       audioFiles: [],
+
+      tokens: i10n( 'assignment' ),
     };
   },
 
@@ -113,16 +116,6 @@ export default {
       return this.textPresenter ? !this.textPresenter.hasNextPage : false;
     },
 
-    /** @returns {string} */
-    titleNext() {
-      return this.texts.next || 'Next';
-    },
-
-    /** @returns {string} */
-    titleFinish() {
-      return this.texts.finish || 'Finish';
-    },
-
     /** @returns {TextPageImage[]} */
     images() {
       if ( !this.textPresenter ) {
@@ -143,7 +136,7 @@ export default {
       const container = /** @type {Vue} */ (this.$refs.container);
 
       this.font = Font.from( container.$data.textStyle );
-
+      
       this.feedbackProvider = new FeedbackProvider( this.task.syllab, this.task.speech );
       this.feedbackProvider.init();
 
@@ -301,11 +294,17 @@ export default {
   },
 
   mounted() {
-    AudioRecorder().then( recorder => {
-      this.audioRecorder = recorder;
+    if (this.task.recordAudio) {
+      AudioRecorder().then( recorder => {
+        this.audioRecorder = recorder;
+        this.init();
+        this.next( null );
+      });
+    }
+    else {
       this.init();
       this.next( null );
-    });
+    }
   },
 
   beforeDestroy() {

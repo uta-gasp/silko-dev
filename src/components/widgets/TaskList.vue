@@ -3,10 +3,10 @@
     p.panel-heading
       nav.level
         .level-left
-          .level-item {{ displayCount( tasks, 'task' ) }}
+          .level-item {{ tokens[ 'num_task' ]( tasks ) }}
         .level-right
           .level-item
-            button.button.is-primary(@click="openNewTextBox") Create new
+            button.button.is-primary(@click="openNewTextBox") {{ tokens[ 'btn_new' ] }}
     .panel-block.is-paddingless
       .container(v-if="tasks === null")
         loading
@@ -15,19 +15,19 @@
           tr(v-for="task in tasks" :key="parent.id+task.id")
             td
               span.is-inline-block {{ task.name }}
-              span.is-inline-block(v-if="!!task.pages") &nbsp;({{ task.pages.length }} pages)
+              span.is-inline-block(v-if="!!task.pages") &nbsp;({{ tokens[ 'lbl_pages' ]( task.pages.length ) }})
             td.is-narrow
               button.button.is-light(
-                :title="isLocked( task.id ) ? 'This task has recorded sessions' : 'Edit the task'"
+                :title="tokens[ 'tit_edit' ]( isLocked( task.id ) )"
                 :disabled="isLocked( task.id )"
                 @click="edit( task )")
                 i.far.fa-edit
               button.button.is-light(
-                title="Create a new task from the existing"
+                :title="tokens[ 'tit_copy' ]"
                 @click="copy( task )")
                 i.far.fa-copy
               button.button.is-danger(
-                title="Delete the task"
+                :title="tokens[ 'tit_delete' ]"
                 @click="remove( task )")
                 i.far.fa-trash-alt
 
@@ -35,15 +35,18 @@
       task-editor(:action="action" :task="toEdit" :source="toCopy" :intros="intros" @save="save" @modified="onTaskModified")
 
     remove-warning(v-if="toDelete" object="task" :name="toDeleteName" @close="removeWarningClosed")
-      span All students assignments completed on this task will be deleted as well.&nbsp;
+      span {{ tokens[ 'msg_delete_warning' ] }}.&nbsp;
 
     temporal-notification(type="danger" :show="showError")
       span {{ errorMessage }}
 </template>
 
 <script>
-import dataUtils from '@/utils/data-utils.js';
 import DBUtils from '@/db/utils.js';
+
+import eventBus from '@/utils/event-bus.js';
+import dataUtils from '@/utils/data-utils.js';
+import { i10n } from '@/utils/i10n.js';
 
 import ActionError from '@/components/mixins/actionError';
 import ActionSuccess from '@/components/mixins/actionSuccess';
@@ -92,6 +95,8 @@ export default {
       isCreating: false,
 
       isTaskModified: false,
+
+      tokens: i10n( 'task_list', '_labels', '_buttons', '_utils', '_failures' ),
     };
   },
 
@@ -121,23 +126,17 @@ export default {
     /** @returns {string} */
     action() {
       if ( this.isCreating ) {
-        return 'Create';
+        return this.tokens[ 'create' ];
       }
       else if ( this.toEdit ) {
-        return 'Save';
+        return this.tokens[ 'save' ];
       }
 
       return '';
     },
 
-    /** @returns {string} */
-    actionType() {
-      return this.toEdit ? 'edit' : 'create new';
-    },
-
-    /** @returns {string} */
     taskEditorTitle() {
-      return 'Task editor' + ( this.toEdit ? ` - ${this.toEdit.name}` : '' );
+      return this.tokens[ 'hdr_editor' ]( this.toEdit ? ` - ${this.toEdit.name}` : '' );
     },
   },
 
@@ -147,7 +146,7 @@ export default {
       this.parent.getTasks( /** @param {Error | string} err; @param {Task[]} tasks */ ( err, tasks ) => {
         if ( err ) {
           this.tasks = [];
-          return this.setError( err, 'Failed to load tasks' );
+          return this.setError( err, this.tokens[ 'load' ]( this.tokens[ 'tasks' ] ) );
         }
 
         this.tasks = tasks.sort( dataUtils.byName );
@@ -160,15 +159,6 @@ export default {
           this.locked = response;
         } );
       } );
-    },
-
-    /**
-     * @param {any[]} arr
-     * @param {string} name
-     * @returns {string}
-     */
-    displayCount( arr, name ) {
-      return dataUtils.displayCount( arr, name );
     },
 
     /** 
@@ -208,7 +198,7 @@ export default {
         } );
       }
       else if ( !this.canCreate( task ) ) {
-        this.$emit( 'created', { err: 'A task with the same name exists already' } );
+        this.$emit( 'created', { err: this.tokens[ 'err_same_name' ] } );
       }
       else {
         this.parent.createTask( task, 'text', /** @param {Error | string} err */ err => {
@@ -235,7 +225,7 @@ export default {
     closeEditor( e ) {
       let canClose = true;
       if (e && this.isTaskModified) {
-        canClose = window.confirm( 'All changes will be lost. OK to continue?' );
+        canClose = window.confirm( this.tokens[ 'msg_cancel_warning' ] );
       }
 
       if (canClose) {
@@ -272,7 +262,7 @@ export default {
 
         this.parent.deleteTask( this.toDelete, /** @param {Error | string} err */ err => {
           if ( err ) {
-            return this.setError( err, 'Failed to delete the task' );
+            return this.setError( err, this.tokens[ 'delete' ]( this.tokens[ 'task' ] ) );
           }
           else {
             DBUtils.deleteTaskSessions( id, /** @param {Error | string} err */ err => {
@@ -286,7 +276,7 @@ export default {
               }
             } );
 
-            this.setSuccess( 'The task was deleted' );
+            this.setSuccess( this.tokens[ 'deleted' ]( this.tokens[ 'task' ] ) );
             this.$emit( 'deleted', { task: id } );
           }
 
@@ -302,6 +292,12 @@ export default {
       this.isCreating = true;
       this.isTaskModified = false;
     },
+  },
+
+  created() {
+    eventBus.$on( 'lang', () => {
+      this.tokens = i10n( 'task_list', '_labels', '_buttons', '_utils', '_failures' );
+    } );
   },
 
   mounted() {

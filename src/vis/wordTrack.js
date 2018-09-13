@@ -1,3 +1,5 @@
+import { i10n } from '@/utils/i10n.js';
+
 // ts-check-only
 import DataPage from '@/model/data/dataPage';
 import DataPageTextWord from '@/model/data/dataPageTextWord';
@@ -17,7 +19,9 @@ import DataPageTextWord from '@/model/data/dataPageTextWord';
  * @property {Word} word
  */
 
-const DONE = 'done';
+const tokens = i10n( 'vis_word_replay' );
+
+const DONE = tokens[ 'lbl_done' ];
 
 export class ReplayWord {
 
@@ -137,8 +141,7 @@ export class WordTrack {
     this._fixationIndex = 0;
 
     if ( !fixations ) {
-      this._doneMessage = 'no data';
-      onCompleted( 'no data' );
+      onCompleted();
       return;
     }
 

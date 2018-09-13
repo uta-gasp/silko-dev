@@ -3,19 +3,19 @@
     p.panel-heading
       nav.level
         .level-left
-          .level-item {{ displayCount( students, 'student' ) }}
+          .level-item {{ tokens[ 'num_student' ]( students ) }}
         .level-right
           .level-item
-            button.button.is-primary(@click="openEditor") Add
+            button.button.is-primary(@click="openEditor") {{ tokens[ 'add' ] }}
     .panel-block.is-paddingless
       .container(v-if="students === null")
         loading
       table.table(v-else)
         thead
           tr.is-subheader(v-if="students && students.length")
-            th Name
+            th {{ tokens[ 'name' ] }}
             th.is-narrow
-              .has-text-centered Assignments
+              .has-text-centered {{ tokens[ 'assignments' ] }}
             th.is-narrow
         tbody
           tr(v-for="student in students" :key="currentClass.id+student.id")
@@ -30,7 +30,7 @@
                   v-show="availableTasks( student ).length")
                 .dropdown-trigger(@click.stop="")
                   button.button(aria-haspopup="true" aria-controls="dropdown-menu" @click="toggleTaskList( currentClass.id+student.id )")
-                    span Add an assignment
+                    span {{ tokens[ 'lbl_add' ] }}
                     span.icon.is-small
                       i.fa.fa-angle-down(aria-hidden="true")
                 .dropdown-menu(role="menu")
@@ -40,16 +40,16 @@
                       @click.stop="addAssignment( student, task.id, $event )" ) {{ task.name }}
 
             td.is-narrow
-              button.button(title="Remove the student from this class" @click="remove( student )")
+              button.button(:title="tokens[ 'tit_remove' ]" @click="remove( student )")
                 i.fa.fa-times
 
-    modal-container(v-if="isEditing" title="Available students" @close="closeEditor")
+    modal-container(v-if="isEditing" :title="tokens[ 'tit_students' ]" @close="closeEditor")
       item-selection-box(
         :items="schoolGrades"
         :multiple="true"
         :single-group="false"
-        item-name="grade"
-        subitem-name="student"
+        :item-name="tokens[ 'data_grade' ]"
+        :subitem-name="tokens[ 'data_student' ]"
         @accept="addNewStudents")
 
     temporal-notification(type="danger" :show="showError")
@@ -59,7 +59,9 @@
 </template>
 
 <script>
+import eventBus from '@/utils/event-bus.js';
 import dataUtils from '@/utils/data-utils.js';
+import { i10n } from '@/utils/i10n.js';
 
 import Class from '@/model/class.js';
 import Teacher from '@/model/teacher.js';
@@ -91,9 +93,6 @@ import School from '@/model/school.js';
  * @property {GradeSubItem[]} subitems
  */
 
-/** @type {Grade} */
-const __needed_only_to_make_vscode_happy_about_Grade__ = null;
-
 export default {
   name: 'student-list',
 
@@ -124,6 +123,8 @@ export default {
 
       /** @type {Element} */
       activeMenu: null,
+
+      tokens: i10n( 'student_list', '_buttons', '_form', '_labels', '_utils', '_failures' ),
     };
   },
 
@@ -152,7 +153,7 @@ export default {
     loadTasks() {
       this.currentClass.getTasks( /** @param {Error | string} err; @param {Task[]} tasks */ ( err, tasks ) => {
         if ( err ) {
-          return this.setError( err, 'Failed to load tasks' );
+          return this.setError( err, this.tokens[ 'load' ]( this.tokens[ 'tasks' ] ) );
         }
 
         this.tasks = tasks.sort( dataUtils.byName );
@@ -165,7 +166,7 @@ export default {
       this.currentClass.getStudents( /** @param {Error | string} err; @param {Student[]} students */ ( err, students ) => {
         if ( err ) {
           this.students = [];
-          return this.setError( err, 'Failed to load students' );
+          return this.setError( err, this.tokens[ 'load' ]( this.tokens[ 'students' ] ) );
         }
 
         this.students = students.sort( dataUtils.byName );
@@ -176,13 +177,13 @@ export default {
     loadAvailableStudents( cb ) {
       this.teacher.getSchool( /** @param {Error | string} err; @param {School} school */ ( err, school ) => {
         if ( err ) {
-          this.setError( err, 'Failed to load teacher\'s school' );
+          this.setError( err, this.tokens[ 'err_load_school' ] );
           return cb( err );
         }
 
         school.getStudents( /** @param {Error | string} err; @param {Student[]} students */ ( err, students ) => {
           if ( err ) {
-            return this.setError( err, 'Failed to load school students' );
+            return this.setError( err, this.tokens[ 'err_load_school_students' ] );
           }
 
           this.schoolStudents = students;
@@ -244,15 +245,6 @@ export default {
       } );
     },
 
-    /**
-     * @param {any[]} arr
-     * @param {string} name
-     * @returns {string}
-     */
-    displayCount( arr, name ) {
-      return dataUtils.displayCount( arr, name );
-    },
-
     /** @param {Event} e */
     openEditor( e ) {
       this.loadAvailableStudents( /** @param {Error | string} err */ err => {
@@ -267,10 +259,10 @@ export default {
       if ( e.subitems ) {
         this.currentClass.addStudents( e.subitems, /** @param {Error | string} err */ err => {
           if ( err ) {
-            this.setError( err, 'Failed to add new student' );
+            this.setError( err, this.tokens[ 'add_new' ]( this.tokens[ 'students' ] ) );
           }
           else {
-            this.setSuccess( 'Students were added' );
+            this.setSuccess( this.tokens[ 'msg_students_added' ] );
           }
 
           this.loadStudents();
@@ -295,10 +287,10 @@ export default {
 
       student.addAssignment( taskID, this.currentClass.id, /** @param {Error | string} err */ err => {
         if ( err ) {
-          this.setError( err, 'Failed to add the assignment' );
+          this.setError( err, this.tokens[ 'err_add_assig' ] );
         }
         else {
-          this.setSuccess( 'The assignment was added' );
+          this.setSuccess( this.tokens[ 'msg_assig_added' ] );
         }
       } );
     },
@@ -311,10 +303,10 @@ export default {
     removeAssignment( student, taskID, e ) {
       student.removeAssignment( taskID, /** @param {Error | string} err */ err => {
         if ( err ) {
-          this.setError( err, 'Failed to remove the assignment' );
+          this.setError( err, this.tokens[ 'err_remove_assig' ] );
         }
         else {
-          this.setSuccess( 'The assignment was removed' );
+          this.setSuccess( this.tokens[ 'msg_assig_removed' ] );
         }
       } );
     },
@@ -343,10 +335,10 @@ export default {
     remove( student, e ) {
       this.currentClass.removeStudent( student, /** @param {Error | string} err */ err => {
         if ( err ) {
-          this.setError( err, 'Failed to remove the student from the list' );
+          this.setError( err, this.tokens[ 'remove' ]( this.tokens[ 'student' ] ) );
         }
         else {
-          this.setSuccess( 'The student was removed' );
+          this.setSuccess( this.tokens[ 'removed' ]( this.tokens[ 'student' ] ) );
         }
 
         this.loadStudents();
@@ -405,6 +397,10 @@ export default {
   },
 
   created() {
+    eventBus.$on( 'lang', () => {
+      this.tokens = i10n( 'student_list', '_buttons', '_form', '_labels', '_utils', '_failures' );
+    } );
+
     window.document.body.addEventListener( 'click', this.hideTaskList );
   },
 

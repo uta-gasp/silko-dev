@@ -6,49 +6,49 @@
       span {{ successMessage }}
 
     nav.panel
-      p.panel-heading New student
+      p.panel-heading {{ tokens[ 'hdr_new' ] }}
       .panel-block
         .field.control
           p.control
-            input.input(type="text" placeholder="Name" v-model="newName" :class="{'is-danger': newName.length && !isNewNameValid}")
-          p.help.is-danger(v-show="newName.length && !isNewNameValid") name is too short
+            input.input(type="text" :placeholder="tokens[ 'name' ]" v-model="newName" :class="{'is-danger': newName.length && !isNewNameValid}")
+          p.help.is-danger(v-show="newName.length && !isNewNameValid") {{ tokens[ 'name_invalid' ] }}
 
           p.control
-            input.input(type="email" placeholder="Email or ID" v-model="newEmail" :class="{'is-danger': newEmail.length && !isNewEmailValid}")
-          p.help.is-danger(v-show="newEmail.length && !isNewEmailValid") email is not valid
+            input.input(type="email" :placeholder="tokens[ 'email_id' ]" v-model="newEmail" :class="{'is-danger': newEmail.length && !isNewEmailValid}")
+          p.help.is-danger(v-show="newEmail.length && !isNewEmailValid") {{ tokens[ 'email_invalid' ] }}
 
           p.control(v-show="!isRealEmail")
-            input.input(type="text" placeholder="Password" v-model="newPassword" :class="{'is-danger': newPassword.length && !isNewPasswordValid}")
-          p.help.is-danger(v-show="newPassword.length && !isNewPasswordValid") password is too short
+            input.input(type="text" :placeholder="tokens[ 'password' ]" v-model="newPassword" :class="{'is-danger': newPassword.length && !isNewPasswordValid}")
+          p.help.is-danger(v-show="newPassword.length && !isNewPasswordValid") {{ tokens[ 'password_invalid' ] }}
 
           p.control
-            input.input(type="text" placeholder="Grade" v-model="newGrade")
+            input.input(type="text" :placeholder="tokens[ 'grade' ]" v-model="newGrade")
 
           p.control(v-if="isAdmin")
             span.select
               select(v-model="newSchool" required)
-                option(value="" disabled selected hidden ) School
+                option(value="" disabled selected hidden ) {{ tokens[ 'school' ] }}
                 option(v-for="item in schoolItems" v-bind:value="item.value") {{ item.text }}
 
           p.control
-            button.button.is-primary(:disabled="!canCreateStudent" @click="tryToCreateStudent") Create
+            button.button.is-primary(:disabled="!canCreateStudent" @click="tryToCreateStudent") {{ tokens[ 'create' ] }}
 
     nav.panel
-      p.panel-heading Students
+      p.panel-heading {{ tokens[ 'students' ] }}
       .panel-block.is-paddingless
         .container(v-if="students === null")
           loading
         .container(v-else-if="!students.length")
-          i No students exists yet
+          i {{ tokens[ 'msg_no_students' ] }}
         table.table(v-else)
           thead
             tr
-              th Name
-              th(v-if="isAdmin") School
-              th Grade
-              th(v-if="!isAdmin") Classes
+              th {{ tokens[ 'name' ] }}
+              th(v-if="isAdmin") {{ tokens[ 'school' ] }}
+              th {{ tokens[ 'grade' ] }}
+              th(v-if="!isAdmin") {{ tokens[ 'classes' ] }}
               th(v-if="isAdmin")
-                .is-pulled-right Action
+                .is-pulled-right {{ tokens[ 'action' ] }}
           tbody
             tr(v-for="student in students" v-if="!student.deleted")
               td {{ student.name }}
@@ -70,6 +70,7 @@
 import eventBus from '@/utils/event-bus.js';
 import dataUtils from '@/utils/data-utils.js';
 import login from '@/utils/login.js';
+import { i10n } from '@/utils/i10n.js';
 
 import Admin from '@/model/admin.js';
 import School from '@/model/school.js';
@@ -120,6 +121,8 @@ export default {
       students: null,
       /** @type {Class[]} */
       classes: [],
+
+      tokens: i10n( 'students', '_form', '_buttons', '_labels', '_failures' ),
     };
   },
 
@@ -217,7 +220,7 @@ export default {
     loadSchools() {
       return School.list( /** @param {Error | string} err; @param {School[]} schools */ ( err, schools ) => {
         if ( err ) {
-          return this.setError( err, 'Failed to load schools' );
+          return this.setError( err, this.tokens[ 'load' ]( this.tokens[ 'schools' ] ) );
         }
 
         this.schools = schools.sort( dataUtils.byName );
@@ -228,7 +231,7 @@ export default {
       const onDone = /** @param {Error | string} err; @param {Student[]} students */( err, students ) => {
         if ( err ) {
           this.students = [];
-          return this.setError( err, 'Failed to load students' );
+          return this.setError( err, this.tokens[ 'load' ]( this.tokens[ 'students' ] ) );
         }
 
         this.students = students.sort( /** @param {Student} a;@param {Student} b; @returns {number} */ ( a, b ) => {
@@ -250,7 +253,7 @@ export default {
       else if ( this.teacher ) {
         this.teacher.getSchool( /** @param {Error | string} err; @param {School} school */ ( err, school ) => {
           if ( err ) {
-            return this.setError( err, 'Failed to load teacher\'s school' );
+            return this.setError( err, this.tokens[ 'err_load_teacher' ] );
           }
           school.getStudents( onDone );
         } );
@@ -282,7 +285,7 @@ export default {
       } );
 
       if ( exists ) {
-        this.setError( 'A student with this email or ID exists already', 'Failed to add new student' );
+        this.setError( this.tokens[ 'err_exists' ], this.tokens[ 'add_new' ]( this.tokens[ 'student' ] ) );
       }
       else {
         this.createStudent( email );
@@ -299,7 +302,7 @@ export default {
         this.isCreating = false;
 
         if ( err ) {
-          this.setError( err, 'Failed to add new student' );
+          this.setError( err, this.tokens[ 'add_new' ]( this.tokens[ 'student' ] ) );
         }
         else {
           this.newName = '';
@@ -308,7 +311,7 @@ export default {
           this.newGrade = '';
           this.loadStudents();
 
-          this.setSuccess( 'New student was added' );
+          this.setSuccess( this.tokens[ 'added' ]( this.tokens[ 'student' ] ) );
         }
       };
 
@@ -345,10 +348,10 @@ export default {
       const el = /** @type {HTMLInputElement} */ (e.target);
       Admin.moveStudent( student, el.value, this.schools, /** @param {Error | string} err */ err => {
         if ( err ) {
-          this.setError( err, 'Failed to move the student to another school' );
+          this.setError( err, this.tokens[ 'err_move' ] );
         }
         else {
-          this.setSuccess( 'The student was moved to another school' );
+          this.setSuccess( this.tokens[ 'msg_moved' ] );
         }
       } );
     },
@@ -379,15 +382,15 @@ export default {
 
         School.get( student.school, /** @param {Error | string} err; @param {School} school */ ( err, school ) => {
           if ( err ) {
-            return this.setError( err, 'Failed to access the student school' );
+            return this.setError( err, this.tokens[ 'err_access_school' ] );
           }
 
           school.deleteStudent( student, /** @param {Error | string} err */ err => {
             if ( err ) {
-              this.setError( err, 'Failed to remove the student from the database' );
+              this.setError( err, this.tokens[ 'delete' ]( this.tokens[ 'student' ] ) );
             }
             else {
-              this.setSuccess( 'The student was removed' );
+              this.setSuccess( this.tokens[ 'deleted' ]( this.tokens[ 'student' ] ) );
             }
 
             this.init();
@@ -406,6 +409,9 @@ export default {
     } );
     eventBus.$on( 'login', () => {
       this.init();
+    } );
+    eventBus.$on( 'lang', () => {
+      this.tokens = i10n( 'students', '_form', '_buttons', '_labels', '_failures' );
     } );
 
     this.checkAccess();

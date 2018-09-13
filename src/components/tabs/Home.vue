@@ -5,10 +5,10 @@
         .container
           //-img(src="../assets/icon-32.png")
           h1.title.logo Silko
-          h2.subtitle A reading aid for students and teachers
+          h2.subtitle {{ tokens[ 'hdr_subtitle' ] }}
 
     section.connecting(v-if="isConnecting")
-      div Connecting to database...
+      div {{ tokens[ 'msg_connecting' ] }}
       loading 
 
     section(v-else-if="!user")
@@ -16,13 +16,13 @@
 
       p.control.extra-tools
         .has-text-centered
-          button.button.is-link(@click="register") Request an account
-          button.button.is-link(@click="remindPassword") Forgot password?
+          button.button.is-link(@click="register") {{ tokens[ 'btn_request_account' ] }}
+          button.button.is-link(@click="remindPassword") {{ tokens[ 'btn_forgot_password' ] }}
 
     section.section(v-else)
       .message.is-info
         .message-header
-          p {{ tokens[ 'info_title' ]( userTitle ) }}
+          p {{ tokens[ 'hdr_info_title' ]( userTitle ) }}
         .message-body.is-paddingless
           .panel
             .panel-block(v-if="isAdmin || isSchool") {{ tokens[ 'info_adm_1' ] }}
@@ -42,29 +42,29 @@
     footer.footer(v-if="!user")
       .columns.is-32
         .column
-          div TAUCHI, COMS, {{ tokens[ 'contact_uta' ] }}
+          div TAUCHI, COMS, {{ tokens[ 'msg_contact_uta' ] }}
         .column.is-narrow
           a.manual(href="https://uta-gasp.gitbooks.io/silko/") {{ tokens[ 'manual' ] }}
         .column
-          .browser-info {{ tokens[ 'test_info' ] }}
+          .browser-info {{ tokens[ 'msg_test_info' ] }}
           .is-inline-block
             .browser-name.chrome Chrome 55+
             .browser-name.firefox Firefox 47+
 
-    modal-container(v-if="schools" title="Registration" @close="closeSelectionBox")
+    modal-container(v-if="schools" :title="tokens[ 'tit_registration' ]" @close="closeSelectionBox")
       .has-text-centered
-        div {{ tokens[ 'contact_info' ] }}
-        div Oleg Špakov @ {{ tokens[ 'contact_uta' ] }}
-        div oleg.spakov@uta.fi
+        div {{ tokens[ 'msg_contact_info' ] }}
+        div Oleg Špakov @ {{ tokens[ 'msg_contact_uta' ] }}
+        div oleg.spakov at uta dot fi
 
-    modal-container(v-if="isGettingEmail" title="Password reset" @close="closeEmailBox" @mounted="passwordResetAppeared")
+    modal-container(v-if="isGettingEmail" :title="tokens[ 'tit_pass_reset' ]" @close="closeEmailBox" @mounted="passwordResetAppeared")
       .field(v-if="!schoolToRegester")
         p.control
-          span {{ tokens[ 'message_password_reset' ] }}
+          span {{ tokens[ 'hdr_password_reset' ] }}
 
       .field
         p.control.has-icons-left.has-icons-right
-          input.input(ref="email" type="email" placeholder="Email" v-model="email" @keyup.enter="sendPasswordResetRequest")
+          input.input(ref="email" type="email" :placeholder="tokens[ 'email' ]" v-model="email" @keyup.enter="sendPasswordResetRequest")
           span.icon.is-small.is-left
             i.fa.fa-envelope
           span.icon.is-small.is-right(v-if="!isEmailValid")
@@ -72,7 +72,7 @@
 
       p.control
         .has-text-centered
-          button.button.is-primary(@click="sendPasswordResetRequest") {{ tokens[ 'button_password_reset' ] }}
+          button.button.is-primary(@click="sendPasswordResetRequest") {{ tokens[ 'btn_send' ] }}
 
     temporal-notification(type="success" :show="showSuccess")
       span {{ successMessage }}
@@ -105,6 +105,7 @@
 import eventBus from '@/utils/event-bus.js';
 import login from '@/utils/login.js';
 import gazeTracking from '@/utils/gazeTracking.js';
+import { i10n } from '@/utils/i10n.js';
 
 import ActionError from '@/components/mixins/actionError';
 import ActionSuccess from '@/components/mixins/actionSuccess';
@@ -113,8 +114,6 @@ import Login from '@/components/widgets/Login.vue';
 import ModalContainer from '@/components/widgets/ModalContainer.vue';
 import TemporalNotification from '@/components/widgets/TemporalNotification.vue';
 import Loading from '@/components/widgets/Loading.vue';
-
-import { i10n } from '@/utils/i10n.js';
 
 // ts-check-only
 import UserBase from '@/db/userBase.js';
@@ -149,7 +148,7 @@ export default {
       isGettingEmail: false,
       email: '',
 
-      tokens: i10n( 'home' ),
+      tokens: i10n( 'home', '_form', '_buttons' ),
     };
   },
 
@@ -234,16 +233,16 @@ export default {
     /** @param {Event} e */
     sendPasswordResetRequest( e ) {
       if ( this.schoolToRegester ) {
-        this.setSuccess( `The registration request for "${this.email}" has been sent.` );
+        this.setSuccess( this.tokens[ 'msg_request_sent' ]( this.email ) );
         this.schoolToRegester = null;
       }
       else {
         login.resetPassword( this.email, /** @param {Error | string} err */ err => {
           if ( err ) {
-            this.setError( err, `Cannot send the password reset request to "${this.email}".` );
+            this.setError( err, this.tokens[ 'err_password_reset' ]( this.email ) );
           }
           else {
-            this.setSuccess( `The password reset request has been sent to "${this.email}".` );
+            this.setSuccess( this.tokens[ 'msg_password_reset' ] );
           }
           this.email = '';
         } );
@@ -266,7 +265,7 @@ export default {
       }
     } );
     eventBus.$on( 'login', () => {
-      this.tokens = i10n( 'home' );
+      this.tokens = i10n( 'home', '_form', '_buttons' );
       this.user = login.user;
       this.isConnecting = false;
     } );
@@ -274,7 +273,7 @@ export default {
       this.user = null;
     } );
     eventBus.$on( 'lang', () => {
-      this.tokens = i10n( 'home' );
+      this.tokens = i10n( 'home', '_form', '_buttons' );
     } );
 
     this.user = login.user;
@@ -326,7 +325,7 @@ export default {
   }
 
   .footer {
-    opacity: 0.5;
+    color: #777;
     position: fixed;
     bottom: 0;
     width: 100vw;

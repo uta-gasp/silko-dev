@@ -1,4 +1,8 @@
 <script>
+  import { i10n } from '@/utils/i10n.js';
+
+  const tokens = i10n( '_labels' );
+
   export default {
     name: 'progress-chart', 
 
@@ -35,7 +39,7 @@
             },
             scaleLabel: {
               display: true,
-              labelString: 'Date',
+              labelString: tokens[ 'date' ],
               fontSize: 18,
             },
           }]

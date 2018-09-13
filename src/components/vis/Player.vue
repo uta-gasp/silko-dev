@@ -1,19 +1,27 @@
 <template lang="pug">
   #player
-    abbr(title="Restart")
+    abbr(:title="tokens[ 'tit_restart' ]")
       button.icon-btn.restart(@click="restart")
-    abbr(title="Pause / Continue")
+    abbr(:title="tokens[ 'tit_pause_cont' ]")
       button.icon-btn(:class="{ play: isPaused, pause: !isPaused }" @click="toggle")
     .track
 </template>
 
 <script>
+import { i10n } from '@/utils/i10n.js';
+
 /**
  * @fires restart
  * @fires toggle
  */
 export default {
   name: 'player',
+
+  data() {
+    return {
+      tokens: i10n( 'player' ),
+    };
+  },
 
   props: {
     isPaused: {

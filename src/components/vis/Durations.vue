@@ -25,6 +25,8 @@
 </template>
 
 <script>
+import { i10n } from '@/utils/i10n.js';
+
 import { OptionsCreator, OptionGroup, OptionItem } from '@/vis/optionsCreator.js';
 import { Feedbacks } from '@/model/session/feedbacks';
 
@@ -36,9 +38,11 @@ import Data from '@/vis/data/data.js';
 import DataPageFocusedWord from '@/model/data/dataPageFocusedWord.js';
 import { Feedback } from '@/model/session/feedback';
 
+const tokens = i10n( 'vis_durations' );
+
 const UNITS = {
-  SECONDS: 'seconds',
-  PERCENTAGE: 'percentage',
+  SECONDS: tokens[ 'item_seconds' ],
+  PERCENTAGE: tokens[ 'item_percentage' ],
 };
 
 const UI = {
@@ -70,9 +74,13 @@ export default {
       options: {
         gazePlot: new OptionGroup({
           id: 'durations',
-          title: 'Durations',
+          title: tokens[ 'hdr_options' ],
           options: OptionsCreator.createOptions( {
-            units: new OptionItem({ type: Array, items: Object.values( UNITS ), label: 'Units' }),
+            units: new OptionItem({ 
+              type: Array, 
+              items: Object.values( UNITS ), 
+              label: tokens[ 'lbl_units' ]
+            }),
           }, UI ),
           defaults: OptionsCreator.createDefaults( UI ),
         }),
@@ -101,8 +109,7 @@ export default {
     /** @returns {string} */
     title() {
       const r = this.data.records[0];
-      const student = this.data.params.student ? ` for ${this.data.params.student}` : '';
-      return `Word reading durations in "${r.task.name}"${student}`;
+      return tokens[ 'hdr_dur' ]( this.data.params.student, r.task.name );
     },
 
     feedback() {

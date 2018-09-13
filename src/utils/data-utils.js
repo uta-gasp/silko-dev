@@ -41,18 +41,6 @@ export default class DataUtils {
   }
 
   /**
-   * @param {array} arr 
-   * @param {string} name 
-   * @returns {string}
-   */
-  static displayCount( arr, name ) {
-    if ( arr === null ) {
-      return '';
-    }
-    return `${arr.length ? arr.length : 'No'} ${name}${arr.length !== 1 ? 's' : ''}`;
-  }
-
-  /**
    * @param {string} dateString 
    * @returns {string}
    */
@@ -63,4 +51,11 @@ export default class DataUtils {
     return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()} ${hours}:${minutes} `;
   }
 
+  /** 
+   * @param {string} lang 
+   * @returns {string}
+   */
+  static convertLegacy( lang ) {
+    return lang === 'Finnish' ? 'Suomi' : lang;
+  }
 }

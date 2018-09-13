@@ -1,7 +1,7 @@
 <template lang="pug">
   #options(@click="close")
     .inner
-      .options-title Settings
+      .options-title {{ tokens[ 'hdr_settings' ] }}
       .options(ref="container")
         //---- example of the content
         //- .group
@@ -15,12 +15,14 @@
         //-         .label [LABEL]
         //-         input.value.id(type="checkbox")
       .buttons
-        button.button.is-primary(@click="save") Save and close
-        button.button.is-primary(@click="apply") Apply
-        button.button.is-danger(@click="reset") Reset
+        button.button.is-primary(@click="save") {{ tokens[ 'btn_save_close' ] }}
+        button.button.is-primary(@click="apply") {{ tokens[ 'btn_apply' ] }}
+        button.button.is-danger(@click="reset") {{ tokens[ 'btn_reset' ] }}
 </template>
 
 <script>
+import { i10n } from '@/utils/i10n.js';
+
 import Colors from '@/vis/colors.js';
 import { OptionsCreator, OptionGroup, OptionItem } from '@/vis/optionsCreator.js';
 
@@ -35,6 +37,7 @@ export default {
 
   data() {
     return {
+      tokens: i10n( 'options' ),
     };
   },
 
@@ -259,6 +262,9 @@ export default {
       else if ( option.type === Number ) {
         row.appendChild( this.createNumberInput( option, id ) );
       }
+      else if ( option.type === Map ) {
+        row.appendChild( this.createSelectVal( option, id ) );
+      }
 
       return row;
     },
@@ -279,6 +285,34 @@ export default {
         item.value = itemName;
         item.textContent = itemName;
         if ( currentValue === itemName ) {
+          item.selected = true;
+        }
+        select.appendChild( item );
+      } );
+
+      select.addEventListener( 'change', e => {
+        option.ref( option.items[ /** @type {HTMLSelectElement} */ (e.target).selectedIndex ] );
+      } );
+
+      return select;
+    },
+
+    /** 
+     * @param {OptionItem} option
+     * @param {string} id
+     * @returns {HTMLSelectElement}
+     */
+    createSelectMap( option, id ) {
+      const select = document.createElement( 'select' );
+      select.classList.add( 'value' );
+      select.classList.add( id );
+
+      const currentValue = option.ref();
+      /** @type {Map} */ (option.items).forEach( (val, key) => {
+        const item = document.createElement( 'option' );
+        item.value = key;
+        item.textContent = val;
+        if ( currentValue === key ) {
           item.selected = true;
         }
         select.appendChild( item );

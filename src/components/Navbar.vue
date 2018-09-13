@@ -6,27 +6,27 @@
         //- img(src="../assets/icon-32.png")
       router-link.nav-item.is-tab(to="/schools" v-if="isAdmin")
         i.fa.fa-university
-        span {{ tokens[ 'link_schools' ] }}
+        span {{ tokens[ 'schools' ] }}
       router-link.nav-item.is-tab(to="/teachers" v-if="isAdmin || isSchool")
         i.fa.fa-users
-        span {{ tokens[ 'link_teachers' ] }}
+        span {{ tokens[ 'teachers' ] }}
       router-link.nav-item.is-tab(to="/students" v-if="isAdmin || isSchool || isTeacher")
         i.fa.fa-child
-        span {{ tokens[ 'link_students' ] }}
+        span {{ tokens[ 'students' ] }}
       router-link.nav-item.is-tab(to="/instructions" v-if="isTeacher")
         i.fa.fa-info
-        span {{ tokens[ 'link_instructions' ] }}
+        span {{ tokens[ 'instructions' ] }}
       router-link.nav-item.is-tab(to="/classes" v-if="isTeacher")
         i.fa.fa-database
-        span {{ tokens[ 'link_classes' ] }}
+        span {{ tokens[ 'classes' ] }}
       router-link.nav-item.is-tab(to="/results" v-if="isTeacher")
         i.fa.fa-chart-pie
-        span {{ tokens[ 'link_results' ] }}
+        span {{ tokens[ 'results' ] }}
       router-link.nav-item.is-tab(to="/assignments" v-if="isStudent")
         i.fa.fa-tasks
-        span {{ tokens[ 'link_assignments' ] }}
+        span {{ tokens[ 'assignments' ] }}
     .nav-right(v-if="user")
-      a.button(:href="manualLink" target="_blank") Manual
+      a.button(:href="manualLink" target="_blank") {{ tokens[ 'manual' ] }}
       #usermenu.dropdown.is-right(:class="{ 'is-active': isUsermenuDropped }")
         .dropdown-trigger
           button.button(
@@ -47,7 +47,7 @@
                 option(v-for="lang in langs" :key="lang") {{ lang }}
             hr.dropdown-divider
             .nav-item
-              a(v-on:click="logOut") {{ tokens[ 'user_logout' ] }}
+              a(v-on:click="logOut") {{ tokens[ 'logout' ] }}
 </template>
 
 <script>
@@ -88,10 +88,11 @@ export default {
       /** @type {UserBase} */
       user: null,
       langs,
-      tokens: i10n( 'navbar' ),
       isUsermenuDropped: false,
       isUsermenuHover: false,
       manualTopic: '',
+
+      tokens: i10n( 'navbar', '_buttons', '_labels' ),
     };
   },
 
@@ -160,14 +161,14 @@ export default {
     this.user = login.user;
     
     eventBus.$on( 'login', () => {
-      this.tokens = i10n( 'navbar' );
+      this.tokens = i10n( 'navbar', '_buttons', '_labels' );
       this.user = login.user;
     } );
     eventBus.$on( 'logout', () => {
       this.user = null;
     } );
     eventBus.$on( 'lang', () => {
-      this.tokens = i10n( 'navbar' );
+      this.tokens = i10n( 'navbar', '_buttons', '_labels' );
     } );
 
     document.addEventListener( 'click', e => {

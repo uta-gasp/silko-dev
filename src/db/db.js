@@ -19,7 +19,7 @@ import Recordable from '@/model/commons/recordable.js';
  */
 
 // TODO remove the first line, uncomment the other
-// const config = require( `@/config/db.development.js` ).config;
+// const config = require( '@/config/db.development.js' ).config;
 const configName = process.env.IS_DEV ? 'development' : process.env.NODE_ENV;
 const config = require( `@/config/db.${configName}.js` ).config;
 console.log( `Connecting to ${config.projectId}` );
@@ -156,7 +156,7 @@ class DB {
     if ( cls.validate && !cls.validate( obj ) ) {
       let objString = JSON.stringify( obj );
       objString = objString.substr( 0, Math.min( objString.length, 50 ) );
-      return cb( new Error( `"${objString}" is not of a class '${cls.name}'` ) );
+      return cb( new Error( `INTERNAL: ${objString}" is not of a class '${cls.name}'` ) );
     }
 
     if ( obj.email ) {
@@ -274,7 +274,7 @@ class DB {
     const ref = this.fb.child( `${cls.db}/${id}` );
     return ref.once( 'value', snapshot => {
       if ( !snapshot.exists() ) {
-        return cb( new Error( `${cls.db}/${id} do not exist` ) );
+        return cb( new Error( `INTERNAL: ${cls.db}/${id} do not exist` ) );
       }
 
       cb( null, cls.from( snapshot ) );
@@ -496,7 +496,7 @@ class DB {
     const pathParts = new window.URL( url ).pathname.split( '/' );
     const filename = pathParts[ pathParts.length - 1 ];
     if ( !filename ) {
-      return cb( new Error( 'invalid url' ) );
+      return cb( new Error( 'INTERNAL: invalid url' ) );
     }
 
     return this.storage

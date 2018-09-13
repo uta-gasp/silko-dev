@@ -1,56 +1,39 @@
 <template lang="pug">
   #intro-editor
     .field(:class="{ squeezed: showLabels }")
-      .columns
-        .column
-          label.label(v-show="showLabels") Name
-          p.control
-            input.input(type="text" placeholder="Name" :disabled="!nameEditable" v-model="name" :class="{'is-danger': name.length && !isNameValid}")
-          p.help.is-danger(v-show="name.length && !isNameValid") name is too short
-      .columns(v-show="showLabels")
-        .column.is-three-quarters
-          p.control
-            label.label Texts
-        .column
-          p.control
-            label.label Buttons
-      .columns
-        .column.is-three-quarters
-          p.control
-            textarea.textarea.low(placeholder="Calibration instruction" v-model="calib" :class="{'is-danger': calib.length && !isCalibInstructionValid}")
-          p.help.is-danger(v-show="calib.length && !isCalibInstructionValid") instruction is too short
-        .column
-          p.control
-            input.input(type="text" placeholder="Calibrate" v-model="calibStart")
-          p.control
-            input.input(type="text" placeholder="Skip calibration" v-model="calibSkip")
-      .columns
-        .column.is-three-quarters
-          p.control
-            textarea.textarea.low(placeholder="Start instruction" v-model="start" :class="{'is-danger': start.length && !isStartInstructionValid}")
-          p.help.is-danger(v-show="start.length && !isStartInstructionValid") instruction is too short
-        .column
-          p.control
-            input.input(type="text" placeholder="Start" v-model="startRun")
-          p.control
-            input.input(type="text" placeholder="Cancel" v-model="startCancel")
-      .columns
-        .column.is-three-quarters
-          p.control
-            textarea.textarea(placeholder="First page" v-model="firstPage" :class="{'is-danger': firstPage.length && !isFirstPageValid}")
-          p.help.is-danger(v-show="firstPage.length && !isFirstPageValid") instruction is too short
-        .column
-          p.control
-            input.input(type="text" placeholder="Next" v-model="next")
-          p.control
-            input.input(type="text" placeholder="Finish" v-model="finish")
-          p.control
-            input.input(type="text" placeholder="Thank you" v-model="finished")
+      label.label(v-show="showLabels") {{ tokens[ 'name' ] }}
+      p.control
+        input.input(
+          type="text" 
+          :placeholder="tokens[ 'name' ]" 
+          :disabled="!nameEditable" 
+          v-model="name" 
+          :class="{'is-danger': name.length && !isNameValid}")
+      p.help.is-danger(v-show="name.length && !isNameValid") {{ tokens[ 'name_invalid' ] }}
+
+      p.control(v-show="showLabels")
+        label.label {{ tokens[ 'hdr_texts' ] }}
+
+      p.control
+        textarea.textarea.low(:placeholder="tokens[ 'ph_calib_inst' ]" v-model="calib" :class="{'is-danger': !isCalibInstructionValid}")
+      p.help.is-danger(v-show="!isCalibInstructionValid") {{ tokens[ 'msg_instruction_invalid' ] }}
+
+      p.control
+        textarea.textarea.low(:placeholder="tokens[ 'ph_start_inst' ]" v-model="start" :class="{'is-danger': !isStartInstructionValid}")
+      p.help.is-danger(v-show="!isStartInstructionValid") {{ tokens[ 'msg_instruction_invalid' ] }}
+
+      p.control
+        textarea.textarea(:placeholder="tokens[ 'ph_first_page' ]" v-model="firstPage" :class="{'is-danger': !isFirstPageValid}")
+      p.help.is-danger(v-show="!isFirstPageValid") {{ tokens[ 'msg_instruction_invalid' ] }}
+
       p.control
         button.button.is-primary(:disabled="!canSave" @click="save") {{ action }}
 </template>
 
 <script>
+import eventBus from '@/utils/event-bus.js';
+import { i10n } from '@/utils/i10n.js';
+
 import Intro from '@/model/intro.js';
 
 /**
@@ -63,22 +46,16 @@ export default {
     return {
       name: this.intro ? this.intro.name : '',
       calib: this.intro ? this.intro.calibInstruction : '',
-      calibStart: this.intro ? this.intro.calibStart : '',
-      calibSkip: this.intro ? this.intro.calibSkip : '',
       start: this.intro ? this.intro.startInstruction : '',
-      startRun: this.intro ? this.intro.startRun : '',
-      startCancel: this.intro ? this.intro.startCancel : '',
       firstPage: this.intro ? this.intro.firstPageAsText() : '',
-      next: this.intro ? this.intro.next : '',
-      finish: this.intro ? this.intro.finish : '',
-      finished: this.intro ? this.intro.finished : '',
+
+      tokens: i10n( 'instruction_editor', '_form' ),
     };
   },
 
   props: {
     action: {
       type: String,
-      default: 'Create',
     },
     showLabels: {
       type: Boolean,
@@ -99,15 +76,8 @@ export default {
     reload() {
       this.name = this.intro ? this.intro.name : '';
       this.calib = this.intro ? this.intro.calibInstruction : '';
-      this.calibStart = this.intro ? this.intro.calibStart : '';
-      this.calibSkip = this.intro ? this.intro.calibSkip : '';
       this.start = this.intro ? this.intro.startInstruction : '';
-      this.startRun = this.intro ? this.intro.startRun : '';
-      this.startCancel = this.intro ? this.intro.startCancel : '';
       this.firstPage = this.intro ? this.intro.firstPageAsText() : '';
-      this.next = this.intro ? this.intro.next : '';
-      this.finish = this.intro ? this.intro.finish : '';
-      this.finished = this.intro ? this.intro.finished : '';
     },
   },
 
@@ -120,25 +90,31 @@ export default {
 
     /** @returns {boolean} */
     isFirstPageValid() {
-      return this.firstPage.length > 14;
+      return !this.firstPage.length || this.firstPage.length > 14;
     },
 
     /** @returns {boolean} */
     isCalibInstructionValid() {
-      return this.calib.length > 4;
+      return !this.calib.length || this.calib.length > 4;
     },
 
     /** @returns {boolean} */
     isStartInstructionValid() {
-      return this.start.length > 4;
+      return !this.start.length || this.start.length > 4;
+    },
+
+    /** @returns {boolean} */
+    hasAnyInstuction() {
+      return this.firstPage.length || this.calib.length || this.start.length;
     },
 
     /** @returns {boolean} */
     canSave() {
-      return this.isNameValid && (
-        this.isCalibInstructionValid ||
-          this.isStartInstructionValid ||
-          this.isFirstPageValid );
+      return this.isNameValid &&
+        this.isCalibInstructionValid &&
+          this.isStartInstructionValid &&
+          this.isFirstPageValid &&
+          this.hasAnyInstuction;
     },
   },
 
@@ -149,20 +125,19 @@ export default {
         name: this.name.trim(),
         texts: {
           calibInstruction: this.calib.trim(),
-          calibStart: this.calibStart.trim(),
-          calibSkip: this.calibSkip.trim(),
           startInstruction: this.start.trim(),
-          startRun: this.startRun.trim(),
-          startCancel: this.startCancel.trim(),
           firstPage: this.firstPage.trim(),
-          next: this.next.trim(),
-          finish: this.finish.trim(),
-          finished: this.finished.trim(),
         },
       } );
     },
-
   },
+
+  created() {
+    eventBus.$on( 'lang', () => {
+      this.tokens = i10n( 'instruction_editor', '_form' );
+    } );
+  },
+
 };
 </script>
 

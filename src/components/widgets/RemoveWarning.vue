@@ -5,19 +5,19 @@
       .modal-content
         article.message.is-danger
           .message-header
-            p Deleting {{ object }}.
+            p {{ tokens[ 'header' ]( object ) }}.
             button.delete(@click="reject")
           .message-body
             .level
               .level-item
                 span
-                  span The {{ object }} "{{ name }}" will be deleted permanently.&nbsp;
+                  span {{ tokens[ 'warning' ]( object, name ) }}.&nbsp;
                   slot
-                  span Continue?
+                  span {{ tokens[ 'continue' ] }}
             .level
               .level-item
-                button.button.is-danger(@click="confirm") OK
-                button.button(@click="reject") Cancel
+                button.button.is-danger(@click="confirm") {{ tokens[ 'ok' ] }}
+                button.button(@click="reject") {{ tokens[ 'cancel' ] }}
   //- #modal-error.modal(:class="{ 'is-active': !!text }")
   //-   .modal-background
   //-   .modal-card
@@ -34,6 +34,8 @@
 </template>
 
 <script>
+import { i10n } from '@/utils/i10n.js';
+
 /**
  * @fires close
  */
@@ -42,6 +44,7 @@ export default {
 
   data() {
     return {
+      tokens: i10n( 'remove_warning', '_buttons' ),
     };
   },
 
@@ -69,6 +72,10 @@ export default {
   .button {
     margin-left: 0.5em;
     min-width: 5em;
+  }
+
+  .level-item {
+    flex-shrink: 1;    
   }
 
   // .centered {

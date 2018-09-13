@@ -274,7 +274,7 @@ export class Painter {
    * @property {string} fontFamily
    * @property {Point} location
    * @property {number} nameSpacing
-   * @property {string} [reason]
+   * @property {boolean} [isNoData]
    */
   /**
    * @param {Name[]} names 
@@ -310,8 +310,7 @@ export class Painter {
     ctx.strokeStyle = '#000';
     ctx.fillStyle = name.color;
 
-    const isNoData = settings.reason === 'no data';
-    const fontFamily = isNoData ? 'Segoe UI' : settings.fontFamily;
+    const fontFamily = settings.isNoData ? 'Segoe UI' : settings.fontFamily;
     ctx.font = `bold ${settings.fontSize}px ${fontFamily}`;
 
     const location = {
@@ -319,7 +318,7 @@ export class Painter {
       y: settings.location.y + ( settings.nameSpacing * settings.fontSize ) * name.index,
     };
 
-    ctx.fillText( isNoData ? NO_DATA_MARK : CHECK_MARK, location.x, location.y );
+    ctx.fillText( settings.isNoData ? NO_DATA_MARK : CHECK_MARK, location.x, location.y );
   }
 
   /**

@@ -6,7 +6,7 @@
           a(@click="selectItem( item )") {{ item.text }}
     main.subitems
       .has-text-centered(v-if="!isItemSelected()")
-        i Select a {{ itemName }}
+        i {{ tokens[ 'lbl_select' ]( itemName ) }}
       div(v-if="currentItem")
         //- .card.subitem(
         //-   :class="{ 'is-selected' : subitem.selected }"
@@ -20,27 +20,29 @@
           .message-body.is-paddingless
             .card.subitem(
               v-show="isGroupVisible( group )"
-              :class="{ 'is-selected' : subitem.selected }"
               v-for="(subitem, index) in group.items"
+              :class="{ 'is-selected' : subitem.selected }"
               :key="subitem.id")
               .card-content(@click="selectSubitem( subitem, index, $event )") {{ subitem.text }}
         .has-text-centered(v-if="!hasSubitems( currentItem )")
-          i No available {{ subitemName }}
+          i {{ tokens[ 'lbl_no_avail' ]( subitemName ) }}
     footer.field
       p.control
         .level
           .level-left
             .level-item
-              button.button.is-primary(:disabled="!hasItemsSelected" @click="accept") Select
+              button.button.is-primary(:disabled="!hasItemsSelected" @click="accept") {{ tokens[ 'btn_select' ] }}
             .level-item
           .level-right
             .level-item
-              button.button(v-if="multiple && !singleGroup" :disabled="!hasSubitems()" @click="selectAllSubitems") Select all
+              button.button(v-if="multiple && !singleGroup" :disabled="!hasSubitems()" @click="selectAllSubitems") {{ tokens[ 'btn_select_all' ] }}
             .level-item
-              button.button(v-if="multiple" :disabled="!hasSubitems()" @click="removeAllSubitems") Remove all selections
+              button.button(v-if="multiple" :disabled="!hasSubitems()" @click="removeAllSubitems") {{ tokens[ 'btn_remove_all' ] }}
 </template>
 
 <script>
+import { i10n } from '@/utils/i10n.js';
+
 // ts-check-only
 import Subitem from '@/utils/selectionBoxItem.js';
 
@@ -79,6 +81,8 @@ export default {
 
       lastSelectionIndex: -1,
       lastSelectionGroup: '',
+
+      tokens: i10n( 'selection_box' ),
     };
   },
 

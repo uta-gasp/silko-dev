@@ -1,5 +1,6 @@
 <script>
 import dataUtils from '@/utils/data-utils.js';
+import { i10n } from '@/utils/i10n.js';
 
 import VisPlot from '@/components/vis/VisPlot.vue';
 
@@ -12,6 +13,8 @@ import { TextPageImage } from '@/model/task/textPageImage.js';
 
 // ts-check-only
 import DataPageTextWord from '@/model/data/dataPageTextWord.js';
+
+const tokens = i10n( 'vis', 'vis_gaze_plot' );
 
 /** 
  * @typedef {DataPageTextWord} FixatedWord
@@ -58,7 +61,7 @@ export default {
   computed: {
     /** @returns {string} */
     title() {
-      return `${this.record.student.name} reading "${this.record.task.name}" at ${dataUtils.sessionDate( this.record.session.date )}`;
+      return tokens[ 'hdr_reading' ]( this.record.student.name, this.record.task.name, dataUtils.sessionDate( this.record.session.date ) );
     },
   },
 
@@ -178,19 +181,19 @@ export default {
     // options representation for editor
     this.options["gazePlot"] = new OptionGroup({
       id: 'gazePlot',
-      title: 'Gaze Plot',
+      title: tokens[ 'hdr_options' ],
       options: OptionsCreator.createOptions( {
-        colorMetric: new OptionItem({ type: Array, items: Metric.Types, label: 'Word color metric' }),
+        colorMetric: new OptionItem({ type: Array, items: Metric.Types, label: tokens[ 'lbl_word_color' ] }),
 
-        saccadeColor: new OptionItem({ type: '#', label: 'Saccade color' }),
-        regressionColor: new OptionItem({ type: '#', label: 'Regressive saccade color' }),
+        saccadeColor: new OptionItem({ type: '#', label: tokens[ 'lbl_sacc_color' ] }),
+        regressionColor: new OptionItem({ type: '#', label: tokens[ 'lbl_reg_sacc_color' ] }),
 
-        showConnections: new OptionItem({ type: Boolean, label: 'Show word-fixation connections' }),
-        showSaccades: new OptionItem({ type: Boolean, label: 'Show saccades' }),
-        showFixations: new OptionItem({ type: Boolean, label: 'Show fixations' }),
+        showConnections: new OptionItem({ type: Boolean, label: tokens[ 'lbl_show_conn' ] }),
+        showSaccades: new OptionItem({ type: Boolean, label: tokens[ 'lbl_show_sacc' ] }),
+        showFixations: new OptionItem({ type: Boolean, label: tokens[ 'lbl_show_fix' ] }),
 
-        'syllab.background': new OptionItem({ type: '#', label: 'Syllabification background' }),
-        'syllab.wordColor': new OptionItem({ type: '#', label: 'Syllabification word color' }),
+        'syllab.background': new OptionItem({ type: '#', label: tokens[ 'lbl_syllab_back' ] }),
+        'syllab.wordColor': new OptionItem({ type: '#', label: tokens[ 'lbl_syllab_word' ] }),
       }, UI ),
       defaults: OptionsCreator.createDefaults( UI ),
     });

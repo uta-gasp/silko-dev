@@ -245,7 +245,10 @@ export class TextPageImage {
       return name;
     }
     else {
-      return 'https://firebasestorage.googleapis.com/v0/b/eye-school-test.appspot.com/o/image%2F' + name;
+      const path = process.env.IS_DEV ? 
+        'https://firebasestorage.googleapis.com/v0/b/eye-school-test.appspot.com/o/image%2F' :
+        'https://firebasestorage.googleapis.com/v0/b/uta-gasp-silko.appspot.com/o/image%2F';
+      return path + name;
     }
   }
 };

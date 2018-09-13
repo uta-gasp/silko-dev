@@ -4,10 +4,10 @@
       table.table
         thead
           tr
-            th Student
-            th.is-narrow Date
+            th {{ tokens[ 'name' ] }}
+            th.is-narrow {{ tokens[ 'date' ] }}
             th(v-for="question in questionnaire.questions") {{ question }}
-            th.is-narrow Total
+            th.is-narrow {{ tokens[ 'hdr_total' ] }}
             //- th(v-for="record in data.records") {{ getRecordName( record ) }}
 
         tbody
@@ -27,6 +27,7 @@
 
 <script>
 import DataUtils from '@/utils/data-utils.js';
+import { i10n } from '@/utils/i10n.js';
 
 import ControlPanel from '@/components/vis/controlPanel.vue';
 
@@ -62,6 +63,8 @@ export default {
     return {
       /** @type {Questionnaire} */
       questionnaire: null,
+
+      tokens: i10n( 'vis', '_form', '_labels' ),
     };
   },
 
@@ -76,7 +79,7 @@ export default {
     /** @returns {string} */
     title() {
       const r = this.data.records[0];
-      return `Questionnaire results in "${r.task.name}"`;
+      return this.tokens[ 'hdr_quest' ]( r.task.name );
     },
   },
 

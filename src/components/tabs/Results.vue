@@ -3,7 +3,7 @@
     .container(v-if="classes === null")
       loading
     .container(v-else-if="!classes.length")
-      i No data was recorded yet
+      i {{ tokens[ 'msg_no_data' ] }}
     nav.panel(v-for="cls in classes" :key="cls.ref.id")
       .panel-block.is-marginless.is-paddingless
         .card.is-fullwidth
@@ -13,7 +13,7 @@
             table.table
               thead
                 tr
-                  th Tasks
+                  th {{ tokens[ 'tasks' ] }}
                   th
                   th
                   th
@@ -22,13 +22,21 @@
                 tr(v-for="task in tasksWithSessions( cls.tasks )" :key="task.id")
                   td {{ task.name }}
                   td.is-narrow
-                    button.button.is-primary(:disabled="!isLoaded" @click="selectTaskStudents( task, VISUALIZATIONS.durations )") Durations
+                    button.button.is-primary(
+                      :disabled="!isLoaded" 
+                      @click="selectTaskStudents( task, VISUALIZATIONS.durations )") {{ tokens[ 'btn_durations' ] }}
                   td.is-narrow
-                    button.button.is-primary(:disabled="!isLoaded" @click="selectTaskStudents( task, VISUALIZATIONS.gazeReplay )") Gaze replay
+                    button.button.is-primary(
+                      :disabled="!isLoaded" 
+                      @click="selectTaskStudents( task, VISUALIZATIONS.gazeReplay )") {{ tokens[ 'btn_gaze_replay' ] }}
                   td.is-narrow
-                    button.button.is-primary(:disabled="!isLoaded" @click="selectTaskStudents( task, VISUALIZATIONS.wordReplay )") Word replay
+                    button.button.is-primary(
+                      :disabled="!isLoaded" 
+                      @click="selectTaskStudents( task, VISUALIZATIONS.wordReplay )") {{ tokens[ 'btn_word_replay' ] }}
                   td.is-narrow
-                    button.button.is-primary(:disabled="!isLoaded || !task.hasQuestionnaire" @click="selectTaskStudents( task, VISUALIZATIONS.questionnaireResults )") Questionnaire
+                    button.button.is-primary(
+                      :disabled="!isLoaded || !task.hasQuestionnaire"
+                      @click="selectTaskStudents( task, VISUALIZATIONS.questionnaireResults )") {{ tokens[ 'btn_questionnaire' ] }}
 
             .container(v-if="cls.students === null")
               loading
@@ -37,29 +45,43 @@
             table.table(v-else)
               thead
                 tr
-                  th Students
+                  th {{ tokens[ 'students' ] }}
                   th
                   th
                   th
                   th
                   th
                   th
-                    button.button.is-primary.is-pulled-right(:disabled="!isLoaded" @click="selectClassStudents( cls, VISUALIZATIONS.studentsSummary )") Summary
+                    button.button.is-primary.is-pulled-right(
+                      :disabled="!isLoaded" 
+                      @click="selectClassStudents( cls, VISUALIZATIONS.studentsSummary )") {{ tokens[ 'btn_summary' ] }}
               tbody
                 tr(v-for="student in cls.students" :key="student.ref.id")
                   td {{ student.ref.name }}
                   td.is-narrow
-                    button.button.is-warning(:disabled="!isLoaded || !student.sessions.length" @click="editSessions( student )") Edit
+                    button.button.is-warning(
+                      :disabled="!isLoaded || !student.sessions.length" 
+                      @click="editSessions( student )") {{ tokens[ 'btn_edit' ] }}
                   td.is-narrow
-                    button.button.is-primary(:disabled="!isLoaded" @click="selectSession( student, VISUALIZATIONS.gazePlot )") Gaze plot
+                    button.button.is-primary(
+                      :disabled="!isLoaded" 
+                      @click="selectSession( student, VISUALIZATIONS.gazePlot )") {{ tokens[ 'btn_gaze_plot' ] }}
                   td.is-narrow
-                    button.button.is-primary(:disabled="!isLoaded || !hasItems(student, filterHasAudio)" @click="selectSession( student, VISUALIZATIONS.audioReplay, filterHasAudio )") Audio replay
+                    button.button.is-primary(
+                      :disabled="!isLoaded || !hasItems(student, filterHasAudio)" 
+                      @click="selectSession( student, VISUALIZATIONS.audioReplay, filterHasAudio )") {{ tokens[ 'btn_audio_replay' ] }}
                   td.is-narrow
-                    button.button.is-primary(:disabled="!isLoaded" @click="selectSession( student, VISUALIZATIONS.durations )") Durations
+                    button.button.is-primary(
+                      :disabled="!isLoaded" 
+                      @click="selectSession( student, VISUALIZATIONS.durations )") {{ tokens[ 'btn_durations' ] }}
                   td.is-narrow
-                    button.button.is-primary(:disabled="!isLoaded" @click="selectSession( student, VISUALIZATIONS.gazeReplay )") Gaze replay
+                    button.button.is-primary(
+                      :disabled="!isLoaded" 
+                      @click="selectSession( student, VISUALIZATIONS.gazeReplay )") {{ tokens[ 'btn_gaze_replay' ] }}
                   td.is-narrow
-                    button.button.is-primary(:disabled="!isLoaded" @click="selectSession( student, VISUALIZATIONS.wordReplay )") Word replay
+                    button.button.is-primary(
+                      :disabled="!isLoaded" 
+                      @click="selectSession( student, VISUALIZATIONS.wordReplay )") {{ tokens[ 'btn_word_replay' ] }}
 
     modal-container(
       v-if="gradeWithStudents"
@@ -67,8 +89,8 @@
       @close="closeStudentSelectionBox")
       item-selection-box(
         :items="gradeWithStudents"
-        item-name="grade"
-        subitem-name="student"
+        :item-name="tokens[ 'data_grade' ]"
+        :subitem-name="tokens[ 'data_student' ]"
         @accept="continueDeferredWithStudents")
 
     modal-container(
@@ -79,13 +101,13 @@
         :multiple="!isMultipleSessions"
         :single-group="!isMultipleSessions && !studentWithSessions[0].multiGroup"
         :items="studentWithSessions"
-        item-name="student"
-        subitem-name="session"
+        :item-name="tokens[ 'data_grade' ]"
+        :subitem-name="tokens[ 'data_session' ]"
         @accept="continueDeferredWithSessions")
 
     modal-container(
       v-if="editingStudent"
-      :title="`Sessions by ${editingStudent.ref.name}`"
+      :title="tokens[ 'tit_sessions' ]( editingStudent.ref.name )"
       @close="closeSessionEditingBox")
       session-editing-box(:student="editingStudent" @deleted="sessionDeleted")
 
@@ -110,6 +132,7 @@
 <script>
 import eventBus from '@/utils/event-bus.js';
 import dataUtils from '@/utils/data-utils.js';
+import { i10n } from '@/utils/i10n.js';
 
 import SelectionBoxItem from '@/utils/selectionBoxItem.js';
 
@@ -210,6 +233,8 @@ export default {
         studentsSummary: 'StudentsSummary',
         questionnaireResults: 'QuestionnaireResults',
       },
+
+      tokens: i10n( 'results', '_labels' ),
     };
   },
 
@@ -231,7 +256,7 @@ export default {
         this.loadClasses( /** @param {Error | string} err */ err => {
           if ( err ) {
             this.classes = [];
-            return this.setError( err, 'Failed to load classes' );
+            return this.setError( err, this.tokens[ 'err_load_classes' ] );
           }
 
           this.isLoaded = true;
@@ -327,7 +352,7 @@ export default {
       this.deferredVisualization = new _VisualizationInitialData( visualizationName, task.sessions );
 
       const grade = {
-        text: `Students completed "${task.name}"`,
+        text: this.tokens[ 'tit_students' ]( task.name ),
         multiGroup: true,
         /** @type {SelectionBoxItem[]} */
         subitems: [],
@@ -363,7 +388,7 @@ export default {
       this.deferredVisualization = new _VisualizationInitialData( visualizationName, sessions );
 
       const grade = {
-        text: `students of "${cls.ref.name}"`,
+        text: this.tokens[ 'tit_students_of' ]( cls.ref.name ),
         /** @type {SelectionBoxItem[]} */
         subitems: [],
       };
@@ -395,7 +420,7 @@ export default {
       this.deferredVisualization = new _VisualizationInitialData( visualizationName, student.sessions );
 
       const studentWithSessions = {
-        text: `Sessions by ${student.ref.name}`,
+        text: this.tokens[ 'tit_sessions' ]( student.ref.name ),
         /** @type {SelectionBoxItem[]} */
         subitems: [],
       };
@@ -475,7 +500,7 @@ export default {
       const dataIDs = sessions.map( session => session.ref.data );
       ModelStudent.getData( dataIDs, /** @param {Error} err, @param {ModelData[]} data */( err, data ) => {
         if ( err ) {
-          return this.setError( err, 'Failed to load student data' );
+          return this.setError( err, this.tokens[ 'err_load_student' ] );
         }
 
         const records = sessions.map( session => new Record( session, data ) );
@@ -509,6 +534,9 @@ export default {
     } );
     eventBus.$on( 'login', () => {
       this.init();
+    } );
+    eventBus.$on( 'lang', () => {
+      this.tokens = i10n( 'results', '_labels' );
     } );
 
     this.checkAccess();

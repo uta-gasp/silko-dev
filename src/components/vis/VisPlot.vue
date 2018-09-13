@@ -8,8 +8,8 @@
     )
 
     .message.is-danger.below-title(v-if="isWarningMessageVisible")
-      .message-header Missing data
-      .message-body Fixation data is missing on this page
+      .message-header {{ tokens[ 'hdr_missing_data' ] }}
+      .message-body {{ tokens[ 'msg_missing_data' ] }}
 
     control-panel(
       :title="title"
@@ -40,6 +40,8 @@
 </template>
 
 <script>
+import { i10n } from '@/utils/i10n.js';
+
 import { OptionsCreator, OptionGroup, OptionItem } from '@/vis/optionsCreator.js';
 import sgwmController from '@/vis/sgwmController.js';
 import { Feedbacks } from '@/model/session/feedbacks';
@@ -111,6 +113,8 @@ export default {
       /** @type {TextPageImage[]} */
       visibleImages: [],
       fixation: null,
+
+      tokens: i10n( 'vis' ),
     };
   },
 
@@ -151,12 +155,24 @@ export default {
     createCommonOptions() {
       return new OptionGroup({
         id: '_common',
-        title: 'Common',
+        title: this.tokens[ 'hdr_commons' ],
         options: OptionsCreator.createOptions( {
-          wordColor: new OptionItem({ type: '#', label: 'Text color' }),
-          wordHighlightColor: new OptionItem({ type: '#', label: 'Highlighting color' }),
-          wordRectColor: new OptionItem({ type: '#', label: 'Word frame color' }),
-          drawWordFrame: new OptionItem({ type: Boolean, label: 'Draw word frame' }),
+          wordColor: new OptionItem({ 
+            type: '#', 
+            label: this.tokens[ 'lbl_text_color' ],
+          }),
+          wordHighlightColor: new OptionItem({ 
+            type: '#', 
+            label: this.tokens[ 'lbl_hl_color' ],
+          }),
+          wordRectColor: new OptionItem({ 
+            type: '#', 
+            label: this.tokens[ 'lbl_frame_color' ],
+          }),
+          drawWordFrame: new OptionItem({ 
+            type: Boolean, 
+            label: this.tokens[ 'lbl_draw_frame' ], 
+          }),
         }, COMMON_UI ),
         defaults: OptionsCreator.createDefaults( COMMON_UI ),
       });

@@ -56,7 +56,7 @@ export default class UserCreator {
       }
     }
 
-    cb( new Error( 'invalid reference' ) );
+    cb( new Error( 'INTERNAL: invalid reference' ) );
   }
 
 }

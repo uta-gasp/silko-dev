@@ -110,15 +110,8 @@ export default class Teacher extends Recordable {
       name: name,
       owner: this.id,
       calibInstruction: introTexts.calibInstruction,
-      calibStart: introTexts.calibStart,
-      calibSkip: introTexts.calibSkip,
       startInstruction: introTexts.startInstruction,
-      startRun: introTexts.startRun,
-      startCancel: introTexts.startCancel,
       firstPage: introTexts.firstPage,
-      next: introTexts.next,
-      finish: introTexts.finish,
-      finished: introTexts.finished,
     }, ( err, id ) => {
       if ( err ) {
         return cb( err );

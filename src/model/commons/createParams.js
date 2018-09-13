@@ -56,23 +56,9 @@ export class IntroCreateParams {
     /** @type {string} */
     this.calibInstruction = '';
     /** @type {string} */
-    this.calibStart = '';
-    /** @type {string} */
-    this.calibSkip = '';
-    /** @type {string} */
     this.startInstruction = '';
     /** @type {string} */
-    this.startRun = '';
-    /** @type {string} */
-    this.startCancel = '';
-    /** @type {string} */
     this.firstPage = '';
-    /** @type {string} */
-    this.next = '';
-    /** @type {string} */
-    this.finish = '';
-    /** @type {string} */
-    this.finished = '';
   }
 
 }

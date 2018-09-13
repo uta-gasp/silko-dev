@@ -5,8 +5,8 @@
         .content.is-large
           p(v-for="line in startInstruction") {{ line }}
 
-        button.button.is-large.is-primary(:disabled="!isCalibrated" @click="start") {{ titleStart }}
-        button.button.is-large(@click="cancel") {{ titleCancel }}
+        button.button.is-large.is-primary(:disabled="!isCalibrated" @click="start") {{ tokens[ 'start' ] }}
+        button.button.is-large(@click="cancel") {{ tokens[ 'cancel' ] }}
 
     div.fullscreen(ref="fullscreen")
       task-page(
@@ -20,14 +20,17 @@
 
       .container.tracking-lost-error-container(v-show="isFullscreen && !isRunning")
         .message.is-danger.tracking-lost-error
-          .message-body Gaze tracking is not available
+          .message-body {{ tokens[ 'msg_tracking_lost' ] }}
 
     .container(v-show="!isCalibrated")
       .message.is-danger
-        .message-body The tracker is not calibrated yet
+        .message-body {{ tokens[ 'msg_tracker_not_calibrated' ] }}
+      article.message.is-info
+        .message-body {{ tokens[ 'msg_calib_window_not_visible' ] }}
 </template>
 
 <script>
+import { i10n } from '@/utils/i10n.js';
 import gazeTracking from '@/utils/gazeTracking.js';
 
 import Intro from '@/model/intro.js';
@@ -60,6 +63,8 @@ export default {
       isFullscreen: false,
       timeoutTimer: null,
       finilizeTask: false,  // trigger
+
+      tokens: i10n( 'assignment', '_buttons' ),
     };
   },
 
@@ -82,16 +87,6 @@ export default {
     /** @returns {string[]} */
     startInstruction() {
       return this.texts.startInstruction ? this.texts.startInstruction.split( '\n' ) : [];
-    },
-
-    /** @returns {string} */
-    titleStart() {
-      return this.texts.startRun || 'Start';
-    },
-
-    /** @returns {string} */
-    titleCancel() {
-      return this.texts.startCancel || 'Cancel';
     },
   },
 

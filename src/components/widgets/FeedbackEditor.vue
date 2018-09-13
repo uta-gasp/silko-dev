@@ -5,14 +5,14 @@
       .field.is-horizontal
         .select
           select(v-model="language")
-            option(value="" selected) none
+            option(value="" selected) {{ tokens[ 'item_none' ] }}
             option(v-for="lang in languages" :value="lang") {{ lang }}
         slot(name="first")
       .field.is-horizontal
         .select
           select(v-model="thresholdIsSmart" :disabled="!isLanguageSelected")
-            option(:value="false") fixed
-            option(:value="true") calibrated
+            option(:value="false") {{ tokens[ 'item_fixed' ] }}
+            option(:value="true") {{ tokens[ 'item_calib' ] }}
         template(v-if="thresholdIsSmart")
           input.input(type="number" step="100" v-model.number="thresholdMin" :disabled="!canEditCalibThresholdParams" min="1000" :max="thresholdMax")
           .control-line -
@@ -27,6 +27,9 @@
 </template>
 
 <script>
+import { i10n } from '@/utils/i10n.js';
+import DataUtils from '@/utils/data-utils.js';
+
 import { SyllabOptions } from '@/model/session/feedbacks.js';
 
 /**
@@ -37,11 +40,13 @@ export default {
 
   data() {
     return {
-      language: this.value.language,
+      language: DataUtils.convertLegacy( this.value.language ),
       thresholdIsSmart: this.value.threshold.smart,
       thresholdMin: this.value.threshold.min,
       thresholdMax: this.value.threshold.max,
       thresholdValue: this.value.threshold.value,
+
+      tokens: i10n( 'task_editor_feedback' ),
     };
   },
 

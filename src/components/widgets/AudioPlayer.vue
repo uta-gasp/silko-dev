@@ -13,11 +13,15 @@
 </template>
 
 <script>
+import { i10n } from '@/utils/i10n.js';
+
 export default {
   data() {
     return {
       isPlaying: this.playing,
       currentTime: this.time,
+
+      tokens: i10n( 'audio' ),
     };
   },
 
@@ -40,7 +44,7 @@ export default {
 
   computed: {
     title() {
-      return this.isPlaying ? 'Pause' : 'Play';
+      return this.isPlaying ? this.tokens[ 'pause' ] : this.tokens[ 'play' ];
     },
 
     durationMs() {

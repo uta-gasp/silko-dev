@@ -4,13 +4,13 @@
       table.table(v-if="images.length")
         thead
           tr
-            th Preview
-            th Name
-            th Page
-            th Location
-            th Size
-            th On
-            th Off
+            th {{ tokens[ 'lbl_preview' ] }}
+            th {{ tokens[ 'name' ] }}
+            th {{ tokens[ 'lbl_page' ] }}
+            th {{ tokens[ 'lbl_location' ] }}
+            th {{ tokens[ 'lbl_size' ] }}
+            th {{ tokens[ 'lbl_on' ] }}
+            th {{ tokens[ 'lbl_off' ] }}
             th
         tbody
           tr.is-64(v-for="(image, index) in images" :key="index")
@@ -19,7 +19,7 @@
             td {{ getImageName( image ) }}
             td {{ getImagePage( image ) }}
             td {{ getImageLocation( image ) }}
-            td {{ image.keepOriginalSize ? 'original' : 'shrinked' }}
+            td {{ tokens[ 'lbl_keep_size' ]( image.keepOriginalSize ) }}
             td
               .event-name {{ formatEventName( image.on ) }}
               .event-param(v-show="hasParameters( image.on )") {{ formatEventParams( image.on ) }}
@@ -28,16 +28,16 @@
               .event-param(v-show="hasParameters( image.off )") {{ formatEventParams( image.off ) }}
             td
               button.button(
-                title="Edit the image appearance parameters"
+                :title="tokens[ 'tit_params' ]"
                 @click="edit( index )")
                 i.far.fa-edit
             td
               button.button(
-                title="Remove the image"
+                :title="tokens[ 'tit_remove' ]"
                 @click="remove( index )")
                 i.fa.fa-times
       section(v-else)
-        i No images
+        i {{ tokens[ 'msg_no_images' ] }}
 
     section.absolute-parent
       .has-text-centered(v-if="!isEditing")
@@ -56,8 +56,8 @@
               span.file-cta
                 span.file-icon
                   i.fa.fa-upload
-                span.file-label Choose an image…
-                span.help or drag it here
+                span.file-label {{ tokens[ 'msg_choose' ] }}
+                span.help {{ tokens[ 'msg_drag' ] }}
 
       div(:class="{ 'sticked': !isEditing, 'at-top': !images.length, 'at-bottom': images.length }" v-if="selectedFile || isEditing")
         article.media(v-if="selectedFile")
@@ -69,61 +69,61 @@
               div
                 strong {{ selectedFile.name }}
               div
-                small {{ selectedFile.size }} bytes
+                small {{ selectedFile.size }} {{ tokens[ 'msg_no_images' ] }}
               progress.progress.is-small.is-primary(v-show="isUploading" max="100" :value="uploadProgress")
           .media-right
             .field
-              button.button.is-primary(@click="uploadImage" :disabled="isUploading || !hasValidParams") Upload
-              button.button(@click="cancel" :disabled="isUploading") Cancel
+              button.button.is-primary(@click="uploadImage" :disabled="isUploading || !hasValidParams") {{ tokens[ 'btn_upload' ] }}
+              button.button(@click="cancel" :disabled="isUploading") {{ tokens[ 'btn_cancel' ] }}
         article
           .field.is-horizontal(v-if="isEditing")
             .field-label.is-normal  
             .field-body
               h4.heading.is-4 {{ getImageName( images[ editingImageIndex ] ) }}
           .field.is-horizontal
-            .field-label.is-normal Page
+            .field-label.is-normal {{ tokens[ 'lbl_page' ] }}
             .field-body
               .select
                 select(v-model="page")
-                  option(value="-1") any
+                  option(value="-1") {{ tokens[ 'item_any' ] }}
                   option(v-for="index in pageCount" :key="index" :value="index - 1") {{ index }}
           .field.is-horizontal
-            .field-label.is-normal Location
+            .field-label.is-normal {{ tokens[ 'lbl_location' ] }}
             .field-body
               input.input.is-inline(type="number" step="5" v-model.number="offset" min="0" max="800")
-              .info-label pixels from
+              .info-label {{ tokens[ 'lbl_pixels' ] }}
               .select
                 select(v-model="location")
-                  option(value="left") left
-                  option(value="bottom") bottom
-                  option(value="right") right
+                  option(value="left") {{ tokens[ 'item_left' ] }}
+                  option(value="bottom") {{ tokens[ 'item_bottom' ] }}
+                  option(value="right") {{ tokens[ 'item_right' ] }}
           .field.is-horizontal
-            .field-label.is-normal Size
+            .field-label.is-normal {{ tokens[ 'lbl_size' ] }}
             .field-body
               .select
                 select(v-model="keepOriginalSize")
-                  option(value="true") original
-                  option(value="false") 15% of width / height
+                  option(value="true") {{ tokens[ 'item_original' ] }}
+                  option(value="false") {{ tokens[ 'item_15' ] }}
           .field.is-horizontal
-            .field-label.is-normal Show
+            .field-label.is-normal {{ tokens[ 'lbl_show' ] }}
             .field-body
               .select
                 select(v-model="on")
                   option(v-for="(text, id) in ON" :value="id" :key="id") {{ text }}
               .field.is-horizontal(v-show="on === 'fixation'")
-                .field-label.is-normal.is-inner-label.no-wrap at
+                .field-label.is-normal.is-inner-label.no-wrap {{ tokens[ 'lbl_at' ] }}
                 .field-body.select-container
                   .select.is-multiple
                     select(v-model="fixationWords" multiple)
                       option(v-for="word in currentWords" :value="word" :key="word.text + Math.random()") {{ word.text }}
-                .field-label.is-normal.is-inner-label.no-wrap longer than
+                .field-label.is-normal.is-inner-label.no-wrap {{ tokens[ 'lbl_longer' ] }}
                 .field-body.number-container
                   input.input.is-number(
                     type="text"
                     v-model="fixationDuration")
                 .field-label.is-normal.is-inner-label.no-wrap ms
           .field.is-horizontal
-            .field-label.is-normal Hide
+            .field-label.is-normal {{ tokens[ 'lbl_hide' ] }}
             .field-body
               .select
                 select(v-model="off")
@@ -138,8 +138,8 @@
             .field-label.is-normal
             .field-body
               .is-grouped.is-right  
-                button.button.is-primary(@click="saveEdited()") Save
-                button.button(@click="cancelEditing()") Cancel
+                button.button.is-primary(@click="saveEdited()") {{ tokens[ 'save' ] }}
+                button.button(@click="cancelEditing()") {{ tokens[ 'cancel' ] }}
 
     temporal-notification(type="danger" :show="showError")
       span {{ errorMessage }}
@@ -147,6 +147,8 @@
 </template>
 
 <script>
+import { i10n } from '@/utils/i10n.js';
+
 import Task from '@/model/task.js';
 import { TextPageImage,
   TextPageImageEvent,
@@ -262,17 +264,10 @@ export default {
 
       isDraggingFileOverDropzone: false,
 
-      ON: {
-        [TextPageImage.EVENT.none]: 'initially',
-        [TextPageImage.EVENT.fixation]: 'on fixation',
-      },
+      tokens: i10n( 'task_editor_images', '_form', '_labels', '_buttons', '_failures' ),
 
-      OFF: {
-        [TextPageImage.EVENT.none]: 'never',
-        [TextPageImage.EVENT.image]: 'when other image is shown',
-        [TextPageImage.EVENT.delay]: 'after',
-      },
-
+      ON: {},   // constant populated in "created"
+      OFF: {},  // constant populated in "created"
     };
   },
 
@@ -390,7 +385,7 @@ export default {
       const deletedImage = this.images.splice( index, 1 )[0];
       Task.deleteImage( deletedImage, /** @param {Error | string} err */ err => {
         if ( err ) {
-          this.setError( err, 'Cannot delete the image' );
+          this.setError( err, this.tokens[ 'delete' ]( this.tokens[ 'image' ] ) );
         }
       } );
       this.$emit( 'input', { images: this.images } );
@@ -444,7 +439,7 @@ export default {
      * @returns {string | number}
      */
     getImagePage( image ) {
-      return image.page < 0 ? 'any' : ( image.page + 1 );
+      return image.page < 0 ? this.tokens[ 'item_any' ] : ( image.page + 1 );
     },
 
     /** 
@@ -452,7 +447,7 @@ export default {
      * @returns {string}
      */
     getImageLocation( image ) {
-      return image.location + (image.offset ? ` + ${image.offset}px` : '');
+      return this.tokens[ `item_${image.location}` ] + (image.offset ? ` + ${image.offset}px` : '');
     },
  
     /** 
@@ -472,7 +467,7 @@ export default {
         return '-';
       }
       else if ( event.name === TextPageImage.EVENT.fixation ) {
-        return `fixation on word`;
+        return this.tokens[ 'msg_fix_on_word' ];
       }
       else {
         return event.name;
@@ -487,10 +482,10 @@ export default {
       if ( event.name === TextPageImage.EVENT.fixation ) {
         const fixEvent = /** @type {TextPageImageFixationEvent}*/ (event);
         const words = (fixEvent.word ? [ { text: fixEvent.word } ] : fixEvent.words).map( word => word.text ).join( ' ' );
-        return `"${words}"\nlonger than ${event.duration} ms`;
+        return `"${words}"\n${this.tokens[ 'lbl_longer' ]} ${event.duration} ms`;
       }
       else if ( event.name === TextPageImage.EVENT.delay ) {
-        return `${event.duration} seconds`;
+        return `${event.duration} ${this.tokens[ 'lbl_seconds' ]}`;
       }
       else {
         return '';
@@ -515,10 +510,10 @@ export default {
 
       }
       else if ( file.type !== 'image/jpeg' && file.type !== 'image/png' ) {
-        return this.setError( 'Only JPEG and PNG images are supported' );
+        return this.setError( this.tokens[ 'err_image_type' ] );
       }
       else if ( file.size > 100000 ) {
-        return this.setError( 'File size must not exceed 100 kB' );
+        return this.setError( this.tokens[ 'err_image_size' ] );
       }
       else {
         this.selectedFile = file;
@@ -549,7 +544,7 @@ export default {
           this.uploadProgress = -1;
 
           if ( err ) {
-            this.setError( err, 'Cannot upload the file' );
+            this.setError( err, this.tokens[ 'err_upload' ] );
           }
           else {
             image.src = TextPageImage.nameFromURL( url );
@@ -603,6 +598,17 @@ export default {
   },
 
   created() {
+    this.ON = {
+      [TextPageImage.EVENT.none]: this.tokens[ 'item_initially' ],
+      [TextPageImage.EVENT.fixation]: this.tokens[ 'item_on_fix' ],
+    };
+
+    this.OFF = {
+      [TextPageImage.EVENT.none]: this.tokens[ 'item_never' ],
+      [TextPageImage.EVENT.image]: this.tokens[ 'item_when_other' ],
+      [TextPageImage.EVENT.delay]: this.tokens[ 'item_after' ],
+    };
+
     this.listImages();
   },
 };

@@ -17,6 +17,7 @@
 
 <script>
 import dataUtils from '@/utils/data-utils.js';
+import { i10n } from '@/utils/i10n.js';
 
 import ActionError from '@/components/mixins/actionError.js';
 
@@ -41,6 +42,8 @@ export default {
     return {
       /** @type {Session} */
       sessionToDelete: null,
+
+      tokens: i10n( 'session_box' ),
     };
   },
 
@@ -82,7 +85,7 @@ export default {
       const sessionID = this.sessionToDelete.ref.id;
       this.student.ref.deleteSession( sessionID, /** @param {Error | string} err */ err => {
         if ( err ) {
-          return this.setError( err, 'Failed to delete the session' );
+          return this.setError( err, this.tokens[ 'err_delete' ] );
         }
 
         this.student.sessions = this.student.sessions.filter( session => session.ref.id !== sessionID );

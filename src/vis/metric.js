@@ -1,3 +1,7 @@
+import { i10n } from '@/utils/i10n.js';
+
+const tokens = i10n( 'vis' );
+
 /**
  * Word
  * @typedef {Object} Word
@@ -53,10 +57,10 @@ function mapFocusCountToAlpha( word, mapFocusCount ) {
 const DURATION_TRANSPARENT = 100;
 
 const Type = {
-  NONE: 'none',
-  DURATION: 'duration',
-  CHAR_SPEED: 'char speed',
-  FOCUS_COUNT: 'focus count',
+  NONE: tokens[ 'item_none' ],
+  DURATION: tokens[ 'item_dur' ],
+  CHAR_SPEED: tokens[ 'item_char' ],
+  FOCUS_COUNT: tokens[ 'item_focus' ],
   // SYLL_SPEED: 'syllable speed',
 };
 

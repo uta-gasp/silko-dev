@@ -34,21 +34,23 @@
     p.control.bottom-panel
       span.is-inline-block
         button.button.is-primary(:disabled="!canSave" @click="save") {{ action }}
-        button.button.stacked(v-show="currentTab === tabs.feedback" @click="setDefaultFeedback") Set as default
+        button.button.stacked(v-show="currentTab === tabs.feedback" @click="setDefaultFeedback") {{ tokens[ 'btn_set_default' ] }}
         span.is-inline-block.stacked
-          bulma-checkbox.is-inline-block(v-model="useTimeout" label="Use timeout:" :disabled="false")
+          bulma-checkbox.is-inline-block(v-model="useTimeout" :label="tokens[ 'lbl_use_timeout' ]" :disabled="false")
           input.input.is-inline-block.timeout(type="number" step="1" v-model.number="timeout" :disabled="!useTimeout" min="1" max="1000")
-          span min.
+          span {{ tokens[ 'lbl_min' ] }}
         span.is-inline-block.stacked
-          bulma-checkbox.is-inline-block(v-model="recordAudio" label="Record audio")
+          bulma-checkbox.is-inline-block(v-model="recordAudio" :label="tokens[ 'lbl_record_audio' ]")
 
-      button.button.is-primary(:disabled="!canPreview" @click="preview") Preview
+      button.button.is-primary(:disabled="!canPreview" @click="preview") {{ tokens[ 'btn_preview' ] }}
 
     .fullscreen(ref="fullscreen")
       task-preview(v-if="inPreview" :task="getCurrentTask()" @close="closePreview")
 </template>
 
 <script>
+import { i10n } from '@/utils/i10n.js';
+
 import Task from '@/model/task.js';
 
 import fullscreen from '@/components/mixins/fullscreen.js';
@@ -138,6 +140,8 @@ export default {
 
       /** @type {Tab} */
       currentTab: null,
+
+      tokens: i10n( 'task_editor' ),
     };
   },
 

@@ -3,6 +3,8 @@
  * @see {@link https://responsivevoice.org/}
  */
 
+import DataUtils from '@/utils/data-utils.js';
+
 import SpeechFeedback from '@/model/session/speechFeedback.js';
 
 // ts-check-only
@@ -23,7 +25,7 @@ export default class Speaker {
     this._options.threshold.factor = 4;
 
     /** @type {function( string )} */
-    this.voice = voices[ this._options.language ];
+    this.voice = voices[ DataUtils.convertLegacy( this._options.language ) ];
   }
 
   /** @returns {string[]} */
@@ -100,7 +102,7 @@ const voices = {
   /**
    * @param {string} word 
    */
-  Finnish( word ) {
+  Suomi( word ) {
     responsiveVoice.speak( word, 'Finnish Female' );
   },
 

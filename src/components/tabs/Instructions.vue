@@ -6,41 +6,42 @@
       span {{ successMessage }}
 
     nav.panel
-      p.panel-heading Instructions
+      p.panel-heading {{ tokens[ 'instructions' ] }}
       .panel-block.is-paddingless
         .container(v-if="intros === null")
           loading
         .container(v-else-if="!intros.length")
-          i No instructions exists yet
+          i {{ tokens[ 'msg_no_instructions' ] }}
         table.table(v-else)
           thead
             tr
-              th Name
-              th Text
+              th {{ tokens[ 'name' ] }}
+              th {{ tokens[ 'text' ] }}
               th
-                .is-pulled-right Actions
+                .is-pulled-right {{ tokens[ 'actions' ] }}
           tbody
             tr(v-for="item in intros")
               td {{ item.name }}
               td.keep-lines {{ item.textsSummary() }}
               td
                 .is-pulled-right.is-flex
-                  button.button.is-light(@click="edit( item )")
+                  button.button.is-light(:title="tokens[ 'tit_edit' ]" @click="edit( item )")
                     i.fa.fa-edit
-                  button.button.is-danger(@click="remove( item )")
+                  button.button.is-danger(:title="tokens[ 'tit_delete' ]" @click="remove( item )")
                     i.far.fa-trash-alt
 
     nav.panel
-      p.panel-heading New instruction
+      p.panel-heading {{ tokens[ 'hdr_new' ] }}
       .panel-block.is-paddingless
         intro-editor.control(
+        :action="tokens[ 'create' ]"
           :name-editable="true"
           :reload="resetNew"
           @save="tryToCreate")
 
-    modal-container(v-if="toEdit" title="Instruction editor" @close="closeEditor")
+    modal-container(v-if="toEdit" :title="tokens[ 'hdr_editor' ]" @close="closeEditor")
       intro-editor(
-        action="Save"
+        :action="tokens[ 'save' ]"
         :show-labels="true"
         :intro="toEdit"
         @save="saveEdited")
@@ -51,6 +52,7 @@
 <script>
 import eventBus from '@/utils/event-bus.js';
 import dataUtils from '@/utils/data-utils.js';
+import { i10n } from '@/utils/i10n.js';
 
 import Teacher from '@/model/teacher.js';
 
@@ -96,6 +98,8 @@ export default {
       toDelete: null,
       /** @type {Intro} */
       toEdit: null,
+
+      tokens: i10n( 'instructions', '_form', '_buttons', '_labels', '_failures' ),
     };
   },
 
@@ -118,7 +122,7 @@ export default {
       this.teacher.getIntros( /** @param {Error} err, @param {Intro[]} intros */( err, intros ) => {
         if ( err ) {
           this.intros = [];
-          return this.setError( err, 'Failed to load introductions' );
+          return this.setError( err, this.tokens[ 'load' ]( this.tokens[ 'instructions' ] ) );
         }
 
         this.intros = intros.sort( dataUtils.byName );
@@ -138,7 +142,7 @@ export default {
       } );
 
       if ( exists ) {
-        this.setError( 'An instructions of this name exists already', 'Failed to create new introduction' );
+        this.setError( this.tokens[ 'err_exists' ], this.tokens[ 'create_new' ]( this.tokens[ 'instruction' ] ) );
       }
       else {
         this.createIntro( e );
@@ -155,11 +159,11 @@ export default {
         this.isCreating = false;
 
         if ( err ) {
-          this.setError( err, 'Failed to create new introduction' );
+          this.setError( err, this.tokens[ 'create_new' ]( this.tokens[ 'instruction' ] ) );
         }
         else {
           this.loadIntros();
-          this.setSuccess( 'New introduction was created' );
+          this.setSuccess( this.tokens[ 'created' ]( this.tokens[ 'instruction' ] ) );
           this.resetNew = Math.random();
         }
       } );
@@ -185,10 +189,10 @@ export default {
     saveEdited( e ) {
       this.toEdit.update( e.name, e.texts, /** @param {Error} err */ err => {
         if ( err ) {
-          this.setError( err, 'Failed to save updates' );
+          this.setError( err, this.tokens[ 'update' ]( this.tokens[ 'instruction' ] ) );
         }
         else {
-          this.setSuccess( 'Updates were saved' );
+          this.setSuccess( this.tokens[ 'updated' ]( this.tokens[ 'instruction' ] ) );
         }
 
         this.loadIntros();
@@ -207,10 +211,10 @@ export default {
       if ( e.confirm ) {
         this.teacher.deleteIntro( this.toDelete, /** @param {Error} err */ err => {
           if ( err ) {
-            this.setError( err, 'Failed to delete the introduction' );
+            this.setError( err, this.tokens[ 'delete' ]( this.tokens[ 'instruction' ] ) );
           }
           else {
-            this.setSuccess( 'The introduction was deleted' );
+            this.setSuccess( this.tokens[ 'deleted' ]( this.tokens[ 'instruction' ] ) );
           }
 
           this.loadIntros();
@@ -227,6 +231,9 @@ export default {
     } );
     eventBus.$on( 'login', () => {
       this.init();
+    } );
+    eventBus.$on( 'lang', () => {
+      this.tokens = i10n( 'instructions', '_form', '_buttons', '_labels', '_failures' );
     } );
 
     this.checkAccess();

@@ -1,5 +1,5 @@
 export class OptionItem {
-  constructor( /** @type {{type: (NumberConstructor | BooleanConstructor | StringConstructor | ArrayConstructor | string), label: string, items?: string[], step?: number}} */ 
+  constructor( /** @type {{type: (MapConstructor | NumberConstructor | BooleanConstructor | StringConstructor | ArrayConstructor | string), label: string, items?: string[], step?: number}} */ 
     { type, label, items = [''], step = 0 } ) {
     this.type = type;
     this.label = label;

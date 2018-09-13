@@ -2,10 +2,10 @@
   #task-preview
     .notification.is-info.has-text-centered.on-top
       .columns
-        .column(v-if="task.syllab.language") Ctrl + click on a word to syllabify it.
+        .column(v-if="task.syllab.language") {{ tokens[ 'lbl_syllab_word' ] }}
         .column(v-if="task.syllab.language")
-          button.button.is-primary.is-small(@click="syllabifyAll") Syllabify all
-        .column(v-if="task.speech.language") Alt + click on a word to pronounce it.
+          button.button.is-primary.is-small(@click="syllabifyAll") {{ tokens[ 'btn_syllab_all' ] }}
+        .column(v-if="task.speech.language") {{ tokens[ 'lbl_speak_word' ] }}
 
     task-text(ref="container"
       @click.native.ctrl="syllabify"
@@ -22,13 +22,15 @@
           span &lt;
       .column.has-text-centered.is-narrow
         button.button.is-primary(@click="close")
-          span Close
+          span {{ tokens[ 'btn_close' ] }}
       .column.has-text-left
         button.button.is-primary(:disabled="!hasNextPage" @click="next")
           span &gt;
 </template>
 
 <script>
+import { i10n } from '@/utils/i10n.js';
+
 import TaskText from '@/components/widgets/TaskText.vue';
 import TaskImages from '@/components/widgets/TaskImages.vue';
 
@@ -61,6 +63,8 @@ export default {
       feedbackProvider: null,
       /** @type {Word} */
       fixatedWord: null,
+
+      tokens: i10n( 'preview' ),
     };
   },
 

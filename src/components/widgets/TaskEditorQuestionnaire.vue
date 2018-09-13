@@ -7,26 +7,26 @@
           p.control
             .columns.is-inlined
               .column.is-narrow
-                .control-line For
+                .control-line {{ tokens[ 'lbl_for' ] }}
                 .select
                   select(v-model="type")
-                    option(v-for="item in types" :value="item") {{ item.text }}
+                    option(v-for="item in types" :value="item") {{ tokens[ `item_${item.name}` ] }}
               .column
-                input.input(type="text" placeholder="Word" v-model="word" v-show="type === types.word")
+                input.input(type="text" :placeholder="tokens[ 'ph_word' ]" v-model="word" v-show="type === types.word")
           p.control
-            input.input(type="text" placeholder="Question" v-model="question")
+            input.input(type="text" :placeholder="tokens[ 'ph_question' ]" v-model="question")
           p.control
             .columns.is-inlined
               .column(v-for="answer in answers")
                 p.control.has-icon
-                  input.input(type="text" placeholder="answer" v-model="answer.text")
+                  input.input(type="text" :placeholder="tokens[ 'ph_answer' ]" v-model="answer.text")
                   template(v-if="answer.text")
                     span.icon.is-small.is-left.checkbox(v-if="!answer.isCorrect")
                       i.fa.fa-check(@click="selectCorrect( answer )")
                     span.icon.is-small.is-left.checkbox.is-success(v-else)
                       i.fa.fa-check-circle(@click="selectCorrect( answer )")
           p.control
-            button.button.is-primary(:disabled="!canAdd" @click="add") Add
+            button.button.is-primary(:disabled="!canAdd" @click="add") {{ tokens[ 'add' ] }}
 
       .panel-block.questions.is-paddingless
         table.table
@@ -36,7 +36,7 @@
                 template(v-if="question.type === 'word'")
                   p.word.is-inline-block {{ question.word }}
                 template(v-else)
-                  .heading.is-inline-block {{ question.type }}
+                  .heading.is-inline-block {{ tokens[ `lbl_${question.type}` ] }}
               td
                 span.is-inline-block {{ question.question }}
                 //- i.is-inline-block.is-pulled-right.answers {{ answersToString( question ) }}
@@ -49,6 +49,8 @@
 </template>
 
 <script>
+import { i10n } from '@/utils/i10n.js';
+
 import { Question, AnswerCandidate, QuestionType } from '@/model/session/question.js';
 
 // ts-check-only
@@ -73,6 +75,8 @@ export default {
       questions: this.task && this.task.questionnaire ? Array.from( this.task.questionnaire ) : [],
 
       types: Question.types,
+
+      tokens: i10n( 'task_editor_quest', '_buttons' ),
     };
   },
 

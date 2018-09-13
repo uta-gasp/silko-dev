@@ -1,5 +1,6 @@
 <script>
 import dataUtils from '@/utils/data-utils.js';
+import { i10n } from '@/utils/i10n.js';
 
 import { OptionsCreator, OptionGroup, OptionItem } from '@/vis/optionsCreator.js';
 import { Painter } from '@/vis/painter.js';
@@ -12,6 +13,8 @@ import VisPlot from '@/components/vis/VisPlot.vue';
 
 // ts-check-only
 import Fixation from '@/model/data/fixation';
+
+const tokens = i10n( 'vis', 'vis_gaze_replay' );
 
 const LEGEND_LOCATION = {
   x: 2,
@@ -49,8 +52,7 @@ export default {
     /** @returns {string} */
     title() {
       const r = this.data.records[0];
-      const student = this.data.params.student ? ` for ${this.data.params.student}` : '';
-      return `Gaze replay in "${r.task.name}"${student}`;
+      return tokens[ 'hdr_gaze_replay' ]( this.data.params.student, r.task.name );
     },
   },
 
@@ -146,8 +148,8 @@ export default {
                   .map( image => TextPageImage.from( image, { ignoreDisplayCondition: true } ) );
               }
             },
-            completed: /** @param {string} reason */ reason => {
-              this.isWarningMessageVisible = !!reason;
+            completed: /** @param {boolean} noData */ noData => {
+              this.isWarningMessageVisible = !!noData;
               const name = {
                 color: track.color,
                 index: ti,
@@ -158,7 +160,7 @@ export default {
                 fontFamily: UI.nameFontFamily,
                 nameSpacing: UI.nameSpacing,
                 location: LEGEND_LOCATION,
-                reason,
+                isNoData: !!noData,
               } );
             },
             syllabification: syllabification => {
@@ -200,18 +202,18 @@ export default {
 
   created() {
     // options representation for editor
-    this.options["gazeReplay"] = new OptionGroup({
+    this.options[ 'gazeReplay' ] = new OptionGroup({
       id: 'gazeReplay',
-      title: 'Gaze Replay',
+      title: tokens[ 'hdr_options' ],
       options: OptionsCreator.createOptions( {
-        colorMetric: new OptionItem({ type: Array, items: ['none', 'duration', 'char speed', 'syllable speed'], label: 'Word color metric' }),
+        colorMetric: new OptionItem({ type: Array, items: Metric.Types, label: tokens[ 'lbl_word_color' ] }),
 
-        nameFontFamily: new OptionItem({ type: String, label: 'Name font' }),
-        nameFontSize: new OptionItem({ type: Number, step: 1, label: 'Name font size' }),
-        nameSpacing: new OptionItem({ type: Number, step: 0.1, label: 'Name spacing' }),
+        nameFontFamily: new OptionItem({ type: String, label: tokens[ 'lbl_font' ] }),
+        nameFontSize: new OptionItem({ type: Number, step: 1, label: tokens[ 'lbl_font_size' ] }),
+        nameSpacing: new OptionItem({ type: Number, step: 0.1, label: tokens[ 'lbl_spacing' ] }),
 
-        'syllab.background': new OptionItem({ type: '#', label: 'Syllabification background' }),
-        'syllab.wordColor': new OptionItem({ type: '#', label: 'Syllabification word color' }),
+        'syllab.background': new OptionItem({ type: '#', label: tokens[ 'lbl_syllab_back' ] }),
+        'syllab.wordColor': new OptionItem({ type: '#', label: tokens[ 'lbl_syllab_word' ] }),
       }, UI ),
       defaults: OptionsCreator.createDefaults( UI ),
     });

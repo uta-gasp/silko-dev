@@ -3,38 +3,42 @@
     p.control
       .columns.is-inlined
         .column(v-if="isNameEditable")
-          label.label Name
+          label.label {{ tokens[ 'name' ] }}
           input.input(type="text" :placeholder="placeholder" v-model="name")
         .column.is-narrow
-          label.label Alignment
+          label.label {{ tokens[ 'lbl_alignment' ] }}
           .select
             select(v-model="alignment")
-              option(value="center") center
-              option(value="left") left
+              option(value="center") {{ tokens[ 'item_center' ] }}
+              option(value="left") {{ tokens[ 'item_left' ] }}
         .column.is-narrow
-          label.label Font
+          label.label {{ tokens[ 'lbl_font' ] }}
           .select
             select(v-model="fontname")
               option(v-for="name in FONTS" :key="name") {{ name }}
         .column.is-narrow
-          label.label Instructions
+          label.label {{ tokens[ 'instructions' ] }}
           span.select
             select(v-model="intro")
-              option(value="") none
+              option(value="") {{ tokens[ 'item_none' ] }}
               option(v-for="item in intros" :value="item.id") {{ item.name }}
 
     p.control
       .columns.is-inlined.tip-parent
         .column
-          label.label Text
-        .column.is-narrow.tip-header Formatting
+          label.label {{ tokens[ 'text' ] }}
+        .column.is-narrow.tip-header {{ tokens[ 'lbl_formatting' ] }}
 
         task-text-formatting-instructions.is-tip
-    .notification.is-warning(v-if="hasTaskImagesBoundToWords") The task contains images bound to words and therefore its text cannot be modified.
-    textarea.textarea.text(placeholder="Text" v-model="text" :disabled="hasTaskImagesBoundToWords")
+
+    .notification.is-warning(v-if="hasTaskImagesBoundToWords") {{ tokens[ 'msg_not_editable' ] }}
+
+    textarea.textarea.text(:placeholder="tokens[ 'text' ]" v-model="text" :disabled="hasTaskImagesBoundToWords")
 </template>
 
 <script>
+import { i10n } from '@/utils/i10n.js';
+
 import Task from '@/model/task.js';
 
 import TaskTextFormattingInstructions from '@/components/widgets/TaskTextFormattingInstructions.vue';
@@ -81,6 +85,8 @@ export default {
         'Trebuchet MS',
         'Verdana',
       ],
+
+      tokens: i10n( 'task_editor', '_form', '_labels' ),
     };
   },
 
@@ -126,7 +132,7 @@ export default {
 
     /** @returns {string} */
     placeholder() {
-      return this.isCloning ? this.originalName : 'Name';
+      return this.isCloning ? this.originalName : this.tokens[ 'name' ];
     }
   },
 

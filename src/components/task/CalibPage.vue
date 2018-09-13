@@ -5,20 +5,19 @@
         .content.is-large
           p(v-for="line in calibInstruction") {{ line }}
 
-        button.button.is-large.is-primary(:disabled="!isConnected" @click="calibrate") {{ titleStart }}
-        button.button.is-large(:disabled="!isCalibrated" @click="skip") {{ titleSkip }}
-        button.button.is-large(@click="cancel") {{ titleCancel }}
+        button.button.is-large.is-primary(:disabled="!isConnected" @click="calibrate") {{ tokens[ 'btn_calib' ] }}
+        button.button.is-large(:disabled="!isCalibrated" @click="skip") {{ tokens[ 'btn_skip_calib' ] }}
+        button.button.is-large(@click="cancel") {{ tokens[ 'cancel' ] }}
 
       .container(v-show="!isETUDConnected")
         .message.is-danger.is-centered
-          .message-header Cannot connect to a gaze tracker
+          .message-header {{ tokens[ 'hdr_cannot_conect' ] }}
           .message-body
             .content.has-text-left
-              span Possible reasons:
+              span {{ tokens[ 'msg_cannot_conect_1' ] }}
               ul
-                li ETU-Driver service is not running
-                li ETU-Driver service is running, but its WebSocket server is not enabled
-            //- button.button.is-large.is-primary(@click="reload") Reload
+                li {{ tokens[ 'msg_cannot_conect_2' ] }}
+                li {{ tokens[ 'msg_cannot_conect_3' ] }}
 
       .is-bottom-right
         a.button(:disabled="!isETUDConnected" @click="showETUDOptions")
@@ -27,6 +26,7 @@
 </template>
 
 <script>
+import { i10n } from '@/utils/i10n.js';
 import gazeTracking from '@/utils/gazeTracking.js';
 
 import Intro from '@/model/intro.js';
@@ -42,6 +42,8 @@ export default {
       isConnected: ( gazeTracking.state.isConnected && !gazeTracking.state.isTracking && !gazeTracking.state.isBusy ) || false,
       isETUDConnected: gazeTracking.state.isServiceRunning || false,
       isCalibrated: gazeTracking.state.isCalibrated || false,
+
+      tokens: i10n( 'assignment', '_buttons' ),
     };
   },
 
@@ -56,21 +58,6 @@ export default {
     /** @returns {string[]} */
     calibInstruction() {
       return this.texts.calibInstruction ? this.texts.calibInstruction.split( '\n' ) : [];
-    },
-
-    /** @returns {string} */
-    titleStart() {
-      return this.texts.calibStart || 'Start';
-    },
-
-    /** @returns {string} */
-    titleSkip() {
-      return this.texts.calibSkip || 'Skip';
-    },
-
-    /** @returns {string} */
-    titleCancel() {
-      return this.texts.startCancel || 'Cancel';
     },
   },
 

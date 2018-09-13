@@ -1,5 +1,6 @@
 import SyllabificationFeedback from '@/model/session/syllabificationFeedback.js';
 
+import DataUtils from '@/utils/data-utils.js';
 import loggerFactory from '@/utils/logger.js';
 
 // ts-check-only
@@ -29,7 +30,7 @@ export default class Syllabifier {
     this._hyphenHtml = `<span class="hyphen">${this._hyphen}</span>`;
 
     /** @type {function( string, string ): string} */
-    this._rule = rules[ this._options.language ];
+    this._rule = rules[ DataUtils.convertLegacy( this._options.language ) ];
 
     /** @type {object} */
     this._exceptions = {};
@@ -355,7 +356,7 @@ const rules = {
    * @param {string} hyphen 
    * @returns {string}
    */
-  Finnish( word, hyphen ) {
+  Suomi( word, hyphen ) {
     const vowels = [ 'a', 'o', 'u', 'i', 'e', 'ä', 'ö', 'y' ];
     const consonants = [ 'b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm',
       'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'z' ];

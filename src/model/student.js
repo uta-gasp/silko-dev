@@ -329,7 +329,7 @@ export default class Student extends Recordable {
   deleteSession( id, cb ) {
     const session = this.sessions[ id ];
     if ( !session ) {
-      return cb( new Error( 'Session does not exist' ) );
+      return cb( new Error( 'INTERNAL: Session does not exist' ) );
     }
 
     delete this.sessions[ id ];

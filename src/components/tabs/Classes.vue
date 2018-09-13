@@ -6,21 +6,21 @@
       span {{ successMessage }}
 
     nav.panel
-      p.panel-heading Classes
+      p.panel-heading {{ tokens[ 'classes' ] }}
       .panel-block.is-paddingless
         .container(v-if="classes === null")
           loading
         table.table(v-else)
           thead
             tr
-              th Name
-              th Tasks
-              th Students
+              th {{ tokens[ 'name' ] }}
+              th {{ tokens[ 'tasks' ] }}
+              th {{ tokens[ 'students' ] }}
           tbody
             tr(v-for="item in classes" :key="item.id")
               td 
                 .title.is-4.no-wrapping {{ item.name }}
-                button.button.is-danger(title="Delete the class" @click="removeClass( item )")
+                button.button.is-danger(:title="tokens[ 'tit_delete_class' ]" @click="removeClass( item )")
                   i.far.fa-trash-alt
               td
                 task-list(:cls="item" :intros="intros" @saved="taskSaved" @created="taskCreated" @deleted="taskDeleted")
@@ -28,15 +28,15 @@
                 student-list(:cls="item" :teacher="teacher" :refresh="refreshStudents")
 
     nav.panel
-      p.panel-heading New class
+      p.panel-heading {{ tokens[ 'hdr_new' ] }}
       .panel-block
         .field.control
           p.control
-            input.input(type="text" placeholder="Name" v-model="newName" :class="{'is-danger': newName.length && !canCreate}")
-          p.help.is-danger(v-show="newName.length && !canCreate") name is too short
+            input.input(type="text" :placeholder="tokens[ 'name' ]" v-model="newName" :class="{'is-danger': newName.length && !canCreate}")
+          p.help.is-danger(v-show="newName.length && !canCreate") {{ tokens[ 'name_invalid' ] }}
 
           p.control
-            button.button.is-primary(:disabled="!canCreate" @click="tryToCreate") Create
+            button.button.is-primary(:disabled="!canCreate" @click="tryToCreate") {{ tokens[ 'create' ] }}
 
     remove-warning(v-if="toDelete" object="class" :name="toDeleteName" @close="removeWarningClosed")
 </template>
@@ -44,6 +44,7 @@
 <script>
 import eventBus from '@/utils/event-bus.js';
 import dataUtils from '@/utils/data-utils.js';
+import { i10n } from '@/utils/i10n.js';
 
 import Teacher from '@/model/teacher.js';
 
@@ -90,6 +91,8 @@ export default {
 
       /** @type {Class} */
       toDelete: null,
+
+      tokens: i10n( 'classes', '_form', '_buttons', '_labels', '_failures' ),
     };
   },
 
@@ -119,7 +122,7 @@ export default {
       this.teacher.getClasses( /** @param {Error} err, @param {Class[]} classes */ ( err, classes ) => {
         if ( err ) {
           this.classes = [];
-          return this.setError( err, 'Failed to load classes' );
+          return this.setError( err, this.tokens[ 'load' ]( this.tokens[ 'classes' ] ) );
         }
 
         this.classes = classes.sort( dataUtils.byName );
@@ -129,7 +132,7 @@ export default {
     loadIntros() {
       this.teacher.getIntros( /** @param {Error} err, @param {Intro[]} intros */ ( err, intros ) => {
         if ( err ) {
-          return this.setError( err, 'Failed to load introductions' );
+          return this.setError( err, this.tokens[ 'load' ]( this.tokens[ 'instructions' ] ) );
         }
 
         this.intros = intros.sort( dataUtils.byName );
@@ -153,7 +156,7 @@ export default {
       } );
 
       if ( exists ) {
-        this.setError( 'A class of this name exists already', 'Failed to create new class' );
+        this.setError( this.tokens[ 'msg_name_exists' ], this.tokens[ 'create_new' ]( this.tokens[ 'class' ] ) );
       }
       else {
         this.createClass( this.newName );
@@ -170,12 +173,12 @@ export default {
         this.isCreating = false;
 
         if ( err ) {
-          this.setError( err, 'Failed to create new class' );
+          this.setError( err, this.tokens[ 'create_new' ]( this.tokens[ 'class' ] ) );
         }
         else {
           this.loadClasses();
 
-          this.setSuccess( 'New class has been created' );
+          this.setSuccess( this.tokens[ 'created' ]( this.tokens[ 'class' ] ) );
 
           this.newName = '';
         }
@@ -195,10 +198,10 @@ export default {
       if ( e.confirm ) {
         this.teacher.deleteClass( this.toDelete, /** @param {Error} err */ err => {
           if ( err ) {
-            this.setError( err, 'Failed to delete the class' );
+            this.setError( err, this.tokens[ 'delete' ]( this.tokens[ 'class' ] ) );
           }
           else {
-            this.setSuccess( 'The class was deleted' );
+            this.setSuccess( this.tokens[ 'deleted' ]( this.tokens[ 'class' ] ) );
           }
 
           this.loadClasses();
@@ -211,20 +214,20 @@ export default {
     /** @param {{err: string}} e */
     taskSaved( e ) {
       if ( e.err ) {
-        this.setError( e.err, 'Failed to save updates' );
+        this.setError( e.err, this.tokens[ 'update' ]( this.tokens[ 'task' ] ) );
       }
       else {
-        this.setSuccess( 'The task was updated' );
+        this.setSuccess( this.tokens[ 'updated' ]( this.tokens[ 'task' ] ) );
       }
     },
 
     /** @param {{err: string}} e */
     taskCreated( e ) {
       if ( e.err ) {
-        this.setError( e.err, 'Failed to create new task' );
+        this.setError( e.err, this.tokens[ 'create_new' ]( this.tokens[ 'task' ] ) );
       }
       else {
-        this.setSuccess( 'New task was created' );
+        this.setSuccess( this.tokens[ 'created' ]( this.tokens[ 'task' ] ) );
         this.refreshStudents = Math.random();
       }
     },
@@ -242,6 +245,9 @@ export default {
     } );
     eventBus.$on( 'login', () => {
       this.init();
+    } );
+    eventBus.$on( 'lang', () => {
+      this.tokens = i10n( 'classes', '_form', '_buttons', '_labels', '_failures' );
     } );
 
     this.checkAccess();

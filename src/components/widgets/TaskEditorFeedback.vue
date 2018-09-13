@@ -2,30 +2,32 @@
   #task-editor-feedback
     .columns.is-paddingless.is-marginless
       .column.is-paddingless.is-marginless.is-narrow
-        feedback-editor(header="Speech" v-model="speech" :languages="speechLangs")
+        feedback-editor(:header="tokens[ 'lbl_speech' ]" v-model="speech" :languages="speechLangs")
           .field
             .field.is-horizontal
               bulma-checkbox(v-model="speechAdjustForWordLength" label="word-length dependent" :disabled="!speech.language")
-        feedback-editor(header="Syllabification" v-model="syllab" :languages="syllabLangs")
+        feedback-editor(:header="tokens[ 'lbl_syllab' ]" v-model="syllab" :languages="syllabLangs")
           .field
             .field.is-horizontal
               span.select()
                 select(v-model="syllabMode" :disabled="!syllab.language")
-                  option(v-for="mode in syllabModes" :value="mode") {{ mode }}
+                  option(v-for="mode in syllabModes" :value="mode") {{ tokens[ `item_${mode}` ] }}
             .field.is-horizontal
-              bulma-checkbox(v-model="syllabTemporary" label="temporary" :disabled="!syllab.language")
+              bulma-checkbox(v-model="syllabTemporary" :label="tokens[ 'lbl_temp' ]" :disabled="!syllab.language")
             .field.is-horizontal
-              bulma-checkbox(v-model="syllabAdjustForWordLength" label="word-length dependent" :disabled="!syllab.language")
+              bulma-checkbox(v-model="syllabAdjustForWordLength" :label="tokens[ 'lbl_word' ]" :disabled="!syllab.language")
       .column.is-paddingless.is-marginless
         .columns.is-paddingless.is-marginless
           .column.is-paddingless.is-marginless.is-narrow
-            label.label Exceptions
+            label.label {{ tokens[ 'lbl_exceptions' ] }}
           .column.has-text-right.is-paddingless.is-marginless
-            i.instruction Example: maailma=maa il ma
-        textarea.textarea.exceptions(:disabled="!syllab.language" placeholder="Syllabifications" v-model="syllabExceptions")
+            i.instruction {{ tokens[ 'lbl_example' ] }} 
+        textarea.textarea.exceptions(:disabled="!syllab.language" :placeholder="tokens[ 'lbl_syllabs' ]" v-model="syllabExceptions")
 </template>
 
 <script>
+import { i10n } from '@/utils/i10n.js';
+
 import Task from '@/model/task.js';
 
 import Syllabifier from '@/task/syllabifier.js';
@@ -62,6 +64,8 @@ export default {
 
       syllabModes: Object.keys( Syllabifier.MODES ),
       syllabLangs: Syllabifier.LANGS,
+
+      tokens: i10n( 'task_editor_feedback' ),
     };
   },
 

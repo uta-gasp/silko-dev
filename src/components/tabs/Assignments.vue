@@ -1,15 +1,15 @@
 <template lang="pug">
   #assignments.section
     article.message.is-danger(v-if="student && student.deleted")
-      .message-body {{ tokens[ 'message_removed_account' ] }}
+      .message-body {{ tokens[ 'msg_removed_account' ] }}
 
     nav.panel(v-else)
-      p.panel-heading {{ tokens[ 'assignments_title' ] }}
+      p.panel-heading {{ tokens[ 'hdr_assignments' ] }}
       .panel-block
         .container(v-if="assignments === null")
           loading
         .container(v-else-if="!assignments.length")
-          i {{ tokens[ 'assignments_0' ] }}
+          i {{ tokens[ 'msg_no_assignments' ] }}
         .tile.is-ancestor(v-else)
           .tile.is-parent(v-for="assignment in assignments")
             .tile.is-child
@@ -17,31 +17,31 @@
                 header.card-header.notification.is-info.is-paddingless
                   .card-header-title {{ assignment.cls.name }}
                   .card-header-icon
-                    span.icon(v-if="assignment.task.syllab.language" title="Syllabification")
+                    span.icon(v-if="assignment.task.syllab.language" :title="tokens[ 'tit_syllab' ]")
                       i.fa.fa-ellipsis-h
-                    span.icon(v-if="assignment.task.speech.language" title="Voice")
+                    span.icon(v-if="assignment.task.speech.language" :title="tokens[ 'tit_voice' ]")
                       i.fa.fa-headphones
-                    span.icon(v-if="assignment.task.recordAudio" title="Recording")
+                    span.icon(v-if="assignment.task.recordAudio" :title="tokens[ 'tit_rec' ]")
                       i.fa.fa-microphone
                 .card-content
                   .content {{ assignment.task.name }}
                 .card-footer
-                  a.card-footer-item(@click="start( assignment )") {{ tokens[ 'assignments_start' ] }}
+                  a.card-footer-item(@click="start( assignment )") {{ tokens[ 'start' ] }}
 
     nav.panel
-      p.panel-heading {{ tokens[ 'completed_title' ] }}
+      p.panel-heading {{ tokens[ 'hdr_completed' ] }}
       .panel-block
         .container(v-if="sessions === null")
           loading
         .container(v-else-if="!sessions.length")
-          i {{ tokens[ 'completed_0' ] }} 
+          i {{ tokens[ 'msg_no_completed' ] }} 
         table.table(v-else)
           thead
             tr
-              th {{ tokens[ 'completed_col_class' ] }}
-              th {{ tokens[ 'completed_col_task' ] }}
-              th {{ tokens[ 'completed_col_wpm' ] }}
-              th {{ tokens[ 'completed_col_date' ] }}
+              th {{ tokens[ 'class' ] }}
+              th {{ tokens[ 'task' ] }}
+              th {{ tokens[ 'hdr_wpm' ] }}
+              th {{ tokens[ 'date' ] }}
           tbody
             tr(v-for="session in sessions")
               td {{ session.cls.name }}
@@ -56,6 +56,7 @@
 <script>
 import eventBus from '@/utils/event-bus.js';
 import dataUtils from '@/utils/data-utils.js';
+import { i10n } from '@/utils/i10n.js';
 
 import Student from '@/model/student.js';
 
@@ -63,8 +64,6 @@ import ActionError from '@/components/mixins/actionError';
 
 import Loading from '@/components/widgets/Loading.vue';
 import TemporalNotification from '@/components/widgets/TemporalNotification.vue';
-
-import { i10n } from '@/utils/i10n.js';
 
 // ts-check-only
 import Data from '@/model/data.js';
@@ -110,7 +109,7 @@ export default {
       sessions: null,     // [{cls, task, session}]
       assignment: '',
 
-      tokens: i10n( 'assignments' ),
+      tokens: i10n( 'assignments', '_labels', '_buttons', '_failures' ),
     };
   },
 
@@ -137,7 +136,7 @@ export default {
       this.student.loadAssignments( /** @param {Error} err, @param {Assignment[]} assignments */ ( err, assignments ) => {
         this.assignments = [];
         if ( err ) {
-          return this.setError( err, this.tokens[ 'message_failed_assignments' ] );
+          return this.setError( err, this.tokens[ 'load' ]( this.tokens[ 'assignments' ] ) );
         }
 
         this.assignments = assignments;
@@ -148,7 +147,7 @@ export default {
       this.student.loadSessions( /** @param {Error} err, @param {Session[]} sessions */ ( err, sessions ) => {
         this.sessions = [];
         if ( err ) {
-          return this.setError( err, this.tokens[ 'message_failed_sessions' ] );
+          return this.setError( err, this.tokens[ 'load' ]( this.tokens[ 'sessions' ] ) );
         }
 
         this.sessions = sessions;
@@ -217,7 +216,7 @@ export default {
       this.init();
     } );
     eventBus.$on( 'lang', () => {
-      this.tokens = i10n( 'assignments' );
+      this.tokens = i10n( 'assignments', '_labels', '_buttons', '_failures' );
     } );
 
     this.checkAccess();

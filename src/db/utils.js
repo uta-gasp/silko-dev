@@ -1,3 +1,7 @@
+import { i10n } from '@/utils/i10n.js';
+
+const tokens = i10n( 'db' );
+
 // TODO remove the first line, uncomment the other
 // const config = require( `@/config/db.development.js` ).config;
 const configName = process.env.IS_DEV ? 'development' : process.env.NODE_ENV;
@@ -72,7 +76,7 @@ export default class DBUtils {
     if ( window.fetch ) {
       window.fetch( request, init ).then( response => {
         if ( !response ) {
-          return cb( new Error( 'not response' ) );
+          return cb( new Error( tokens[ 'err_no_resp' ] ) );
         }
         return response.json();
       } ).then( response => {
@@ -82,7 +86,7 @@ export default class DBUtils {
       } );
     }
     else {
-      cb( new Error( 'not supported' ) );
+      cb( new Error( tokens[ 'err_not_supported' ] ) );
     }
   }
 
@@ -98,14 +102,14 @@ export default class DBUtils {
       response = typeof json === 'string' ? JSON.parse( json ) : json;
 
       if ( !response || response.err || !( 'result' in response ) ) {
-        err = response.err || 'no result';
+        err = response.err || tokens[ 'err_no_results' ];
       }
       else {
         response = response.result;
       }
     }
     catch ( e ) {
-      err = e && e.message ? e.message : 'unknown error';
+      err = e && e.message ? e.message : tokens[ 'err_unknown' ];
     }
 
     return { err, response };

@@ -1,5 +1,6 @@
 <script>
 import dataUtils from '@/utils/data-utils.js';
+import { i10n } from '@/utils/i10n.js';
 
 import { OptionsCreator, OptionGroup, OptionItem } from '@/vis/optionsCreator.js';
 import { Painter } from '@/vis/painter.js';
@@ -14,8 +15,7 @@ import VisPlot from '@/components/vis/VisPlot.vue';
 import Fixation from '@/model/data/fixation';
 import Record from '@/vis/data/record.js';
 
-const UI = {
-};
+const tokens = i10n( 'vis' );
 
 export default {
   name: 'audio-replay',
@@ -39,7 +39,7 @@ export default {
   computed: {
     /** @returns {string} */
     title() {
-      return `${this.record.student.name} reading "${this.record.task.name}" at ${dataUtils.sessionDate( this.record.session.date )}`;
+      return tokens[ 'hdr_reading' ]( this.record.student.name, this.record.task.name, dataUtils.sessionDate( this.record.session.date ) );
     },
   },
 

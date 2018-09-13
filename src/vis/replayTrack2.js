@@ -1,6 +1,5 @@
 // ts-check-only
 import DataPage from '@/model/data/dataPage';
-import FeedbackEvent from '@/model/data/feedbackEvent';
 import Fixation from '@/model/data/fixation';
 
 /**
