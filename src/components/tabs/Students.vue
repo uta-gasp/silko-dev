@@ -48,7 +48,7 @@
               th {{ tokens[ 'grade' ] }}
               th(v-if="!isAdmin") {{ tokens[ 'classes' ] }}
               th(v-if="isAdmin")
-                .is-pulled-right {{ tokens[ 'action' ] }}
+                .is-pulled-right {{ tokens[ 'actions' ] }}
           tbody
             tr(v-for="student in students" v-if="!student.deleted")
               td {{ student.name }}

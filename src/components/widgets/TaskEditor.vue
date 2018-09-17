@@ -38,7 +38,7 @@
         span.is-inline-block.stacked
           bulma-checkbox.is-inline-block(v-model="useTimeout" :label="tokens[ 'lbl_use_timeout' ]" :disabled="false")
           input.input.is-inline-block.timeout(type="number" step="1" v-model.number="timeout" :disabled="!useTimeout" min="1" max="1000")
-          span {{ tokens[ 'lbl_min' ] }}
+          span {{ tokens[ 'lbl_minute' ] }}
         span.is-inline-block.stacked
           bulma-checkbox.is-inline-block(v-model="recordAudio" :label="tokens[ 'lbl_record_audio' ]")
 
