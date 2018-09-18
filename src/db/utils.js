@@ -1,6 +1,10 @@
+import eventBus from '@/utils/event-bus.js';
 import { i10n } from '@/utils/i10n.js';
 
-const tokens = i10n( 'db' );
+let tokens = i10n( 'db' );
+eventBus.$on( 'lang', () => {
+  tokens = i10n( 'vis' );
+});
 
 // TODO remove the first line, uncomment the other
 // const config = require( `@/config/db.development.js` ).config;

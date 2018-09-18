@@ -21,8 +21,6 @@ import DataPage from '@/model/data/dataPage';
 /** @type {_SGWMSettings} */
 const _SGWM = {};
 
-const tokens = i10n( 'sgwm' );
-
 export default class sgwmController {
 
   /** @returns {_SGWMSettings} */
@@ -84,6 +82,8 @@ export default class sgwmController {
 
   /** @returns {OptionGroup} */
   static createOptions() {
+    const tokens = i10n( 'sgwm' );
+
     return new OptionGroup({
       id: '_sgwm',
       title: tokens[ 'hdr_data_map' ],
@@ -93,7 +93,7 @@ export default class sgwmController {
           options: OptionsCreator.createOptions( {
             'FixationProcessorSettings.location.enabled': new OptionItem({ type: Boolean, label: tokens[ 'lbl_loc' ] }),
             'FixationProcessorSettings.location.marginX': new OptionItem({ type: Number, step: 10, label: '\t' + tokens[ 'lbl_margin' ]( 'X' ) }),
-            'FixationProcessorSettings.location.marginY': new OptionItem({ type: Number, label: '\t' + tokens[ 'lbl_margin' ]( 'X' ) }),
+            'FixationProcessorSettings.location.marginY': new OptionItem({ type: Number, label: '\t' + tokens[ 'lbl_margin' ]( 'Y' ) }),
             'FixationProcessorSettings.duration.enabled': new OptionItem({ type: Boolean, label: tokens[ 'lbl_dur' ] }),
             'FixationProcessorSettings.duration.mergingDurationThreshold': new OptionItem({ type: Number, label: '\t' + tokens[ 'lbl_merge_th' ] }),
             'FixationProcessorSettings.duration.mergingDistanceThreshold': new OptionItem({ type: Number, label: '\t' + tokens[ 'lbl_merge_dist' ] }),

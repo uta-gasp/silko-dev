@@ -53,8 +53,6 @@ import Data from '@/vis/data/data.js';
 
 sgwmController.initializeSettings();
 
-const tokens = i10n( 'vis_word_replay' );
-
 const UI = {
   levelDuration: 500,
 };
@@ -84,22 +82,10 @@ export default {
       /** @type {WordTrack[]} */
       tracks: null,
 
-      // options representation for editor
-      options: {
-        wordReplay: new OptionGroup({
-          id: 'wordReplay',
-          title: tokens[ 'hdr_options' ],
-          options: OptionsCreator.createOptions( {
-            levelDuration: new OptionItem({ 
-              type: Number, 
-              step: 50, 
-              label: tokens[ 'lbl_level_dur' ] + ', ms' 
-            }),
-          }, UI ),
-          defaults: OptionsCreator.createDefaults( UI ),
-        }),
-        _sgwm: sgwmController.createOptions(),
-      },
+      // options representation for editor, defined in created()
+      options: null,
+
+      tokens: i10n( 'vis_word_replay' ),
     };
   },
 
@@ -124,7 +110,7 @@ export default {
     /** @returns {string} */
     title() {
       const r = this.data.records[0];
-      return tokens[ 'hdr_word_replay' ]( this.data.params.student, r.task.name );
+      return this.tokens[ 'hdr_word_replay' ]( this.data.params.student, r.task.name );
     },
   },
 
@@ -276,6 +262,24 @@ export default {
         // cell.classList.remove( 'hidden' );
       };
     },
+  },
+
+  created() {
+    this.options = {
+      wordReplay: new OptionGroup({
+        id: 'wordReplay',
+        title: this.tokens[ 'hdr_options' ],
+        options: OptionsCreator.createOptions( {
+          levelDuration: new OptionItem({ 
+            type: Number, 
+            step: 50, 
+            label: this.tokens[ 'lbl_level_dur' ] + ', ms' 
+          }),
+        }, UI ),
+        defaults: OptionsCreator.createDefaults( UI ),
+      }),
+      _sgwm: sgwmController.createOptions(),
+    };
   },
 
   mounted() {

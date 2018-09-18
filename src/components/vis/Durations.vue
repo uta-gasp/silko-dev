@@ -38,17 +38,6 @@ import Data from '@/vis/data/data.js';
 import DataPageFocusedWord from '@/model/data/dataPageFocusedWord.js';
 import { Feedback } from '@/model/session/feedback';
 
-const tokens = i10n( 'vis_durations' );
-
-const UNITS = {
-  SECONDS: tokens[ 'item_seconds' ],
-  PERCENTAGE: tokens[ 'item_percentage' ],
-};
-
-const UI = {
-  units: UNITS.SECONDS,
-};
-
 /**
  * @fires close
  */
@@ -71,20 +60,11 @@ export default {
       words: [],
 
       // options representation for editor
-      options: {
-        gazePlot: new OptionGroup({
-          id: 'durations',
-          title: tokens[ 'hdr_options' ],
-          options: OptionsCreator.createOptions( {
-            units: new OptionItem({ 
-              type: Array, 
-              items: Object.values( UNITS ), 
-              label: tokens[ 'lbl_units' ]
-            }),
-          }, UI ),
-          defaults: OptionsCreator.createDefaults( UI ),
-        }),
-      },
+      options: null,
+      UNITS: null,
+      UI: null,
+
+      tokens: i10n( 'vis_durations' ),
     };
   },
 
@@ -109,7 +89,7 @@ export default {
     /** @returns {string} */
     title() {
       const r = this.data.records[0];
-      return tokens[ 'hdr_dur' ]( this.data.params.student, r.task.name );
+      return this.tokens[ 'hdr_dur' ]( this.data.params.student, r.task.name );
     },
 
     feedback() {
@@ -194,10 +174,10 @@ export default {
       words.forEach( word => {
         let value = '';
         const duration = word.focusing.duration;
-        if ( UI.units === UNITS.SECONDS ) {
+        if ( this.UI.units === this.UNITS.SECONDS ) {
           value = ( Math.round( duration ) / 1000 ).toFixed( 2 );
         }
-        else if ( UI.units === UNITS.PERCENTAGE ) {
+        else if ( this.UI.units === this.UNITS.PERCENTAGE ) {
           value = ( 100 * duration / totalDuration ).toFixed( 1 ) + '%';
         }
 
@@ -206,6 +186,32 @@ export default {
 
       return result;
     },
+  },
+
+  created() {
+    this.UNITS = {
+      SECONDS: this.tokens[ 'item_seconds' ],
+      PERCENTAGE: this.tokens[ 'item_percentage' ],
+    };
+
+    this.UI = {
+      units: this.UNITS.SECONDS,
+    };
+
+    this.options = {
+      gazePlot: new OptionGroup({
+        id: 'durations',
+        title: this.tokens[ 'hdr_options' ],
+        options: OptionsCreator.createOptions( {
+          units: new OptionItem({ 
+            type: Array, 
+            items: Object.values( this.UNITS ), 
+            label: this.tokens[ 'lbl_units' ]
+          }),
+        }, this.UI ),
+        defaults: OptionsCreator.createDefaults( this.UI ),
+      }),
+    };
   },
 
   mounted() {

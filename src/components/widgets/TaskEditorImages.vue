@@ -69,12 +69,12 @@
               div
                 strong {{ selectedFile.name }}
               div
-                small {{ selectedFile.size }} {{ tokens[ 'msg_no_images' ] }}
+                small {{ selectedFile.size }} {{ tokens[ 'lbl_bytes' ] }}
               progress.progress.is-small.is-primary(v-show="isUploading" max="100" :value="uploadProgress")
           .media-right
             .field
               button.button.is-primary(@click="uploadImage" :disabled="isUploading || !hasValidParams") {{ tokens[ 'btn_upload' ] }}
-              button.button(@click="cancel" :disabled="isUploading") {{ tokens[ 'btn_cancel' ] }}
+              button.button(@click="cancel" :disabled="isUploading") {{ tokens[ 'cancel' ] }}
         article
           .field.is-horizontal(v-if="isEditing")
             .field-label.is-normal  

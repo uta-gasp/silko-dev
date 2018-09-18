@@ -19,10 +19,6 @@ import DataPageTextWord from '@/model/data/dataPageTextWord';
  * @property {Word} word
  */
 
-const tokens = i10n( 'vis_word_replay' );
-
-const DONE = tokens[ 'lbl_done' ];
-
 export class ReplayWord {
 
   /**
@@ -79,6 +75,8 @@ export class WordTrack {
     this._onCompleted = null;
 
     this.__next = this._next.bind( this );
+
+    this.tokens = i10n( 'vis_word_replay' );
   }
 
   /** @returns {string} */
@@ -93,7 +91,7 @@ export class WordTrack {
 
   /** @returns {string} */
   get doneMessage() {
-    return DONE;
+    return this.tokens[ 'lbl_done' ];
   }
 
   /** @returns {number} */

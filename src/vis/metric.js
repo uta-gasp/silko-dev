@@ -1,6 +1,43 @@
+import eventBus from '@/utils/event-bus.js';
 import { i10n } from '@/utils/i10n.js';
 
-const tokens = i10n( 'vis' );
+let tokens = i10n( 'vis' );
+
+const DURATION_TRANSPARENT = 100;
+
+let Type = {
+  NONE: tokens[ 'item_none' ],
+  DURATION: tokens[ 'item_dur' ],
+  CHAR_SPEED: tokens[ 'item_char' ],
+  FOCUS_COUNT: tokens[ 'item_focus' ],
+  // SYLL_SPEED: 'syllable speed',
+};
+
+const alphaComputers = new Map();
+alphaComputers.set( Type.NONE, () => 0 );
+alphaComputers.set( Type.DURATION, mapDurationToAlpha );
+alphaComputers.set( Type.CHAR_SPEED, mapCharSpeedTAlpha );
+alphaComputers.set( Type.FOCUS_COUNT, mapFocusCountToAlpha );
+// alphaComputers.set( Type.SYLL_SPEED, mapSyllableSpeedToAlpha );
+
+
+eventBus.$on( 'login', () => {
+  tokens = i10n( 'vis' );
+
+  Type = {
+    NONE: tokens[ 'item_none' ],
+    DURATION: tokens[ 'item_dur' ],
+    CHAR_SPEED: tokens[ 'item_char' ],
+    FOCUS_COUNT: tokens[ 'item_focus' ],
+    // SYLL_SPEED: 'syllable speed',
+  };
+
+  alphaComputers.set( Type.NONE, () => 0 );
+  alphaComputers.set( Type.DURATION, mapDurationToAlpha );
+  alphaComputers.set( Type.CHAR_SPEED, mapCharSpeedTAlpha );
+  alphaComputers.set( Type.FOCUS_COUNT, mapFocusCountToAlpha );
+  // alphaComputers.set( Type.SYLL_SPEED, mapSyllableSpeedToAlpha );
+} );
 
 /**
  * Word
@@ -53,23 +90,6 @@ function mapFocusCountToAlpha( word, mapFocusCount ) {
 //   }
 //   return result;
 // }
-
-const DURATION_TRANSPARENT = 100;
-
-const Type = {
-  NONE: tokens[ 'item_none' ],
-  DURATION: tokens[ 'item_dur' ],
-  CHAR_SPEED: tokens[ 'item_char' ],
-  FOCUS_COUNT: tokens[ 'item_focus' ],
-  // SYLL_SPEED: 'syllable speed',
-};
-
-const alphaComputers = new Map();
-alphaComputers.set( Type.NONE, () => 0 );
-alphaComputers.set( Type.DURATION, mapDurationToAlpha );
-alphaComputers.set( Type.CHAR_SPEED, mapCharSpeedTAlpha );
-alphaComputers.set( Type.FOCUS_COUNT, mapFocusCountToAlpha );
-// alphaComputers.set( Type.SYLL_SPEED, mapSyllableSpeedToAlpha );
 
 export default class Metric {
 

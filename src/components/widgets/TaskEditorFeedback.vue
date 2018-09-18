@@ -5,7 +5,7 @@
         feedback-editor(:header="tokens[ 'lbl_speech' ]" v-model="speech" :languages="speechLangs")
           .field
             .field.is-horizontal
-              bulma-checkbox(v-model="speechAdjustForWordLength" label="word-length dependent" :disabled="!speech.language")
+              bulma-checkbox(v-model="speechAdjustForWordLength" :label="tokens[ 'lbl_word' ]" :disabled="!speech.language")
         feedback-editor(:header="tokens[ 'lbl_syllab' ]" v-model="syllab" :languages="syllabLangs")
           .field
             .field.is-horizontal

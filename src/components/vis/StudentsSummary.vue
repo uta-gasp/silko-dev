@@ -298,10 +298,12 @@ export default {
       fixationAvg = fixations.count ? fixations.duration / fixations.count : 0;
       fixationSD = fixations.count > 1 ? student.sessions.reduce( (acc, session) => {
         session.data.pages.forEach( page => {
-          page.fixations.forEach( fix => {
-            const d = fix.duration - fixationAvg;
-            acc += d * d;
-          });
+          if (page.fixations) {
+            page.fixations.forEach( fix => {
+              const d = fix.duration - fixationAvg;
+              acc += d * d;
+            });
+          }
         });
         return acc;
       }, 0 ) : 0;

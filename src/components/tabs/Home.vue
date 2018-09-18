@@ -148,7 +148,7 @@ export default {
       isGettingEmail: false,
       email: '',
 
-      tokens: i10n( 'home', '_form', '_buttons' ),
+      tokens: i10n( 'home', '_form', '_buttons', '_labels' ),
     };
   },
 
@@ -163,10 +163,10 @@ export default {
     isStudent() { return this.user && this.user.isStudent; },
     /** @returns {string} */
     userTitle() {
-      if ( this.isAdmin ) { return this.tokens[ 'acc_admin' ]; }
-      else if ( this.isSchool ) { return this.tokens[ 'acc_school' ]; }
-      else if ( this.isTeacher ) { return this.tokens[ 'acc_teacher' ]; }
-      else if ( this.isStudent ) { return this.tokens[ 'acc_student' ]; }
+      if ( this.isAdmin ) { return this.tokens[ 'admin' ]; }
+      else if ( this.isSchool ) { return this.tokens[ 'school' ]; }
+      else if ( this.isTeacher ) { return this.tokens[ 'teacher' ]; }
+      else if ( this.isStudent ) { return this.tokens[ 'student' ]; }
       else { return ''; }
     },
 
@@ -265,7 +265,7 @@ export default {
       }
     } );
     eventBus.$on( 'login', () => {
-      this.tokens = i10n( 'home', '_form', '_buttons' );
+      this.tokens = i10n( 'home', '_form', '_buttons', '_labels' );
       this.user = login.user;
       this.isConnecting = false;
     } );
@@ -273,7 +273,7 @@ export default {
       this.user = null;
     } );
     eventBus.$on( 'lang', () => {
-      this.tokens = i10n( 'home', '_form', '_buttons' );
+      this.tokens = i10n( 'home', '_form', '_buttons', '_labels' );
     } );
 
     this.user = login.user;

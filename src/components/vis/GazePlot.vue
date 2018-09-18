@@ -14,8 +14,6 @@ import { TextPageImage } from '@/model/task/textPageImage.js';
 // ts-check-only
 import DataPageTextWord from '@/model/data/dataPageTextWord.js';
 
-const tokens = i10n( 'vis', 'vis_gaze_plot' );
-
 /** 
  * @typedef {DataPageTextWord} FixatedWord
  * @property {number} count
@@ -55,13 +53,15 @@ export default {
       painter: null,
       /** @type {HTMLAudioElement} */
       audio: null,
+
+      tokens: i10n( 'vis', 'vis_gaze_plot' ),
     };
   },
 
   computed: {
     /** @returns {string} */
     title() {
-      return tokens[ 'hdr_reading' ]( this.record.student.name, this.record.task.name, dataUtils.sessionDate( this.record.session.date ) );
+      return this.tokens[ 'hdr_reading' ]( this.record.student.name, this.record.task.name, dataUtils.sessionDate( this.record.session.date ) );
     },
   },
 
@@ -181,19 +181,19 @@ export default {
     // options representation for editor
     this.options["gazePlot"] = new OptionGroup({
       id: 'gazePlot',
-      title: tokens[ 'hdr_options' ],
+      title: this.tokens[ 'hdr_options' ],
       options: OptionsCreator.createOptions( {
-        colorMetric: new OptionItem({ type: Array, items: Metric.Types, label: tokens[ 'lbl_word_color' ] }),
+        colorMetric: new OptionItem({ type: Array, items: Metric.Types, label: this.tokens[ 'lbl_word_color' ] }),
 
-        saccadeColor: new OptionItem({ type: '#', label: tokens[ 'lbl_sacc_color' ] }),
-        regressionColor: new OptionItem({ type: '#', label: tokens[ 'lbl_reg_sacc_color' ] }),
+        saccadeColor: new OptionItem({ type: '#', label: this.tokens[ 'lbl_sacc_color' ] }),
+        regressionColor: new OptionItem({ type: '#', label: this.tokens[ 'lbl_reg_sacc_color' ] }),
 
-        showConnections: new OptionItem({ type: Boolean, label: tokens[ 'lbl_show_conn' ] }),
-        showSaccades: new OptionItem({ type: Boolean, label: tokens[ 'lbl_show_sacc' ] }),
-        showFixations: new OptionItem({ type: Boolean, label: tokens[ 'lbl_show_fix' ] }),
+        showConnections: new OptionItem({ type: Boolean, label: this.tokens[ 'lbl_show_conn' ] }),
+        showSaccades: new OptionItem({ type: Boolean, label: this.tokens[ 'lbl_show_sacc' ] }),
+        showFixations: new OptionItem({ type: Boolean, label: this.tokens[ 'lbl_show_fix' ] }),
 
-        'syllab.background': new OptionItem({ type: '#', label: tokens[ 'lbl_syllab_back' ] }),
-        'syllab.wordColor': new OptionItem({ type: '#', label: tokens[ 'lbl_syllab_word' ] }),
+        'syllab.background': new OptionItem({ type: '#', label: this.tokens[ 'lbl_syllab_back' ] }),
+        'syllab.wordColor': new OptionItem({ type: '#', label: this.tokens[ 'lbl_syllab_word' ] }),
       }, UI ),
       defaults: OptionsCreator.createDefaults( UI ),
     });

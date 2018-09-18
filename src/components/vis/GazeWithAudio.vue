@@ -15,8 +15,6 @@ import VisPlot from '@/components/vis/VisPlot.vue';
 import Fixation from '@/model/data/fixation';
 import Record from '@/vis/data/record.js';
 
-const tokens = i10n( 'vis' );
-
 export default {
   name: 'audio-replay',
 
@@ -33,13 +31,15 @@ export default {
       /** @type {HTMLAudioElement} */
       audio: null,
       offset: 0,  // ms
+
+      tokens: i10n( 'vis' ),
     };
   },
 
   computed: {
     /** @returns {string} */
     title() {
-      return tokens[ 'hdr_reading' ]( this.record.student.name, this.record.task.name, dataUtils.sessionDate( this.record.session.date ) );
+      return this.tokens[ 'hdr_reading' ]( this.record.student.name, this.record.task.name, dataUtils.sessionDate( this.record.session.date ) );
     },
   },
 

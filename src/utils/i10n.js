@@ -39,7 +39,7 @@ const repos = {
     },
     hdr_info_title: {
       'en': /** @param {string} p1 */ p1 => `As a ${p1}, you can`,
-      'fi': /** @param {string} p1 */ p1 => `${p1} saa`,
+      'fi': /** @param {string} p1 */ p1 => `${p1} voi`,
     },
     hdr_password_reset: {
       'en': 'Send password reset notification to this email:',
@@ -57,23 +57,6 @@ const repos = {
     btn_send: {
       'en': 'Send',
       'fi': 'Lähetä',
-    },
-
-    acc_admin: {
-      'en': 'an admin',
-      'fi': 'ylläpitäjä',
-    },
-    acc_school: {
-      'en': 'a school',
-      'fi': 'koulu',
-    },
-    acc_teacher: {
-      'en': 'a teacher',
-      'fi': 'opettaja',
-    },
-    acc_student: {
-      'en': 'a student',
-      'fi': 'oppilas',
     },
 
     info_adm_1: {
@@ -114,7 +97,7 @@ const repos = {
     },
     info_tch_6: {
       'en': 'Create visalizations from data of tasks completed by students',
-      'fi': 'Luoda visualisointeja suoritetuista tehtävistö',
+      'fi': 'Luoda visualisointeja suoritetuista tehtävistä',
     },
     info_std_1: {
       'en': 'List tasks assigned to complete',
@@ -1458,7 +1441,7 @@ const repos = {
   _utils: {
     num_student: {
       'en': /** @param {[]} p1 */ p1 => (p1 && p1.length) ? p1.length + ' student' + (p1.length !== 1 ? 's' : '') : 'No students',
-      'fi': /** @param {[]} p1 */ p1 => (p1 && p1.length) ? p1.length + ' oppilas' + (p1.length !== 1 ? 'a' : '') : 'Ei oppilaita',
+      'fi': /** @param {[]} p1 */ p1 => (p1 && p1.length) ? p1.length + ' oppilas' + (p1.length !== 1 ? 'ta' : '') : 'Ei oppilaita',
     },
     num_task: {
       'en': /** @param {[]} p1 */ p1 => (p1 && p1.length) ? p1.length + ' task' + (p1.length !== 1 ? 's' : '') : 'No tasks',
@@ -1530,6 +1513,10 @@ const repos = {
   },
 
   _labels: {
+    admin: {
+      'en': 'admin',
+      'fi': 'ylläpitäjä',
+    },
     school: {
       'en': 'School',
       'fi': 'Koulu',
@@ -1592,7 +1579,11 @@ const repos = {
     },
     image: {
       'en': 'Image',
-      'fi': 'Image',
+      'fi': 'Kuva',
+    },
+    images: {
+      'en': 'Images',
+      'fi': 'Kuvat',
     },
     assignments: {
       'en': 'Assignments',
@@ -1605,6 +1596,14 @@ const repos = {
     date: {
       'en': 'Date',
       'fi': 'Aika',
+    },
+    feedback: {
+      'en': 'Feedback',
+      'fi': 'Palaute',
+    },
+    questionnaire: {
+      'en': 'Questionnaire',
+      'fi': 'Kysely',
     },
   },
 

@@ -634,7 +634,7 @@ var SGWM =
 	    merge( progressions, textLines ) {
 	        const lineCount = textLines.length;
 	
-	        let result = progressions.map( set => set );
+	        let result = progressions.filter( set => set.every( fix => !!fix) ).map( set => set );
 	        log( '#0:', result.length, '\n', result.map( set => (set.map( fix => fix.id ))) );
 	
 	        // 1. join only long sets

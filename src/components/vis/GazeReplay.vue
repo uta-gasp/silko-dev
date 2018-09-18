@@ -14,8 +14,6 @@ import VisPlot from '@/components/vis/VisPlot.vue';
 // ts-check-only
 import Fixation from '@/model/data/fixation';
 
-const tokens = i10n( 'vis', 'vis_gaze_replay' );
-
 const LEGEND_LOCATION = {
   x: 2,
   y: 56,
@@ -45,6 +43,8 @@ export default {
       painter: null,
       /** @type {ReplayTrack[]} */
       tracks: [],
+
+      tokens: i10n( 'vis', 'vis_gaze_replay' ),
     };
   },
 
@@ -52,7 +52,7 @@ export default {
     /** @returns {string} */
     title() {
       const r = this.data.records[0];
-      return tokens[ 'hdr_gaze_replay' ]( this.data.params.student, r.task.name );
+      return this.tokens[ 'hdr_gaze_replay' ]( this.data.params.student, r.task.name );
     },
   },
 
@@ -204,16 +204,16 @@ export default {
     // options representation for editor
     this.options[ 'gazeReplay' ] = new OptionGroup({
       id: 'gazeReplay',
-      title: tokens[ 'hdr_options' ],
+      title: this.tokens[ 'hdr_options' ],
       options: OptionsCreator.createOptions( {
-        colorMetric: new OptionItem({ type: Array, items: Metric.Types, label: tokens[ 'lbl_word_color' ] }),
+        colorMetric: new OptionItem({ type: Array, items: Metric.Types, label: this.tokens[ 'lbl_word_color' ] }),
 
-        nameFontFamily: new OptionItem({ type: String, label: tokens[ 'lbl_font' ] }),
-        nameFontSize: new OptionItem({ type: Number, step: 1, label: tokens[ 'lbl_font_size' ] }),
-        nameSpacing: new OptionItem({ type: Number, step: 0.1, label: tokens[ 'lbl_spacing' ] }),
+        nameFontFamily: new OptionItem({ type: String, label: this.tokens[ 'lbl_font' ] }),
+        nameFontSize: new OptionItem({ type: Number, step: 1, label: this.tokens[ 'lbl_font_size' ] }),
+        nameSpacing: new OptionItem({ type: Number, step: 0.1, label: this.tokens[ 'lbl_spacing' ] }),
 
-        'syllab.background': new OptionItem({ type: '#', label: tokens[ 'lbl_syllab_back' ] }),
-        'syllab.wordColor': new OptionItem({ type: '#', label: tokens[ 'lbl_syllab_word' ] }),
+        'syllab.background': new OptionItem({ type: '#', label: this.tokens[ 'lbl_syllab_back' ] }),
+        'syllab.wordColor': new OptionItem({ type: '#', label: this.tokens[ 'lbl_syllab_word' ] }),
       }, UI ),
       defaults: OptionsCreator.createDefaults( UI ),
     });

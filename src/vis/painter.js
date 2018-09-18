@@ -103,8 +103,6 @@ import Font from '@/model/session/font.js';
  * @property {*} index
  */
 
-const WORD_HIGHLIGHT_COLOR = '#A06';
-
 const LINE_COLOR_A = 0.5;
 const LINE_COLORS = [
   `rgba(255,0,0,${LINE_COLOR_A}`,
@@ -388,7 +386,7 @@ export class Painter {
     ctx.fillText( word.text, x, y );
 
     if ( settings.alpha > 0 ) {
-      ctx.fillStyle = Colors.rgb2rgba( WORD_HIGHLIGHT_COLOR, settings.alpha );
+      ctx.fillStyle = Colors.rgb2rgba( settings.wordHighlightColor, settings.alpha );
       ctx.fillText( word.text, x, y );
     }
 

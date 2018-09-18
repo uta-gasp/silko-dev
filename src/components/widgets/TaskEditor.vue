@@ -3,7 +3,7 @@
     .tabs.is-centered
       ul
         li(:class="{ 'is-active': isCurrentTab( tab ) }" v-for="(tab, id) in tabs" :key="id")
-          a(@click="selectTab( tab )") {{ tab.name }}
+          a(@click="selectTab( tab )") {{ tokens[ tab.name.toLowerCase() ] }}
 
     .field.expand
       task-editor-text(v-show="currentTab === tabs.text"
@@ -141,7 +141,7 @@ export default {
       /** @type {Tab} */
       currentTab: null,
 
-      tokens: i10n( 'task_editor' ),
+      tokens: i10n( 'task_editor', '_labels' ),
     };
   },
 

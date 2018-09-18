@@ -1,12 +1,16 @@
 <script>
   import { i10n } from '@/utils/i10n.js';
 
-  const tokens = i10n( '_labels' );
-
   export default {
     name: 'progress-chart', 
 
     extends: VueChartJs.Line,
+
+    data() {
+      return {
+        tokens: i10n( '_labels' ),
+      }
+    },
 
     props: ['data'],
 
@@ -39,7 +43,7 @@
             },
             scaleLabel: {
               display: true,
-              labelString: tokens[ 'date' ],
+              labelString: this.tokens[ 'date' ],
               fontSize: 18,
             },
           }]
