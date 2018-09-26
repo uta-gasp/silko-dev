@@ -135,8 +135,7 @@ export default {
         } );
       } );
 
-      const descending = /** @param {*} a; @param {*} b */ ( a, b ) => b[1].focusing.duration - a[1].focusing.duration;
-      this.words = this.compute( new Map( [...words.entries()].sort( descending ) ), totalDuration );
+      this.words = this.compute( new Map( [...words.entries()] ), totalDuration );
     },
 
     /**
@@ -165,26 +164,33 @@ export default {
     /**
      * @param {Map<string, DataPageFocusedWord>} words
      * @param {number} totalDuration
-     * @returns {{text: string, value: string}[]}
+     * @returns {{text: string, value: string, num: number}[]}
      */
     compute( words, totalDuration ) {
-      /** @type {{text: string, value: string}[]} */
+      /** @type {{text: string, value: string, num: number}[]} */
       const result = [];
 
       words.forEach( word => {
-        let value = '';
+        let value;
         const duration = word.focusing.duration;
+
         if ( this.UI.units === this.UNITS.SECONDS ) {
-          value = ( Math.round( duration ) / 1000 ).toFixed( 2 );
+          value = ( Math.round( duration ) / 1000 );
+          result.push( { text: word.text, value: value.toFixed( 2 ), num: value } );
         }
         else if ( this.UI.units === this.UNITS.PERCENTAGE ) {
-          value = ( 100 * duration / totalDuration ).toFixed( 1 ) + '%';
+          value = ( 100 * duration / totalDuration );
+          result.push( { text: word.text, value: value.toFixed( 1 ) + '%', num: value } );
         }
-
-        result.push( { text: word.text, value } );
+        else if ( this.UI.units === this.UNITS.MS_PER_CHAR ) {
+          value = ( duration /  word.text.length );
+          result.push( { text: word.text, value: value.toFixed( 0 ), num: value } );
+        }
       } );
 
-      return result;
+      const descending = /** @param {*} a; @param {*} b */ ( a, b ) => b.num - a.num;
+
+      return result.sort( descending );
     },
   },
 
@@ -192,6 +198,7 @@ export default {
     this.UNITS = {
       SECONDS: this.tokens[ 'item_seconds' ],
       PERCENTAGE: this.tokens[ 'item_percentage' ],
+      MS_PER_CHAR: this.tokens[ 'item_ms_char' ],
     };
 
     this.UI = {

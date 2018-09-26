@@ -2,7 +2,7 @@
   #item-select-box
     header.tabs.is-centered.is-boxed(v-if="items.length > 0")
       ul.ul
-        li(:class="{ 'is-active': isItemSelected( item ) }" v-for="item in items" :key="item.id")
+        li(v-if="items.length > 1" v-for="item in items" :key="item.id" :class="{ 'is-active': isItemSelected( item ) }")
           a(@click="selectItem( item )") {{ item.text }}
     main.subitems
       .has-text-centered(v-if="!isItemSelected()")

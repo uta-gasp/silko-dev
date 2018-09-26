@@ -457,7 +457,7 @@ export default {
     .inner {
       font-size: 18px;
       font-family: Arial, sans-serif;
-      max-width: 20em;
+      max-width: 21em;
       max-height: 100%;
       margin: 0 0 0 auto;
       border: solid 1px #aaa;
