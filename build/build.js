@@ -1,8 +1,8 @@
 require('./check-versions')()
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'production';
-process.env.IS_DEV = process.argv[2] === 'dev';
-console.log( `building for ${process.env.NODE_ENV}${process.env.IS_DEV ? ' [dev]' : ''}...` );
+process.env.IS_DEV_DB = process.argv[2] === 'dev';
+console.log( `building for ${process.env.NODE_ENV}${process.env.IS_DEV_DB ? ' [dev]' : ''}...` );
 
 var ora = require('ora')
 var rm = require('rimraf')

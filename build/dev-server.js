@@ -1,5 +1,12 @@
 require('./check-versions')()
 
+console.log( `
+extra params:
+  proddb - use production database instead of the development one
+
+  example: "node run dev -- proddb";
+`);
+
 var config = require('../config')
 if (!process.env.NODE_ENV) {
   process.env.NODE_ENV = JSON.parse(config.dev.env.NODE_ENV)
