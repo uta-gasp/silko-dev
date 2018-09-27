@@ -245,7 +245,7 @@ export class TextPageImage {
       return name;
     }
     else {
-      const path = process.env.IS_DEV ? 
+      const path = process.env.IS_DEV_DB ? 
         'https://firebasestorage.googleapis.com/v0/b/eye-school-test.appspot.com/o/image%2F' :
         'https://firebasestorage.googleapis.com/v0/b/uta-gasp-silko.appspot.com/o/image%2F';
       return path + name;

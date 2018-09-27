@@ -5,7 +5,7 @@
   "author": "oleg.spakov <oleg.spakov@uta.fi>",
   "private": false,
   "scripts": {
-    "dev": "node build/dev-server.js",
+    "dev": "node build/dev-server.js proddb",
     "build": "node build/build.js",
     "lint": "clear & clear & eslint --fix --ext .js,.vue src",
     "test": "./node_modules/.bin/jest"
