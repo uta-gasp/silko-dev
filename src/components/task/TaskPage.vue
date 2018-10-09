@@ -118,11 +118,9 @@ export default {
 
     /** @returns {TextPageImage[]} */
     images() {
-      if ( !this.textPresenter ) {
-        return [];
-      }
-
-      if ( this.textPresenter.isInstructionPage ) {
+      if ( !this.textPresenter || 
+          this.textPresenter.isInstructionPage || 
+          this.textPresenter.page < 0) {
         return [];
       }
 
@@ -192,14 +190,20 @@ export default {
 
     /** @param {Event} e */
     next( e ) {
-      if (e && this.task.recordAudio)  { // when showing the first page
+      if (e && this.task.recordAudio)  { // when showing a page other than first
         this.isWaitingToFinilizePage = true;
+
+        const container = /** @type {Vue} */ (this.$refs.container);
+        const textEl = /** @type {HTMLElement}*/ (container.$refs.text);
+        textEl.innerHTML = '';
+
         this.audioRecorder.stop().then( /** @param {Blob} blob */ blob => {
           this.saveAudio( blob, url => {
             this.audioFiles.push( url );
+
+            this.startPage();
+            this.isWaitingToFinilizePage = false;
           } );
-          this.startPage();
-          this.isWaitingToFinilizePage = false;
         });
       }
       else {
@@ -298,7 +302,8 @@ export default {
       AudioRecorder().then( recorder => {
         this.audioRecorder = recorder;
         this.init();
-        this.next( null );
+
+        setTimeout( () => this.next( null ), 2000 );
       });
     }
     else {
